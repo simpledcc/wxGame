@@ -593,16 +593,19 @@ function serializeSpellQuestion(question) {
   return question ? JSON.stringify(question) : "";
 }
 
-function resetSpellSubmissions(now) {
-  return { _resetAt: now || Date.now() };
+function resetSpellSubmissions(now, questionId) {
+  return { _resetAt: now || Date.now(), _questionId: questionId || "" };
 }
 
-function getActiveSpellSubmissions(submissions) {
+function getActiveSpellSubmissions(submissions, questionId) {
   const source = submissions && typeof submissions === "object" ? submissions : {};
   const result = {};
   Object.keys(source).forEach((openid) => {
     if (openid.charAt(0) === "_") return;
-    result[openid] = source[openid];
+    const item = source[openid];
+    if (!item || typeof item !== "object") return;
+    if (questionId && item.questionId !== questionId) return;
+    result[openid] = item;
   });
   return result;
 }
@@ -844,13 +847,14 @@ async function submitCoopSpellInRoom(roomRef, room, players, playerIndex, gameOp
 
   const normalizedAnswer = String(answer || "").trim().toLowerCase();
   const expected = String(segment.answer || "").trim().toLowerCase();
-  const submissions = getActiveSpellSubmissions(room.spellSubmissions);
+  const submissions = getActiveSpellSubmissions(room.spellSubmissions, question.id);
   const existing = submissions[player.openid];
   if (existing && existing.status === "submitted") {
     return { delta: 0, correct: true, submitted: true, finished: false, waitingPartner: true, alreadySubmitted: true };
   }
   submissions[player.openid] = {
     status: "submitted",
+    questionId: question.id,
     length: expected.length,
     answer: normalizedAnswer,
     submittedAt: now
@@ -865,7 +869,7 @@ async function submitCoopSpellInRoom(roomRef, room, players, playerIndex, gameOp
   if (!allSubmitted) {
     await roomRef.update({
       data: {
-        spellSubmissions: submissions,
+        spellSubmissions: { _questionId: question.id, ...submissions },
         updatedAt: db.serverDate()
       }
     });
@@ -887,7 +891,7 @@ async function submitCoopSpellInRoom(roomRef, room, players, playerIndex, gameOp
     players,
     teamScore,
     usedWords: Array.from(usedWords),
-    spellSubmissions: resetSpellSubmissions(now),
+    spellSubmissions: resetSpellSubmissions(now, nextQuestion && nextQuestion.id),
     spellQuestion: serializeSpellQuestion(nextQuestion),
     currentMeaning: nextQuestion ? nextQuestion.meaning : room.currentMeaning,
     targetFishId: nextQuestion ? nextQuestion.id : room.targetFishId,
@@ -933,7 +937,7 @@ async function skipCoopSpellInRoom(roomRef, room, players, playerIndex, gameOpti
   if (manual) {
     delta = -COOP_SPELL_ROUND_SCORE;
   }
-  const submissions = getActiveSpellSubmissions(room.spellSubmissions);
+  const submissions = getActiveSpellSubmissions(room.spellSubmissions, question.id);
   const teamScore = getTeamScore(room, players) + delta;
   applyTeamScore(players, teamScore);
   const nextQuestion = makeNextSpellQuestion(players, usedWords, gameOptions);
@@ -943,7 +947,7 @@ async function skipCoopSpellInRoom(roomRef, room, players, playerIndex, gameOpti
     players,
     teamScore,
     usedWords: Array.from(usedWords),
-    spellSubmissions: resetSpellSubmissions(now),
+    spellSubmissions: resetSpellSubmissions(now, nextQuestion && nextQuestion.id),
     spellQuestion: serializeSpellQuestion(nextQuestion),
     currentMeaning: nextQuestion ? nextQuestion.meaning : room.currentMeaning,
     targetFishId: nextQuestion ? nextQuestion.id : room.targetFishId,

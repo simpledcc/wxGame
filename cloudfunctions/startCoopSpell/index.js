@@ -206,7 +206,7 @@ exports.main = async (event) => {
     currentMeaning: spellQuestion.meaning,
     targetFishId: spellQuestion.id,
     spellQuestion: serializedQuestion,
-    spellSubmissions: { _resetAt: now },
+    spellSubmissions: { _resetAt: now, _questionId: spellQuestion.id },
     winnerOpenid: "",
     duration,
     usedWords: [spellQuestion.word],

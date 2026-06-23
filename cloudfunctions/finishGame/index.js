@@ -37,12 +37,15 @@ function parseSpellQuestion(value) {
   return typeof value === "object" ? value : null;
 }
 
-function getActiveSpellSubmissions(submissions) {
+function getActiveSpellSubmissions(submissions, questionId) {
   const source = submissions && typeof submissions === "object" ? submissions : {};
   const result = {};
   Object.keys(source).forEach((openid) => {
     if (openid.charAt(0) === "_") return;
-    result[openid] = source[openid];
+    const item = source[openid];
+    if (!item || typeof item !== "object") return;
+    if (questionId && item.questionId !== questionId) return;
+    result[openid] = item;
   });
   return result;
 }
@@ -74,7 +77,7 @@ function makeIncompleteSpellRecord(room, players, now) {
   if (!question || !question.id) return null;
   const history = getSpellHistory(room);
   if (history.some((item) => item && item.questionId === question.id)) return null;
-  const submissions = getActiveSpellSubmissions(room.spellSubmissions);
+  const submissions = getActiveSpellSubmissions(room.spellSubmissions, question.id);
   const segments = Array.isArray(question.segments) ? question.segments : [];
   const teamScore = Number(room.teamScore || 0);
   return {

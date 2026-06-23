@@ -4349,7 +4349,11 @@ function getCoopSpellSegment(player) {
 
 function getCoopSpellSubmission(openid) {
   const submissions = state.coopSpellSubmissions || {};
-  return submissions[openid] || null;
+  const submission = submissions[openid] || null;
+  if (!submission) return null;
+  const questionId = (state.coopSpellQuestion && state.coopSpellQuestion.id) || "";
+  if (questionId && submission.questionId !== questionId) return null;
+  return submission;
 }
 
 function isCoopSpellSubmissionReady(submission) {
@@ -4373,7 +4377,9 @@ function getCoopSpellSlotValue(slotIndex, localSegment) {
   if (localSegment && owner.openid === localSegment.openid) {
     const localSubmission = getCoopSpellSubmission(owner.openid);
     const submittedAnswer = localSubmission && localSubmission.answer;
-    return String(state.coopSpellInput[answerIndex] || (submittedAnswer && submittedAnswer.charAt(answerIndex)) || "").toUpperCase();
+    const questionId = (state.coopSpellQuestion && state.coopSpellQuestion.id) || "";
+    const localInput = state.coopSpellInputQuestionId === questionId ? state.coopSpellInput[answerIndex] : "";
+    return String(localInput || (submittedAnswer && submittedAnswer.charAt(answerIndex)) || "").toUpperCase();
   }
   return "";
 }
@@ -6020,15 +6026,32 @@ async function submitCoopSpellAnswer() {
       finished: !!result.finished,
       delta: result.delta || 0
     });
+    if (result.submitted && !result.roundComplete) {
+      state.coopSpellSubmissions = {
+        ...(state.coopSpellSubmissions || {}),
+        [me.openid]: {
+          status: "submitted",
+          questionId,
+          answer,
+          length: expectedLength,
+          submittedAt: Date.now()
+        }
+      };
+    }
     if (result.waitingPartner) {
       addFeedback("已填写，等队友", screen.width / 2, screen.height * 0.42, COLORS.green);
     } else if (result.roundComplete && result.correct) {
+      state.coopSpellInput = [];
+      state.coopSpellInputQuestionId = "";
+      state.coopSpellSubmissions = {};
       addFeedback("+100", screen.width / 2, screen.height * 0.42, COLORS.green);
     } else if (result.roundComplete) {
       const word = state.coopSpellQuestion && state.coopSpellQuestion.word;
       const meaning = state.coopSpellQuestion && state.coopSpellQuestion.meaning;
       if (word && meaning) saveWrongWord({ word, meaning });
       state.coopSpellInput = [];
+      state.coopSpellInputQuestionId = "";
+      state.coopSpellSubmissions = {};
       addFeedback("-100", screen.width / 2, screen.height * 0.42, COLORS.red);
     } else {
       addFeedback("已填写", screen.width / 2, screen.height * 0.42, COLORS.green);
