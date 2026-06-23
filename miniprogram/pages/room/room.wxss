@@ -1,0 +1,121 @@
+.room-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0 8rpx;
+}
+
+.muted {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.room-code {
+  margin-top: 8rpx;
+  font-size: 52rpx;
+  font-weight: 800;
+  letter-spacing: 8rpx;
+  color: #155e75;
+}
+
+.copy-button {
+  width: 128rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  color: #0e7490;
+  background: #ecfeff;
+  border: 2rpx solid #67e8f9;
+  font-size: 26rpx;
+}
+
+.player-panel {
+  padding: 28rpx;
+}
+
+.panel-title {
+  margin-bottom: 20rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.players {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  min-height: 96rpx;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #0e7490;
+  font-weight: 800;
+}
+
+.player-main {
+  flex: 1;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.state {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.state.ready {
+  color: #047857;
+}
+
+.empty-seat {
+  padding: 28rpx 0;
+  color: #64748b;
+  text-align: center;
+  border: 2rpx dashed #cbd5e1;
+  border-radius: 8rpx;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.main-button {
+  height: 92rpx;
+  line-height: 92rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.main-button[disabled] {
+  color: #94a3b8;
+  background: #e2e8f0;
+}
+
+.hint {
+  color: #64748b;
+  font-size: 26rpx;
+  line-height: 1.5;
+}

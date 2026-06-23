@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/room/room",
+    "pages/game/game"
+  ],
+  "window": {
+    "navigationBarTitleText": "单词捕鱼",
+    "navigationBarBackgroundColor": "#0E7490",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#E6FFFA"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

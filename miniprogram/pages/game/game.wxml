@@ -1,0 +1,41 @@
+<view class="game-page">
+  <view class="topbar">
+    <view class="score" wx:for="{{players}}" wx:key="openid">
+      <view class="score-name">{{item.nickName}}</view>
+      <view class="score-value {{item.isMine ? 'mine' : ''}}">{{item.score}}</view>
+    </view>
+    <view class="timer">{{timeLeft}}s</view>
+  </view>
+
+  <view class="sea" catchtouchmove="noop">
+    <view
+      class="fish"
+      wx:for="{{renderFishes}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      catchtap="onFishTap"
+      style="left: {{item.left}}%; top: {{item.top}}%;"
+    >
+      <view class="fish-body">
+        <text class="word">{{item.word}}</text>
+      </view>
+      <view class="tail"></view>
+    </view>
+  </view>
+
+  <view class="prompt">
+    <view class="prompt-label">捕捉这个意思的单词</view>
+    <view class="meaning">{{currentMeaning}}</view>
+  </view>
+
+  <view class="result-mask" wx:if="{{stateFinished}}">
+    <view class="panel result-panel">
+      <view class="result-title">{{resultTitle}}</view>
+      <view class="result-row" wx:for="{{players}}" wx:key="openid">
+        <text>{{item.nickName}}</text>
+        <text>{{item.score}} 分</text>
+      </view>
+      <button class="primary-button result-button" bindtap="backHome">返回首页</button>
+    </view>
+  </view>
+</view>

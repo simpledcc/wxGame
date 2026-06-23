@@ -1,0 +1,32 @@
+<view class="page room-page">
+  <view class="room-header">
+    <view>
+      <view class="muted">房间码</view>
+      <view class="room-code">{{roomCode}}</view>
+    </view>
+    <button class="copy-button" bindtap="copyCode">复制</button>
+  </view>
+
+  <view class="panel player-panel">
+    <view class="panel-title">玩家</view>
+    <view class="players">
+      <view class="player" wx:for="{{players}}" wx:key="openid">
+        <view class="avatar">{{item.avatarText}}</view>
+        <view class="player-main">
+          <view class="name">{{item.nickName}}</view>
+          <view class="state {{item.ready ? 'ready' : ''}}">{{item.ready ? '已准备' : '未准备'}}</view>
+        </view>
+      </view>
+      <view class="empty-seat" wx:if="{{players.length < 2}}">等待第二位玩家加入</view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="{{ready ? 'secondary-button' : 'primary-button'}} main-button" loading="{{readyLoading}}" bindtap="toggleReady">
+      {{ready ? '取消准备' : '准备'}}
+    </button>
+    <button class="primary-button main-button" loading="{{starting}}" disabled="{{!canStart}}" bindtap="startGame">开始游戏</button>
+  </view>
+
+  <view class="hint">{{hint}}</view>
+</view>

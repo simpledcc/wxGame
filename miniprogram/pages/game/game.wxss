@@ -1,0 +1,177 @@
+.game-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #0891b2;
+}
+
+.topbar {
+  position: absolute;
+  z-index: 5;
+  top: 24rpx;
+  left: 24rpx;
+  right: 24rpx;
+  display: grid;
+  grid-template-columns: 1fr 108rpx 1fr;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.score {
+  min-width: 0;
+  padding: 14rpx 16rpx;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 8rpx;
+}
+
+.score-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 22rpx;
+  color: #475569;
+}
+
+.score-value {
+  margin-top: 4rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.score-value.mine {
+  color: #0e7490;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72rpx;
+  color: #ffffff;
+  background: #be123c;
+  border-radius: 50%;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.sea {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.28), transparent 12%),
+    radial-gradient(circle at 70% 38%, rgba(255, 255, 255, 0.18), transparent 10%),
+    linear-gradient(180deg, #67e8f9 0%, #0891b2 45%, #155e75 100%);
+}
+
+.fish {
+  position: absolute;
+  width: 168rpx;
+  height: 76rpx;
+  margin-left: -84rpx;
+  margin-top: -38rpx;
+  transition: left 70ms linear, top 70ms linear;
+}
+
+.fish-body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132rpx;
+  height: 76rpx;
+  box-sizing: border-box;
+  padding: 0 16rpx;
+  color: #0f172a;
+  background: #facc15;
+  border: 4rpx solid rgba(15, 23, 42, 0.12);
+  border-radius: 50%;
+  box-shadow: 0 10rpx 24rpx rgba(8, 47, 73, 0.18);
+}
+
+.word {
+  max-width: 104rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.tail {
+  position: absolute;
+  right: 0;
+  top: 18rpx;
+  width: 0;
+  height: 0;
+  border-top: 20rpx solid transparent;
+  border-bottom: 20rpx solid transparent;
+  border-left: 40rpx solid #facc15;
+}
+
+.prompt {
+  position: absolute;
+  z-index: 6;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: 34rpx;
+  padding: 24rpx;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12rpx;
+  box-shadow: 0 12rpx 32rpx rgba(15, 23, 42, 0.16);
+}
+
+.prompt-label {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.meaning {
+  margin-top: 8rpx;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #155e75;
+}
+
+.result-mask {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.result-panel {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 34rpx;
+}
+
+.result-title {
+  margin-bottom: 24rpx;
+  text-align: center;
+  font-size: 42rpx;
+  font-weight: 900;
+  color: #155e75;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid #e2e8f0;
+  font-size: 30rpx;
+}
+
+.result-button {
+  margin-top: 30rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-weight: 800;
+}
