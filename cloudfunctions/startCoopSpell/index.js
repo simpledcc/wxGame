@@ -4,6 +4,14 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
 const VALID_DURATIONS = [30, 60, 90, 120];
+let importedSpellWordBanks = null;
+
+function getImportedSpellWordBanks() {
+  if (!importedSpellWordBanks) {
+    importedSpellWordBanks = (require("./spellWordBankData").SPELL_WORD_BANKS || {});
+  }
+  return importedSpellWordBanks;
+}
 
 function normalizeWords(words) {
   if (!Array.isArray(words)) return [];
@@ -26,10 +34,54 @@ function isBotPlayer(player) {
   return !!(player && (player.isBot || String(player.openid || "").indexOf("bot_") === 0));
 }
 
-function pickBlankPositions(length) {
-  const indexes = Array.from({ length }, (_, index) => index);
+function normalizeSpellQuestions(questions) {
+  if (!Array.isArray(questions)) return [];
+  const seen = new Set();
+  return questions
+    .map((item) => {
+      const word = String(item && item.word ? item.word : "").trim();
+      const meaning = String(item && item.meaning ? item.meaning : "").trim();
+      const key = String((item && item.key) || word).trim().toLowerCase();
+      const slots = Array.isArray(item && item.slots) ? item.slots.map((slot, index) => ({
+        index,
+        position: Number(slot.position),
+        answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+      })).filter((slot) => Number.isFinite(slot.position) && slot.answer) : [];
+      if (!/^[a-zA-Z]{4,18}$/.test(word) || !meaning || !key || slots.length !== 4 || seen.has(key)) return null;
+      seen.add(key);
+      return {
+        key,
+        word,
+        meaning,
+        mask: String(item.mask || ""),
+        blankPositions: Array.isArray(item.blankPositions) ? item.blankPositions.slice(0, 4).map(Number) : slots.map((slot) => slot.position),
+        slots
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 240);
+}
+
+function hashSpellTemplateText(text) {
+  let hash = 2166136261;
+  const value = String(text || "");
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  return hash >>> 0;
+}
+
+function nextSpellTemplateSeed(seed) {
+  return (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+}
+
+function pickStableBlankPositions(word, meaning, bankId) {
+  const indexes = Array.from({ length: word.length }, (_, index) => index);
+  let seed = hashSpellTemplateText(`${bankId || ""}:${word}:${meaning || ""}`) || 1;
   for (let index = indexes.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
+    seed = nextSpellTemplateSeed(seed);
+    const swapIndex = seed % (index + 1);
     const value = indexes[index];
     indexes[index] = indexes[swapIndex];
     indexes[swapIndex] = value;
@@ -37,23 +89,45 @@ function pickBlankPositions(length) {
   return indexes.slice(0, 4).sort((a, b) => a - b);
 }
 
-function makeSpellQuestion(players, words) {
-  const item = words[Math.floor(Math.random() * words.length)];
-  if (!item) return null;
-  const letters = Array.from(item.word.toLowerCase());
-  const blankPositions = pickBlankPositions(letters.length);
+function makeSpellTemplateFromWord(item, bankId) {
+  const word = String(item && item.word ? item.word : "").trim();
+  const meaning = String(item && item.meaning ? item.meaning : "").trim();
+  const key = word.toLowerCase();
+  if (!/^[a-zA-Z]{4,18}$/.test(word) || !meaning) return null;
+  const letters = Array.from(key);
+  const blankPositions = pickStableBlankPositions(key, meaning, bankId);
   const slots = blankPositions.map((position, index) => ({
     index,
     position,
     answer: letters[position]
   }));
+  return {
+    key,
+    word,
+    meaning,
+    mask: letters.map((letter, index) => (blankPositions.includes(index) ? "_" : letter)).join(""),
+    blankPositions,
+    slots
+  };
+}
+
+function makeSpellQuestion(players, templates) {
+  const item = templates[Math.floor(Math.random() * templates.length)];
+  if (!item) return null;
+  const slots = (Array.isArray(item.slots) ? item.slots : []).map((slot, index) => ({
+    index,
+    position: Number(slot.position),
+    answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+  }));
+  if (slots.length !== 4) return null;
   const createdAt = Date.now();
   return {
     id: `spell_${createdAt}_${Math.floor(Math.random() * 100000)}`,
+    wordKey: item.key,
     word: item.word,
     meaning: item.meaning,
-    mask: letters.map((letter, index) => (blankPositions.includes(index) ? "_" : letter)).join(""),
-    blankPositions,
+    mask: item.mask,
+    blankPositions: item.blankPositions,
     slots,
     mode: "boatLetters",
     segments: [
@@ -159,7 +233,8 @@ exports.main = async (event) => {
   const roomId = String(event.roomId || "").trim();
   console.log("[startCoopSpell] start", {
     roomId: String(roomId || "").slice(-6),
-    eventRoomWordCount: Array.isArray(event.roomWords) ? event.roomWords.length : 0
+    eventRoomWordCount: Array.isArray(event.roomWords) ? event.roomWords.length : 0,
+    eventRoomSpellQuestionCount: Array.isArray(event.roomSpellQuestions) ? event.roomSpellQuestions.length : 0
   });
   if (!roomId) throw new Error("缺少房间 ID");
 
@@ -191,10 +266,17 @@ exports.main = async (event) => {
   const storedWords = normalizeWords(options.roomWords);
   const eventWords = normalizeWords(event.roomWords);
   const roomWords = storedWords.length ? storedWords : eventWords;
-  if (!roomWords.length) throw new Error("当前词库没有长度不少于4的拼词单词");
+  const storedQuestions = normalizeSpellQuestions(options.roomSpellQuestions);
+  const eventQuestions = normalizeSpellQuestions(event.roomSpellQuestions);
+  const importedQuestions = normalizeSpellQuestions((getImportedSpellWordBanks()[options.bankId] || []));
+  const fallbackQuestions = roomWords.map((item) => makeSpellTemplateFromWord(item, options.bankId)).filter(Boolean);
+  const roomQuestions = storedQuestions.length
+    ? storedQuestions
+    : (eventQuestions.length ? eventQuestions : (importedQuestions.length ? importedQuestions : fallbackQuestions));
+  if (!roomQuestions.length) throw new Error("当前词库没有长度不少于4的拼词单词");
 
   const resetPlayers = players.map(makeSafePlayer);
-  const spellQuestion = makeSpellQuestion(resetPlayers, roomWords);
+  const spellQuestion = makeSpellQuestion(resetPlayers, roomQuestions);
   if (!spellQuestion) throw new Error("拼词题生成失败，请重新开始");
 
   const duration = VALID_DURATIONS.includes(Number(options.duration)) ? Number(options.duration) : 60;
@@ -209,7 +291,7 @@ exports.main = async (event) => {
     spellSubmissions: { _resetAt: now, _questionId: spellQuestion.id },
     winnerOpenid: "",
     duration,
-    usedWords: [spellQuestion.word],
+    usedWords: [spellQuestion.wordKey || spellQuestion.word],
     startedAt: now,
     updatedAt: now
   };
@@ -228,6 +310,7 @@ exports.main = async (event) => {
     playerCount: resetPlayers.length,
     readyCount: resetPlayers.filter((player) => player.ready).length,
     roomWordCount: roomWords.length,
+    roomSpellQuestionCount: roomQuestions.length,
     duration,
     minimalUpdate: true
   });
@@ -237,6 +320,7 @@ exports.main = async (event) => {
     elapsed: Date.now() - started,
     playerCount: resetPlayers.length,
     roomWordCount: roomWords.length,
+    roomSpellQuestionCount: roomQuestions.length,
     questionChars: serializedQuestion.length
   });
 

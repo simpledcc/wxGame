@@ -1,5 +1,6 @@
 const config = require("./config");
 const IMPORTED_WORD_BANK_DATA = require("./wordBankData");
+const IMPORTED_SPELL_WORD_BANK_DATA = require("./spellWordBankData");
 
 const canvas = wx.createCanvas();
 const ctx = canvas.getContext("2d");
@@ -483,6 +484,7 @@ function applyImportedWordBankData(data) {
 
 applyImportedWordBankData(IMPORTED_WORD_BANK_DATA);
 
+const SPELL_WORD_BANKS = (IMPORTED_SPELL_WORD_BANK_DATA && IMPORTED_SPELL_WORD_BANK_DATA.SPELL_WORD_BANKS) || {};
 const WRONG_BANK_ID = IMPORTED_WORD_BANK_DATA.WRONG_BANK_ID || "wrong";
 
 function getSelectableWordBankIds() {
@@ -2996,6 +2998,100 @@ function getRoomWordPool() {
   }));
 }
 
+function hashSpellTemplateText(text) {
+  let hash = 2166136261;
+  const value = String(text || "");
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  return hash >>> 0;
+}
+
+function nextSpellTemplateSeed(seed) {
+  return (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+}
+
+function pickStableBlankPositions(word, meaning, bankId) {
+  const indexes = Array.from({ length: word.length }, (_, index) => index);
+  let seed = hashSpellTemplateText(`${bankId || ""}:${word}:${meaning || ""}`) || 1;
+  for (let index = indexes.length - 1; index > 0; index -= 1) {
+    seed = nextSpellTemplateSeed(seed);
+    const swapIndex = seed % (index + 1);
+    const value = indexes[index];
+    indexes[index] = indexes[swapIndex];
+    indexes[swapIndex] = value;
+  }
+  return indexes.slice(0, 4).sort((a, b) => a - b);
+}
+
+function makeSpellTemplateFromWord(item, bankId) {
+  const normalized = normalizeWordItem(item);
+  if (!normalized) return null;
+  const word = String(normalized.word || "").trim().toLowerCase();
+  if (!/^[a-zA-Z]{4,18}$/.test(word)) return null;
+  const letters = Array.from(word);
+  const blankPositions = pickStableBlankPositions(word, normalized.meaning, bankId);
+  const slots = blankPositions.map((position, index) => ({
+    index,
+    position,
+    answer: letters[position]
+  }));
+  return {
+    key: word,
+    word: normalized.word,
+    meaning: normalized.meaning,
+    mask: letters.map((letter, index) => (blankPositions.indexOf(index) >= 0 ? "_" : letter)).join(""),
+    blankPositions,
+    slots
+  };
+}
+
+function normalizeSpellTemplate(template) {
+  if (!template || !template.word || !template.meaning) return null;
+  const word = String(template.word || "").trim();
+  const key = String(template.key || word).trim().toLowerCase();
+  if (!/^[a-zA-Z]{4,18}$/.test(word) || !key) return null;
+  const slots = Array.isArray(template.slots) ? template.slots.map((slot, index) => ({
+    index,
+    position: Number(slot.position),
+    answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+  })).filter((slot) => Number.isFinite(slot.position) && slot.answer) : [];
+  if (slots.length !== 4) return null;
+  return {
+    key,
+    word,
+    meaning: String(template.meaning || "").trim(),
+    mask: String(template.mask || ""),
+    blankPositions: Array.isArray(template.blankPositions) ? template.blankPositions.slice(0, 4).map(Number) : slots.map((slot) => slot.position),
+    slots
+  };
+}
+
+function getSpellTemplatePoolForBank(bankId) {
+  const templates = SPELL_WORD_BANKS[bankId];
+  if (Array.isArray(templates) && templates.length) {
+    return templates.map(normalizeSpellTemplate).filter(Boolean);
+  }
+  return [];
+}
+
+function getStudySpellTemplates() {
+  const bankId = state.gameOptions.bankId;
+  let templates = isWrongBankId(bankId) ? [] : getSpellTemplatePoolForBank(bankId);
+  if (!templates.length) {
+    templates = getStudyWords().map((item) => makeSpellTemplateFromWord(item, bankId)).filter(Boolean);
+  }
+  if (!templates.length && bankId !== DEFAULT_GAME_OPTIONS.bankId) {
+    templates = getSpellTemplatePoolForBank(DEFAULT_GAME_OPTIONS.bankId);
+  }
+  return templates;
+}
+
+function getRoomSpellQuestionPool() {
+  return getStudySpellTemplates().slice(0, ROOM_WORD_POOL_LIMIT);
+}
+
 function getCurrentStudyWord() {
   const words = getStudyWords();
   if (!words.length) return null;
@@ -4229,57 +4325,31 @@ function updateCoopSpellQuestionClock() {
   skipCoopSpellQuestion(false);
 }
 
-function getSpellCandidateWords() {
-  const active = getStudyWords().filter((item) => /^[a-zA-Z]{4,18}$/.test(String(item.word || "").trim()));
-  if (active.length) return active;
-  const fallbackBank = WORD_BANKS[DEFAULT_GAME_OPTIONS.bankId] || {};
-  const fallbackWords = Array.isArray(fallbackBank) ? fallbackBank : (fallbackBank.words || []);
-  return fallbackWords.map(normalizeWordItem).filter((item) => item && /^[a-zA-Z]{4,18}$/.test(String(item.word || "").trim()));
-}
-
-function pickBlankPositions(count, total) {
-  const indexes = [];
-  for (let index = 0; index < total; index += 1) indexes.push(index);
-  for (let index = indexes.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    const temp = indexes[index];
-    indexes[index] = indexes[swapIndex];
-    indexes[swapIndex] = temp;
-  }
-  return indexes.slice(0, count).sort((a, b) => a - b);
-}
-
-function pickSoloSpellWord() {
-  const words = getSpellCandidateWords();
-  if (!words.length) return null;
+function pickSoloSpellTemplate() {
+  const templates = getStudySpellTemplates();
+  if (!templates.length) return null;
   const used = new Set(state.usedWords || []);
-  const available = words.filter((item) => !used.has(String(item.word || "").trim().toLowerCase()));
-  const source = available.length ? available : words;
+  const available = templates.filter((item) => !used.has(String(item.key || item.word || "").trim().toLowerCase()));
+  const source = available.length ? available : templates;
   if (!available.length) state.usedWords = [];
-  const item = source[Math.floor(Math.random() * source.length)];
-  const wordKey = String(item.word || "").trim().toLowerCase();
+  const template = source[Math.floor(Math.random() * source.length)];
+  const wordKey = String(template.key || template.word || "").trim().toLowerCase();
   state.usedWords = [...new Set([...(state.usedWords || []), wordKey])];
-  return item;
+  return template;
 }
 
 function makeSoloSpellQuestion() {
-  const item = pickSoloSpellWord();
-  if (!item) return null;
-  const word = String(item.word || "").trim().toLowerCase();
-  const letters = Array.from(word);
-  if (letters.length < 4) return null;
-  const blankPositions = pickBlankPositions(4, letters.length);
-  const slots = blankPositions.map((position, index) => ({
-    index,
-    position,
-    answer: letters[position]
-  }));
+  const template = pickSoloSpellTemplate();
+  if (!template) return null;
+  const slots = Array.isArray(template.slots) ? template.slots : [];
+  if (slots.length !== 4) return null;
   return {
     id: `solo_spell_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
-    word: item.word,
-    meaning: item.meaning,
-    mask: letters.map((letter, index) => (blankPositions.indexOf(index) >= 0 ? "_" : letter)).join(""),
-    blankPositions,
+    wordKey: template.key,
+    word: template.word,
+    meaning: template.meaning,
+    mask: template.mask,
+    blankPositions: template.blankPositions,
     slots,
     mode: "boatLetters",
     segments: [{
@@ -5950,7 +6020,8 @@ function createRoomWithOptions(optionOverrides, busyText) {
       ...nextOptions,
       wrongWords: isWrongBankId(nextOptions.bankId) ? getStoredWrongWords() : []
     }),
-    roomWords: getRoomWordPool()
+    roomWords: getRoomWordPool(),
+    roomSpellQuestions: getRoomSpellQuestionPool()
   };
   logInfo("room", "create.start", {
     soloStart,
@@ -5975,7 +6046,7 @@ function createRoomWithOptions(optionOverrides, busyText) {
         .then((readyRes) => {
           const readyResult = readyRes.result || {};
           if (readyResult.room) roomSnapshot = readyResult.room;
-          return callFunction(startFunctionName, { roomId: result.roomId, roomWords: gameOptions.roomWords });
+          return callFunction(startFunctionName, { roomId: result.roomId, roomWords: gameOptions.roomWords, roomSpellQuestions: gameOptions.roomSpellQuestions });
         })
         .then((startRes) => {
           const startResult = startRes.result || {};
@@ -6478,7 +6549,7 @@ async function handleButton(id) {
     state.startError = "";
     setBusy(true);
     const startFunctionName = isCoopSpellMode() ? "startCoopSpell" : "startGame";
-    callFunction(startFunctionName, { roomId: state.roomId, roomWords: getRoomWordPool() }).then((res) => {
+    callFunction(startFunctionName, { roomId: state.roomId, roomWords: getRoomWordPool(), roomSpellQuestions: getRoomSpellQuestionPool() }).then((res) => {
       const result = res.result || {};
       if (result.room) {
         applyRoomSnapshot(result.room);

@@ -204,6 +204,11 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 ## Caution Points
 
+- 2026-06-27 update: co-op spell now uses pre-generated blank templates.
+  - Added `spellWordBankData.js` to the miniprogram and spell-related cloud functions.
+  - 44 built-in banks generate 6351 fixed spell templates with `mask`, `blankPositions`, and `slots`.
+  - Room creation now stores `roomSpellQuestions`; `startCoopSpell`, `catchFish`, and legacy `startGame` draw from templates instead of randomly blanking letters at runtime.
+  - If one player submits and the other times out, `timeoutCoopSpell` records the submitted player, leaves the other as unsubmitted in spell history, resets `spellSubmissions`, and the next room snapshot clears all blank inputs.
 - 2026-06-26 update: co-op spell input is now isolated by `spellQuestion.id`.
   - Frontend filters `spellSubmissions` to the active question only.
   - Room snapshots clear local draft input when the question changes.

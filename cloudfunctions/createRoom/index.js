@@ -128,7 +128,8 @@ function normalizeGameOptions(options) {
   const coopMode = VALID_OPTIONS.coopModes.includes(source.coopMode) ? source.coopMode : DEFAULT_GAME_OPTIONS.coopMode;
   const wrongWords = normalizeWrongWords(source.wrongWords);
   const roomWords = normalizeRoomWords(source.roomWords);
-  return { duration, bankId, mode, wrongWords, roomWords, botDifficulty, matchMode, coopMode };
+  const roomSpellQuestions = normalizeSpellQuestions(source.roomSpellQuestions);
+  return { duration, bankId, mode, wrongWords, roomWords, roomSpellQuestions, botDifficulty, matchMode, coopMode };
 }
 
 function normalizeWrongWords(words) {
@@ -149,6 +150,34 @@ function normalizeWrongWords(words) {
 
 function normalizeRoomWords(words) {
   return normalizeWrongWords(words).slice(0, 240);
+}
+
+function normalizeSpellQuestions(questions) {
+  if (!Array.isArray(questions)) return [];
+  const seen = new Set();
+  return questions
+    .map((item) => {
+      const word = String(item && item.word ? item.word : "").trim();
+      const meaning = String(item && item.meaning ? item.meaning : "").trim();
+      const key = String((item && item.key) || word).trim().toLowerCase();
+      const slots = Array.isArray(item && item.slots) ? item.slots.map((slot, index) => ({
+        index,
+        position: Number(slot.position),
+        answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+      })).filter((slot) => Number.isFinite(slot.position) && slot.answer) : [];
+      if (!/^[a-zA-Z]{4,18}$/.test(word) || !meaning || !key || slots.length !== 4 || seen.has(key)) return null;
+      seen.add(key);
+      return {
+        key,
+        word,
+        meaning,
+        mask: String(item.mask || ""),
+        blankPositions: Array.isArray(item.blankPositions) ? item.blankPositions.slice(0, 4).map(Number) : slots.map((slot) => slot.position),
+        slots
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 240);
 }
 
 function makeRoomCode() {

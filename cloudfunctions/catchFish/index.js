@@ -4,12 +4,20 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
 let importedWordBanks = null;
+let importedSpellWordBanks = null;
 
 function getImportedWordBanks() {
   if (!importedWordBanks) {
     importedWordBanks = (require("./wordBankData").WORD_BANKS || {});
   }
   return importedWordBanks;
+}
+
+function getImportedSpellWordBanks() {
+  if (!importedSpellWordBanks) {
+    importedSpellWordBanks = (require("./spellWordBankData").SPELL_WORD_BANKS || {});
+  }
+  return importedSpellWordBanks;
 }
 
 const JILIN_GAOKAO_WORDS = [
@@ -409,7 +417,8 @@ function normalizeGameOptions(options) {
   const coopMode = VALID_COOP_MODES.includes(source.coopMode) ? source.coopMode : DEFAULT_GAME_OPTIONS.coopMode;
   const wrongWords = normalizeWrongWords(source.wrongWords);
   const roomWords = normalizeRoomWords(source.roomWords);
-  return { duration, bankId, mode, wrongWords, roomWords, botDifficulty, matchMode, coopMode };
+  const roomSpellQuestions = normalizeSpellQuestions(source.roomSpellQuestions);
+  return { duration, bankId, mode, wrongWords, roomWords, roomSpellQuestions, botDifficulty, matchMode, coopMode };
 }
 
 function normalizeWrongWords(words) {
@@ -430,6 +439,34 @@ function normalizeWrongWords(words) {
 
 function normalizeRoomWords(words) {
   return normalizeWrongWords(words).slice(0, 240);
+}
+
+function normalizeSpellQuestions(questions) {
+  if (!Array.isArray(questions)) return [];
+  const seen = new Set();
+  return questions
+    .map((item) => {
+      const word = String(item && item.word ? item.word : "").trim();
+      const meaning = String(item && item.meaning ? item.meaning : "").trim();
+      const key = String((item && item.key) || word).trim().toLowerCase();
+      const slots = Array.isArray(item && item.slots) ? item.slots.map((slot, index) => ({
+        index,
+        position: Number(slot.position),
+        answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+      })).filter((slot) => Number.isFinite(slot.position) && slot.answer) : [];
+      if (!/^[a-zA-Z]{4,18}$/.test(word) || !meaning || !key || slots.length !== 4 || seen.has(key)) return null;
+      seen.add(key);
+      return {
+        key,
+        word,
+        meaning,
+        mask: String(item.mask || ""),
+        blankPositions: Array.isArray(item.blankPositions) ? item.blankPositions.slice(0, 4).map(Number) : slots.map((slot) => slot.position),
+        slots
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 240);
 }
 
 function getActiveWords(options) {
@@ -490,42 +527,85 @@ function pickTarget(fishes) {
   return alive[Math.floor(Math.random() * alive.length)];
 }
 
-function pickSpellWord(usedWords, options) {
-  const words = getActiveWords(options);
-  const available = words.filter((item) => {
-    const word = String(item.word || "").trim();
-    return /^[a-zA-Z]{4,18}$/.test(word) && !usedWords.has(word);
-  });
-  if (!available.length) return null;
-  return available[Math.floor(Math.random() * available.length)];
+function hashSpellTemplateText(text) {
+  let hash = 2166136261;
+  const value = String(text || "");
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  return hash >>> 0;
 }
 
-function pickFourBlankPositions(length) {
-  const indexes = [];
-  for (let i = 0; i < length; i += 1) indexes.push(i);
-  for (let i = indexes.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = indexes[i];
-    indexes[i] = indexes[j];
-    indexes[j] = temp;
+function nextSpellTemplateSeed(seed) {
+  return (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+}
+
+function pickStableBlankPositions(word, meaning, bankId) {
+  const indexes = Array.from({ length: word.length }, (_, index) => index);
+  let seed = hashSpellTemplateText(`${bankId || ""}:${word}:${meaning || ""}`) || 1;
+  for (let index = indexes.length - 1; index > 0; index -= 1) {
+    seed = nextSpellTemplateSeed(seed);
+    const swapIndex = seed % (index + 1);
+    const value = indexes[index];
+    indexes[index] = indexes[swapIndex];
+    indexes[swapIndex] = value;
   }
   return indexes.slice(0, 4).sort((a, b) => a - b);
 }
 
-function makeSpellQuestion(players, usedWords, options) {
-  const item = pickSpellWord(usedWords, options);
-  if (!item) return null;
-  const word = String(item.word || "").trim().toLowerCase();
-  const letters = Array.from(word);
-  if (letters.length < 4) return null;
-  usedWords.add(item.word);
-  const blankPositions = pickFourBlankPositions(letters.length);
+function makeSpellTemplateFromWord(item, bankId) {
+  const word = String(item && item.word ? item.word : "").trim();
+  const meaning = String(item && item.meaning ? item.meaning : "").trim();
+  const key = word.toLowerCase();
+  if (!/^[a-zA-Z]{4,18}$/.test(word) || !meaning) return null;
+  const letters = Array.from(key);
+  const blankPositions = pickStableBlankPositions(key, meaning, bankId);
   const slots = blankPositions.map((position, index) => ({
     index,
     position,
     answer: letters[position]
   }));
-  const mask = letters.map((letter, index) => (blankPositions.includes(index) ? "_" : letter)).join("");
+  return {
+    key,
+    word,
+    meaning,
+    mask: letters.map((letter, index) => (blankPositions.includes(index) ? "_" : letter)).join(""),
+    blankPositions,
+    slots
+  };
+}
+
+function getActiveSpellTemplates(options) {
+  if (Array.isArray(options.roomSpellQuestions) && options.roomSpellQuestions.length) return options.roomSpellQuestions;
+  const importedSpellBanks = getImportedSpellWordBanks();
+  const importedTemplates = importedSpellBanks[options.bankId] || importedSpellBanks[DEFAULT_GAME_OPTIONS.bankId] || [];
+  if (Array.isArray(importedTemplates) && importedTemplates.length) return normalizeSpellQuestions(importedTemplates);
+  return getActiveWords(options).map((item) => makeSpellTemplateFromWord(item, options.bankId)).filter(Boolean).slice(0, 240);
+}
+
+function pickSpellTemplate(usedWords, options) {
+  const templates = getActiveSpellTemplates(options);
+  const available = templates.filter((item) => {
+    const key = String(item.key || item.word || "").trim().toLowerCase();
+    const word = String(item.word || "").trim();
+    return key && !usedWords.has(key) && !usedWords.has(word);
+  });
+  if (!available.length) return null;
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+function makeSpellQuestion(players, usedWords, options) {
+  const template = pickSpellTemplate(usedWords, options);
+  if (!template) return null;
+  const slots = (Array.isArray(template.slots) ? template.slots : []).map((slot, index) => ({
+    index,
+    position: Number(slot.position),
+    answer: String(slot.answer || "").slice(0, 1).toLowerCase()
+  }));
+  if (slots.length !== 4) return null;
+  const wordKey = String(template.key || template.word || "").trim().toLowerCase();
+  usedWords.add(wordKey);
   const now = Date.now();
   const segments = players.length <= 1
     ? [{
@@ -556,10 +636,11 @@ function makeSpellQuestion(players, usedWords, options) {
     ];
   return {
     id: `spell_${now}_${Math.floor(Math.random() * 100000)}`,
-    word: item.word,
-    meaning: item.meaning,
-    mask,
-    blankPositions,
+    wordKey,
+    word: template.word,
+    meaning: template.meaning,
+    mask: template.mask,
+    blankPositions: template.blankPositions,
     slots,
     mode: "boatLetters",
     segments,
