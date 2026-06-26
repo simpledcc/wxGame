@@ -204,6 +204,11 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 ## Caution Points
 
+- 2026-06-26 update: co-op spell input is now isolated by `spellQuestion.id`.
+  - Frontend filters `spellSubmissions` to the active question only.
+  - Room snapshots clear local draft input when the question changes.
+  - Late submit callbacks from an old question only trigger a room refresh and do not overwrite the current question.
+  - While a completed round is waiting for the next room snapshot, letter input is temporarily locked to avoid editing the old word.
 - `wordBankData.js` is currently duplicated into frontend and three cloud functions. If the data is regenerated, copy/update all four locations.
 - Do not rely on latest `.docx` blindly in Downloads because Word creates temporary `~$...docx` lock files that are not valid zip/docx files.
 - When parsing the Chinese `.docx` through PowerShell, set UTF-8 output encoding, otherwise Chinese matching can fail:
@@ -214,7 +219,7 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 $env:PYTHONIOENCODING='utf-8'
 ```
 
-- The project directory does not appear to be a git repository, so use file-level care and syntax checks instead of relying on git diff.
+- The project directory is now a git repository connected to `git@github.com:simpledcc/wxGame.git`; still use file-level care because user testing may leave local changes.
 
 ## Suggested Next Steps
 

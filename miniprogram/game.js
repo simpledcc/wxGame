@@ -681,6 +681,7 @@ const state = {
   coopSpellSubmissions: {},
   coopSpellInput: [],
   coopSpellInputQuestionId: "",
+  coopSpellAdvancingQuestionId: "",
   coopSpellAutoSkipQuestionId: "",
   coopSpellQuestionTimeLeft: COOP_SPELL_QUESTION_SECONDS,
   soloSpellRecordSaved: false,
@@ -4298,6 +4299,7 @@ function applySoloSpellQuestion(question) {
   state.coopSpellSubmissions = {};
   state.coopSpellInput = [];
   state.coopSpellInputQuestionId = question ? question.id : "";
+  state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
   state.currentMeaning = question ? question.meaning : "";
@@ -4352,8 +4354,61 @@ function getCoopSpellSubmission(openid) {
   const submission = submissions[openid] || null;
   if (!submission) return null;
   const questionId = (state.coopSpellQuestion && state.coopSpellQuestion.id) || "";
-  if (questionId && submission.questionId !== questionId) return null;
+  if (!questionId || String(submission.questionId || "") !== String(questionId)) return null;
   return submission;
+}
+
+function getCoopSpellQuestionId(question) {
+  return question && question.id ? String(question.id) : "";
+}
+
+function filterCoopSpellSubmissionsForQuestion(submissions, questionId) {
+  const activeQuestionId = String(questionId || "");
+  const source = submissions && typeof submissions === "object" ? submissions : {};
+  const result = {};
+  if (!activeQuestionId) return result;
+  Object.keys(source).forEach((openid) => {
+    if (!openid || openid.charAt(0) === "_") return;
+    const item = source[openid];
+    if (!item || typeof item !== "object") return;
+    if (String(item.questionId || "") !== activeQuestionId) return;
+    result[openid] = item;
+  });
+  return result;
+}
+
+function resetCoopSpellDraftForQuestion(questionId) {
+  state.coopSpellInput = [];
+  state.coopSpellInputQuestionId = String(questionId || "");
+  state.coopSpellAutoSkipQuestionId = "";
+  state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
+}
+
+function isCoopSpellAdvancingQuestion() {
+  const questionId = getCoopSpellQuestionId(state.coopSpellQuestion);
+  return !!questionId && state.coopSpellAdvancingQuestionId === questionId;
+}
+
+function applyCoopSpellQuestionState(nextQuestion, roomSubmissions) {
+  const previousQuestionId = getCoopSpellQuestionId(state.coopSpellQuestion);
+  const nextQuestionId = getCoopSpellQuestionId(nextQuestion);
+  const questionChanged = nextQuestionId !== previousQuestionId;
+  if (questionChanged || nextQuestionId !== state.coopSpellInputQuestionId) {
+    resetCoopSpellDraftForQuestion(nextQuestionId);
+  }
+  if (state.coopSpellAdvancingQuestionId && state.coopSpellAdvancingQuestionId !== nextQuestionId) {
+    state.coopSpellAdvancingQuestionId = "";
+  }
+  const roomActive = filterCoopSpellSubmissionsForQuestion(roomSubmissions, nextQuestionId);
+  const localActive = questionChanged ? {} : filterCoopSpellSubmissionsForQuestion(state.coopSpellSubmissions, nextQuestionId);
+  state.coopSpellQuestion = nextQuestion;
+  state.coopSpellSubmissions = {
+    ...localActive,
+    ...roomActive
+  };
+  if (questionChanged) {
+    logInfo("spell", "question.change", { from: previousQuestionId, to: nextQuestionId });
+  }
 }
 
 function isCoopSpellSubmissionReady(submission) {
@@ -4419,6 +4474,10 @@ function syncCoopSpellInputLength(segment) {
 
 function addCoopSpellLetter(letter) {
   if (!isCoopSpellMode()) return;
+  if (isCoopSpellAdvancingQuestion()) {
+    logWarn("spell", "letter.blocked.advancing", { questionId: state.coopSpellAdvancingQuestionId });
+    return;
+  }
   const me = getLocalPlayer();
   const segment = me && getCoopSpellSegment(me);
   if (!segment) {
@@ -4513,8 +4572,8 @@ function skipSoloSpellQuestion(manual) {
 }
 
 function skipCoopSpellQuestion(manual) {
-  if (state.catchPending || state.busy || (!state.roomId && !state.soloSpellMode)) {
-    logWarn("spell", "skip.blocked", { manual: !!manual, catchPending: state.catchPending, busy: state.busy, roomId: state.roomId, soloSpellMode: state.soloSpellMode });
+  if (state.catchPending || state.busy || isCoopSpellAdvancingQuestion() || (!state.roomId && !state.soloSpellMode)) {
+    logWarn("spell", "skip.blocked", { manual: !!manual, catchPending: state.catchPending, busy: state.busy, advancingQuestionId: state.coopSpellAdvancingQuestionId, roomId: state.roomId, soloSpellMode: state.soloSpellMode });
     return;
   }
   const question = state.coopSpellQuestion;
@@ -4549,6 +4608,10 @@ function skipCoopSpellQuestion(manual) {
       return;
     }
     if (!result.stale) {
+      state.coopSpellInput = [];
+      state.coopSpellInputQuestionId = question.id;
+      state.coopSpellSubmissions = {};
+      state.coopSpellAdvancingQuestionId = question.id;
       addFeedback(manual ? "跳过 -100" : "时间到，自动换词", screen.width / 2, screen.height * 0.42, manual ? COLORS.red : COLORS.gold);
     }
     fetchRoom();
@@ -4737,6 +4800,7 @@ function drawCoopSpellPlaying() {
 
   const localSubmission = me && getCoopSpellSubmission(me.openid);
   const localSubmitted = isCoopSpellSubmissionReady(localSubmission);
+  const advancingQuestion = isCoopSpellAdvancingQuestion();
   const readyToSubmit = !!(localSegment && state.coopSpellInput.length >= Number(localSegment.length || 0));
   const controlH = compact ? 36 : 40;
   const skipButtonW = 92;
@@ -4755,7 +4819,7 @@ function drawCoopSpellPlaying() {
       addButton(`coopLetter:${letter}`, letter, x, y, keyW, keyH, {
         kind: "secondary",
         fontSize: compact ? 15 : 17,
-        disabled: state.catchPending || !localSegment || localSubmitted
+        disabled: state.catchPending || advancingQuestion || !localSegment || localSubmitted
       });
     });
   });
@@ -4764,7 +4828,7 @@ function drawCoopSpellPlaying() {
   addButton("coopSpellBackspace", "⌫", screen.width - 12 - deleteKeyW, deleteKeyY, deleteKeyW, keyH, {
     kind: "secondary",
     fontSize: compact ? 18 : 21,
-    disabled: !state.coopSpellInput.length || state.catchPending || localSubmitted
+    disabled: !state.coopSpellInput.length || state.catchPending || advancingQuestion || localSubmitted
   });
 }
 
@@ -5261,15 +5325,7 @@ function applyRoomSnapshot(room) {
   state.teamScore = Number(room.teamScore || 0);
   state.spellHistory = normalizeSpellHistory(room.spellHistory || []);
   const nextSpellQuestion = parseCoopSpellQuestion(room.spellQuestion);
-  const nextSpellQuestionId = (nextSpellQuestion && nextSpellQuestion.id) || "";
-  if (nextSpellQuestionId !== state.coopSpellInputQuestionId) {
-    state.coopSpellInput = [];
-    state.coopSpellInputQuestionId = nextSpellQuestionId;
-    state.coopSpellAutoSkipQuestionId = "";
-    state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
-  }
-  state.coopSpellQuestion = nextSpellQuestion;
-  state.coopSpellSubmissions = room.spellSubmissions || {};
+  applyCoopSpellQuestionState(nextSpellQuestion, room.spellSubmissions || {});
   state.duration = room.duration || state.duration || 60;
   state.gameOptions = normalizeGameOptions(room.gameOptions || { ...state.gameOptions, duration: state.duration });
   if (room.startedAt) state.startedAt = new Date(room.startedAt).getTime();
@@ -5488,6 +5544,7 @@ function enterRoom(roomId, roomCode, initialRoom) {
   state.coopSpellSubmissions = {};
   state.coopSpellInput = [];
   state.coopSpellInputQuestionId = "";
+  state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
   state.finishing = false;
@@ -5626,6 +5683,7 @@ function goHome() {
   state.coopSpellSubmissions = {};
   state.coopSpellInput = [];
   state.coopSpellInputQuestionId = "";
+  state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
   state.resultTitle = "";
@@ -5973,8 +6031,8 @@ function createRoomWithOptions(optionOverrides, busyText) {
 }
 
 async function submitCoopSpellAnswer() {
-  if (state.catchPending || state.busy || (!state.roomId && !state.soloSpellMode)) {
-    logWarn("spell", "submit.blocked", { catchPending: state.catchPending, busy: state.busy, roomId: state.roomId, soloSpellMode: state.soloSpellMode });
+  if (state.catchPending || state.busy || isCoopSpellAdvancingQuestion() || (!state.roomId && !state.soloSpellMode)) {
+    logWarn("spell", "submit.blocked", { catchPending: state.catchPending, busy: state.busy, advancingQuestionId: state.coopSpellAdvancingQuestionId, roomId: state.roomId, soloSpellMode: state.soloSpellMode });
     return;
   }
   const me = getLocalPlayer();
@@ -6017,6 +6075,7 @@ async function submitCoopSpellAnswer() {
     answer
   }).then((res) => {
     const result = res.result || {};
+    const stillSameQuestion = getCoopSpellQuestionId(state.coopSpellQuestion) === String(questionId || "");
     logInfo("spell", "submit.result", {
       questionId,
       elapsed: Date.now() - started,
@@ -6024,8 +6083,13 @@ async function submitCoopSpellAnswer() {
       roundComplete: !!result.roundComplete,
       waitingPartner: !!result.waitingPartner,
       finished: !!result.finished,
-      delta: result.delta || 0
+      delta: result.delta || 0,
+      stillSameQuestion
     });
+    if (!stillSameQuestion) {
+      fetchRoom();
+      return;
+    }
     if (result.submitted && !result.roundComplete) {
       state.coopSpellSubmissions = {
         ...(state.coopSpellSubmissions || {}),
@@ -6042,16 +6106,18 @@ async function submitCoopSpellAnswer() {
       addFeedback("已填写，等队友", screen.width / 2, screen.height * 0.42, COLORS.green);
     } else if (result.roundComplete && result.correct) {
       state.coopSpellInput = [];
-      state.coopSpellInputQuestionId = "";
+      state.coopSpellInputQuestionId = questionId;
       state.coopSpellSubmissions = {};
+      state.coopSpellAdvancingQuestionId = questionId;
       addFeedback("+100", screen.width / 2, screen.height * 0.42, COLORS.green);
     } else if (result.roundComplete) {
       const word = state.coopSpellQuestion && state.coopSpellQuestion.word;
       const meaning = state.coopSpellQuestion && state.coopSpellQuestion.meaning;
       if (word && meaning) saveWrongWord({ word, meaning });
       state.coopSpellInput = [];
-      state.coopSpellInputQuestionId = "";
+      state.coopSpellInputQuestionId = questionId;
       state.coopSpellSubmissions = {};
+      state.coopSpellAdvancingQuestionId = questionId;
       addFeedback("-100", screen.width / 2, screen.height * 0.42, COLORS.red);
     } else {
       addFeedback("已填写", screen.width / 2, screen.height * 0.42, COLORS.green);

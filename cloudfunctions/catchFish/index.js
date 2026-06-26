@@ -869,7 +869,7 @@ async function submitCoopSpellInRoom(roomRef, room, players, playerIndex, gameOp
   if (!allSubmitted) {
     await roomRef.update({
       data: {
-        spellSubmissions: { _questionId: question.id, ...submissions },
+        spellSubmissions: { _resetAt: now, _questionId: question.id, ...submissions },
         updatedAt: db.serverDate()
       }
     });

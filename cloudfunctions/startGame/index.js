@@ -635,7 +635,7 @@ exports.main = async (event) => {
     currentMeaning,
     targetFishId,
     spellQuestion,
-    spellSubmissions: {},
+    spellSubmissions: spellQuestion ? { _resetAt: now, _questionId: spellQuestion.id } : {},
     winnerOpenid: "",
     duration: gameOptions.duration,
     gameOptions,
