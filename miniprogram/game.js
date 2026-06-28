@@ -4826,6 +4826,61 @@ function drawCoopSpellStatusCard(player, x, y, w, isMe, playerIndex) {
   }
 }
 
+function drawCoopSpellLocalFocusCard(player, x, y, w, h, playerIndex) {
+  const segment = getCoopSpellSegment(player) || {};
+  const submission = getCoopSpellSubmission(player.openid) || {};
+  const submitted = isCoopSpellSubmissionReady(submission);
+  const theme = COOP_SPELL_PLAYER_THEMES[playerIndex === 1 ? 1 : 0];
+  const slotIndexes = Array.isArray(segment.slotIndexes) ? segment.slotIndexes : [];
+  const inputCount = submitted ? Number(submission.length || segment.length || 0) : state.coopSpellInput.length;
+  const expectedCount = Number(segment.length || slotIndexes.length || 0);
+  const title = submitted ? "我已填好" : "我负责的字母";
+  const rangeText = segment.start ? `第${segment.start}-${segment.end}空` : "等待分配";
+
+  fillRoundedRect(x, y, w, h, 14, theme.fill);
+  strokeRoundedRect(x, y, w, h, 14, submitted ? COLORS.green : theme.stroke, 2.4);
+  fillRoundedRect(x + 14, y + 12, 76, 24, 12, theme.badge);
+  drawText(title, x + 52, y + 29, 13, COLORS.white, 900, "center");
+  drawFitText(rangeText, x + 104, y + 30, 16, theme.text, 900, "left", w - 188);
+  fillRoundedRect(x + w - 70, y + 12, 52, 24, 12, "rgba(255,255,255,0.88)");
+  drawText(`${inputCount}/${expectedCount || 0}`, x + w - 44, y + 29, 13, theme.text, 900, "center");
+
+  const boxCount = Math.max(1, expectedCount || 2);
+  const compact = h < 96;
+  const boxGap = compact ? 7 : 9;
+  const maxBox = compact ? 42 : 50;
+  const boxSize = Math.min(maxBox, (w - 40 - boxGap * (boxCount - 1)) / boxCount);
+  const boxesW = boxSize * boxCount + boxGap * (boxCount - 1);
+  const boxStartX = x + (w - boxesW) / 2;
+  const boxY = y + (compact ? 42 : 46);
+  for (let index = 0; index < boxCount; index += 1) {
+    const slotIndex = slotIndexes[index];
+    const letter = Number.isFinite(slotIndex) ? getCoopSpellSlotValue(slotIndex, segment) : "";
+    const bx = boxStartX + index * (boxSize + boxGap);
+    fillRoundedRect(bx, boxY, boxSize, boxSize, 10, "rgba(255,255,255,0.92)");
+    strokeRoundedRect(bx, boxY, boxSize, boxSize, 10, letter ? theme.stroke : "rgba(8,145,178,0.28)", letter ? 2.2 : 1.4);
+    drawText(letter || "_", bx + boxSize / 2, boxY + boxSize * 0.67, compact ? 21 : 25, letter ? theme.text : theme.stroke, 900, "center");
+  }
+}
+
+function drawCoopSpellPeerMiniCard(player, x, y, w, h, playerIndex) {
+  const segment = getCoopSpellSegment(player) || {};
+  const submission = getCoopSpellSubmission(player.openid) || {};
+  const submitted = isCoopSpellSubmissionReady(submission);
+  const theme = COOP_SPELL_PLAYER_THEMES[playerIndex === 1 ? 1 : 0];
+  fillRoundedRect(x, y, w, h, 12, "rgba(255,255,255,0.9)");
+  strokeRoundedRect(x, y, w, h, 12, submitted ? COLORS.green : theme.stroke, 1.6);
+  ctx.fillStyle = theme.badge;
+  ctx.beginPath();
+  ctx.arc(x + 22, y + h / 2, 14, 0, Math.PI * 2);
+  ctx.fill();
+  drawText((player.nickName || "队").slice(0, 1), x + 22, y + h / 2 + 5, 12, COLORS.white, 900, "center");
+  const rangeText = segment.start ? `队友 ${segment.start}-${segment.end}空` : "队友";
+  drawFitText(rangeText, x + 44, y + h / 2 - 3, 12, COLORS.muted, 800, "left", w - 106);
+  fillRoundedRect(x + w - 58, y + h / 2 - 13, 46, 26, 13, submitted ? "rgba(220,252,231,0.95)" : "rgba(255,247,237,0.95)");
+  drawText(submitted ? "已填" : "等待", x + w - 35, y + h / 2 + 5, 12, submitted ? COLORS.green : COLORS.gold, 900, "center");
+}
+
 function drawSoloSpellGroupCard(groupIndex, x, y, w) {
   const theme = COOP_SPELL_PLAYER_THEMES[groupIndex === 1 ? 1 : 0];
   const start = groupIndex === 1 ? 3 : 1;
@@ -4879,15 +4934,24 @@ function drawCoopSpellPlaying() {
   const keyH = compact ? 36 : 42;
   const keyboardTop = keyboardBottom - keyH * 3 - keyGap * 2 - 4;
   const controlY = keyboardTop - (compact ? 42 : 46);
-  const statusY = controlY - (compact ? 82 : 86);
+  const peerCardH = compact ? 46 : 52;
+  const localCardH = compact ? 88 : 104;
+  const cardGap = compact ? 6 : 8;
+  const statusStackH = state.soloSpellMode
+    ? (compact ? 82 : 86)
+    : peerCardH + localCardH + cardGap + (compact ? 8 : 10);
+  const statusY = controlY - statusStackH;
   const boatY = promptY + promptH + 8;
-  const boatH = Math.max(compact ? 112 : 150, statusY - boatY - 8);
+  const availableBoatH = Math.max(72, statusY - boatY - 8);
+  const boatH = Math.min(compact ? 112 : 150, availableBoatH);
 
   drawCoopSpellBoat(18, boatY, screen.width - 36, boatH);
   const cells = getCoopSpellCells(localSegment);
   const wordY = boatY + Math.max(28, Math.min(boatH - 58, boatH * 0.22));
   drawCoopSpellWord(cells, 30, wordY, screen.width - 60, localSegment);
-  drawText(state.soloSpellMode ? "看中文意思，依次填完四个空" : "看中文意思，按颜色填写自己的两个空", screen.width / 2, boatY + boatH - 18, compact ? 11 : 12, COLORS.deep, 900, "center");
+  if (boatH >= 104) {
+    drawText(state.soloSpellMode ? "看中文意思，依次填完四个空" : "看中文意思，按颜色填写自己的两个空", screen.width / 2, boatY + boatH - 18, compact ? 11 : 12, COLORS.deep, 900, "center");
+  }
 
   const statusGap = 10;
   const statusW = (screen.width - 48 - statusGap) / 2;
@@ -4895,8 +4959,11 @@ function drawCoopSpellPlaying() {
     drawSoloSpellGroupCard(0, 24, statusY, statusW);
     drawSoloSpellGroupCard(1, 24 + statusW + statusGap, statusY, statusW);
   } else {
-    drawCoopSpellStatusCard(state.players[0] || me, 24, statusY, statusW, isLocalPlayer(state.players[0] || me), 0);
-    drawCoopSpellStatusCard(state.players[1] || other, 24 + statusW + statusGap, statusY, statusW, isLocalPlayer(state.players[1] || other), 1);
+    const meIndex = Math.max(0, state.players.findIndex((player) => player && player.openid === me.openid));
+    const otherIndex = Math.max(0, state.players.findIndex((player) => player && player.openid === other.openid));
+    const peerW = Math.min(screen.width - 48, compact ? 214 : 238);
+    drawCoopSpellPeerMiniCard(other, screen.width - 24 - peerW, statusY, peerW, peerCardH, otherIndex);
+    drawCoopSpellLocalFocusCard(me, 24, statusY + peerCardH + cardGap, screen.width - 48, localCardH, meIndex);
   }
 
   const localSubmission = me && getCoopSpellSubmission(me.openid);
@@ -4907,7 +4974,7 @@ function drawCoopSpellPlaying() {
   const skipButtonW = 92;
   const submitX = 24 + skipButtonW + 8;
   addButton("coopSpellSkip", "跳过 -100", 24, controlY, skipButtonW, controlH, { kind: "danger", fontSize: 12, disabled: state.catchPending || advancingQuestion || !question.id });
-  addButton("coopSpellSubmit", localSubmitted ? "已提交，等队友" : (state.catchPending ? "发送中..." : "确认提交"), submitX, controlY, screen.width - submitX - 24, controlH, { disabled: !readyToSubmit || state.catchPending || advancingQuestion || localSubmitted });
+  addButton("coopSpellSubmit", localSubmitted ? "已提交，等队友" : (state.catchPending ? "发送中..." : "提交我的字母"), submitX, controlY, screen.width - submitX - 24, controlH, { disabled: !readyToSubmit || state.catchPending || advancingQuestion || localSubmitted });
 
   LETTER_KEY_ROWS.forEach((letters, row) => {
     const rowLength = letters.length;
