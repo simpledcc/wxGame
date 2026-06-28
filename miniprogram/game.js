@@ -551,7 +551,8 @@ const ROOM_RENDER_DELAY = 120;
 const STATIC_RENDER_DELAY = 80;
 const ROOM_POLL_INTERVAL = 1000;
 const COOP_SPELL_ROOM_POLL_INTERVAL = 600;
-const DEBUG_LOGS_ENABLED = true;
+const DEBUG_TOOLS_ENABLED = false;
+const DEBUG_LOGS_ENABLED = false;
 const DEBUG_LOG_MAX_TEXT = 80;
 const DEBUG_LOG_COPY_MAX_CHARS = 4200;
 const DEBUG_LOG_COPY_RETRY_CHARS = 1800;
@@ -3234,7 +3235,9 @@ function drawHome() {
   } else {
     drawMascotFish(screen.width - 70, headerY + 32, 0.56, true);
   }
-  addButton("debugLogs", "日志", 24, headerY + 62, 64, 36, { kind: "secondary", fontSize: 13 });
+  if (DEBUG_TOOLS_ENABLED) {
+    addButton("debugLogs", "日志", 24, headerY + 62, 64, 36, { kind: "secondary", fontSize: 13 });
+  }
   addButton("soundToggle", state.soundMuted ? "已静音" : "声音开", screen.width - 276, headerY + 62, 76, 36, { kind: state.soundMuted ? "secondary" : "primary", fontSize: 14 });
   addButton("help", "玩法", screen.width - 190, headerY + 62, 76, 36, { kind: "secondary" });
   addButton("history", "战绩", screen.width - 104, headerY + 62, 80, 36, { kind: "secondary" });
@@ -3835,7 +3838,9 @@ function drawRoom() {
   addButton("ready", ready ? "取消准备" : "准备", x, actionY, (w - 14) / 2, 50, { kind: ready ? "secondary" : "primary", disabled: state.busy });
   addButton("start", "开始游戏", x + (w + 14) / 2, actionY, (w - 14) / 2, 50, { disabled: !canStart || state.busy });
   addButton("home", "返回首页", x, actionY + 60, w, 42, { kind: "secondary" });
-  addButton("debugLogs", "日志", x, actionY + 104, w, 28, { kind: "secondary", fontSize: 13 });
+  if (DEBUG_TOOLS_ENABLED) {
+    addButton("debugLogs", "日志", x, actionY + 104, w, 28, { kind: "secondary", fontSize: 13 });
+  }
 }
 
 function bounce(value, min, max) {
@@ -6257,7 +6262,7 @@ async function handleButton(id) {
     gameOptions: state.gameOptions
   });
   if (id === "debugLogs") {
-    copyDebugLogs();
+    if (DEBUG_TOOLS_ENABLED) copyDebugLogs();
     return;
   }
 
