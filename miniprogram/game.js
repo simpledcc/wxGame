@@ -564,6 +564,7 @@ const SLOW_CLOUD_CALL_MS = 900;
 const SLOW_ROOM_FETCH_MS = 700;
 const SLOW_INPUT_HANDLER_MS = 80;
 const EMPTY_TAP_LOG_INTERVAL_MS = 2000;
+const TAP_RIPPLE_ENABLED = false;
 
 const BACKGROUND_SCENES = [
   {
@@ -688,6 +689,10 @@ const state = {
   coopSpellAdvancingQuestionId: "",
   coopSpellAutoSkipQuestionId: "",
   coopSpellQuestionTimeLeft: COOP_SPELL_QUESTION_SECONDS,
+  coopSpellQuestionLocalId: "",
+  coopSpellQuestionLocalStartedAt: 0,
+  roomStartedRemoteAt: 0,
+  roomStartedLocalAt: 0,
   soloSpellRecordSaved: false,
   soundMuted: getStoredSoundMuted()
 };
@@ -4300,9 +4305,24 @@ function getCoopSpellQuestionStartedAt(question) {
   return Number.isFinite(timestamp) && timestamp > 0 ? timestamp : getNow();
 }
 
-function updateCoopSpellQuestionClock() {
+function getCoopSpellTotalElapsedSeconds() {
+  if (!state.soloSpellMode && state.roomStartedLocalAt && Number(state.startedAt || 0) === state.roomStartedRemoteAt) {
+    return Math.max(0, (getNow() - state.roomStartedLocalAt) / 1000);
+  }
   const totalStartedAt = Number(state.startedAt || getNow());
-  const totalElapsed = Math.max(0, (getNow() - totalStartedAt) / 1000);
+  return Math.max(0, (getNow() - totalStartedAt) / 1000);
+}
+
+function getCoopSpellQuestionElapsedSeconds(question) {
+  const questionId = getCoopSpellQuestionId(question);
+  if (!state.soloSpellMode && questionId && questionId === state.coopSpellQuestionLocalId && state.coopSpellQuestionLocalStartedAt) {
+    return Math.max(0, (getNow() - state.coopSpellQuestionLocalStartedAt) / 1000);
+  }
+  return Math.max(0, (getNow() - getCoopSpellQuestionStartedAt(question)) / 1000);
+}
+
+function updateCoopSpellQuestionClock() {
+  const totalElapsed = getCoopSpellTotalElapsedSeconds();
   const totalDuration = Number(state.duration || state.gameOptions.duration || DEFAULT_GAME_OPTIONS.duration);
   state.timeLeft = Math.max(0, Math.ceil(totalDuration - totalElapsed));
   if (state.timeLeft <= 0) {
@@ -4325,7 +4345,7 @@ function updateCoopSpellQuestionClock() {
     state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
     return;
   }
-  const elapsed = Math.max(0, (getNow() - getCoopSpellQuestionStartedAt(question)) / 1000);
+  const elapsed = getCoopSpellQuestionElapsedSeconds(question);
   state.coopSpellQuestionTimeLeft = Math.max(0, Math.ceil(COOP_SPELL_QUESTION_SECONDS - elapsed));
   if (state.coopSpellQuestionTimeLeft > 0 || state.catchPending || state.coopSpellAutoSkipQuestionId === question.id) return;
   state.coopSpellAutoSkipQuestionId = question.id;
@@ -4376,6 +4396,8 @@ function applySoloSpellQuestion(question) {
   state.coopSpellSubmissions = {};
   state.coopSpellInput = [];
   state.coopSpellInputQuestionId = question ? question.id : "";
+  state.coopSpellQuestionLocalId = question ? question.id : "";
+  state.coopSpellQuestionLocalStartedAt = question ? getNow() : 0;
   state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
@@ -4457,6 +4479,8 @@ function filterCoopSpellSubmissionsForQuestion(submissions, questionId) {
 function resetCoopSpellDraftForQuestion(questionId) {
   state.coopSpellInput = [];
   state.coopSpellInputQuestionId = String(questionId || "");
+  state.coopSpellQuestionLocalId = String(questionId || "");
+  state.coopSpellQuestionLocalStartedAt = questionId ? getNow() : 0;
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
 }
@@ -4566,6 +4590,8 @@ function syncCoopSpellInputLength(segment) {
   if (questionId !== state.coopSpellInputQuestionId) {
     state.coopSpellInput = [];
     state.coopSpellInputQuestionId = questionId;
+    state.coopSpellQuestionLocalId = questionId;
+    state.coopSpellQuestionLocalStartedAt = questionId ? getNow() : 0;
   }
   const maxLength = segment ? Number(segment.length || 0) : 0;
   if (maxLength && state.coopSpellInput.length > maxLength) {
@@ -4834,14 +4860,14 @@ function drawCoopSpellLocalFocusCard(player, x, y, w, h, playerIndex) {
   const slotIndexes = Array.isArray(segment.slotIndexes) ? segment.slotIndexes : [];
   const inputCount = submitted ? Number(submission.length || segment.length || 0) : state.coopSpellInput.length;
   const expectedCount = Number(segment.length || slotIndexes.length || 0);
-  const title = submitted ? "我已填好" : "我负责的字母";
+  const title = submitted ? "已填" : "请填";
   const rangeText = segment.start ? `第${segment.start}-${segment.end}空` : "等待分配";
 
   fillRoundedRect(x, y, w, h, 14, theme.fill);
   strokeRoundedRect(x, y, w, h, 14, submitted ? COLORS.green : theme.stroke, 2.4);
-  fillRoundedRect(x + 14, y + 12, 76, 24, 12, theme.badge);
-  drawText(title, x + 52, y + 29, 13, COLORS.white, 900, "center");
-  drawFitText(rangeText, x + 104, y + 30, 16, theme.text, 900, "left", w - 188);
+  fillRoundedRect(x + 14, y + 12, 58, 24, 12, theme.badge);
+  drawText(title, x + 43, y + 29, 13, COLORS.white, 900, "center");
+  drawFitText(rangeText, x + 86, y + 30, 16, theme.text, 900, "left", w - 170);
   fillRoundedRect(x + w - 70, y + 12, 52, 24, 12, "rgba(255,255,255,0.88)");
   drawText(`${inputCount}/${expectedCount || 0}`, x + w - 44, y + 29, 13, theme.text, 900, "center");
 
@@ -4941,7 +4967,7 @@ function drawCoopSpellPlaying() {
     ? (compact ? 82 : 86)
     : peerCardH + localCardH + cardGap + (compact ? 8 : 10);
   const statusY = controlY - statusStackH;
-  const boatY = promptY + promptH + 8;
+  const boatY = promptY + promptH + (compact ? 12 : 16);
   const availableBoatH = Math.max(72, statusY - boatY - 8);
   const boatH = Math.min(compact ? 112 : 150, availableBoatH);
 
@@ -5513,7 +5539,16 @@ function applyRoomSnapshot(room) {
   state.duration = room.duration || state.duration || 60;
   state.gameOptions = normalizeGameOptions(room.gameOptions || { ...state.gameOptions, duration: state.duration });
   refreshRoomPollingInterval();
-  if (room.startedAt) state.startedAt = new Date(room.startedAt).getTime();
+  if (room.startedAt) {
+    const remoteStartedAt = new Date(room.startedAt).getTime();
+    if (Number.isFinite(remoteStartedAt) && remoteStartedAt > 0) {
+      if (remoteStartedAt !== state.roomStartedRemoteAt || !state.roomStartedLocalAt) {
+        state.roomStartedRemoteAt = remoteStartedAt;
+        state.roomStartedLocalAt = getNow();
+      }
+      state.startedAt = remoteStartedAt;
+    }
+  }
   addRoomPowerUpUseFeedback(getRoomPowerUpUseEvent(room));
 
   if (room.state === "playing" && state.scene !== GAME.PLAYING) {
@@ -5732,6 +5767,10 @@ function enterRoom(roomId, roomCode, initialRoom) {
   state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
+  state.coopSpellQuestionLocalId = "";
+  state.coopSpellQuestionLocalStartedAt = 0;
+  state.roomStartedRemoteAt = 0;
+  state.roomStartedLocalAt = 0;
   state.finishing = false;
   state.catchPending = false;
   state.pesticideEffectUntil = 0;
@@ -5871,6 +5910,10 @@ function goHome() {
   state.coopSpellAdvancingQuestionId = "";
   state.coopSpellAutoSkipQuestionId = "";
   state.coopSpellQuestionTimeLeft = COOP_SPELL_QUESTION_SECONDS;
+  state.coopSpellQuestionLocalId = "";
+  state.coopSpellQuestionLocalStartedAt = 0;
+  state.roomStartedRemoteAt = 0;
+  state.roomStartedLocalAt = 0;
   state.resultTitle = "";
   state.combo = 0;
   state.feedbacks = [];
@@ -6000,7 +6043,7 @@ function handleFishTap(x, y) {
     return;
   }
   state.catchPending = true;
-  addFeedback("", x, y, COLORS.cyan, { type: "tap" });
+  if (TAP_RIPPLE_ENABLED) addFeedback("", x, y, COLORS.cyan, { type: "tap" });
   callFunction("catchFish", { roomId: state.roomId, fishId: fish.id }).then((res) => {
     const result = res.result || {};
     const delta = result.delta || 0;
