@@ -544,12 +544,13 @@ const COOP_SPELL_PLAYER_THEMES = [
   { fill: "#CFFAFE", stroke: "#0891B2", text: "#155E75", badge: "#0E7490" },
   { fill: "#FFE4E6", stroke: "#FB7185", text: "#9F1239", badge: "#E11D48" }
 ];
-const COOP_SPELL_QUESTION_SECONDS = 15;
+const COOP_SPELL_QUESTION_SECONDS = 20;
 const COOP_SPELL_ROUND_SCORE = 100;
 const PLAYING_RENDER_DELAY = 33;
 const ROOM_RENDER_DELAY = 120;
 const STATIC_RENDER_DELAY = 80;
 const ROOM_POLL_INTERVAL = 1000;
+const COOP_SPELL_ROOM_POLL_INTERVAL = 600;
 const DEBUG_LOGS_ENABLED = true;
 const DEBUG_LOG_MAX_TEXT = 80;
 const DEBUG_LOG_COPY_MAX_CHARS = 4200;
@@ -695,6 +696,7 @@ migrateStoredScoreRecords();
 state.bestScores = getBestScores();
 
 let pollTimer = null;
+let roomPollInterval = 0;
 let renderTimer = null;
 let frameNow = 0;
 let roomFetchPending = false;
@@ -3516,8 +3518,8 @@ function drawCoopSelect() {
   drawCoopModeCard(
     "coopSpell",
     "同舟拼词记",
-    `${state.gameOptions.duration}秒 · 每词15秒 · 两人各填2格`,
-    "蓝色空格由玩家1填写，粉色空格由玩家2填写。每个单词限时15秒。",
+    `${state.gameOptions.duration}秒 · 每词20秒 · 两人各填2格`,
+    "蓝色空格由玩家1填写，粉色空格由玩家2填写。两人都确认或倒计时结束后判定。",
     x + 18,
     cardY + cardH + cardGap,
     w - 36,
@@ -4485,6 +4487,30 @@ function isCoopSpellSubmissionReady(submission) {
   return !!(submission && (submission.status === "submitted" || submission.status === "correct" || submission.status === "wrong"));
 }
 
+function rememberLocalCoopSpellSubmission(openid, questionId, answer, length) {
+  if (!openid || !questionId) return;
+  state.coopSpellSubmissions = {
+    ...(state.coopSpellSubmissions || {}),
+    [openid]: {
+      status: "submitted",
+      questionId,
+      answer,
+      length,
+      submittedAt: Date.now(),
+      optimistic: true
+    }
+  };
+}
+
+function rollbackLocalCoopSpellSubmission(openid, questionId) {
+  const submissions = state.coopSpellSubmissions || {};
+  const current = submissions[openid];
+  if (!current || !current.optimistic || String(current.questionId || "") !== String(questionId || "")) return;
+  const next = { ...submissions };
+  delete next[openid];
+  state.coopSpellSubmissions = next;
+}
+
 function getCoopSpellSegmentOwner(slotIndex) {
   const question = state.coopSpellQuestion || {};
   const segments = Array.isArray(question.segments) ? question.segments : [];
@@ -4787,7 +4813,7 @@ function drawCoopSpellStatusCard(player, x, y, w, isMe, playerIndex) {
   drawText((player.nickName || "玩").slice(0, 1), x + 28, y + 40, 14, COLORS.white, 900, "center");
   drawFitText(isMe ? "我负责" : `${player.nickName || "队友"}负责`, x + 56, y + 25, 13, COLORS.muted, 800, "left", w - 74);
   const rangeText = segment.start ? `第${segment.start}-${segment.end}空 · ${segment.length || 0}个字母` : "等待分配";
-  drawFitText(submitted ? "已填写，等待判定" : rangeText, x + 56, y + 50, 15, submitted ? COLORS.green : COLORS.text, 900, "left", w - 74);
+  drawFitText(submitted ? "已提交，等队友" : rangeText, x + 56, y + 50, 15, submitted ? COLORS.green : COLORS.text, 900, "left", w - 74);
   if (isMe && pending && segment.length) {
     const text = `${state.coopSpellInput.length}/${segment.length}`;
     fillRoundedRect(x + w - 58, y + 22, 42, 26, 13, "rgba(255,255,255,0.86)");
@@ -4856,7 +4882,7 @@ function drawCoopSpellPlaying() {
   const cells = getCoopSpellCells(localSegment);
   const wordY = boatY + Math.max(28, Math.min(boatH - 58, boatH * 0.22));
   drawCoopSpellWord(cells, 30, wordY, screen.width - 60, localSegment);
-  drawText(state.soloSpellMode ? "前两格蓝色、后两格粉色，四格都由你填写" : "蓝色由玩家1填写，粉色由玩家2填写", screen.width / 2, boatY + boatH - 18, compact ? 11 : 12, COLORS.deep, 900, "center");
+  drawText(state.soloSpellMode ? "看中文意思，依次填完四个空" : "看中文意思，按颜色填写自己的两个空", screen.width / 2, boatY + boatH - 18, compact ? 11 : 12, COLORS.deep, 900, "center");
 
   const statusGap = 10;
   const statusW = (screen.width - 48 - statusGap) / 2;
@@ -4875,8 +4901,8 @@ function drawCoopSpellPlaying() {
   const controlH = compact ? 36 : 40;
   const skipButtonW = 92;
   const submitX = 24 + skipButtonW + 8;
-  addButton("coopSpellSkip", "跳过 -100", 24, controlY, skipButtonW, controlH, { kind: "danger", fontSize: 12, disabled: state.catchPending || !question.id });
-  addButton("coopSpellSubmit", state.catchPending ? "处理中..." : (localSubmitted ? "已填写，等队友" : "确认"), submitX, controlY, screen.width - submitX - 24, controlH, { disabled: !readyToSubmit || state.catchPending || localSubmitted });
+  addButton("coopSpellSkip", "跳过 -100", 24, controlY, skipButtonW, controlH, { kind: "danger", fontSize: 12, disabled: state.catchPending || advancingQuestion || !question.id });
+  addButton("coopSpellSubmit", localSubmitted ? "已提交，等队友" : (state.catchPending ? "发送中..." : "确认提交"), submitX, controlY, screen.width - submitX - 24, controlH, { disabled: !readyToSubmit || state.catchPending || advancingQuestion || localSubmitted });
 
   LETTER_KEY_ROWS.forEach((letters, row) => {
     const rowLength = letters.length;
@@ -5338,6 +5364,20 @@ function getRenderDelay() {
   return STATIC_RENDER_DELAY;
 }
 
+function getRoomPollInterval() {
+  return isCoopSpellMode() ? COOP_SPELL_ROOM_POLL_INTERVAL : ROOM_POLL_INTERVAL;
+}
+
+function refreshRoomPollingInterval() {
+  if (!pollTimer || !state.roomId) return;
+  const nextInterval = getRoomPollInterval();
+  if (nextInterval === roomPollInterval) return;
+  clearInterval(pollTimer);
+  roomPollInterval = nextInterval;
+  pollTimer = setInterval(fetchRoom, roomPollInterval);
+  logInfo("room", "poll.interval", { roomId: state.roomId, interval: roomPollInterval });
+}
+
 function startRenderLoop() {
   if (renderTimer) clearTimeout(renderTimer);
   const loop = () => {
@@ -5365,14 +5405,16 @@ function startRenderLoop() {
 function startPollingRoom(skipInitialFetch) {
   if (pollTimer) clearInterval(pollTimer);
   if (!skipInitialFetch) fetchRoom();
-  pollTimer = setInterval(fetchRoom, ROOM_POLL_INTERVAL);
-  logInfo("room", "poll.start", { roomId: state.roomId, skipInitialFetch: !!skipInitialFetch, interval: ROOM_POLL_INTERVAL });
+  roomPollInterval = getRoomPollInterval();
+  pollTimer = setInterval(fetchRoom, roomPollInterval);
+  logInfo("room", "poll.start", { roomId: state.roomId, skipInitialFetch: !!skipInitialFetch, interval: roomPollInterval });
 }
 
 function stopPollingRoom() {
   if (pollTimer) {
     clearInterval(pollTimer);
     pollTimer = null;
+    roomPollInterval = 0;
     logInfo("room", "poll.stop", { roomId: state.roomId });
   }
   roomFetchQueued = false;
@@ -5398,6 +5440,7 @@ function applyRoomSnapshot(room) {
   applyCoopSpellQuestionState(nextSpellQuestion, room.spellSubmissions || {});
   state.duration = room.duration || state.duration || 60;
   state.gameOptions = normalizeGameOptions(room.gameOptions || { ...state.gameOptions, duration: state.duration });
+  refreshRoomPollingInterval();
   if (room.startedAt) state.startedAt = new Date(room.startedAt).getTime();
   addRoomPowerUpUseFeedback(getRoomPowerUpUseEvent(room));
 
@@ -6135,9 +6178,10 @@ async function submitCoopSpellAnswer() {
     submitSoloSpellAnswer(answer, me, segment);
     return;
   }
+  const questionId = (state.coopSpellQuestion && state.coopSpellQuestion.id) || state.targetFishId;
+  rememberLocalCoopSpellSubmission(me.openid, questionId, answer, expectedLength);
   state.catchPending = true;
   const started = Date.now();
-  const questionId = (state.coopSpellQuestion && state.coopSpellQuestion.id) || state.targetFishId;
   logInfo("spell", "submit.start", { questionId, answerLength: answer.length, segmentLength: expectedLength });
   callFunction("catchFish", {
     roomId: state.roomId,
@@ -6195,6 +6239,7 @@ async function submitCoopSpellAnswer() {
     }
     fetchRoom();
   }).catch((err) => {
+    rollbackLocalCoopSpellSubmission(me.openid, questionId);
     logError("spell", "submit.fail", { questionId, elapsed: Date.now() - started, errMsg: err && (err.errMsg || err.message) });
     toast(err.errMsg || "提交失败");
   }).finally(() => {

@@ -403,7 +403,7 @@ const LANE_COUNT = 6;
 const POWER_UP_COMBO = 3;
 const STUN_DURATION = 5000;
 const POWER_UPS = ["pesticide", "swatter"];
-const COOP_SPELL_QUESTION_MS = 15000;
+const COOP_SPELL_QUESTION_MS = 20000;
 const COOP_SPELL_ROUND_SCORE = 100;
 
 function normalizeGameOptions(options) {

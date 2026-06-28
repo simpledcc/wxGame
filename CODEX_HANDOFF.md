@@ -204,6 +204,11 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 ## Caution Points
 
+- 2026-06-28 update: co-op spell interaction polish.
+  - Per-word spell timer is now 20 seconds on both client and `catchFish`.
+  - Co-op spell rooms poll every 600ms instead of 1000ms to reduce partner-submit/switch-word delay.
+  - Submit is optimistic locally: the player sees "已提交，等队友" immediately, with rollback on cloud failure.
+  - In-game co-op spell prompts now emphasize checking the Chinese meaning and filling the player's own colored blanks.
 - 2026-06-27 update: co-op spell now uses pre-generated blank templates.
   - Added `spellWordBankData.js` to the miniprogram and spell-related cloud functions.
   - 44 built-in banks generate 6351 fixed spell templates with `mask`, `blankPositions`, and `slots`.
