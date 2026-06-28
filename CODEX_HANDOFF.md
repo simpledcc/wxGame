@@ -14,9 +14,10 @@ Resume point for the next agent:
 
 - Current latest build includes: word-bank unlocks with `金币`, `背单词`, background music, PK mode, test robot, power-ups, and two co-op modes.
 - Latest preview QR is at `C:\work\wxgame\wx_game\wx_game\.codex-preview\preview.png`.
-- Latest preview package size is about `2.1 MB` (`2251396` bytes).
+- Latest preview package size is about `2.1 MB` (`2252810` bytes).
 - Latest cloud deploy target is `cloud1-d3gre86i51a49821a`.
-- Last deployed cloud functions: `createRoom`, `startGame`, `catchFish`, `addBot`, `finishGame`.
+- Last deployed cloud functions: `createRoom`, `startGame`, `catchFish`, `addBot`, `finishGame`, `submitFeedback`.
+- 2026-06-28 player feedback pass: home now has a `反馈` button next to `加入房间`. Players can submit problem/suggestion text and optional contact info. The frontend calls the new `submitFeedback` cloud function, which validates the content and writes records into the cloud database `feedbacks` collection with player name, openid, contact, scene/room/bank/game context, client version, platform, and `status: "new"`. `submitFeedback` was deployed to `cloud1-d3gre86i51a49821a`. WeChat DevTools preview and upload passed; uploaded development version is `2026.06.28.2` with description `add player feedback form and submitFeedback cloud function`.
 - 2026-06-28 launch hardening pass: client diagnostic tools are now disabled for release (`DEBUG_TOOLS_ENABLED=false`, `DEBUG_LOGS_ENABLED=false`), so the visible home/room `logs` buttons are hidden and the stale debug handler is gated. `project.config.json` now disables source-map upload for release previews. Validation passed for JS syntax, JSON parsing, static button-handler coverage, direct cloud-function references, all 44 prebuilt spell banks/6351 spell templates, coop spell submit/wait/history behavior, and question-change input reset behavior. A WeChat DevTools preview was generated successfully at `.codex-preview/preview.png`.
 - 2026-06-28 coop spell UI focus pass: the two-player spell screen now emphasizes the local player's responsibility area. The local segment is shown as a large full-width card above the keyboard with two prominent input boxes and progress, while the teammate area is reduced to a compact status chip showing only range/submission state. Boat height now adapts to the remaining vertical space, and the boat hint is hidden on short screens to avoid overlap. JS syntax checks and WeChat DevTools preview passed.
 - 2026-06-28 coop spell timer/layout tuning: coop spell total/question countdowns now use local room/question anchors after the room snapshot arrives, avoiding visible countdown differences caused by two phones having different system clocks. The local input card label is shortened to `请填` / `已填`, the boat area is moved slightly lower with adaptive height, and PK tap ripple feedback is disabled by `TAP_RIPPLE_ENABLED=false` to reduce extra per-frame drawing on lower-end devices. Clock-skew simulation, JS syntax checks, JSON checks, layout coordinate checks, and WeChat DevTools preview passed.
@@ -121,6 +122,11 @@ Cloud functions:
   - Finishes timed-out rooms.
   - Co-op rooms finish without a winner openid.
 
+- `cloudfunctions/submitFeedback/index.js`
+  - Receives player feedback from the home `反馈` button.
+  - Writes records to the cloud database `feedbacks` collection.
+  - Keep writes server-side because `database.rules.json` has client writes disabled.
+
 Each cloud function has its own copy of:
 
 - `cloudfunctions/createRoom/wordBankData.js`
@@ -142,6 +148,7 @@ The following cloud functions were deployed successfully after the latest loggin
 - `catchFish`
 - `finishGame`
 - `getOpenId`
+- `submitFeedback`
 
 Environment used:
 
@@ -155,7 +162,7 @@ Latest preview was generated successfully:
 
 `C:\work\wxgame\wx_game\wx_game\.codex-preview\preview.png`
 
-Latest preview package size was about `663.4 KB` (`679328` bytes).
+Latest preview package size was about `2.1 MB` (`2252810` bytes).
 
 ## Useful Commands
 

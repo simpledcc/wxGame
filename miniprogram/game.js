@@ -519,6 +519,7 @@ const BOT_PRESETS = [
 
 const LANE_COUNT = 6;
 const DEFAULT_FISH_COUNT = 6;
+const CLIENT_VERSION = "2026.06.28-feedback";
 const WRONG_WORDS_KEY = "wrongWords";
 const MATCH_RECORDS_KEY = "matchRecords";
 const BEST_SCORES_KEY = "bestScoresByMode";
@@ -1448,6 +1449,48 @@ function promptText(title, placeholder, defaultValue, maxLength) {
         resolve("");
       }
     });
+  });
+}
+
+function getFeedbackContext() {
+  const options = state.gameOptions || {};
+  const info = systemInfo || {};
+  return {
+    scene: state.scene,
+    roomId: state.roomId,
+    roomCode: state.roomCode,
+    bankId: options.bankId || "",
+    mode: options.mode || "",
+    matchMode: options.matchMode || "",
+    coopMode: options.coopMode || "",
+    duration: options.duration || state.duration || 0,
+    clientVersion: CLIENT_VERSION,
+    system: info.system || "",
+    platform: info.platform || ""
+  };
+}
+
+async function submitUserFeedback() {
+  if (state.busy) return;
+  const content = await promptText("问题反馈", "请描述遇到的问题或建议", "", 300);
+  if (!content) return;
+  if (content.length < 4) {
+    toast("请多写一点反馈内容");
+    return;
+  }
+  const contact = await promptText("联系方式（可选）", "微信号/手机号/邮箱，可不填", "", 80);
+  setBusy(true, "正在提交反馈...");
+  callFunction("submitFeedback", {
+    content,
+    contact,
+    playerName: state.playerName,
+    context: getFeedbackContext()
+  }).then(() => {
+    toast("反馈已提交，谢谢");
+  }).catch((err) => {
+    toast(getCloudErrorMessage(err, "反馈提交失败"));
+  }).finally(() => {
+    setBusy(false);
   });
 }
 
@@ -3245,6 +3288,9 @@ function drawHome() {
   const studyH = compactHome ? 56 : 62;
   const battleY = compactHome ? 342 : 382;
   const joinY = compactHome ? 400 : 448;
+  const joinGap = 12;
+  const feedbackW = compactHome ? 82 : 92;
+  const joinW = panelW - 36 - joinGap - feedbackW;
 
   drawBubble(54, headerY + 12, 10, "rgba(255,255,255,0.55)", 0.8);
   drawBubble(screen.width - 62, headerY + 44, 7, "rgba(255,255,255,0.5)", 0.8);
@@ -3292,7 +3338,8 @@ function drawHome() {
   const battleW = (panelW - 36 - battleGap) / 2;
   addButton("create", state.busy ? "处理中..." : "双人PK", panelX + 18, panelY + battleY, battleW, compactHome ? 48 : 52, { disabled: state.busy });
   addButton("coop", "双人合作", panelX + 18 + battleW + battleGap, panelY + battleY, battleW, compactHome ? 48 : 52, { kind: "secondary", disabled: state.busy });
-  addButton("join", "加入房间", panelX + 18, panelY + joinY, panelW - 36, compactHome ? 42 : 44, { kind: "secondary", disabled: state.busy });
+  addButton("join", "加入房间", panelX + 18, panelY + joinY, joinW, compactHome ? 42 : 44, { kind: "secondary", disabled: state.busy });
+  addButton("feedback", "反馈", panelX + 18 + joinW + joinGap, panelY + joinY, feedbackW, compactHome ? 42 : 44, { kind: "secondary", disabled: state.busy });
 }
 
 function drawBankPicker() {
@@ -6530,6 +6577,11 @@ async function handleButton(id) {
   if (id === "help") {
     stopPollingRoom();
     state.scene = GAME.HELP;
+    return;
+  }
+
+  if (id === "feedback") {
+    await submitUserFeedback();
     return;
   }
 
