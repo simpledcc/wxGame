@@ -525,8 +525,12 @@ const BEST_SCORES_KEY = "bestScoresByMode";
 const WORD_COINS_KEY = "wordCoins";
 const UNLOCKED_BANKS_KEY = "unlockedWordBanks";
 const SOUND_MUTED_KEY = "soundMuted";
-const INITIAL_WORD_COINS = 1000;
+const INITIAL_WORD_COINS = 50;
 const WORD_BANK_UNLOCK_COST = 10;
+const REVIEW_WORD_BANK_UNLOCK_COST = 30;
+const ALL_REVIEW_WORD_BANK_UNLOCK_COST = 150;
+const RECHARGE_RMB_AMOUNT = 1;
+const RECHARGE_COIN_AMOUNT = 10;
 const MATCH_RECORD_LIMIT = 50;
 const HISTORY_PAGE_SIZE = 5;
 const ROOM_WORD_POOL_LIMIT = 240;
@@ -1693,11 +1697,12 @@ function drawCoinPill(x, y, w, h) {
   drawFitText(`金币 ${getWordCoinLabel()}`, x + h + 8, y + h / 2 + 5, 14, "#78350F", 900, "left", w - h - 14);
 }
 
-function drawUnlockCostBadge(x, y, w, h) {
+function drawUnlockCostBadge(x, y, w, h, cost) {
+  const text = String(cost == null ? WORD_BANK_UNLOCK_COST : cost);
   fillRoundedRect(x, y, w, h, h / 2, "rgba(255,247,237,0.94)");
   strokeRoundedRect(x, y, w, h, h / 2, "#F59E0B", 1);
   drawCoinIcon(x + h / 2, y + h / 2, Math.max(6, h * 0.32));
-  drawText(String(WORD_BANK_UNLOCK_COST), x + h + 2, y + h / 2 + 4, 11, "#92400E", 900);
+  drawText(text, x + h + 2, y + h / 2 + 4, 11, "#92400E", 900);
 }
 
 function drawMascotFish(x, y, scale, flip) {
@@ -2614,6 +2619,15 @@ function isUnlockableWordBankId(bankId) {
   return !!(WORD_BANKS[bankId] && WORD_BANKS[bankId].meta) && !isWrongBankId(bankId);
 }
 
+function getWordBankUnlockCost(bankId) {
+  const bank = WORD_BANKS[bankId];
+  const meta = bank && bank.meta;
+  if (meta && meta.special === "review") {
+    return bankId === "jilin-g3r-all-review" ? ALL_REVIEW_WORD_BANK_UNLOCK_COST : REVIEW_WORD_BANK_UNLOCK_COST;
+  }
+  return WORD_BANK_UNLOCK_COST;
+}
+
 function getStoredUnlockedBankIds() {
   let raw = [];
   try {
@@ -2675,11 +2689,12 @@ function getWordCoinLabel() {
 function unlockWordBank(bankId) {
   if (!isUnlockableWordBankId(bankId)) return true;
   if (isWordBankUnlocked(bankId)) return true;
-  if (state.coins < WORD_BANK_UNLOCK_COST) {
+  const cost = getWordBankUnlockCost(bankId);
+  if (state.coins < cost) {
     toast("金币不足，暂时无法解锁");
     return false;
   }
-  saveCoinBalance(state.coins - WORD_BANK_UNLOCK_COST);
+  saveCoinBalance(state.coins - cost);
   saveUnlockedBankIds([bankId, ...state.unlockedBankIds]);
   toast("词库已解锁");
   return true;
@@ -2689,14 +2704,15 @@ function confirmUnlockWordBank(bankId) {
   if (isWordBankUnlocked(bankId)) return Promise.resolve(true);
   const bank = WORD_BANKS[bankId];
   if (!bank) return Promise.resolve(false);
-  if (state.coins < WORD_BANK_UNLOCK_COST) {
+  const cost = getWordBankUnlockCost(bankId);
+  if (state.coins < cost) {
     toast("金币不足，无法解锁");
     return Promise.resolve(false);
   }
   return new Promise((resolve) => {
     wx.showModal({
       title: "解锁词库",
-      content: `消耗 ${WORD_BANK_UNLOCK_COST} 金币解锁 ${getWordBankLabel(bank, false)}？`,
+      content: `消耗 ${cost} 金币解锁 ${getWordBankLabel(bank, false)}？`,
       confirmText: "解锁",
       cancelText: "再看看",
       success(res) {
@@ -3292,6 +3308,7 @@ function drawBankPicker() {
   const pickedBankId = WORD_BANKS[state.bankPickerSelectedBankId] ? state.bankPickerSelectedBankId : state.gameOptions.bankId;
   const pickedBank = WORD_BANKS[pickedBankId] || selectedBank;
   const pickedUnlocked = isWordBankUnlocked(pickedBankId);
+  const pickedUnlockCost = getWordBankUnlockCost(pickedBankId);
   const banks = getBanksForProvince(state.bankPickerProvinceId);
 
   drawText("选择词库", x, topY, 32, COLORS.white, 900);
@@ -3301,8 +3318,8 @@ function drawBankPicker() {
   fillRoundedRect(x + 16, panelY + 14, w - 32, 76, 10, "rgba(207,250,254,0.78)");
   drawFitText(getWordBankLabel(pickedBank, false), x + 32, panelY + 40, 16, COLORS.deep, 900, "left", w - 64);
   const pickedStatus = w < 310
-    ? (pickedUnlocked ? "已解锁" : `${WORD_BANK_UNLOCK_COST}金币解锁`)
-    : (pickedUnlocked ? "已解锁，可进入对战" : `未解锁，消耗 ${WORD_BANK_UNLOCK_COST} 金币开启`);
+    ? (pickedUnlocked ? "已解锁" : `${pickedUnlockCost}金币解锁`)
+    : (pickedUnlocked ? "已解锁，可进入对战" : `未解锁，消耗 ${pickedUnlockCost} 金币开启`);
   drawText(
     pickedStatus,
     x + 32,
@@ -3358,7 +3375,9 @@ function drawBankPicker() {
       fontSize: 14
     });
     if (!unlocked) {
-      drawUnlockCostBadge(buttonX + bankW - 48, buttonY + 7, 42, 20);
+      const cost = getWordBankUnlockCost(item.id);
+      const badgeW = cost >= 100 ? 52 : 42;
+      drawUnlockCostBadge(buttonX + bankW - badgeW - 6, buttonY + 7, badgeW, 20, cost);
       if (selected) strokeRoundedRect(buttonX, buttonY, bankW, 34, 8, COLORS.gold, 2);
     }
   });
@@ -3572,14 +3591,14 @@ function drawHelp() {
   const sections = compact ? [
     ["目标", "看上方中文含义，点击正确英文虫子。"],
     ["得分", "答对+100，答错-100，错词进错题词库。"],
-    ["词库", `单元词库可用${WORD_BANK_UNLOCK_COST}金币解锁，初始1000金币。`],
+    ["词库", `初始${INITIAL_WORD_COINS}金币，单元${WORD_BANK_UNLOCK_COST}金币，总复习${REVIEW_WORD_BANK_UNLOCK_COST}金币。`],
     ["房间", "默契捕词赛、同舟拼词记需好友加入。"],
     ["道具", "连续答对3个获得，头像上方点击使用。"],
     ["技能", "杀虫剂清屏加分，苍蝇拍敲晕对手5秒。"]
   ] : [
     ["目标", "看上方中文含义，点击正确英文虫子。"],
     ["得分", "答对+100，答错-100，错词进错题词库。"],
-    ["词库", `选择单元开局，锁定词库可用${WORD_BANK_UNLOCK_COST}金币解锁。`],
+    ["词库", `充值按${RECHARGE_RMB_AMOUNT}元${RECHARGE_COIN_AMOUNT}金币设计；全部总复习${ALL_REVIEW_WORD_BANK_UNLOCK_COST}金币。`],
     ["房间", "双人PK可选机器人；默契捕词赛和同舟拼词记必须邀请好友。"],
     ["道具", "连续答对3个随机获得，头像上方点击使用。"],
     ["技能", "杀虫剂清屏加分，苍蝇拍敲晕对手5秒。"],
