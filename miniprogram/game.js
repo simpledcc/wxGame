@@ -519,7 +519,7 @@ const BOT_PRESETS = [
 
 const LANE_COUNT = 6;
 const DEFAULT_FISH_COUNT = 6;
-const CLIENT_VERSION = "2026.06.28-feedback";
+const CLIENT_VERSION = "2026.06.29-content-safety";
 const WRONG_WORDS_KEY = "wrongWords";
 const MATCH_RECORDS_KEY = "matchRecords";
 const BEST_SCORES_KEY = "bestScoresByMode";
@@ -1452,6 +1452,26 @@ function promptText(title, placeholder, defaultValue, maxLength) {
   });
 }
 
+async function checkUserTextSafety(content, label, scene, maxLength) {
+  const text = String(content || "").trim().slice(0, maxLength || 300);
+  if (!text) return true;
+  setBusy(true, "正在检查内容...");
+  try {
+    await callFunction("checkText", {
+      content: text,
+      label: label || "内容",
+      scene: scene || 1,
+      maxLength: maxLength || 300
+    });
+    return true;
+  } catch (err) {
+    toast(getCloudErrorMessage(err, "内容包含不合规信息"));
+    return false;
+  } finally {
+    setBusy(false);
+  }
+}
+
 function getFeedbackContext() {
   const options = state.gameOptions || {};
   const info = systemInfo || {};
@@ -1480,6 +1500,13 @@ async function submitUserFeedback() {
   }
   const contact = await promptText("联系方式（可选）", "微信号/手机号/邮箱，可不填", "", 80);
   setBusy(true, "正在提交反馈...");
+  const contentSafe = await checkUserTextSafety(content, "反馈内容", 2, 300);
+  if (!contentSafe) return;
+  if (contact) {
+    const contactSafe = await checkUserTextSafety(contact, "联系方式", 2, 80);
+    if (!contactSafe) return;
+  }
+  setBusy(true, "姝ｅ湪鎻愪氦鍙嶉...");
   callFunction("submitFeedback", {
     content,
     contact,
@@ -6559,6 +6586,8 @@ async function handleButton(id) {
   if (id === "name") {
     const value = await promptText("玩家昵称", "输入昵称", state.playerName, 12);
     if (value) {
+      const safe = await checkUserTextSafety(value, "昵称", 1, 12);
+      if (!safe) return;
       state.playerName = value;
       wx.setStorageSync("playerName", value);
     }
