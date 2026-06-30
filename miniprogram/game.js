@@ -519,7 +519,8 @@ const BOT_PRESETS = [
 
 const LANE_COUNT = 6;
 const DEFAULT_FISH_COUNT = 6;
-const CLIENT_VERSION = "2026.06.29-content-safety";
+const CLIENT_VERSION = "2026.06.30-ugc-nickname-lockdown";
+const PUBLIC_PLAYER_NAME = "玩家";
 const WRONG_WORDS_KEY = "wrongWords";
 const MATCH_RECORDS_KEY = "matchRecords";
 const BEST_SCORES_KEY = "bestScoresByMode";
@@ -634,7 +635,7 @@ const FISH_PALETTES = [
 const state = {
   scene: GAME.HOME,
   openid: "",
-  playerName: wx.getStorageSync("playerName") || "玩家",
+  playerName: PUBLIC_PLAYER_NAME,
   gameOptions: { ...DEFAULT_GAME_OPTIONS },
   practiceMode: false,
   soloSpellMode: false,
@@ -702,6 +703,7 @@ const state = {
   soundMuted: getStoredSoundMuted()
 };
 
+try { wx.removeStorageSync("playerName"); } catch (err) {}
 applyInitialUnlockedBankSelection();
 migrateStoredScoreRecords();
 state.bestScores = getBestScores();
@@ -2879,9 +2881,9 @@ function normalizeSpellHistory(history) {
       delta: Number(item.delta || 0),
       teamScore: Number(item.teamScore || 0),
       finishedAt: getDateTime(item.finishedAt) || Date.now(),
-      players: players.slice(0, 2).map((player) => ({
+      players: players.slice(0, 2).map((player, playerIndex) => ({
         openid: String(player.openid || ""),
-        nickName: String(player.nickName || "玩家"),
+        nickName: getPublicPlayerName(player, playerIndex),
         slotIndexes: Array.isArray(player.slotIndexes) ? player.slotIndexes : [],
         expectedLength: Number(player.expectedLength || 0),
         submitted: !!player.submitted,
@@ -3032,9 +3034,9 @@ function saveMatchRecord(room) {
     score,
     teamScore: modeKey === "coopSpell" ? score : undefined,
     spellHistory: modeKey === "coopSpell" ? normalizeSpellHistory(room.spellHistory || state.spellHistory) : [],
-    players: players.slice(0, 2).map((player) => ({
+    players: players.slice(0, 2).map((player, playerIndex) => ({
       openid: player.openid || "",
-      nickName: player.nickName || "玩家",
+      nickName: getPublicPlayerName(player, playerIndex),
       score: player.score || 0
     }))
   };
@@ -3063,7 +3065,7 @@ function saveSoloSpellRecord() {
     score: Number(player.score || 0),
     players: [{
       openid: player.openid || state.openid || "solo_spell",
-      nickName: player.nickName || state.playerName || "玩家",
+      nickName: PUBLIC_PLAYER_NAME,
       score: Number(player.score || 0)
     }]
   });
@@ -3342,10 +3344,10 @@ function drawHome() {
   ctx.beginPath();
   ctx.arc(panelX + 45, panelY + 50, 25, 0, Math.PI * 2);
   ctx.fill();
-  drawText((state.playerName || "玩").slice(0, 1), panelX + 45, panelY + 58, 18, COLORS.white, 900, "center");
+  drawText("玩", panelX + 45, panelY + 58, 18, COLORS.white, 900, "center");
   drawText("玩家昵称", panelX + 84, panelY + 40, 13, COLORS.muted, 600);
-  drawFitText(state.playerName, panelX + 84, panelY + 66, 20, COLORS.text, 900, "left", panelW - 214);
-  addButton("name", "修改", panelX + panelW - 92, panelY + 32, 66, 36, { kind: "secondary" });
+  drawFitText(PUBLIC_PLAYER_NAME, panelX + 84, panelY + 66, 20, COLORS.text, 900, "left", panelW - 214);
+  addButton("name", "系统", panelX + panelW - 92, panelY + 32, 66, 36, { kind: "secondary", disabled: true });
 
   fillRoundedRect(panelX + 18, panelY + setupY, panelW - 36, setupH, 10, "#F8FAFC");
   drawSparkle(panelX + 42, panelY + setupY + 24, 6, COLORS.coral);
@@ -4516,6 +4518,27 @@ function isBotPlayer(player) {
   return !!(player && (player.isBot || String(player.openid || "").indexOf("bot_") === 0));
 }
 
+function getPublicPlayerName(player, index) {
+  if (isBotPlayer(player)) {
+    const botName = String((player && player.nickName) || "");
+    return BOT_PRESETS.some((bot) => bot.name === botName) ? botName : "机器人";
+  }
+  const order = Number.isFinite(index) && index >= 0 ? index + 1 : 1;
+  return `${PUBLIC_PLAYER_NAME}${order}`;
+}
+
+function sanitizePublicPlayer(player, index) {
+  if (!player || typeof player !== "object") return player;
+  return {
+    ...player,
+    nickName: getPublicPlayerName(player, index)
+  };
+}
+
+function sanitizePublicPlayers(players) {
+  return Array.isArray(players) ? players.map((player, index) => sanitizePublicPlayer(player, index)) : [];
+}
+
 function getLocalPlayer() {
   const players = state.players || [];
   const exact = players.find((player) => player && player.openid === state.openid);
@@ -5621,7 +5644,7 @@ function applyRoomSnapshot(room) {
     });
     lastLoggedRoomState = room.state || "";
   }
-  state.players = room.players || state.players || [];
+  state.players = sanitizePublicPlayers(room.players || state.players || []);
   state.fishes = room.fishes || [];
   state.currentMeaning = room.currentMeaning || "";
   state.targetFishId = room.targetFishId || "";
@@ -6584,13 +6607,9 @@ async function handleButton(id) {
   }
 
   if (id === "name") {
-    const value = await promptText("玩家昵称", "输入昵称", state.playerName, 12);
-    if (value) {
-      const safe = await checkUserTextSafety(value, "昵称", 1, 12);
-      if (!safe) return;
-      state.playerName = value;
-      wx.setStorageSync("playerName", value);
-    }
+    state.playerName = PUBLIC_PLAYER_NAME;
+    try { wx.removeStorageSync("playerName"); } catch (err) {}
+    toast("已使用系统玩家名");
     return;
   }
 

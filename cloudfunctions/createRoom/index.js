@@ -112,10 +112,7 @@ function isValidBankId(bankId) {
   return value === WRONG_BANK_ID || /^[a-z0-9_-]{1,80}$/.test(value);
 }
 
-function normalizeName(name) {
-  const text = String(name || "").trim();
-  return text ? text.slice(0, 12) : "玩家";
-}
+function normalizeName() { return "\u73a9\u5bb61"; }
 
 function getErrCode(err) {
   const code = err && (err.errCode || err.errcode || err.code);
@@ -246,8 +243,7 @@ exports.main = async (event) => withServerLog("createRoom", event, async () => {
   const { OPENID } = cloud.getWXContext();
   const roomCode = await createUniqueCode();
   const gameOptions = normalizeGameOptions(event.gameOptions);
-  const nickName = normalizeName(event.nickName);
-  await checkTextSafety(nickName, OPENID);
+  const nickName = normalizeName();
   const player = {
     openid: OPENID,
     nickName,

@@ -4,10 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
 
-function normalizeName(name) {
-  const text = String(name || "").trim();
-  return text ? text.slice(0, 12) : "玩家";
-}
+function normalizeName(index) { return `\u73a9\u5bb6${Number(index || 0) + 1}`; }
 
 function getErrCode(err) {
   const code = err && (err.errCode || err.errcode || err.code);
@@ -57,8 +54,7 @@ exports.main = async (event) => {
   const started = Date.now();
   const { OPENID } = cloud.getWXContext();
   const roomCode = String(event.roomCode || "").trim().toUpperCase();
-  const nickName = normalizeName(event.nickName);
-  await checkTextSafety(nickName, OPENID);
+  let nickName = "\u73a9\u5bb6";
   console.log("[joinRoom] start", { roomCode });
   if (!roomCode) throw new Error("请输入房间码");
 
@@ -70,11 +66,12 @@ exports.main = async (event) => {
   const players = room.players || [];
   const index = players.findIndex((item) => item.openid === OPENID);
   if (index >= 0) {
+    nickName = normalizeName(index);
     players[index].nickName = nickName;
   } else {
     const nextPlayer = {
       openid: OPENID,
-      nickName,
+      nickName: normalizeName(players.length),
       score: 0,
       ready: false,
       combo: 0,
