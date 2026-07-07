@@ -27,7 +27,7 @@ Page({
     this.ensureOpenId().then(() => {
       this.watchRoom();
       this.startRenderLoop();
-    });
+    }).catch(() => wx.showToast({ title: "请先同意隐私保护指引", icon: "none" }));
   },
 
   onUnload() {
@@ -41,10 +41,12 @@ Page({
       this.setData({ meOpenid: app.globalData.openid });
       return Promise.resolve();
     }
-    return wx.cloud.callFunction({ name: "getOpenId" }).then((res) => {
-      app.globalData.openid = res.result.openid;
-      this.setData({ meOpenid: res.result.openid });
-    });
+    return app.ensurePrivacyAuthorized()
+      .then(() => wx.cloud.callFunction({ name: "getOpenId" }))
+      .then((res) => {
+        app.globalData.openid = res.result.openid;
+        this.setData({ meOpenid: res.result.openid });
+      });
   },
 
   watchRoom() {
@@ -91,12 +93,16 @@ Page({
       this.setData({ renderFishes, timeLeft });
       if (timeLeft <= 0 && this.data.state === "playing" && !this.finishing) {
         this.finishing = true;
-        wx.cloud.callFunction({
-          name: "finishGame",
-          data: { roomId: this.data.roomId },
-          complete: () => {
-            this.finishing = false;
-          }
+        app.ensurePrivacyAuthorized().then(() => {
+          wx.cloud.callFunction({
+            name: "finishGame",
+            data: { roomId: this.data.roomId },
+            complete: () => {
+              this.finishing = false;
+            }
+          });
+        }).catch(() => {
+          this.finishing = false;
         });
       }
     }, 70);
@@ -124,21 +130,23 @@ Page({
   onFishTap(event) {
     if (this.data.state !== "playing") return;
     const fishId = event.currentTarget.dataset.id;
-    wx.cloud.callFunction({
-      name: "catchFish",
-      data: {
-        roomId: this.data.roomId,
-        fishId
-      },
-      success: (res) => {
-        const delta = res.result.delta;
-        wx.showToast({
-          title: delta > 0 ? "+100" : "-100",
-          icon: "none",
-          duration: 450
-        });
-      },
-      fail: (err) => wx.showToast({ title: err.errMsg || "捕捉失败", icon: "none" })
+    app.ensurePrivacyAuthorized().then(() => {
+      wx.cloud.callFunction({
+        name: "catchFish",
+        data: {
+          roomId: this.data.roomId,
+          fishId
+        },
+        success: (res) => {
+          const delta = res.result.delta;
+          wx.showToast({
+            title: delta > 0 ? "+100" : "-100",
+            icon: "none",
+            duration: 450
+          });
+        },
+        fail: (err) => wx.showToast({ title: err.errMsg || "捕捉失败", icon: "none" })
+      });
     });
   },
 

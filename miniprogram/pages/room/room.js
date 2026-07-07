@@ -18,7 +18,9 @@ Page({
       roomId: query.roomId,
       roomCode: query.roomCode
     });
-    this.ensureOpenId().then(() => this.watchRoom());
+    this.ensureOpenId()
+      .then(() => this.watchRoom())
+      .catch(() => wx.showToast({ title: "请先同意隐私保护指引", icon: "none" }));
   },
 
   onUnload() {
@@ -32,10 +34,12 @@ Page({
     if (app.globalData.openid) {
       return Promise.resolve(app.globalData.openid);
     }
-    return wx.cloud.callFunction({ name: "getOpenId" }).then((res) => {
-      app.globalData.openid = res.result.openid;
-      return res.result.openid;
-    });
+    return app.ensurePrivacyAuthorized()
+      .then(() => wx.cloud.callFunction({ name: "getOpenId" }))
+      .then((res) => {
+        app.globalData.openid = res.result.openid;
+        return res.result.openid;
+      });
   },
 
   watchRoom() {
@@ -80,7 +84,9 @@ Page({
   },
 
   copyCode() {
-    wx.setClipboardData({ data: this.data.roomCode });
+    app.ensurePrivacyAuthorized().then(() => {
+      wx.setClipboardData({ data: this.data.roomCode });
+    });
   },
 
   toggleReady() {
@@ -88,28 +94,32 @@ Page({
       console.warn("[legacy-room] ready.blocked", {});
       return;
     }
-    const started = Date.now();
-    console.log("[legacy-room] ready.start", { roomId: String(this.data.roomId || "").slice(-6), ready: !this.data.ready });
     this.setData({ readyLoading: true });
-    wx.cloud.callFunction({
-      name: "toggleReady",
-      data: {
-        roomId: this.data.roomId,
-        ready: !this.data.ready
-      },
-      fail: (err) => wx.showToast({ title: err.errMsg || "操作失败", icon: "none" }),
-      complete: () => this.setData({ readyLoading: false })
-    });
+    app.ensurePrivacyAuthorized().then(() => {
+      const started = Date.now();
+      console.log("[legacy-room] ready.start", { roomId: String(this.data.roomId || "").slice(-6), ready: !this.data.ready });
+      wx.cloud.callFunction({
+        name: "toggleReady",
+        data: {
+          roomId: this.data.roomId,
+          ready: !this.data.ready
+        },
+        fail: (err) => wx.showToast({ title: err.errMsg || "操作失败", icon: "none" }),
+        complete: () => this.setData({ readyLoading: false })
+      });
+    }).catch(() => this.setData({ readyLoading: false }));
   },
 
   startGame() {
     if (!this.data.canStart || this.data.starting) return;
     this.setData({ starting: true });
-    wx.cloud.callFunction({
-      name: "startGame",
-      data: { roomId: this.data.roomId },
-      fail: (err) => wx.showToast({ title: err.errMsg || "无法开始", icon: "none" }),
-      complete: () => this.setData({ starting: false })
-    });
+    app.ensurePrivacyAuthorized().then(() => {
+      wx.cloud.callFunction({
+        name: "startGame",
+        data: { roomId: this.data.roomId },
+        fail: (err) => wx.showToast({ title: err.errMsg || "无法开始", icon: "none" }),
+        complete: () => this.setData({ starting: false })
+      });
+    }).catch(() => this.setData({ starting: false }));
   }
 });

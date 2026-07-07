@@ -519,8 +519,11 @@ const BOT_PRESETS = [
 
 const LANE_COUNT = 6;
 const DEFAULT_FISH_COUNT = 6;
-const CLIENT_VERSION = "2026.06.30-ugc-nickname-lockdown";
+const CLIENT_VERSION = "2026.07.07-privacy-gate";
 const PUBLIC_PLAYER_NAME = "玩家";
+const PRIVACY_ACCEPTED_KEY = "privacyAcceptedVersion";
+const PRIVACY_VERSION = "2026.07.07";
+const DEFAULT_PRIVACY_CONTRACT_NAME = "《词斗乐园单词比拼小程序隐私保护指引》";
 const WRONG_WORDS_KEY = "wrongWords";
 const MATCH_RECORDS_KEY = "matchRecords";
 const BEST_SCORES_KEY = "bestScoresByMode";
@@ -531,8 +534,6 @@ const INITIAL_WORD_COINS = 50;
 const WORD_BANK_UNLOCK_COST = 10;
 const REVIEW_WORD_BANK_UNLOCK_COST = 30;
 const ALL_REVIEW_WORD_BANK_UNLOCK_COST = 150;
-const RECHARGE_RMB_AMOUNT = 1;
-const RECHARGE_COIN_AMOUNT = 10;
 const MATCH_RECORD_LIMIT = 50;
 const HISTORY_PAGE_SIZE = 5;
 const ROOM_WORD_POOL_LIMIT = 240;
@@ -684,8 +685,8 @@ const state = {
   studyIndex: 0,
   studyShowMeaning: true,
   studyRevealCurrentMeaning: false,
-  coins: getStoredCoinBalance(),
-  unlockedBankIds: getStoredUnlockedBankIds(),
+  coins: INITIAL_WORD_COINS,
+  unlockedBankIds: [],
   seenPowerUpId: "",
   seenUsedPowerUpId: "",
   coopSpellQuestion: null,
@@ -700,13 +701,14 @@ const state = {
   roomStartedRemoteAt: 0,
   roomStartedLocalAt: 0,
   soloSpellRecordSaved: false,
-  soundMuted: getStoredSoundMuted()
+  soundMuted: true,
+  privacyReady: false,
+  privacyPromptVisible: true,
+  privacyMessage: "请先阅读并同意隐私保护指引后继续游戏",
+  privacyContractName: DEFAULT_PRIVACY_CONTRACT_NAME,
+  privacyResolve: null,
+  privacyNeedAuthorization: true
 };
-
-try { wx.removeStorageSync("playerName"); } catch (err) {}
-applyInitialUnlockedBankSelection();
-migrateStoredScoreRecords();
-state.bestScores = getBestScores();
 
 let pollTimer = null;
 let roomPollInterval = 0;
@@ -876,6 +878,153 @@ function logError(tag, event, payload) {
   writeLog("error", tag, event, payload);
 }
 
+function savePrivacyAccepted() {
+  try {
+    wx.setStorageSync(PRIVACY_ACCEPTED_KEY, PRIVACY_VERSION);
+  } catch (err) {}
+}
+
+function loadLocalStateAfterPrivacy() {
+  try { wx.removeStorageSync("playerName"); } catch (err) {}
+  state.soundMuted = getStoredSoundMuted();
+  state.coins = getStoredCoinBalance();
+  state.unlockedBankIds = getStoredUnlockedBankIds();
+  applyInitialUnlockedBankSelection();
+  migrateStoredScoreRecords();
+  state.bestScores = getBestScores();
+}
+
+function completePrivacyAuthorization(source) {
+  if (state.privacyReady) return;
+  state.privacyReady = true;
+  state.privacyPromptVisible = false;
+  state.privacyResolve = null;
+  state.privacyNeedAuthorization = false;
+  state.privacyMessage = "已同意隐私保护指引";
+  savePrivacyAccepted();
+  loadLocalStateAfterPrivacy();
+  logInfo("privacy", "authorized", { source: source || "" });
+  initCloud();
+}
+
+function showPrivacyPrompt(message) {
+  state.privacyPromptVisible = true;
+  state.privacyMessage = message || "请先阅读并同意隐私保护指引后继续游戏";
+}
+
+function requestPrivacyAuthorization(source) {
+  if (state.privacyReady) return;
+  logInfo("privacy", "request", { source: source || "" });
+  if (!wx.requirePrivacyAuthorize) {
+    showPrivacyPrompt("当前微信版本不支持隐私授权弹窗，请升级微信后继续");
+    return;
+  }
+  wx.requirePrivacyAuthorize({
+    success() {
+      completePrivacyAuthorization(source || "requirePrivacyAuthorize");
+    },
+    fail(err) {
+      if (state.privacyReady) {
+        logInfo("privacy", "request.fail.ignored", { source: source || "", errMsg: err && (err.errMsg || err.message) });
+        return;
+      }
+      logWarn("privacy", "request.fail", { source: source || "", errMsg: err && (err.errMsg || err.message) });
+      showPrivacyPrompt("需要同意隐私保护指引后才能进入游戏");
+    }
+  });
+}
+
+function setupPrivacyAuthorization() {
+  if (wx.onNeedPrivacyAuthorization) {
+    wx.onNeedPrivacyAuthorization((resolve, eventInfo) => {
+      if (state.privacyReady) {
+        if (typeof resolve === "function") {
+          try {
+            resolve({ event: "agree" });
+          } catch (err) {
+            logWarn("privacy", "need.resolve.fail", { errMsg: err && (err.errMsg || err.message) });
+          }
+        }
+        return;
+      }
+      state.privacyResolve = typeof resolve === "function" ? resolve : null;
+      state.privacyNeedAuthorization = true;
+      showPrivacyPrompt("请阅读并同意隐私保护指引后继续游戏");
+      logInfo("privacy", "needAuthorization", { referrer: eventInfo && eventInfo.referrer });
+    });
+  }
+
+  if (wx.getPrivacySetting) {
+    wx.getPrivacySetting({
+      success(res) {
+        state.privacyContractName = res.privacyContractName || DEFAULT_PRIVACY_CONTRACT_NAME;
+        state.privacyNeedAuthorization = !!res.needAuthorization;
+        logInfo("privacy", "setting", {
+          needAuthorization: !!res.needAuthorization,
+          contractName: state.privacyContractName
+        });
+        if (res.needAuthorization) {
+          requestPrivacyAuthorization("boot");
+        } else {
+          completePrivacyAuthorization("privacySetting");
+        }
+      },
+      fail(err) {
+        logWarn("privacy", "setting.fail", { errMsg: err && (err.errMsg || err.message) });
+        requestPrivacyAuthorization("bootFallback");
+      }
+    });
+    return;
+  }
+
+  requestPrivacyAuthorization("bootCompat");
+}
+
+function openPrivacyContract() {
+  if (!wx.openPrivacyContract) {
+    toast("当前微信版本不支持打开隐私保护指引");
+    return;
+  }
+  wx.openPrivacyContract({
+    success() {
+      logInfo("privacy", "contract.open", {});
+    },
+    fail(err) {
+      logWarn("privacy", "contract.fail", { errMsg: err && (err.errMsg || err.message) });
+      toast("隐私保护指引暂时无法打开，请稍后重试");
+    }
+  });
+}
+
+function agreePrivacyAuthorization() {
+  const resolve = state.privacyResolve;
+  state.privacyResolve = null;
+  if (resolve) {
+    try {
+      resolve({ event: "agree" });
+    } catch (err) {
+      logWarn("privacy", "agree.resolve.fail", { errMsg: err && (err.errMsg || err.message) });
+      showPrivacyPrompt("隐私授权暂时没有成功，请重新点击同意");
+      return;
+    }
+  }
+  completePrivacyAuthorization("manualAgree");
+}
+
+function disagreePrivacyAuthorization() {
+  if (state.privacyResolve) {
+    try {
+      state.privacyResolve({ event: "disagree" });
+    } catch (err) {
+      logWarn("privacy", "disagree.resolve.fail", { errMsg: err && (err.errMsg || err.message) });
+    }
+    state.privacyResolve = null;
+  }
+  state.privacyReady = false;
+  showPrivacyPrompt("你暂未同意隐私保护指引，暂不能进入游戏");
+  logInfo("privacy", "disagree", {});
+}
+
 function setupBgMusic() {
   if (bgmAudio || !wx.createInnerAudioContext) return bgmAudio;
   try {
@@ -966,6 +1115,11 @@ function saveSoundMuted(value) {
 }
 
 function initCloud() {
+  if (!state.privacyReady) {
+    showPrivacyPrompt("请先阅读并同意隐私保护指引后继续游戏");
+    return;
+  }
+  if (state.cloudReady) return;
   if (!wx.cloud) {
     logError("cloud", "init.unavailable", { envId: config.envId || "" });
     state.message = "当前微信版本不支持云开发";
@@ -990,6 +1144,11 @@ function rememberLocalOpenId(openid) {
 }
 
 function callFunction(name, data) {
+  if (!state.privacyReady) {
+    showPrivacyPrompt("请先阅读并同意隐私保护指引后继续游戏");
+    requestPrivacyAuthorization(`cloud:${name}`);
+    return Promise.reject(new Error("请先同意隐私保护指引"));
+  }
   const requestId = `cf_${++cloudCallSeq}`;
   const started = Date.now();
   logInfo("cloud", "call.start", { requestId, name, data: data || {} });
@@ -1019,6 +1178,10 @@ function callFunction(name, data) {
 }
 
 function getRoomDoc(roomId) {
+  if (!state.privacyReady) {
+    showPrivacyPrompt("请先阅读并同意隐私保护指引后继续游戏");
+    return Promise.reject(new Error("请先同意隐私保护指引"));
+  }
   const db = wx.cloud.database();
   return db.collection("rooms").doc(roomId).get();
 }
@@ -1149,7 +1312,7 @@ function setupShare() {
     wx.onShow((options) => {
       logInfo("lifecycle", "show", { inviteCode: getInviteCodeFromOptions(options) });
       handleInviteOptions(options);
-      if (!state.soundMuted && (bgmStarted || bgmPausedByHide)) playBgMusic();
+      if (state.privacyReady && !state.soundMuted && (bgmStarted || bgmPausedByHide)) playBgMusic();
     });
   }
   if (wx.onHide) {
@@ -1673,6 +1836,69 @@ function drawWrappedFitText(text, x, y, maxWidth, maxLines, size, lineHeight, co
   lines.forEach((line, index) => {
     drawText(line, x, y - blockH / 2 + index * lineHeight, fontSize, color, weight, align);
   });
+}
+
+function drawPrivacyGate() {
+  if (!state.privacyPromptVisible && state.privacyReady) return;
+  ctx.fillStyle = "rgba(15,23,42,0.58)";
+  ctx.fillRect(0, 0, screen.width, screen.height);
+
+  const compact = screen.height < 700;
+  const panelW = Math.min(screen.width - 32, 360);
+  const panelH = compact ? 388 : 432;
+  const x = (screen.width - panelW) / 2;
+  const y = Math.max(safeTop + 18, (screen.height - panelH) / 2);
+  drawCartoonPanel(x, y, panelW, panelH, 10, "rgba(255,255,255,0.98)", "#A5F3FC");
+
+  drawText("隐私保护提示", x + 22, y + 38, 22, COLORS.text, 900);
+  drawWrappedFitText(
+    "为提供房间对战、成绩记录、反馈提交等功能，游戏会处理你的微信用户标识、系统玩家名、游戏记录、反馈内容及你填写的联系方式。",
+    x + panelW / 2,
+    y + (compact ? 104 : 112),
+    panelW - 44,
+    compact ? 4 : 5,
+    15,
+    23,
+    COLORS.text,
+    500,
+    "center"
+  );
+
+  const contractText = state.privacyContractName || DEFAULT_PRIVACY_CONTRACT_NAME;
+  drawWrappedFitText(
+    `请先阅读并同意${contractText}后继续游戏。`,
+    x + panelW / 2,
+    y + (compact ? 194 : 218),
+    panelW - 44,
+    2,
+    15,
+    24,
+    COLORS.deep,
+    800,
+    "center"
+  );
+
+  if (state.privacyMessage) {
+    drawWrappedFitText(
+      state.privacyMessage,
+      x + panelW / 2,
+      y + (compact ? 238 : 264),
+      panelW - 52,
+      2,
+      13,
+      20,
+      COLORS.muted,
+      600,
+      "center"
+    );
+  }
+
+  const buttonW = panelW - 44;
+  const buttonX = x + 22;
+  const linkY = y + panelH - (compact ? 138 : 152);
+  addButton("privacyOpen", "查看隐私保护指引", buttonX, linkY, buttonW, 42, { kind: "secondary", fontSize: 15 });
+  addButton("privacyAgree", "同意并进入游戏", buttonX, linkY + 52, buttonW, 46, { fontSize: 16 });
+  addButton("privacyDisagree", "暂不进入", buttonX, linkY + 108, buttonW, 38, { kind: "secondary", fontSize: 14 });
 }
 
 function getSafeTopY(minY) {
@@ -3345,7 +3571,7 @@ function drawHome() {
   ctx.arc(panelX + 45, panelY + 50, 25, 0, Math.PI * 2);
   ctx.fill();
   drawText("玩", panelX + 45, panelY + 58, 18, COLORS.white, 900, "center");
-  drawText("玩家昵称", panelX + 84, panelY + 40, 13, COLORS.muted, 600);
+  drawText("系统玩家", panelX + 84, panelY + 40, 13, COLORS.muted, 600);
   drawFitText(PUBLIC_PLAYER_NAME, panelX + 84, panelY + 66, 20, COLORS.text, 900, "left", panelW - 214);
   addButton("name", "系统", panelX + panelW - 92, panelY + 32, 66, 36, { kind: "secondary", disabled: true });
 
@@ -3674,7 +3900,7 @@ function drawHelp() {
   ] : [
     ["目标", "看上方中文含义，点击正确英文虫子。"],
     ["得分", "答对+100，答错-100，错词进错题词库。"],
-    ["词库", `充值按${RECHARGE_RMB_AMOUNT}元${RECHARGE_COIN_AMOUNT}金币设计；全部总复习${ALL_REVIEW_WORD_BANK_UNLOCK_COST}金币。`],
+    ["词库", `初始${INITIAL_WORD_COINS}金币，高级复习词库最高${ALL_REVIEW_WORD_BANK_UNLOCK_COST}金币解锁。`],
     ["房间", "双人PK可选机器人；默契捕词赛和同舟拼词记必须邀请好友。"],
     ["道具", "连续答对3个随机获得，头像上方点击使用。"],
     ["技能", "杀虫剂清屏加分，苍蝇拍敲晕对手5秒。"],
@@ -5558,6 +5784,7 @@ function render() {
   if (state.scene === GAME.ROOM) drawRoom();
   if (state.scene === GAME.PLAYING) drawPlaying();
   if (state.scene === GAME.FINISHED) drawFinished();
+  drawPrivacyGate();
   const elapsed = Date.now() - renderStarted;
   if (elapsed >= SLOW_FRAME_MS && renderStarted - lastSlowFrameLogAt >= 1000) {
     lastSlowFrameLogAt = renderStarted;
@@ -6487,6 +6714,26 @@ async function handleButton(id) {
     roomId: state.roomId,
     gameOptions: state.gameOptions
   });
+  if (id === "privacyOpen") {
+    openPrivacyContract();
+    return;
+  }
+
+  if (id === "privacyAgree") {
+    agreePrivacyAuthorization();
+    return;
+  }
+
+  if (id === "privacyDisagree") {
+    disagreePrivacyAuthorization();
+    return;
+  }
+
+  if (!state.privacyReady) {
+    showPrivacyPrompt("请先阅读并同意隐私保护指引后继续游戏");
+    return;
+  }
+
   if (id === "debugLogs") {
     if (DEBUG_TOOLS_ENABLED) copyDebugLogs();
     return;
@@ -6852,12 +7099,23 @@ async function handleButton(id) {
 wx.onTouchStart((event) => {
   const started = Date.now();
   try {
-    if (!state.soundMuted && !bgmStarted) playBgMusic();
     const touch = event.changedTouches[0];
     if (!touch) return;
     const x = touch.clientX;
     const y = touch.clientY;
     const buttonId = hitButton(x, y);
+    if (!state.privacyReady) {
+      if (buttonId && buttonId.indexOf("privacy") === 0) {
+        logInfo("input", "touch.button", { buttonId, x: Math.round(x), y: Math.round(y), scene: state.scene });
+        handleButton(buttonId).catch((err) => {
+          logError("input", "button.exception", { buttonId, errMsg: err && (err.errMsg || err.message) });
+        });
+      } else {
+        showPrivacyPrompt("请先阅读并同意隐私保护指引后继续游戏");
+      }
+      return;
+    }
+    if (!state.soundMuted && !bgmStarted) playBgMusic();
     if (buttonId) {
       logInfo("input", "touch.button", { buttonId, x: Math.round(x), y: Math.round(y), scene: state.scene });
       handleButton(buttonId).catch((err) => {
@@ -6892,5 +7150,5 @@ logInfo("client", "boot", {
   gameOptions: state.gameOptions
 });
 setupShare();
-initCloud();
+setupPrivacyAuthorization();
 startRenderLoop();

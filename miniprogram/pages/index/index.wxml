@@ -6,8 +6,8 @@
 
   <view class="panel form-panel">
     <view class="field">
-      <text class="label">玩家昵称</text>
-      <input class="input" maxlength="12" placeholder="输入你的昵称" value="{{playerName}}" bindinput="onNameInput" />
+      <text class="label">玩家名称</text>
+      <view class="input readonly-name">系统玩家</view>
     </view>
 
     <button class="primary-button action" loading="{{creating}}" bindtap="createRoom">创建房间</button>

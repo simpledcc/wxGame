@@ -47,6 +47,11 @@
   font-size: 30rpx;
 }
 
+.readonly-name {
+  line-height: 88rpx;
+  color: #475569;
+}
+
 .code-input {
   text-transform: uppercase;
   letter-spacing: 4rpx;

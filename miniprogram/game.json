@@ -1,4 +1,5 @@
 {
+  "__usePrivacyCheck__": true,
   "deviceOrientation": "portrait",
   "showStatusBar": false,
   "networkTimeout": {
