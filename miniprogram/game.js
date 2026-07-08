@@ -3579,8 +3579,7 @@ function drawHome() {
   ctx.fill();
   drawText("玩", panelX + 45, panelY + 58, 18, COLORS.white, 900, "center");
   drawText("系统玩家", panelX + 84, panelY + 40, 13, COLORS.muted, 600);
-  drawFitText(PUBLIC_PLAYER_NAME, panelX + 84, panelY + 66, 20, COLORS.text, 900, "left", panelW - 214);
-  addButton("name", "系统", panelX + panelW - 92, panelY + 32, 66, 36, { kind: "secondary", disabled: true });
+  drawFitText(PUBLIC_PLAYER_NAME, panelX + 84, panelY + 66, 20, COLORS.text, 900, "left", panelW - 128);
 
   fillRoundedRect(panelX + 18, panelY + setupY, panelW - 36, setupH, 10, "#F8FAFC");
   drawSparkle(panelX + 42, panelY + setupY + 24, 6, COLORS.coral);
@@ -6859,13 +6858,6 @@ function handleButton(id) {
       });
     }
     state.bankPickerSelectedBankId = bankId;
-    return;
-  }
-
-  if (id === "name") {
-    state.playerName = PUBLIC_PLAYER_NAME;
-    try { wx.removeStorageSync("playerName"); } catch (err) {}
-    toast("已使用系统玩家名");
     return;
   }
 
