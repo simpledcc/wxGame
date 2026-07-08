@@ -1617,24 +1617,24 @@ function promptText(title, placeholder, defaultValue, maxLength) {
   });
 }
 
-async function checkUserTextSafety(content, label, scene, maxLength) {
+function checkUserTextSafety(content, label, scene, maxLength) {
   const text = String(content || "").trim().slice(0, maxLength || 300);
-  if (!text) return true;
+  if (!text) return Promise.resolve(true);
   setBusy(true, "正在检查内容...");
-  try {
-    await callFunction("checkText", {
+  return callFunction("checkText", {
       content: text,
       label: label || "内容",
       scene: scene || 1,
       maxLength: maxLength || 300
+    })
+    .then(() => true)
+    .catch((err) => {
+      toast(getCloudErrorMessage(err, "内容包含不合规信息"));
+      return false;
+    })
+    .finally(() => {
+      setBusy(false);
     });
-    return true;
-  } catch (err) {
-    toast(getCloudErrorMessage(err, "内容包含不合规信息"));
-    return false;
-  } finally {
-    setBusy(false);
-  }
 }
 
 function getFeedbackContext() {
@@ -1655,24 +1655,9 @@ function getFeedbackContext() {
   };
 }
 
-async function submitUserFeedback() {
-  if (state.busy) return;
-  const content = await promptText("问题反馈", "请描述遇到的问题或建议", "", 300);
-  if (!content) return;
-  if (content.length < 4) {
-    toast("请多写一点反馈内容");
-    return;
-  }
-  const contact = await promptText("联系方式（可选）", "微信号/手机号/邮箱，可不填", "", 80);
+function submitCheckedFeedback(content, contact) {
   setBusy(true, "正在提交反馈...");
-  const contentSafe = await checkUserTextSafety(content, "反馈内容", 2, 300);
-  if (!contentSafe) return;
-  if (contact) {
-    const contactSafe = await checkUserTextSafety(contact, "联系方式", 2, 80);
-    if (!contactSafe) return;
-  }
-  setBusy(true, "姝ｅ湪鎻愪氦鍙嶉...");
-  callFunction("submitFeedback", {
+  return callFunction("submitFeedback", {
     content,
     contact,
     playerName: state.playerName,
@@ -1683,6 +1668,28 @@ async function submitUserFeedback() {
     toast(getCloudErrorMessage(err, "反馈提交失败"));
   }).finally(() => {
     setBusy(false);
+  });
+}
+
+function submitUserFeedback() {
+  if (state.busy) return Promise.resolve();
+  return promptText("问题反馈", "请描述遇到的问题或建议", "", 300).then((content) => {
+    if (!content) return null;
+    if (content.length < 4) {
+      toast("请多写一点反馈内容");
+      return null;
+    }
+    return promptText("联系方式（可选）", "微信号/手机号/邮箱，可不填", "", 80).then((contact) => {
+      setBusy(true, "正在提交反馈...");
+      return checkUserTextSafety(content, "反馈内容", 2, 300).then((contentSafe) => {
+        if (!contentSafe) return null;
+        if (!contact) return submitCheckedFeedback(content, contact);
+        return checkUserTextSafety(contact, "联系方式", 2, 80).then((contactSafe) => {
+          if (!contactSafe) return null;
+          return submitCheckedFeedback(content, contact);
+        });
+      });
+    });
   });
 }
 
@@ -6602,7 +6609,7 @@ function createRoomWithOptions(optionOverrides, busyText) {
   }).finally(() => setBusy(false));
 }
 
-async function submitCoopSpellAnswer() {
+function submitCoopSpellAnswer() {
   if (state.catchPending || state.busy || isCoopSpellAdvancingQuestion() || (!state.roomId && !state.soloSpellMode)) {
     logWarn("spell", "submit.blocked", { catchPending: state.catchPending, busy: state.busy, advancingQuestionId: state.coopSpellAdvancingQuestionId, roomId: state.roomId, soloSpellMode: state.soloSpellMode });
     return;
@@ -6705,7 +6712,7 @@ async function submitCoopSpellAnswer() {
   });
 }
 
-async function handleButton(id) {
+function handleButton(id) {
   logInfo("input", "button.tap", {
     id,
     scene: state.scene,
@@ -6846,8 +6853,10 @@ async function handleButton(id) {
       }
     }
     if (!isWordBankUnlocked(bankId)) {
-      const unlocked = await confirmUnlockWordBank(bankId);
-      if (!unlocked) return;
+      return confirmUnlockWordBank(bankId).then((unlocked) => {
+        if (!unlocked) return;
+        state.bankPickerSelectedBankId = bankId;
+      });
     }
     state.bankPickerSelectedBankId = bankId;
     return;
@@ -6876,8 +6885,7 @@ async function handleButton(id) {
   }
 
   if (id === "feedback") {
-    await submitUserFeedback();
-    return;
+    return submitUserFeedback();
   }
 
   if (id === "soundToggle") {
@@ -7029,16 +7037,16 @@ async function handleButton(id) {
   }
 
   if (id === "join") {
-    const code = await promptText("加入房间", "输入 6 位房间码", "", 6);
-    if (!code) return;
-    setBusy(true, "正在加入房间...");
-    callFunction("joinRoom", { roomCode: code.toUpperCase(), nickName: state.playerName }).then((res) => {
-      rememberLocalOpenId(res.result && res.result.openid);
-      enterRoom(res.result.roomId, code.toUpperCase());
-    }).catch((err) => {
-      toast(err.errMsg || "加入失败");
-    }).finally(() => setBusy(false));
-    return;
+    return promptText("加入房间", "输入 6 位房间码", "", 6).then((code) => {
+      if (!code) return;
+      setBusy(true, "正在加入房间...");
+      callFunction("joinRoom", { roomCode: code.toUpperCase(), nickName: state.playerName }).then((res) => {
+        rememberLocalOpenId(res.result && res.result.openid);
+        enterRoom(res.result.roomId, code.toUpperCase());
+      }).catch((err) => {
+        toast(err.errMsg || "加入失败");
+      }).finally(() => setBusy(false));
+    });
   }
 
   if (id === "copy") {
@@ -7107,7 +7115,7 @@ wx.onTouchStart((event) => {
     if (!state.privacyReady) {
       if (buttonId && buttonId.indexOf("privacy") === 0) {
         logInfo("input", "touch.button", { buttonId, x: Math.round(x), y: Math.round(y), scene: state.scene });
-        handleButton(buttonId).catch((err) => {
+        Promise.resolve(handleButton(buttonId)).catch((err) => {
           logError("input", "button.exception", { buttonId, errMsg: err && (err.errMsg || err.message) });
         });
       } else {
@@ -7118,7 +7126,7 @@ wx.onTouchStart((event) => {
     if (!state.soundMuted && !bgmStarted) playBgMusic();
     if (buttonId) {
       logInfo("input", "touch.button", { buttonId, x: Math.round(x), y: Math.round(y), scene: state.scene });
-      handleButton(buttonId).catch((err) => {
+      Promise.resolve(handleButton(buttonId)).catch((err) => {
         logError("input", "button.exception", { buttonId, errMsg: err && (err.errMsg || err.message) });
       });
       return;
