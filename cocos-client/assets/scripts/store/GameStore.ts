@@ -1,4 +1,4 @@
-import type { GameDuration, GameModeKey } from "../domain/GameTypes";
+import type { GameDuration, GameModeKey, WordMode } from "../domain/GameTypes";
 import type { RoomSnapshot } from "../domain/RoomTypes";
 import { EventBus } from "../core/EventBus";
 
@@ -24,6 +24,9 @@ export interface AppState {
   selectedMode: GameModeKey;
   duration: GameDuration;
   bankId: string;
+  wordMode: WordMode;
+  bankReturnRoute: RouteName;
+  bankPickerSelectedBankId: string;
   room: RoomSnapshot | null;
 }
 
@@ -41,6 +44,9 @@ export class GameStore {
     selectedMode: "pk",
     duration: 60,
     bankId: "jilin-g1a-b1-welcome",
+    wordMode: "regular",
+    bankReturnRoute: "home",
+    bankPickerSelectedBankId: "jilin-g1a-b1-welcome",
     room: null
   };
 
@@ -64,5 +70,27 @@ export class GameStore {
   setRoom(room: RoomSnapshot | null): void {
     this.patch({ room });
   }
-}
 
+  openBankPicker(returnRoute: RouteName): void {
+    this.patch({
+      route: "bank",
+      bankReturnRoute: returnRoute,
+      bankPickerSelectedBankId: this.state.bankId
+    });
+  }
+
+  setBankPickerSelectedBankId(bankId: string): void {
+    this.patch({ bankPickerSelectedBankId: bankId });
+  }
+
+  confirmBankSelection(bankId: string, wordMode: WordMode): RouteName {
+    const target = this.state.bankReturnRoute || "home";
+    this.patch({
+      route: target,
+      bankId,
+      wordMode,
+      bankPickerSelectedBankId: bankId
+    });
+    return target;
+  }
+}

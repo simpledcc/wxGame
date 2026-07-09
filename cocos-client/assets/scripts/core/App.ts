@@ -14,13 +14,17 @@ import { RoomStore } from "../store/RoomStore";
 import { WordBankStore } from "../store/WordBankStore";
 import { HistoryStore } from "../store/HistoryStore";
 import { SettingsStore } from "../store/SettingsStore";
+import { StudyStore } from "../store/StudyStore";
 import { SceneRouter } from "./SceneRouter";
 import { Logger } from "./Logger";
+import { WORD_BANK_DATA } from "../data/WordBankData.generated";
+import { getDefaultBankId } from "../domain/WordBankRules";
 
 const CLOUD_ENV_ID = "cloud1-d3gre86i51a49821a";
 
 export class App {
   readonly logger = new Logger("App");
+  readonly wordBankCatalog = WORD_BANK_DATA;
   readonly runtime: RuntimePort;
   readonly store = new GameStore();
   readonly playerStore = new PlayerStore();
@@ -28,6 +32,7 @@ export class App {
   readonly wordBankStore = new WordBankStore();
   readonly historyStore = new HistoryStore();
   readonly settingsStore = new SettingsStore();
+  readonly studyStore = new StudyStore();
   readonly router = new SceneRouter(this.store);
 
   readonly cloud: CloudService;
@@ -75,7 +80,7 @@ export class App {
   private async performBoot(): Promise<void> {
     this.logger.info("boot.start");
     const legacy = this.storage.readLegacySnapshot();
-    this.wordBankStore.hydrateLegacyState(legacy);
+    this.wordBankStore.hydrateLegacyState(legacy, this.wordBankCatalog);
     this.historyStore.replaceRecords(legacy.matchRecords);
     this.historyStore.replaceBestScores(legacy.bestScoresByMode);
     this.settingsStore.setMuted(legacy.soundMuted);
@@ -84,7 +89,9 @@ export class App {
     this.store.patch({
       booted: true,
       cloudReady: true,
-      openid: ""
+      openid: "",
+      bankId: this.wordBankStore.getSelectedBankId() || getDefaultBankId(this.wordBankCatalog),
+      bankPickerSelectedBankId: this.wordBankStore.getSelectedBankId() || getDefaultBankId(this.wordBankCatalog)
     });
     this.logger.info("boot.ready", {
       cloudReady: true,

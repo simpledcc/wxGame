@@ -34,5 +34,6 @@ Archive SHA256:
 - WeChat Developer Tools generated a successful legacy preview on 2026-07-09.
 - Cocos migration Phase 0 and Phase 1 are complete.
 - Cocos migration Phase 2 platform services are implemented in the current Cocos client.
+- Cocos migration Phase 3 Home/Bank/Study core logic is implemented; visual Cocos UI is still pending.
 - Cocos Creator 3.8.8 can preview Boot to Home.
 - A Cocos WeChat Mini Game build has been generated successfully, but it has not replaced the production `miniprogram/`.

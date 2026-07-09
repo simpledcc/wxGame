@@ -1,6 +1,26 @@
 import { DEFAULT_BANK_ID } from "../domain/WordBank";
 import { INITIAL_WORD_COINS } from "../domain/StorageKeys";
 import type { WordItem } from "../domain/GameTypes";
+import type { WordBankDataSource } from "../domain/WordBank";
+import {
+  getDefaultBankId,
+  getStudyWords,
+  getWordBankUnlockCost,
+  isUnlockableWordBankId,
+  isWordBankUnlocked,
+  normalizeUnlockedBankIds,
+  resolveBankSelection
+} from "../domain/WordBankRules";
+
+export type UnlockWordBankResult =
+  | { ok: true; bankId: string; cost: number; coins: number }
+  | {
+      ok: false;
+      bankId: string;
+      reason: "missing" | "alreadyUnlocked" | "insufficientCoins" | "notUnlockable";
+      cost?: number;
+      coins: number;
+    };
 
 export class WordBankStore {
   private bankId = DEFAULT_BANK_ID;
@@ -16,14 +36,22 @@ export class WordBankStore {
     this.bankId = bankId;
   }
 
-  hydrateLegacyState(options: {
-    wordCoins: number;
-    unlockedWordBanks: string[];
-    wrongWords: WordItem[];
-  }): void {
+  hydrateLegacyState(
+    options: {
+      wordCoins: number;
+      unlockedWordBanks: string[];
+      wrongWords: WordItem[];
+    },
+    catalog?: WordBankDataSource
+  ): void {
     this.wordCoins = options.wordCoins;
-    this.unlockedBankIds = [...options.unlockedWordBanks];
+    this.unlockedBankIds = catalog
+      ? normalizeUnlockedBankIds(catalog, options.unlockedWordBanks)
+      : [...options.unlockedWordBanks];
     this.wrongWords = options.wrongWords.map((item) => ({ ...item }));
+    if (catalog && !catalog.WORD_BANKS[this.bankId]) {
+      this.bankId = getDefaultBankId(catalog);
+    }
   }
 
   getWordCoins(): number {
@@ -36,5 +64,44 @@ export class WordBankStore {
 
   getWrongWords(): WordItem[] {
     return this.wrongWords.map((item) => ({ ...item }));
+  }
+
+  isUnlocked(catalog: WordBankDataSource, bankId: string): boolean {
+    return isWordBankUnlocked(catalog, this.unlockedBankIds, bankId);
+  }
+
+  selectBank(catalog: WordBankDataSource, bankId: string): boolean {
+    const result = resolveBankSelection(catalog, this.unlockedBankIds, bankId, this.wrongWords);
+    if (!result.ok) {
+      return false;
+    }
+    this.bankId = result.bankId;
+    return true;
+  }
+
+  unlockBank(catalog: WordBankDataSource, bankId: string): UnlockWordBankResult {
+    if (!catalog.WORD_BANKS[bankId]) {
+      return { ok: false, bankId, reason: "missing", coins: this.wordCoins };
+    }
+    if (!isUnlockableWordBankId(catalog, bankId)) {
+      return { ok: false, bankId, reason: "notUnlockable", coins: this.wordCoins };
+    }
+    if (this.isUnlocked(catalog, bankId)) {
+      return { ok: false, bankId, reason: "alreadyUnlocked", coins: this.wordCoins };
+    }
+    const cost = getWordBankUnlockCost(catalog, bankId);
+    if (this.wordCoins < cost) {
+      return { ok: false, bankId, reason: "insufficientCoins", cost, coins: this.wordCoins };
+    }
+    this.wordCoins -= cost;
+    this.unlockedBankIds = normalizeUnlockedBankIds(catalog, [
+      bankId,
+      ...this.unlockedBankIds
+    ]);
+    return { ok: true, bankId, cost, coins: this.wordCoins };
+  }
+
+  getSelectedWords(catalog: WordBankDataSource): WordItem[] {
+    return getStudyWords(catalog, this.bankId, this.wrongWords);
   }
 }

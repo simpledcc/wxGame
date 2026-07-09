@@ -6,7 +6,7 @@ It intentionally does not replace the current production WeChat Mini Game under 
 
 ## Current Phase
 
-Phase 2 provides a runnable source skeleton plus platform services:
+Phase 3 currently provides a runnable source skeleton, platform services, and Home/Bank/Study core logic:
 
 - TypeScript project structure.
 - Boot and Home scenes with their controller scripts attached.
@@ -18,6 +18,9 @@ Phase 2 provides a runnable source skeleton plus platform services:
 - Privacy gate before cloud and personal local storage access.
 - Cloud, storage, share, and logging service wrappers.
 - Legacy storage snapshot hydration for coins, unlocked banks, history, best scores, wrong words, and muted state.
+- Generated word bank data from the legacy WeChat client.
+- Word bank unlock and selection rules.
+- Study session rules for hidden Chinese, current-word reveal, and next/previous word.
 
 ## Open In Cocos Creator
 
@@ -35,6 +38,7 @@ The build configuration uses Boot as the initial scene and includes both Boot an
 From this directory:
 
 ```bash
+npm install
 npm run check:structure
 ```
 
@@ -42,6 +46,18 @@ Run platform-service checks:
 
 ```bash
 npm run test:platform
+```
+
+Regenerate Cocos word bank data after the legacy word bank source changes:
+
+```bash
+npm run generate:word-banks
+```
+
+Run Home/Bank/Study core checks:
+
+```bash
+npm run test:stage3
 ```
 
 Check whether this machine can run Cocos Creator:

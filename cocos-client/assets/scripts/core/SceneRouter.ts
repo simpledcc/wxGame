@@ -30,17 +30,30 @@ export class SceneRouter {
   navigate(route: RouteName): void {
     const config = ROUTES[route];
     this.store.setRoute(route);
+    this.loadSceneIfNeeded(config);
+  }
+
+  openBankPicker(returnRoute = this.store.getState().route): void {
+    this.store.openBankPicker(returnRoute);
+    this.logger.info("route.changed", { route: "bank", returnRoute });
+  }
+
+  returnFromBankPicker(): void {
+    const target = this.store.getState().bankReturnRoute || "home";
+    this.navigate(target);
+  }
+
+  private loadSceneIfNeeded(config: RouteConfig): void {
     if (!config.cocosScene) {
-      this.logger.info("route.changed", { route });
+      this.logger.info("route.changed", { route: config.route });
       return;
     }
     director.loadScene(config.cocosScene, (err) => {
       if (err) {
-        this.logger.error("scene.load.fail", { route, scene: config.cocosScene, message: err.message });
+        this.logger.error("scene.load.fail", { route: config.route, scene: config.cocosScene, message: err.message });
         return;
       }
-      this.logger.info("scene.loaded", { route, scene: config.cocosScene });
+      this.logger.info("scene.loaded", { route: config.route, scene: config.cocosScene });
     });
   }
 }
-

@@ -6,6 +6,8 @@
   "scripts": {
     "check:structure": "node ./tools/check-structure.js",
     "check:cocos-env": "node ./tools/check-cocos-env.js",
+    "generate:word-banks": "node ./tools/generate-word-bank-data.js",
+    "test:stage3": "tsx ./tools/test-word-bank-study.ts",
     "test:platform": "tsx ./tools/test-platform-services.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
