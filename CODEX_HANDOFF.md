@@ -1,10 +1,14 @@
 # Codex Handoff
 
+> Active Cocos migration workspace: `C:\work\wxgame_cocos`.
+>
+> The uploadable legacy version is frozen at `C:\work\wxgame_backups\wx_game_uploadable_20260709_2142`. Continue new development in the active workspace and do not modify the frozen backup.
+
 ## Project
 
 WeChat Mini Game project:
 
-`C:\work\wxgame\wx_game\wx_game`
+`C:\work\wxgame_cocos`
 
 Game concept: two-player English vocabulary PK game. Current visual theme is grass/cockroach. Players see a Chinese prompt, tap the correct English word on moving cockroaches, score points, earn/use power-ups, and can play against a friend or a test robot.
 
@@ -13,7 +17,7 @@ Game concept: two-player English vocabulary PK game. Current visual theme is gra
 Resume point for the next agent:
 
 - Current latest build includes: word-bank unlocks with `金币`, `背单词`, background music, PK mode, test robot, power-ups, and two co-op modes.
-- Latest preview QR is at `C:\work\wxgame\wx_game\wx_game\.codex-preview\preview.png`.
+- Latest preview QR is at `C:\work\wxgame_cocos\.codex-preview\preview.png`.
 - Latest uploaded package size is about `2.1 MB` (`2253921` bytes).
 - Latest cloud deploy target is `cloud1-d3gre86i51a49821a`.
 - Last deployed cloud functions: `createRoom`, `joinRoom`, `submitFeedback`, `checkText`, plus existing game functions.
@@ -162,7 +166,7 @@ WeChat DevTools path:
 
 Latest preview was generated successfully:
 
-`C:\work\wxgame\wx_game\wx_game\.codex-preview\preview.png`
+`C:\work\wxgame_cocos\.codex-preview\preview.png`
 
 Latest preview package size was about `2.1 MB` (`2252810` bytes).
 
@@ -171,29 +175,29 @@ Latest preview package size was about `2.1 MB` (`2252810` bytes).
 Syntax checks:
 
 ```powershell
-node --check C:\work\wxgame\wx_game\wx_game\miniprogram\game.js
-node --check C:\work\wxgame\wx_game\wx_game\miniprogram\wordBankData.js
-node --check C:\work\wxgame\wx_game\wx_game\cloudfunctions\createRoom\index.js
-node --check C:\work\wxgame\wx_game\wx_game\cloudfunctions\startGame\index.js
-node --check C:\work\wxgame\wx_game\wx_game\cloudfunctions\catchFish\index.js
-node --check C:\work\wxgame\wx_game\wx_game\cloudfunctions\finishGame\index.js
+node --check C:\work\wxgame_cocos\miniprogram\game.js
+node --check C:\work\wxgame_cocos\miniprogram\wordBankData.js
+node --check C:\work\wxgame_cocos\cloudfunctions\createRoom\index.js
+node --check C:\work\wxgame_cocos\cloudfunctions\startGame\index.js
+node --check C:\work\wxgame_cocos\cloudfunctions\catchFish\index.js
+node --check C:\work\wxgame_cocos\cloudfunctions\finishGame\index.js
 ```
 
 Deploy cloud functions:
 
 ```powershell
-& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names createRoom --remote-npm-install --project 'C:\work\wxgame\wx_game\wx_game' --lang zh
-& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names startGame --remote-npm-install --project 'C:\work\wxgame\wx_game\wx_game' --lang zh
-& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names catchFish --remote-npm-install --project 'C:\work\wxgame\wx_game\wx_game' --lang zh
-& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names finishGame --remote-npm-install --project 'C:\work\wxgame\wx_game\wx_game' --lang zh
+& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names createRoom --remote-npm-install --project 'C:\work\wxgame_cocos' --lang zh
+& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names startGame --remote-npm-install --project 'C:\work\wxgame_cocos' --lang zh
+& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names catchFish --remote-npm-install --project 'C:\work\wxgame_cocos' --lang zh
+& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' cloud functions deploy --env cloud1-d3gre86i51a49821a --names finishGame --remote-npm-install --project 'C:\work\wxgame_cocos' --lang zh
 ```
 
 Generate preview:
 
 ```powershell
-$outDir='C:\work\wxgame\wx_game\wx_game\.codex-preview'
+$outDir='C:\work\wxgame_cocos\.codex-preview'
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' preview --project 'C:\work\wxgame\wx_game\wx_game' --qr-format image --qr-output "$outDir\preview.png" --info-output "$outDir\preview-info.json" --lang zh
+& 'C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat' preview --project 'C:\work\wxgame_cocos' --qr-format image --qr-output "$outDir\preview.png" --info-output "$outDir\preview-info.json" --lang zh
 ```
 
 ## Known Design/Implementation Notes

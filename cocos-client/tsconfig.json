@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["assets/scripts/core/*"],
+      "@services/*": ["assets/scripts/services/*"],
+      "@store/*": ["assets/scripts/store/*"],
+      "@domain/*": ["assets/scripts/domain/*"],
+      "@adapters/*": ["assets/scripts/adapters/*"],
+      "@components/*": ["assets/scripts/components/*"],
+      "@scenes/*": ["assets/scripts/scenes/*"]
+    },
+    "types": []
+  },
+  "include": [
+    "assets/scripts/**/*.ts",
+    "types/**/*.d.ts"
+  ]
+}
