@@ -6,9 +6,11 @@
   "scripts": {
     "check:structure": "node ./tools/check-structure.js",
     "check:cocos-env": "node ./tools/check-cocos-env.js",
+    "test:platform": "tsx ./tools/test-platform-services.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "tsx": "^3.12.7",
     "typescript": "^5.4.5"
   },
   "creator": {

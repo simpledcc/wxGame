@@ -1,4 +1,5 @@
 import { createRuntimePort } from "../adapters/WechatRuntimePort";
+import type { RuntimePort } from "../adapters/RuntimePort";
 import { CloudService } from "../services/CloudService";
 import { StorageService } from "../services/StorageService";
 import { PrivacyService } from "../services/PrivacyService";
@@ -20,7 +21,7 @@ const CLOUD_ENV_ID = "cloud1-d3gre86i51a49821a";
 
 export class App {
   readonly logger = new Logger("App");
-  readonly runtime = createRuntimePort();
+  readonly runtime: RuntimePort;
   readonly store = new GameStore();
   readonly playerStore = new PlayerStore();
   readonly roomStore = new RoomStore();
@@ -29,38 +30,68 @@ export class App {
   readonly settingsStore = new SettingsStore();
   readonly router = new SceneRouter(this.store);
 
-  readonly cloud = new CloudService(this.runtime);
-  readonly storage = new StorageService(this.runtime);
-  readonly privacy = new PrivacyService(this.storage);
-  readonly contentSafety = new ContentSafetyService(this.cloud);
-  readonly feedback = new FeedbackService(this.cloud);
-  readonly rooms = new RoomService(this.cloud);
-  readonly share = new ShareService(this.runtime);
-  readonly audio = new AudioService(this.storage);
+  readonly cloud: CloudService;
+  readonly storage: StorageService;
+  readonly privacy: PrivacyService;
+  readonly contentSafety: ContentSafetyService;
+  readonly feedback: FeedbackService;
+  readonly rooms: RoomService;
+  readonly share: ShareService;
+  readonly audio: AudioService;
+
+  private bootPromise: Promise<void> | null = null;
+
+  constructor(runtime: RuntimePort = createRuntimePort()) {
+    this.runtime = runtime;
+    this.storage = new StorageService(runtime);
+    this.privacy = new PrivacyService(this.storage, runtime);
+    this.storage.configurePrivacyGate(() => this.privacy.hasAcceptedCurrentVersion());
+    this.cloud = new CloudService(
+      runtime,
+      () => this.privacy.requireAccepted("cloud")
+    );
+    this.contentSafety = new ContentSafetyService(this.cloud);
+    this.feedback = new FeedbackService(this.cloud);
+    this.rooms = new RoomService(this.cloud);
+    this.share = new ShareService(runtime, this.privacy);
+    this.audio = new AudioService(this.storage);
+  }
 
   async boot(): Promise<void> {
+    this.privacy.requireAccepted("cloud");
+    if (this.store.getState().booted) {
+      return;
+    }
+    if (!this.bootPromise) {
+      this.bootPromise = this.performBoot().catch((error) => {
+        this.bootPromise = null;
+        this.store.patch({ booted: false, cloudReady: false });
+        throw error;
+      });
+    }
+    await this.bootPromise;
+  }
+
+  private async performBoot(): Promise<void> {
     this.logger.info("boot.start");
+    const legacy = this.storage.readLegacySnapshot();
+    this.wordBankStore.hydrateLegacyState(legacy);
+    this.historyStore.replaceRecords(legacy.matchRecords);
+    this.historyStore.replaceBestScores(legacy.bestScoresByMode);
+    this.settingsStore.setMuted(legacy.soundMuted);
+
     await this.cloud.init(CLOUD_ENV_ID);
-    const openid = await this.tryGetOpenId();
-    this.playerStore.setOpenId(openid);
     this.store.patch({
       booted: true,
       cloudReady: true,
-      openid
+      openid: ""
     });
-    this.logger.info("boot.ready", { openidKnown: !!openid });
-  }
-
-  private async tryGetOpenId(): Promise<string> {
-    try {
-      const result = await this.cloud.call("getOpenId", {});
-      return result.openid || "";
-    } catch (err) {
-      this.logger.warn("openid.fail", { message: err instanceof Error ? err.message : String(err) });
-      return "";
-    }
+    this.logger.info("boot.ready", {
+      cloudReady: true,
+      legacyRecords: legacy.matchRecords.length,
+      unlockedBanks: legacy.unlockedWordBanks.length
+    });
   }
 }
 
 export const app = new App();
-

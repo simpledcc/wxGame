@@ -1,12 +1,17 @@
-import { MemoryRuntimePort, type CloudCallOptions, type RuntimePort, type ShareMessageOptions } from "./RuntimePort";
+import {
+  MemoryRuntimePort,
+  type RuntimeCloudCallOptions,
+  type RuntimePort,
+  type ShareMessageOptions
+} from "./RuntimePort";
 
 type WxLike = {
   cloud?: {
-    init?: (options: { env: string; traceUser?: boolean }) => void;
+    init?: (options: { env?: string; traceUser?: boolean }) => void;
     callFunction?: (options: {
       name: string;
       data?: unknown;
-      success?: (res: { result?: unknown }) => void;
+      success?: (res: { result?: unknown; requestID?: string }) => void;
       fail?: (err: unknown) => void;
     }) => void;
   };
@@ -15,6 +20,15 @@ type WxLike = {
   removeStorageSync?: (key: string) => void;
   showToast?: (options: { title: string; icon?: string; duration?: number }) => void;
   shareAppMessage?: (options: ShareMessageOptions) => void;
+  setClipboardData?: (options: {
+    data: string;
+    success?: () => void;
+    fail?: (err: unknown) => void;
+  }) => void;
+  openPrivacyContract?: (options: {
+    success?: () => void;
+    fail?: (err: unknown) => void;
+  }) => void;
 };
 
 function getWx(): WxLike | undefined {
@@ -26,12 +40,17 @@ export function createRuntimePort(): RuntimePort {
 }
 
 export class WechatRuntimePort implements RuntimePort {
-  async initCloud(envId: string): Promise<void> {
+  async initCloud(envId?: string): Promise<void> {
     const wx = getWx();
-    wx?.cloud?.init?.({ env: envId, traceUser: true });
+    if (!wx?.cloud?.init) {
+      throw new Error("wx.cloud.init is unavailable.");
+    }
+    wx.cloud.init({ env: envId, traceUser: true });
   }
 
-  async callCloudFunction<TData, TResult>(options: CloudCallOptions<TData>): Promise<TResult> {
+  async callCloudFunction<TData, TResult>(
+    options: RuntimeCloudCallOptions<TData>
+  ): Promise<TResult> {
     const wx = getWx();
     if (!wx?.cloud?.callFunction) {
       throw new Error("wx.cloud.callFunction is unavailable.");
@@ -47,23 +66,67 @@ export class WechatRuntimePort implements RuntimePort {
   }
 
   getStorage<T>(key: string): T | undefined {
-    return getWx()?.getStorageSync?.(key) as T | undefined;
+    const wx = getWx();
+    if (!wx?.getStorageSync) {
+      return undefined;
+    }
+    return wx.getStorageSync(key) as T | undefined;
   }
 
   setStorage<T>(key: string, value: T): void {
-    getWx()?.setStorageSync?.(key, value);
+    const wx = getWx();
+    if (!wx?.setStorageSync) {
+      throw new Error("wx.setStorageSync is unavailable.");
+    }
+    wx.setStorageSync(key, value);
   }
 
   removeStorage(key: string): void {
-    getWx()?.removeStorageSync?.(key);
+    const wx = getWx();
+    if (!wx?.removeStorageSync) {
+      throw new Error("wx.removeStorageSync is unavailable.");
+    }
+    wx.removeStorageSync(key);
   }
 
   showToast(message: string): void {
     getWx()?.showToast?.({ title: message, icon: "none", duration: 1200 });
   }
 
-  shareAppMessage(options: ShareMessageOptions): void {
-    getWx()?.shareAppMessage?.(options);
+  async shareAppMessage(options: ShareMessageOptions): Promise<boolean> {
+    const wx = getWx();
+    if (!wx?.shareAppMessage) {
+      return false;
+    }
+    wx.shareAppMessage(options);
+    return true;
+  }
+
+  async setClipboardText(text: string): Promise<void> {
+    const wx = getWx();
+    if (!wx?.setClipboardData) {
+      throw new Error("wx.setClipboardData is unavailable.");
+    }
+    await new Promise<void>((resolve, reject) => {
+      wx.setClipboardData?.({
+        data: text,
+        success: resolve,
+        fail: reject
+      });
+    });
+  }
+
+  async openPrivacyContract(): Promise<boolean> {
+    const wx = getWx();
+    if (!wx?.openPrivacyContract) {
+      return false;
+    }
+    await new Promise<void>((resolve, reject) => {
+      wx.openPrivacyContract?.({
+        success: resolve,
+        fail: reject
+      });
+    });
+    return true;
   }
 }
-

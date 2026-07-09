@@ -6,7 +6,7 @@ It intentionally does not replace the current production WeChat Mini Game under 
 
 ## Current Phase
 
-Phase 1 provides a runnable source skeleton:
+Phase 2 provides a runnable source skeleton plus platform services:
 
 - TypeScript project structure.
 - Boot and Home scenes with their controller scripts attached.
@@ -15,6 +15,9 @@ Phase 1 provides a runnable source skeleton:
 - Runtime adapter boundary for WeChat APIs.
 - Typed cloud function contracts from `../COCOS_MIGRATION_PHASE0_BASELINE.md`.
 - Typed local storage keys from the Phase 0 baseline.
+- Privacy gate before cloud and personal local storage access.
+- Cloud, storage, share, and logging service wrappers.
+- Legacy storage snapshot hydration for coins, unlocked banks, history, best scores, wrong words, and muted state.
 
 ## Open In Cocos Creator
 
@@ -33,6 +36,12 @@ From this directory:
 
 ```bash
 npm run check:structure
+```
+
+Run platform-service checks:
+
+```bash
+npm run test:platform
 ```
 
 Check whether this machine can run Cocos Creator:

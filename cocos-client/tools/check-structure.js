@@ -28,11 +28,13 @@ const required = [
   "assets/scripts/services/AudioService.ts",
   "assets/scripts/store/GameStore.ts",
   "assets/scripts/domain/CloudFunctionTypes.ts",
+  "assets/scripts/domain/Privacy.ts",
   "assets/scripts/domain/StorageKeys.ts",
   "assets/scripts/domain/RoomTypes.ts",
   "assets/scripts/scenes/BootScene.ts",
   "assets/scripts/scenes/HomeScene.ts",
   "assets/scripts/components/HomePlaceholder.ts",
+  "tools/test-platform-services.ts",
   "tools/check-cocos-env.js",
   "types/cc.d.ts"
 ];
@@ -45,4 +47,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`Phase 1 structure OK: ${required.length} files checked.`);
+console.log(`Cocos migration structure OK: ${required.length} files checked.`);
