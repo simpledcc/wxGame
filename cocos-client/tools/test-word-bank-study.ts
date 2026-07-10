@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { MemoryRuntimePort } from "../assets/scripts/adapters/RuntimePort";
 import { WORD_BANK_DATA } from "../assets/scripts/data/WordBankData.generated";
 import { createStudySession, getStudyCard, moveStudyWord, revealCurrentStudyMeaning, setStudyMeaningVisibility } from "../assets/scripts/domain/StudySession";
 import {
@@ -9,7 +10,9 @@ import {
   normalizeUnlockedBankIds,
   resolveBankSelection
 } from "../assets/scripts/domain/WordBankRules";
-import { ALL_REVIEW_WORD_BANK_UNLOCK_COST, REVIEW_WORD_BANK_UNLOCK_COST, WORD_BANK_UNLOCK_COST } from "../assets/scripts/domain/StorageKeys";
+import { ALL_REVIEW_WORD_BANK_UNLOCK_COST, PRIVACY_VERSION, REVIEW_WORD_BANK_UNLOCK_COST, WORD_BANK_UNLOCK_COST } from "../assets/scripts/domain/StorageKeys";
+import { PrivacyService } from "../assets/scripts/services/PrivacyService";
+import { StorageService } from "../assets/scripts/services/StorageService";
 import { GameStore } from "../assets/scripts/store/GameStore";
 import { WordBankStore } from "../assets/scripts/store/WordBankStore";
 
@@ -91,12 +94,45 @@ function testBankReturnRoute(): void {
   assert.equal(store.getState().bankId, "jilin-g1a-b1-welcome");
 }
 
+async function testWordBankProgressPersistence(): Promise<void> {
+  const runtime = new MemoryRuntimePort({
+    storage: {
+      privacyAcceptedVersion: PRIVACY_VERSION,
+      wordCoins: 160,
+      unlockedWordBanks: []
+    }
+  });
+  const storage = new StorageService(runtime);
+  const privacy = new PrivacyService(storage, runtime);
+  storage.configurePrivacyGate(() => privacy.hasAcceptedCurrentVersion());
+  const store = new WordBankStore();
+  store.hydrateLegacyState(storage.readLegacySnapshot(), WORD_BANK_DATA);
+  storage.writeWordBankProgress(store.getWordCoins(), store.getUnlockedBankIds());
+
+  assert.equal(runtime.getStorage("wordCoins"), 160);
+  assert.deepEqual(runtime.getStorage("unlockedWordBanks"), ["jilin-g1a-b1-welcome"]);
+
+  const unlock = store.unlockBank(WORD_BANK_DATA, "jilin-g3r-all-review");
+  assert.equal(unlock.ok, true);
+  storage.writeWordBankProgress(store.getWordCoins(), store.getUnlockedBankIds());
+  assert.equal(runtime.getStorage("wordCoins"), 10);
+  assert.deepEqual(
+    runtime.getStorage("unlockedWordBanks"),
+    ["jilin-g3r-all-review", "jilin-g1a-b1-welcome"]
+  );
+}
+
 function main(): void {
   testCatalogAndUnlockRules();
   testWordBankStoreSelection();
   testStudyRevealFlow();
   testBankReturnRoute();
-  console.log("Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, and picker return route.");
 }
 
-main();
+async function run(): Promise<void> {
+  main();
+  await testWordBankProgressPersistence();
+  console.log("Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, picker return route, and unlock persistence.");
+}
+
+void run();

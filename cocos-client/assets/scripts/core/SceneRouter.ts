@@ -19,7 +19,8 @@ const ROUTES: Record<RouteName, RouteConfig> = {
   coopSpell: { route: "coopSpell" },
   result: { route: "result" },
   history: { route: "history" },
-  feedback: { route: "feedback" }
+  feedback: { route: "feedback" },
+  help: { route: "help" }
 };
 
 export class SceneRouter {
@@ -31,6 +32,12 @@ export class SceneRouter {
     const config = ROUTES[route];
     this.store.setRoute(route);
     this.loadSceneIfNeeded(config);
+  }
+
+  enterRuntimeShell(route: RouteName = this.store.getState().route): void {
+    const target = route === "boot" ? "home" : route;
+    this.store.setRoute(target);
+    this.loadSceneIfNeeded({ route: target, cocosScene: "Home" });
   }
 
   openBankPicker(returnRoute = this.store.getState().route): void {
@@ -46,6 +53,10 @@ export class SceneRouter {
   private loadSceneIfNeeded(config: RouteConfig): void {
     if (!config.cocosScene) {
       this.logger.info("route.changed", { route: config.route });
+      return;
+    }
+    if (director.getScene()?.name === config.cocosScene) {
+      this.logger.info("route.changed", { route: config.route, scene: config.cocosScene });
       return;
     }
     director.loadScene(config.cocosScene, (err) => {

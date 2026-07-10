@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "default",
+  "label": "草地捕词",
+  "bundleName": "theme_default",
+  "targetStyle": "insect",
+  "assets": {
+    "homeBackground": "textures/gameplay-bg/spriteFrame",
+    "gameplayBackground": "textures/gameplay-bg/spriteFrame",
+    "spellBackground": "textures/gameplay-bg/spriteFrame"
+  },
+  "colors": {
+    "backgroundTint": "#DFF4C8",
+    "panel": "#FFFDF7",
+    "panelBorder": "#3F7D3A",
+    "textPrimary": "#17351C",
+    "textMuted": "#5E715E",
+    "primary": "#2F8F46",
+    "primaryPressed": "#226D35",
+    "secondary": "#F2C14E",
+    "disabled": "#A9B5A7",
+    "targetFill": "#5A3324",
+    "targetStroke": "#24150F",
+    "targetText": "#FFF8E8",
+    "spellLocal": "#1877C9",
+    "spellPartner": "#D54A8C",
+    "keyFill": "#FFFFFF",
+    "keyText": "#17351C",
+    "success": "#168548",
+    "warning": "#C77813",
+    "error": "#C53A31"
+  },
+  "copy": {
+    "gameTitle": "单词捕虫",
+    "targetNoun": "单词虫",
+    "actionPrompt": "看中文，抢拍正确英文"
+  },
+  "sourceBytes": 109849
+}

@@ -1,6 +1,7 @@
 import {
   MemoryRuntimePort,
   type RuntimeCloudCallOptions,
+  type RuntimeEntryOptions,
   type RuntimePort,
   type ShareMessageOptions
 } from "./RuntimePort";
@@ -14,6 +15,13 @@ type WxLike = {
       success?: (res: { result?: unknown; requestID?: string }) => void;
       fail?: (err: unknown) => void;
     }) => void;
+    database?: () => {
+      collection: (name: string) => {
+        doc: (documentId: string) => {
+          get: () => Promise<{ data?: unknown }>;
+        };
+      };
+    };
   };
   getStorageSync?: (key: string) => unknown;
   setStorageSync?: (key: string, value: unknown) => void;
@@ -29,6 +37,12 @@ type WxLike = {
     success?: () => void;
     fail?: (err: unknown) => void;
   }) => void;
+  getLaunchOptionsSync?: () => RuntimeEntryOptions;
+  getLaunchInfoSync?: () => RuntimeEntryOptions;
+  onShow?: (handler: (options: RuntimeEntryOptions) => void) => void;
+  offShow?: (handler: (options: RuntimeEntryOptions) => void) => void;
+  onHide?: (handler: () => void) => void;
+  offHide?: (handler: () => void) => void;
 };
 
 function getWx(): WxLike | undefined {
@@ -63,6 +77,18 @@ export class WechatRuntimePort implements RuntimePort {
         fail: reject
       });
     });
+  }
+
+  async getCloudDocument<TResult>(collection: string, documentId: string): Promise<TResult> {
+    const database = getWx()?.cloud?.database?.();
+    if (!database) {
+      throw new Error("wx.cloud.database is unavailable.");
+    }
+    const result = await database.collection(collection).doc(documentId).get();
+    if (result.data == null) {
+      throw new Error(`Cloud document ${collection}/${documentId} was not found.`);
+    }
+    return result.data as TResult;
   }
 
   getStorage<T>(key: string): T | undefined {
@@ -128,5 +154,28 @@ export class WechatRuntimePort implements RuntimePort {
       });
     });
     return true;
+  }
+
+  getLaunchOptions(): RuntimeEntryOptions {
+    const wx = getWx();
+    const options = wx?.getLaunchOptionsSync?.() ?? wx?.getLaunchInfoSync?.() ?? {};
+    return options.query ? { query: { ...options.query } } : {};
+  }
+
+  onAppShow(handler: (options: RuntimeEntryOptions) => void): () => void {
+    const wx = getWx();
+    if (!wx?.onShow) return () => undefined;
+    const wrapped = (options: RuntimeEntryOptions) => {
+      handler(options.query ? { query: { ...options.query } } : {});
+    };
+    wx.onShow(wrapped);
+    return () => wx.offShow?.(wrapped);
+  }
+
+  onAppHide(handler: () => void): () => void {
+    const wx = getWx();
+    if (!wx?.onHide) return () => undefined;
+    wx.onHide(handler);
+    return () => wx.offHide?.(handler);
   }
 }

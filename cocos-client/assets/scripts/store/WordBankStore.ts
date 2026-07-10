@@ -66,6 +66,16 @@ export class WordBankStore {
     return this.wrongWords.map((item) => ({ ...item }));
   }
 
+  addWrongWord(item: WordItem, limit = 120): boolean {
+    const word = String(item.word || "").trim();
+    const meaning = String(item.meaning || "").trim();
+    if (!word || !meaning || this.wrongWords.some((entry) => entry.word === word)) {
+      return false;
+    }
+    this.wrongWords = [{ word, meaning }, ...this.wrongWords].slice(0, Math.max(1, limit));
+    return true;
+  }
+
   isUnlocked(catalog: WordBankDataSource, bankId: string): boolean {
     return isWordBankUnlocked(catalog, this.unlockedBankIds, bankId);
   }

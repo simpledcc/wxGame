@@ -1,0 +1,184 @@
+type Constructor<T> = new (...args: any[]) => T;
+
+const startQueue: Component[] = [];
+
+export function flushStartQueue(): void {
+  while (startQueue.length) {
+    const component = startQueue.shift();
+    if (component?.node.active) component.start?.();
+  }
+}
+
+export class Vec3 {
+  constructor(public x = 0, public y = 0, public z = 0) {}
+}
+
+export class Component {
+  node!: Node;
+  onLoad?(): void;
+  start?(): void;
+  onDestroy?(): void;
+  update?(_deltaTime: number): void;
+}
+
+export class Node {
+  active = true;
+  private destroyed = false;
+  layer = 0;
+  position = new Vec3();
+  parent: Node | null = null;
+  readonly children: Node[] = [];
+  private readonly components: Component[] = [];
+  private readonly listeners = new Map<string, Array<(...args: unknown[]) => void>>();
+
+  constructor(public name = "") {}
+
+  addChild(child: Node): void {
+    child.parent = this;
+    this.children.push(child);
+  }
+
+  addComponent<T extends Component>(type: Constructor<T>): T {
+    const component = new type();
+    component.node = this;
+    this.components.push(component);
+    component.onLoad?.();
+    if (component.start) startQueue.push(component);
+    return component;
+  }
+
+  getComponent<T extends Component>(type: Constructor<T>): T | null {
+    return (this.components.find((component) => component instanceof type) as T | undefined) || null;
+  }
+
+  getChildByName(name: string): Node | null {
+    return this.children.find((child) => child.name === name) || null;
+  }
+
+  setPosition(x: number, y: number, z = 0): void {
+    this.position = new Vec3(x, y, z);
+  }
+
+  on(type: string, callback: (...args: any[]) => void, target?: unknown): void {
+    const handlers = this.listeners.get(type) || [];
+    handlers.push((...args) => callback.apply(target, args));
+    this.listeners.set(type, handlers);
+  }
+
+  emit(type: string, ...args: unknown[]): void {
+    this.listeners.get(type)?.forEach((handler) => handler(...args));
+  }
+
+  destroy(): boolean {
+    if (this.destroyed) return false;
+    this.destroyed = true;
+    this.active = false;
+    this.children.slice().forEach((child) => child.destroy());
+    this.components.slice().reverse().forEach((component) => component.onDestroy?.());
+    if (this.parent) {
+      const index = this.parent.children.indexOf(this);
+      if (index >= 0) this.parent.children.splice(index, 1);
+    }
+    return true;
+  }
+}
+
+export class Color {
+  constructor(public r = 255, public g = 255, public b = 255, public a = 255) {}
+}
+
+export class UITransform extends Component {
+  width = 0;
+  height = 0;
+  setContentSize(width: number, height: number): void {
+    this.width = width;
+    this.height = height;
+  }
+}
+
+export class Label extends Component {
+  string = "";
+  fontSize = 20;
+  lineHeight = 24;
+  color = new Color();
+  horizontalAlign = 1;
+  verticalAlign = 1;
+  enableWrapText = true;
+}
+
+export class Graphics extends Component {
+  fillColor = new Color();
+  strokeColor = new Color();
+  lineWidth = 1;
+  roundRect(_x: number, _y: number, _width: number, _height: number, _radius: number): void {}
+  fill(): void {}
+  stroke(): void {}
+  clear(): void {}
+}
+
+export class Button extends Component {
+  static readonly EventType = { CLICK: "click" };
+  interactable = true;
+}
+
+export class Asset {}
+export class SpriteFrame extends Asset {}
+
+export class Sprite extends Component {
+  spriteFrame: SpriteFrame | null = null;
+  color = new Color();
+}
+
+export class EditBox extends Component {
+  static readonly InputMode = { ANY: 0, SINGLE_LINE: 6 };
+  string = "";
+  placeholder = "";
+  maxLength = -1;
+  inputMode = EditBox.InputMode.SINGLE_LINE;
+  textLabel: Label | null = null;
+  placeholderLabel: Label | null = null;
+}
+
+class MockBundle {
+  load<T extends Asset>(
+    _path: string,
+    type: Constructor<T>,
+    callback: (error: Error | null, asset?: T) => void
+  ): void {
+    callback(null, new type());
+  }
+}
+
+const bundles = new Map<string, MockBundle>();
+
+export const assetManager = {
+  getBundle(name: string): MockBundle | null {
+    return bundles.get(name) || null;
+  },
+  loadBundle(name: string, callback: (error: Error | null, bundle?: MockBundle) => void): void {
+    const bundle = bundles.get(name) || new MockBundle();
+    bundles.set(name, bundle);
+    callback(null, bundle);
+  }
+};
+
+let currentScene = new Node("Home");
+
+export function setMockScene(scene: Node): void {
+  currentScene = scene;
+}
+
+export const director = {
+  getScene(): Node {
+    return currentScene;
+  },
+  loadScene(name: string, onLaunched?: (error?: Error | null) => void): void {
+    currentScene = new Node(name);
+    onLaunched?.(null);
+  }
+};
+
+export const _decorator = {
+  ccclass: (_name?: string): ClassDecorator => (target) => target,
+  property: (_type?: unknown): PropertyDecorator => () => undefined
+};

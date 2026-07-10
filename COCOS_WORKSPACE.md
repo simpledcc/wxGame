@@ -2,11 +2,19 @@
 
 Active development root:
 
-`C:\work\wxgame_cocos`
+`D:\demo\wexin`
 
-Legacy production source:
+Active Cocos project:
 
-`C:\work\wxgame\wx_game\wx_game`
+`D:\demo\wexin\cocos-client`
+
+Legacy uploadable client in this checkout:
+
+`D:\demo\wexin\miniprogram`
+
+The `C:\work\...` backup and archive paths below are historical records from an older machine. They are not the active checkout and have not been reverified here.
+
+## Historical Backup Record
 
 Frozen uploadable backup:
 
@@ -22,9 +30,8 @@ Archive SHA256:
 
 ## Rules
 
-- Continue Cocos migration only in `C:\work\wxgame_cocos`.
+- Continue Cocos migration in `D:\demo\wexin\cocos-client`.
 - Do not replace or delete the legacy `miniprogram/` implementation until a later migration phase explicitly performs the production switch.
-- Do not modify the frozen backup.
 - Keep `cloudfunctions/` contracts compatible with the production backend while the Cocos client is migrated incrementally.
 - Treat `cocos-client/build/`, `library/`, `temp/`, `local/`, and `profiles/` as generated directories.
 
@@ -32,8 +39,10 @@ Archive SHA256:
 
 - Legacy WeChat client passed JavaScript and JSON checks.
 - WeChat Developer Tools generated a successful legacy preview on 2026-07-09.
-- Cocos migration Phase 0 and Phase 1 are complete.
-- Cocos migration Phase 2 platform services are implemented in the current Cocos client.
-- Cocos migration Phase 3 Home/Bank/Study core logic is implemented; visual Cocos UI is still pending.
-- Cocos Creator 3.8.8 can preview Boot to Home.
-- A Cocos WeChat Mini Game build has been generated successfully, but it has not replaced the production `miniprogram/`.
+- Cocos migration phases 0-8 have engine-independent implementations and regression tests.
+- `Home.scene` provides a runtime UI shell for every migrated route and controller.
+- Launch/show room invitations, lazy identity acquisition, and hide/show polling recovery are implemented behind `RuntimePort`.
+- `npm run verify` covers platform services, lifecycle, word banks, rooms, all three gameplay modes, themes, UI assembly, release checks, and TypeScript.
+- `npm run build:wechat:dry-run` and `npm run test:build-pipeline` validate the fixed Creator command, output isolation, generated package contract, and package-size accounting without requiring the engine.
+- This machine currently has neither Cocos Creator nor WeChat Developer Tools; `npm run check:cocos-env` confirms no Creator command is available.
+- No Cocos preview, real WeChat build/package-size result, or device acceptance from this checkout should be claimed until those external tools are installed and the gates in `COCOS_RELEASE_QA.md` are completed. Use `COCOS_WECHAT_BUILD_PIPELINE.md` when moving the checkout to that machine.

@@ -9,6 +9,7 @@ import {
 } from "../domain/StorageKeys";
 import type { BestScore, GameModeKey, WordItem } from "../domain/GameTypes";
 import type { MatchRecord } from "../domain/RoomTypes";
+import { mergeMatchRecords } from "../domain/MatchRecordRules";
 
 export interface LegacyStorageSnapshot {
   wordCoins: number;
@@ -48,10 +49,7 @@ function normalizeMatchRecords(value: unknown): MatchRecord[] {
   if (!Array.isArray(value)) {
     return [];
   }
-  return value
-    .filter((item): item is MatchRecord => !!item && typeof item === "object")
-    .sort((a, b) => Number(b.finishedAt || 0) - Number(a.finishedAt || 0))
-    .slice(0, MATCH_RECORD_LIMIT);
+  return mergeMatchRecords(value);
 }
 
 function normalizeBestScores(value: unknown): Partial<Record<GameModeKey, BestScore>> {
@@ -140,6 +138,31 @@ export class StorageService {
       wrongWords: normalizeWordItems(this.tryRead("wrongWords")),
       soundMuted: normalizeSoundMuted(this.tryRead("soundMuted"))
     };
+  }
+
+  writeWordBankProgress(wordCoins: number, unlockedWordBanks: string[]): void {
+    const coins = Number(wordCoins);
+    this.set(
+      "wordCoins",
+      Number.isFinite(coins) && coins >= 0 ? Math.floor(coins) : INITIAL_WORD_COINS
+    );
+    this.set("unlockedWordBanks", normalizeStringArray(unlockedWordBanks));
+  }
+
+  writeWrongWords(words: WordItem[]): void {
+    this.set("wrongWords", normalizeWordItems(words).slice(0, 120));
+  }
+
+  writeMatchProgress(
+    records: MatchRecord[],
+    bestScores: Partial<Record<GameModeKey, BestScore>>
+  ): void {
+    this.set("matchRecords", mergeMatchRecords(records));
+    this.set("bestScoresByMode", normalizeBestScores(bestScores));
+  }
+
+  clearLegacyPlayerName(): void {
+    this.remove("playerName");
   }
 
   private tryRead<K extends keyof StorageValueMap>(key: K): unknown {

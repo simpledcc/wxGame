@@ -629,7 +629,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "Cocos 迁移骨架已启动\n首页占位和服务适配已就绪",
+    "_string": "正在连接云服务\n请稍候",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 24,

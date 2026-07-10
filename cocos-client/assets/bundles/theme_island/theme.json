@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "island",
+  "label": "海岛捕鱼",
+  "bundleName": "theme_island",
+  "targetStyle": "fish",
+  "assets": {
+    "homeBackground": "textures/gameplay-bg/spriteFrame",
+    "gameplayBackground": "textures/gameplay-bg/spriteFrame",
+    "spellBackground": "textures/gameplay-bg/spriteFrame"
+  },
+  "colors": {
+    "backgroundTint": "#D8F4EE",
+    "panel": "#FFFDF8",
+    "panelBorder": "#167E89",
+    "textPrimary": "#143A42",
+    "textMuted": "#547078",
+    "primary": "#078A98",
+    "primaryPressed": "#096975",
+    "secondary": "#F08A72",
+    "disabled": "#A9BBC0",
+    "targetFill": "#F17768",
+    "targetStroke": "#9E3D54",
+    "targetText": "#FFFFFF",
+    "spellLocal": "#087BC1",
+    "spellPartner": "#E04E8A",
+    "keyFill": "#F8FFFF",
+    "keyText": "#143A42",
+    "success": "#17845B",
+    "warning": "#C97918",
+    "error": "#C64246"
+  },
+  "copy": {
+    "gameTitle": "单词捕鱼",
+    "targetNoun": "单词鱼",
+    "actionPrompt": "看中文，捕获正确英文"
+  },
+  "sourceBytes": 99227
+}

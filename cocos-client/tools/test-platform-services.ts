@@ -14,7 +14,19 @@ import { StorageService } from "../assets/scripts/services/StorageService";
 async function testPrivacyAndLegacyStorage(): Promise<void> {
   const records = Array.from({ length: 55 }, (_, index) => ({
     id: `record-${index}`,
-    finishedAt: index
+    modeKey: "pk" as const,
+    modeLabel: "双人PK",
+    roomCode: "AB12CD",
+    finishedAt: index,
+    result: "胜利",
+    winnerOpenid: "player-1",
+    duration: 60 as const,
+    bankLabel: "词库",
+    score: index,
+    players: [
+      { openid: "player-1", nickName: "玩家1", score: index },
+      { openid: "player-2", nickName: "玩家2", score: 0 }
+    ]
   }));
   const runtime = new MemoryRuntimePort({
     storage: {
@@ -29,7 +41,8 @@ async function testPrivacyAndLegacyStorage(): Promise<void> {
         { word: "stable", meaning: "稳定的" },
         { word: "", meaning: "invalid" }
       ],
-      soundMuted: false
+      soundMuted: false,
+      playerName: "旧自定义名称"
     }
   });
   const storage = new StorageService(runtime);
@@ -45,6 +58,8 @@ async function testPrivacyAndLegacyStorage(): Promise<void> {
 
   privacy.acceptCurrentVersion();
   assert.equal(runtime.getStorage("privacyAcceptedVersion"), PRIVACY_VERSION);
+  storage.clearLegacyPlayerName();
+  assert.equal(runtime.getStorage("playerName"), undefined);
   const snapshot = storage.readLegacySnapshot();
   assert.equal(snapshot.wordCoins, 86);
   assert.deepEqual(snapshot.unlockedWordBanks, ["bank-a", "bank-b"]);
@@ -82,7 +97,15 @@ async function testCloudCallsAndFailures(): Promise<void> {
       checkText: () => {
         throw new Error("document.update:fail -5 openid=private-openid");
       },
+      joinRoom: () => {
+        throw { errMsg: "cloud.callFunction:fail Error: 房间不存在 request=private-openid" };
+      },
       submitFeedback: () => new Promise(() => {})
+    },
+    cloudDocuments: {
+      rooms: {
+        "room-safe": { roomCode: "AB12CD" }
+      }
     }
   });
   const storage = new StorageService(runtime);
@@ -97,6 +120,8 @@ async function testCloudCallsAndFailures(): Promise<void> {
   await cloud.init("env-test");
   const identity = await cloud.call("getOpenId", {}, { requestId: "req-success" });
   assert.equal(identity.openid, "private-openid");
+  const room = await cloud.getDocument<{ roomCode: string }>("rooms", "room-safe");
+  assert.equal(room.roomCode, "AB12CD");
 
   await assert.rejects(
     () => cloud.call("checkText", { content: "private feedback" }),
@@ -104,6 +129,15 @@ async function testCloudCallsAndFailures(): Promise<void> {
       assert.ok(error instanceof CloudCallError);
       assert.equal(error.code, "FUNCTION_ERROR");
       assert.equal(error.retryable, true);
+      return true;
+    }
+  );
+
+  await assert.rejects(
+    () => cloud.call("joinRoom", { roomCode: "AB12CD" }),
+    (error: unknown) => {
+      assert.ok(error instanceof CloudCallError);
+      assert.equal(error.message, "房间不存在");
       return true;
     }
   );

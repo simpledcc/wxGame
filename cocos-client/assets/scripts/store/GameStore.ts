@@ -1,5 +1,4 @@
 import type { GameDuration, GameModeKey, WordMode } from "../domain/GameTypes";
-import type { RoomSnapshot } from "../domain/RoomTypes";
 import { EventBus } from "../core/EventBus";
 
 export type RouteName =
@@ -14,7 +13,8 @@ export type RouteName =
   | "coopSpell"
   | "result"
   | "history"
-  | "feedback";
+  | "feedback"
+  | "help";
 
 export interface AppState {
   route: RouteName;
@@ -27,7 +27,6 @@ export interface AppState {
   wordMode: WordMode;
   bankReturnRoute: RouteName;
   bankPickerSelectedBankId: string;
-  room: RoomSnapshot | null;
 }
 
 export interface StoreEvents {
@@ -46,8 +45,7 @@ export class GameStore {
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",
     bankReturnRoute: "home",
-    bankPickerSelectedBankId: "jilin-g1a-b1-welcome",
-    room: null
+    bankPickerSelectedBankId: "jilin-g1a-b1-welcome"
   };
 
   getState(): AppState {
@@ -65,10 +63,6 @@ export class GameStore {
 
   setRoute(route: RouteName): void {
     this.patch({ route });
-  }
-
-  setRoom(room: RoomSnapshot | null): void {
-    this.patch({ room });
   }
 
   openBankPicker(returnRoute: RouteName): void {

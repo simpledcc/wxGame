@@ -1,0 +1,29 @@
+{
+  "name": "word-fishing-wechatgame",
+  "platform": "wechatgame",
+  "buildPath": "project://build",
+  "outputName": "wechatgame",
+  "startScene": "2f311a88-dcfc-4838-938d-0ea546208a74",
+  "scenes": [
+    {
+      "url": "db://assets/scenes/Boot.scene",
+      "uuid": "2f311a88-dcfc-4838-938d-0ea546208a74"
+    },
+    {
+      "url": "db://assets/scenes/Home.scene",
+      "uuid": "87946c61-a2ef-4735-9e40-9dbd2753bf88"
+    }
+  ],
+  "debug": false,
+  "md5Cache": true,
+  "replaceSplashScreen": false,
+  "packages": {
+    "wechatgame": {
+      "appid": "wx063a1823d29bed9e",
+      "orientation": "landscape",
+      "buildOpenDataContextTemplate": false,
+      "separateEngine": false,
+      "startSceneAssetBundle": false
+    }
+  }
+}

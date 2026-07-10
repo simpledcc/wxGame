@@ -1,0 +1,14 @@
+{
+  "ver": "1.2.0",
+  "importer": "directory",
+  "imported": true,
+  "uuid": "e8775563-8929-4101-8aa4-7395a7287e68",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "isBundle": true,
+    "bundleName": "theme_island",
+    "priority": 2,
+    "isRemoteBundle": false
+  }
+}

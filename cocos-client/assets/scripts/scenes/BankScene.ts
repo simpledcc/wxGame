@@ -38,6 +38,11 @@ export class BankScene extends Component {
       this.renderStatus();
       return;
     }
+    if (!app.persistWordBankProgress()) {
+      app.runtime.showToast("词库已解锁，但本地保存失败");
+      this.renderStatus();
+      return;
+    }
     app.runtime.showToast("词库已解锁");
     this.renderStatus();
   }

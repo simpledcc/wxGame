@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.runtime-test.json",
+  "include": [
+    "tools/test-runtime-shell-execution.ts",
+    "tools/mocks/**/*.ts"
+  ]
+}

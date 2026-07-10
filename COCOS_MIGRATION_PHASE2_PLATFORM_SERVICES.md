@@ -52,7 +52,7 @@ Normalization rules:
 - Coins are converted to a non-negative integer and default to `50`.
 - Unlocked bank IDs are deduplicated strings.
 - Wrong words keep only valid `{ word, meaning }` items.
-- Match records are sorted by `finishedAt` newest first and capped at `50` for this phase snapshot.
+- At Phase 2 completion, match records were capped at `50` for the initial snapshot. Phase 5 now preserves up to `50` records for each of `pk`, `coopShared`, and `coopSpell`, matching the migration design.
 - Best scores support both legacy numeric values and `{ score, finishedAt }` objects.
 - `soundMuted` follows the old client default: missing value means muted; `true`, `"true"`, `1`, or `"1"` are treated as muted.
 
@@ -77,7 +77,9 @@ Behavior:
 Current design note:
 
 - `App.boot()` initializes cloud only after privacy consent.
-- `App.boot()` intentionally does not call `getOpenId` yet; player identity fetching will be owned by later room/player migration stages.
+- `App.boot()` intentionally does not call `getOpenId`, preserving the legacy startup behavior that avoids an immediate outbound identity request.
+- `createRoom` and `joinRoom` responses provide the local openid only when the player enters multiplayer.
+- `LifecycleService` captures launch/show invitation codes before activation, joins only after privacy-approved boot, pauses room polling on hide, and resumes it on show.
 
 ## 5. Safe Logging
 
@@ -113,6 +115,7 @@ Run from `C:\work\wxgame_cocos\cocos-client`:
 
 ```bash
 npm run check:structure
+npm run test:lifecycle
 npm exec --yes --package typescript@5.4.5 -- tsc -p tsconfig.json --noEmit
 npm exec --yes --package tsx@3.12.7 -- tsx ./tools/test-platform-services.ts
 ```

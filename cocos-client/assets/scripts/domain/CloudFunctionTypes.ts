@@ -110,7 +110,7 @@ export interface StartCoopSpellRequest {
 
 export interface StartCoopSpellResponse {
   ok: true;
-  updateMode?: "full" | "split" | "slim";
+  updateMode?: "single" | "split" | "slim";
   room: RoomSnapshot;
 }
 
@@ -146,6 +146,12 @@ export interface CatchFishResponse {
   stunned?: boolean;
   stunLeft?: number;
   noBot?: boolean;
+  bot?: boolean;
+  botOpenid?: string;
+  powerUp?: import("./RoomTypes").PowerUpSnapshot;
+  usedPowerUp?: import("./RoomTypes").PowerUpSnapshot;
+  noPowerUp?: boolean;
+  updatedAt?: unknown;
 }
 
 export interface FinishGameRequest {

@@ -53,8 +53,38 @@ export class StudyScene extends Component {
     this.renderCard();
   }
 
+  randomWord(): void {
+    const words = app.wordBankStore.getSelectedWords(app.wordBankCatalog);
+    app.studyStore.shuffle(words);
+    this.renderCard();
+  }
+
+  markCurrentUnfamiliar(): void {
+    const words = app.wordBankStore.getSelectedWords(app.wordBankCatalog);
+    const card = app.studyStore.getCard(words);
+    if (!card) {
+      app.runtime.showToast("当前没有可加入的单词");
+      return;
+    }
+    const added = app.wordBankStore.addWrongWord({ word: card.word, meaning: card.meaning });
+    if (!added) {
+      app.runtime.showToast("这个单词已在错题库中");
+      return;
+    }
+    try {
+      app.storage.writeWrongWords(app.wordBankStore.getWrongWords());
+      app.runtime.showToast("已加入错题库");
+    } catch {
+      app.runtime.showToast("已加入错题库，但本地保存失败");
+    }
+  }
+
   changeBank(): void {
     app.router.openBankPicker("study");
+  }
+
+  backHome(): void {
+    app.router.navigate("home");
   }
 
   private renderCard(): void {

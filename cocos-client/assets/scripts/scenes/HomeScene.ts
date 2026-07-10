@@ -10,7 +10,9 @@ export class HomeScene extends Component {
   statusLabel: Label | null = null;
 
   onLoad(): void {
-    app.store.setRoute("home");
+    if (app.store.getState().route === "boot") {
+      app.store.setRoute("home");
+    }
   }
 
   start(): void {
@@ -18,7 +20,7 @@ export class HomeScene extends Component {
     const bank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     if (this.statusLabel) {
       this.statusLabel.string = [
-        state.cloudReady ? "云环境已连接" : "首页占位",
+        state.cloudReady ? "云环境已连接" : "正在连接云环境",
         `词库：${getWordBankLabel(bank, true)}`,
         `金币：${app.wordBankStore.getWordCoins()}`
       ].join("\n");
@@ -40,15 +42,25 @@ export class HomeScene extends Component {
   }
 
   openPkRoom(): void {
+    app.roomSession.leave();
     app.store.patch({ selectedMode: "pk" });
     app.router.navigate("room");
   }
 
   openCoopSelect(): void {
+    app.roomSession.leave();
     app.router.navigate("coopSelect");
   }
 
   openHistory(): void {
     app.router.navigate("history");
+  }
+
+  openFeedback(): void {
+    app.router.navigate("feedback");
+  }
+
+  openHelp(): void {
+    app.router.navigate("help");
   }
 }

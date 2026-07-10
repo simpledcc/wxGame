@@ -71,7 +71,12 @@ export interface PowerUpSnapshot {
   id: string;
   type: string;
   ownerOpenid?: string;
+  playerOpenid?: string;
+  targetOpenid?: string;
+  bonus?: number;
+  stunMs?: number;
   createdAt?: number;
+  usedAt?: number;
 }
 
 export interface FishSnapshot {
@@ -80,8 +85,12 @@ export interface FishSnapshot {
   correctWord?: string;
   meaning: string;
   alive: boolean;
+  isFake?: boolean;
+  lane?: number;
   x?: number;
   y?: number;
+  vx?: number;
+  vy?: number;
   speed?: number;
 }
 

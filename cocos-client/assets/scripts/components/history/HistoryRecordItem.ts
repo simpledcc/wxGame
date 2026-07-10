@@ -1,0 +1,44 @@
+import { _decorator, Button, Component, Label } from "cc";
+import type { MatchRecord } from "../../domain/RoomTypes";
+
+const { ccclass, property } = _decorator;
+
+@ccclass("HistoryRecordItem")
+export class HistoryRecordItem extends Component {
+  @property(Label)
+  titleLabel: Label | null = null;
+
+  @property(Label)
+  metaLabel: Label | null = null;
+
+  @property(Label)
+  scoreLabel: Label | null = null;
+
+  @property(Button)
+  detailButton: Button | null = null;
+
+  private recordIndex = -1;
+  private openHandler: ((index: number) => void) | null = null;
+
+  bind(record: MatchRecord, index: number, openHandler: (index: number) => void): void {
+    this.recordIndex = index;
+    this.openHandler = openHandler;
+    this.node.active = true;
+    if (this.titleLabel) this.titleLabel.string = `${record.modeLabel} · ${record.result}`;
+    if (this.metaLabel) {
+      this.metaLabel.string = `${new Date(record.finishedAt).toLocaleString()} · ${record.bankLabel}`;
+    }
+    if (this.scoreLabel) this.scoreLabel.string = `${record.score} 分`;
+    if (this.detailButton) this.detailButton.interactable = record.modeKey === "coopSpell";
+  }
+
+  clear(): void {
+    this.recordIndex = -1;
+    this.openHandler = null;
+    this.node.active = false;
+  }
+
+  open(): void {
+    if (this.recordIndex >= 0) this.openHandler?.(this.recordIndex);
+  }
+}

@@ -1,8 +1,10 @@
 # Scenes
 
-Phase 1 includes these Cocos Creator scenes:
+The source project currently includes these initial Cocos Creator scenes:
 
 - `Boot.scene`: initializes the app shell and routes to Home.
-- `Home.scene`: renders the migration placeholder.
+- `Home.scene`: renders the minimal Home shell without migration placeholder copy.
 
-Their TypeScript controllers live in `../scripts/scenes/`. Open Boot to run the complete Phase 1 preview flow.
+Controllers for the complete flow live in `../scripts/scenes/`: Boot, Home, Bank, Study, co-op selection, Room, PK, shared co-op, spell co-op, Result, History, Feedback, and Help.
+
+`Home.scene` keeps a serialized shell component that builds every post-Boot route at runtime and mounts these controllers. Additional `.scene` files are not required for the first functional preview. Follow `../../../COCOS_RELEASE_QA.md` for Creator import and visual verification.

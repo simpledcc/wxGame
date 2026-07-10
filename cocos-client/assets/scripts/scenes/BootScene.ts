@@ -136,7 +136,9 @@ export class BootScene extends Component {
       if (this.gateRoot) {
         this.gateRoot.active = false;
       }
-      app.router.navigate("home");
+      const joinedInvite = await app.lifecycle.activate();
+      const targetRoute = joinedInvite ? app.store.getState().route : "home";
+      app.router.enterRuntimeShell(targetRoute);
     } catch {
       this.showPrivacyGate();
       if (this.gateStatus) {

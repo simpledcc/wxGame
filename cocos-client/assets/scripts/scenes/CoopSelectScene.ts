@@ -1,0 +1,45 @@
+import { _decorator, Component, Label } from "cc";
+import { app } from "../core/App";
+import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
+
+const { ccclass, property } = _decorator;
+
+@ccclass("CoopSelectScene")
+export class CoopSelectScene extends Component {
+  @property(Label)
+  statusLabel: Label | null = null;
+
+  onLoad(): void {
+    app.store.setRoute("coopSelect");
+  }
+
+  start(): void {
+    const bank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
+    if (this.statusLabel) {
+      this.statusLabel.string = [
+        `当前词库：${getWordBankLabel(bank, true)}`,
+        "两种合作玩法都需要两名真实玩家准备后开始"
+      ].join("\n");
+    }
+  }
+
+  openSharedRoom(): void {
+    app.roomSession.leave();
+    app.store.patch({ selectedMode: "coopShared" });
+    app.router.navigate("room");
+  }
+
+  openSpellRoom(): void {
+    app.roomSession.leave();
+    app.store.patch({ selectedMode: "coopSpell" });
+    app.router.navigate("room");
+  }
+
+  changeBank(): void {
+    app.router.openBankPicker("coopSelect");
+  }
+
+  backHome(): void {
+    app.router.navigate("home");
+  }
+}

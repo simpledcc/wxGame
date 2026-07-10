@@ -15,6 +15,7 @@ Implemented:
 - Bank picker return-route state.
 - Study session rules for hidden Chinese, current-word reveal, next/previous, and shuffle.
 - `BankScene` and `StudyScene` controller scripts that future Cocos UI nodes can call.
+- Word-bank unlock progress writes back to legacy-compatible `wordCoins` and `unlockedWordBanks` keys.
 - Tests covering word bank rules, unlock behavior, study reveal behavior, and picker return route.
 
 ## 2. Generated Word Bank Data
@@ -106,12 +107,13 @@ These scripts are controller foundations. Final visual layout, Cocos scene asset
 
 ## 7. Verification
 
-Run from `C:\work\wxgame_cocos\cocos-client`:
+Run from `cocos-client`:
 
 ```bash
 npm install
 npm run check:structure
 npm run test:stage3
+npm run test:room
 npm run test:platform
 npm run typecheck
 npm audit --omit=dev
@@ -120,7 +122,7 @@ npm audit --omit=dev
 Expected Stage 3 test output:
 
 ```text
-Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, and picker return route.
+Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, picker return route, and unlock persistence.
 ```
 
 ## 8. Not Complete Yet
@@ -135,4 +137,4 @@ Remaining Phase 3 visual work:
 
 ## 9. Next Step
 
-Continue Phase 3 by creating the actual Cocos visual layout for Home, Bank, and Study, wiring visible buttons to the controller scripts added in this phase.
+The Home, Bank, and Study visual layouts remain an explicit Creator backlog. Because Creator is unavailable on the current machine, Phase 4 engine-independent room work proceeded while preserving this visual acceptance gate.

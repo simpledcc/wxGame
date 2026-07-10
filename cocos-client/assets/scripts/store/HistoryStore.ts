@@ -1,17 +1,31 @@
 import type { MatchRecord } from "../domain/RoomTypes";
 import type { BestScore, GameModeKey } from "../domain/GameTypes";
-import { MATCH_RECORD_LIMIT } from "../domain/StorageKeys";
+import { mergeBestScores, mergeMatchRecords } from "../domain/MatchRecordRules";
 
 export class HistoryStore {
   private records: MatchRecord[] = [];
   private bestScores: Partial<Record<GameModeKey, BestScore>> = {};
 
-  getRecords(): MatchRecord[] {
-    return [...this.records];
+  getRecords(mode?: GameModeKey): MatchRecord[] {
+    const records = mode ? this.records.filter((record) => record.modeKey === mode) : this.records;
+    return records.map((record) => ({
+      ...record,
+      players: record.players.map((player) => ({ ...player })),
+      spellHistory: record.spellHistory?.map((round) => ({
+        ...round,
+        players: round.players.map((player) => ({ ...player, slotIndexes: [...player.slotIndexes] }))
+      }))
+    }));
   }
 
   replaceRecords(records: MatchRecord[]): void {
-    this.records = records.slice(-MATCH_RECORD_LIMIT);
+    this.records = mergeMatchRecords(records);
+    this.bestScores = mergeBestScores(this.bestScores, this.records);
+  }
+
+  addRecord(record: MatchRecord): void {
+    this.records = mergeMatchRecords([record, ...this.records]);
+    this.bestScores = mergeBestScores(this.bestScores, [record]);
   }
 
   getBestScores(): Partial<Record<GameModeKey, BestScore>> {
@@ -19,6 +33,6 @@ export class HistoryStore {
   }
 
   replaceBestScores(scores: Partial<Record<GameModeKey, BestScore>>): void {
-    this.bestScores = { ...scores };
+    this.bestScores = mergeBestScores(scores, this.records);
   }
 }

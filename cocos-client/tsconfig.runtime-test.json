@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "cc": ["tools/mocks/cc.ts"],
+      "cc/env": ["tools/mocks/cc-env.ts"]
+    }
+  },
+  "include": [
+    "assets/scripts/**/*.ts",
+    "tools/test-runtime-shell-execution.ts",
+    "tools/mocks/**/*.ts"
+  ]
+}
