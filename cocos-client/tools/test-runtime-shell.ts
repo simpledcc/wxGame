@@ -10,24 +10,30 @@ function read(relativePath: string): string {
 
 function testRouteCoverage(): void {
   const source = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
-  const routeBuilders: Record<string, string> = {
+  const modePk = read("assets/bundles/mode_pk/scripts/ModePkScreenBuilder.ts");
+  const modeSpell = read("assets/bundles/mode_spell/scripts/ModeSpellScreenBuilder.ts");
+  const coreRouteBuilders: Record<string, string> = {
     bank: "buildBank",
     study: "buildStudy",
     coopSelect: "buildCoopSelect",
     room: "buildRoom",
-    pkGame: "buildPk",
-    coopShared: "buildShared",
-    coopSpell: "buildSpell",
     result: "buildResult",
     history: "buildHistory",
     feedback: "buildFeedback",
     help: "buildHelp",
     home: "buildHome"
   };
-  Object.entries(routeBuilders).forEach(([route, builder]) => {
+  Object.entries(coreRouteBuilders).forEach(([route, builder]) => {
     assert.equal(source.includes(`case "${route}":`), true, `route case missing: ${route}`);
     assert.match(source, new RegExp(`\\b${builder}\\(`));
   });
+  ["pkGame", "coopShared", "coopSpell"].forEach((route) => {
+    assert.equal(source.includes(`case "${route}":`), true, `gameplay route case missing: ${route}`);
+  });
+  assert.match(modePk, /register\("pkGame"/);
+  assert.match(modePk, /register\("coopShared"/);
+  assert.match(modeSpell, /register\("coopSpell"/);
+  const allBuilders = `${source}\n${modePk}\n${modeSpell}`;
   [
     "HomeScene",
     "BankScene",
@@ -42,12 +48,19 @@ function testRouteCoverage(): void {
     "FeedbackScene",
     "HelpScene"
   ].forEach((controller) => {
-    assert.match(source, new RegExp(`addComponent\\(${controller}\\)`));
+    assert.match(allBuilders, new RegExp(`addComponent\\(${controller}\\)`));
   });
+  assert.doesNotMatch(source, /PkGameScene|CoopSharedScene|CoopSpellScene|SpellLetterKey|PkWordTarget/);
+  assert.match(source, /gameplayScreens\.build/);
 }
 
 function testExpectedControls(): void {
   const source = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
+  const gameplay = [
+    read("assets/bundles/mode_pk/scripts/ModePkScreenBuilder.ts"),
+    read("assets/bundles/mode_spell/scripts/ModeSpellScreenBuilder.ts")
+  ].join("\n");
+  const visibleBuilders = `${source}\n${gameplay}`;
   [
     "开始背",
     "双人PK",
@@ -66,7 +79,7 @@ function testExpectedControls(): void {
     "提交反馈",
     "隐私保护指引",
     "机器人难度"
-  ].forEach((label) => assert.equal(source.includes(label), true, `runtime control missing: ${label}`));
+  ].forEach((label) => assert.equal(visibleBuilders.includes(label), true, `runtime control missing: ${label}`));
   [
     "randomWord",
     "markCurrentUnfamiliar",
@@ -80,7 +93,7 @@ function testExpectedControls(): void {
     "addLowBot",
     "addMediumBot",
     "addHighBot"
-  ].forEach((binding) => assert.match(source, new RegExp(`\\b${binding}\\b`)));
+  ].forEach((binding) => assert.match(visibleBuilders, new RegExp(`\\b${binding}\\b`)));
 
   const roomController = read("assets/scripts/scenes/RoomScene.ts");
   const explicitLeaves = roomController.match(/app\.roomSession\.leave\(\)/g) || [];
@@ -102,6 +115,22 @@ function testExpectedControls(): void {
   const bootController = read("assets/scripts/scenes/BootScene.ts");
   assert.match(bootController, /error instanceof CloudCallError/);
   assert.match(bootController, /error\.message/);
+}
+
+function testGameplayBundleBoundary(): void {
+  const manager = read("assets/scripts/core/GameplayBundles.ts");
+  assert.match(manager, /pkGame: "mode_pk"/);
+  assert.match(manager, /coopShared: "mode_pk"/);
+  assert.match(manager, /coopSpell: "mode_spell"/);
+  assert.match(manager, /assetManager\.loadBundle/);
+  assert.match(manager, /gameplayScreens\.has/);
+  ["mode_pk", "mode_spell"].forEach((name) => {
+    const meta = JSON.parse(read(`assets/bundles/${name}.meta`));
+    assert.equal(meta.userData.isBundle, true);
+    assert.equal(meta.userData.bundleName, name);
+    assert.equal(meta.userData.compressionType.wechatgame, "subpackage");
+    assert.equal(meta.userData.isRemoteBundle, false);
+  });
 }
 
 function testShellLifecycleAndSceneAttachment(): void {
@@ -202,6 +231,7 @@ function main(): void {
   testSceneCanvasContract();
   testRouterStaysInRuntimeShell();
   testBootEntryRouting();
+  testGameplayBundleBoundary();
   console.log("Runtime Cocos shell OK: all routes, controllers, controls, lifecycle, and single-scene routing are wired.");
 }
 

@@ -7,7 +7,7 @@
     }
   },
   "include": [
-    "assets/scripts/**/*.ts",
+    "assets/**/*.ts",
     "tools/test-runtime-shell-execution.ts",
     "tools/mocks/**/*.ts"
   ]

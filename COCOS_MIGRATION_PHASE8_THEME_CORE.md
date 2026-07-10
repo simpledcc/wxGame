@@ -2,7 +2,7 @@
 
 Date: 2026-07-10
 
-Scope: add a data-driven presentation theme layer without changing gameplay, room, score, or cloud logic.
+Scope: finish the data-driven presentation layer and move gameplay UI/controller code behind load-on-demand Cocos Asset Bundle boundaries without changing room, score, or cloud contracts.
 
 ## 1. Result
 
@@ -24,6 +24,9 @@ Implemented:
 - Theme-specific runtime target geometry: grass uses the insect silhouette and island uses the fish silhouette without gameplay branches.
 - A fixed three-label gameplay feedback pool for hit/miss/correction effects, avoiding per-tap node creation.
 - Compressed 960x640 JPEG backgrounds with a combined unique payload of 209,076 bytes.
+- `GameplayBundleManager` route gate with deduplicated loads, failure retry, stale-route protection, and a screen-builder registry.
+- PK/shared controllers, target visuals, feedback pool, and screen builders moved into `mode_pk`; spell controller, keyboard, and builder moved into `mode_spell`.
+- `mode_pk` and `mode_spell` configured as Cocos Asset Bundles and WeChat Mini Game subpackages; the main runtime factory no longer statically imports gameplay controllers.
 
 ## 2. Architecture
 
@@ -38,13 +41,17 @@ ThemeDebugPanel
  Cocos Asset Bundles
        |
  ThemeBinding components on scene nodes
+
+Route -> GameplayBundleManager -> mode_pk / mode_spell
+                               -> GameplayScreenRegistry
+                               -> RuntimeScreenFactory mount
 ```
 
 Gameplay services and stores do not import theme IDs. A new skin can change manifests/assets and node bindings without adding `if (theme)` branches to PK, room, or spell state machines.
 
 `ThemeRouteRules` maps application routes to semantic asset keys. `ThemedWordTargetVisual` consumes only the manifest's `targetStyle`, while `GameplayFeedbackPool` consumes normalized fishing feedback and reuses stable Cocos labels.
 
-## 3. Theme Bundles
+## 3. Asset Bundles
 
 ```text
 cocos-client/assets/bundles/
@@ -54,9 +61,18 @@ cocos-client/assets/bundles/
   theme_island/
     theme.json
     textures/gameplay-bg.jpg
+  mode_pk/
+    scripts/ModePkScreenBuilder.ts
+    scripts/PkGameScene.ts
+    scripts/CoopSharedScene.ts
+  mode_spell/
+    scripts/ModeSpellScreenBuilder.ts
+    scripts/CoopSpellScene.ts
 ```
 
 Both manifests expose semantic keys for Home, gameplay, and spell backgrounds. They intentionally reuse one compressed background inside each demo bundle to keep v1 small. Later themes can map those keys to separate assets without changing consumers.
+
+The two gameplay bundles register their route builders when Cocos loads the bundle. `HomePlaceholder` waits for that registration and the active theme asset before replacing the current screen. The WeChat compression setting for both gameplay bundles is `subpackage`; theme bundles remain ordinary Asset Bundles.
 
 ## 4. Generated Asset Provenance
 
@@ -92,9 +108,12 @@ The Phase 8 test proves:
 - a deferred old route preload cannot replace the latest requested route;
 - concurrent selection cannot let an old load overwrite the latest choice;
 - alternate bundle or individual asset failure returns to the default theme, while default-asset failure remains observable.
+- gameplay routes map only to `mode_pk` or `mode_spell`, and the main screen factory has no static gameplay-controller imports;
+- both gameplay bundle metas declare the WeChat `subpackage` compression type;
+- the generated-package inspector requires both gameplay bundles to be declared subpackages with generated configs.
 
-The runtime shell test also defers an island asset request and proves that the old Room remains mounted, the loading layer blocks interaction, PK mounts only after resolution, default target nodes use insect geometry, island targets use fish geometry, disabled buttons expose their theme state, and feedback effects reuse and retire three stable labels.
+The runtime shell test defers `mode_pk` and an island asset request and proves that the old Room remains mounted until both resolve. It also rejects the first `mode_spell` load, verifies the old screen and loading-state cleanup, then retries successfully. Default target nodes use insect geometry, island targets use fish geometry, disabled buttons expose their theme state, and feedback effects reuse and retire three stable labels.
 
 ## 6. External Acceptance Pending
 
-Cocos Creator is required to import the JPEGs, generate their image metadata, and visually verify both themes, route backgrounds, target silhouettes, feedback motion, contrast, and overlap. The WeChat build must still confirm Asset Bundle loading and package-size changes.
+Phase 8 development is complete in source and engine-independent tests. Phase 9 requires Cocos Creator to import the JPEGs, validate both gameplay Bundle registrations, generate the real WeChat subpackages, and visually verify both themes, route backgrounds, target silhouettes, feedback motion, contrast, and overlap. The generated package and real devices must still confirm load timing and package sizes.

@@ -1,5 +1,5 @@
 import { _decorator, Button, Component, Label } from "cc";
-import type { FishSnapshot } from "../../domain/RoomTypes";
+import type { FishSnapshot } from "../../../scripts/domain/RoomTypes";
 
 const { ccclass, property } = _decorator;
 

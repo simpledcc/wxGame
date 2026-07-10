@@ -122,6 +122,15 @@ export class HomePlaceholder extends Component {
   }
 
   private async prepareRoute(route: RouteName, sequence: number): Promise<void> {
+    try {
+      await app.gameplayBundles.prepare(route);
+    } catch (error) {
+      if (sequence !== this.routeLoadSequence) return;
+      this.pendingRoute = "";
+      this.setRouteLoading(null);
+      app.runtime.showToast(error instanceof Error ? error.message : "玩法资源加载失败，请重试");
+      return;
+    }
     let backgroundReady = true;
     try {
       await app.themes.preloadAssets([getRouteBackgroundAssetKey(route)]);

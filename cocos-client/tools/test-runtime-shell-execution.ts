@@ -5,14 +5,19 @@ import {
   Node,
   UITransform,
   deferMockAssetLoad,
+  deferMockBundleLoad,
   director,
   flushStartQueue,
+  rejectMockBundleLoad,
   resolveMockAssetLoad,
+  resolveMockBundleLoad,
   setMockScene
 } from "cc";
+import "../assets/bundles/mode_pk/scripts/ModePkScreenBuilder";
+import "../assets/bundles/mode_spell/scripts/ModeSpellScreenBuilder";
 import { HomePlaceholder } from "../assets/scripts/components/HomePlaceholder";
-import { GameplayFeedbackPool } from "../assets/scripts/components/pk/GameplayFeedbackPool";
-import { ThemedWordTargetVisual } from "../assets/scripts/components/pk/ThemedWordTargetVisual";
+import { GameplayFeedbackPool } from "../assets/bundles/mode_pk/scripts/GameplayFeedbackPool";
+import { ThemedWordTargetVisual } from "../assets/bundles/mode_pk/scripts/ThemedWordTargetVisual";
 import { RuntimeButtonVisual } from "../assets/scripts/components/ui/RuntimeButtonVisual";
 import { MemoryRuntimePort } from "../assets/scripts/adapters/RuntimePort";
 import { App, app } from "../assets/scripts/core/App";
@@ -387,6 +392,7 @@ async function main(): Promise<void> {
   ];
   for (let index = 0; index < routes.length; index += 1) {
     const deferredPkPreload = routes[index] === "pkGame";
+    const deferredSpellFailure = routes[index] === "coopSpell";
     if (routes[index] === "room") {
       app.roomStore.enter("pending-room", "WAIT01");
     }
@@ -413,16 +419,34 @@ async function main(): Promise<void> {
       assertOk(routeLoading);
       assertVisibleUiContract(routeLoading, "route loading overlay");
       assertOk(findDeep(canvas, "RoomRuntimeScreen"), "current route must remain visible during preload");
+      deferMockBundleLoad("mode_pk");
     }
+    if (deferredSpellFailure) deferMockBundleLoad("mode_spell");
     app.store.setRoute(routes[index]);
     await flushMany(2);
     if (deferredPkPreload) {
       assertEqual(findDeep(canvas, "PkRuntimeScreen"), null, "gameplay must not mount before resources load");
       assertOk(findDeep(canvas, "RoomRuntimeScreen"), "old route must survive a pending gameplay preload");
       assertEqual(findDeep(canvas, "RouteLoadingLabel")?.getComponent(Label)?.string, "正在准备玩法资源...");
+      resolveMockBundleLoad("mode_pk");
+      await flushMany(2);
+      assertEqual(findDeep(canvas, "PkRuntimeScreen"), null, "gameplay must wait for its theme assets after bundle load");
+      assertOk(findDeep(canvas, "RoomRuntimeScreen"), "old route must survive the full preload chain");
       resolveMockAssetLoad("theme_island", "textures/gameplay-bg/spriteFrame");
       await flushMany();
       assertEqual(findDeep(canvas, "RouteLoading")?.active, false, "loading state must clear after preload");
+    } else if (deferredSpellFailure) {
+      assertEqual(findDeep(canvas, "SpellRuntimeScreen"), null, "gameplay must not mount before its bundle loads");
+      assertOk(findDeep(canvas, "HomeRuntimeScreen"), "bundle loading must retain the current route");
+      rejectMockBundleLoad("mode_spell", new Error("玩法资源加载失败，请重试"));
+      await flushMany();
+      assertEqual(findDeep(canvas, "RouteLoading")?.active, false, "failed bundle loading must clear loading state");
+      assertOk(findDeep(canvas, "HomeRuntimeScreen"), "failed bundle loading must retain the current route");
+      assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "玩法资源加载失败，请重试");
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("coopSpell");
+      await flushMany();
     } else {
       await flushMany();
     }

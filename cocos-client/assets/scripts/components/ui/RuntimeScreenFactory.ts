@@ -1,23 +1,17 @@
-import { Button, Graphics, Label, Node } from "cc";
+import { Button, Node } from "cc";
 import { DEV } from "cc/env";
 import { HistoryRecordItem } from "../history/HistoryRecordItem";
-import { GameplayFeedbackPool } from "../pk/GameplayFeedbackPool";
-import { PkWordTarget } from "../pk/PkWordTarget";
-import { ThemedWordTargetVisual } from "../pk/ThemedWordTargetVisual";
-import { SpellLetterKey } from "../spell/SpellLetterKey";
 import { app } from "../../core/App";
+import { gameplayScreens, type GameplayRoute } from "../../core/GameplayBundles";
 import type { GameDuration } from "../../domain/GameTypes";
 import { ROOM_CODE_LENGTH } from "../../domain/RoomRules";
 import { getWordBank, getWordBankLabel } from "../../domain/WordBankRules";
 import { BankScene } from "../../scenes/BankScene";
 import { CoopSelectScene } from "../../scenes/CoopSelectScene";
-import { CoopSharedScene } from "../../scenes/CoopSharedScene";
-import { CoopSpellScene } from "../../scenes/CoopSpellScene";
 import { FeedbackScene } from "../../scenes/FeedbackScene";
 import { HelpScene } from "../../scenes/HelpScene";
 import { HistoryScene } from "../../scenes/HistoryScene";
 import { HomeScene } from "../../scenes/HomeScene";
-import { PkGameScene } from "../../scenes/PkGameScene";
 import { ResultScene } from "../../scenes/ResultScene";
 import { RoomScene } from "../../scenes/RoomScene";
 import { StudyScene } from "../../scenes/StudyScene";
@@ -32,9 +26,10 @@ export class RuntimeScreenFactory {
       case "study": return this.buildStudy(parent, ui);
       case "coopSelect": return this.buildCoopSelect(parent, ui);
       case "room": return this.buildRoom(parent, ui);
-      case "pkGame": return this.buildPk(parent, ui);
-      case "coopShared": return this.buildShared(parent, ui);
-      case "coopSpell": return this.buildSpell(parent, ui);
+      case "pkGame":
+      case "coopShared":
+      case "coopSpell":
+        return gameplayScreens.build(route as GameplayRoute, parent, ui);
       case "result": return this.buildResult(parent, ui);
       case "history": return this.buildHistory(parent, ui);
       case "feedback": return this.buildFeedback(parent, ui);
@@ -302,125 +297,6 @@ export class RuntimeScreenFactory {
     return root;
   }
 
-  private buildPk(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "PkRuntimeScreen");
-    const meaning = ui.label(root, "PkMeaning", "", 0, 260, 590, 54, 30);
-    const localScore = ui.label(root, "PkLocalScore", "", -285, 205, 220, 40, 21);
-    const opponentScore = ui.label(root, "PkOpponentScore", "", 285, 205, 220, 40, 21);
-    const timer = ui.label(root, "PkTimer", "", 0, 205, 120, 40, 24, "warning");
-    const combo = ui.label(root, "PkCombo", "", 0, 166, 220, 34, 19, "secondary");
-    const status = ui.label(root, "PkStatus", "", 0, -220, 700, 40, 18, "textMuted");
-    const targets = this.createWordTargets(root, ui, 125);
-    const feedbackPool = this.createGameplayFeedbackPool(root, ui);
-    let controller!: PkGameScene;
-    const power = ui.button(root, "PowerUp", "使用道具", 255, -272, 200, 46, () => {
-      void controller.useFirstPowerUp();
-    }, "secondary", 17);
-    ui.button(root, "LeavePk", "←", -420, -272, 62, 46, () => controller.backHome(), "plain", 28);
-    controller = root.addComponent(PkGameScene);
-    controller.meaningLabel = meaning;
-    controller.localScoreLabel = localScore;
-    controller.opponentScoreLabel = opponentScore;
-    controller.timerLabel = timer;
-    controller.comboLabel = combo;
-    controller.statusLabel = status;
-    controller.powerUpButton = power.button;
-    controller.wordTargets = targets;
-    controller.feedbackPool = feedbackPool;
-    return root;
-  }
-
-  private buildShared(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "SharedRuntimeScreen");
-    const meaning = ui.label(root, "SharedMeaning", "", 0, 260, 600, 54, 30);
-    const team = ui.label(root, "SharedTeam", "", -250, 205, 260, 40, 22);
-    const contribution = ui.label(root, "SharedContribution", "", 80, 205, 300, 40, 20);
-    const timer = ui.label(root, "SharedTimer", "", 340, 205, 120, 40, 24, "warning");
-    const status = ui.label(root, "SharedStatus", "", 0, -220, 720, 40, 18, "textMuted");
-    const targets = this.createWordTargets(root, ui, 125);
-    const feedbackPool = this.createGameplayFeedbackPool(root, ui);
-    let controller!: CoopSharedScene;
-    ui.button(root, "LeaveShared", "←", -420, -272, 62, 46, () => controller.backHome(), "plain", 28);
-    controller = root.addComponent(CoopSharedScene);
-    controller.meaningLabel = meaning;
-    controller.teamScoreLabel = team;
-    controller.contributionLabel = contribution;
-    controller.timerLabel = timer;
-    controller.statusLabel = status;
-    controller.wordTargets = targets;
-    controller.feedbackPool = feedbackPool;
-    return root;
-  }
-
-  private buildSpell(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "SpellRuntimeScreen");
-    const meaning = ui.label(root, "SpellMeaning", "", 0, 274, 650, 44, 27);
-    const word = ui.label(root, "SpellWord", "", 0, 230, 780, 44, 27);
-    const team = ui.label(root, "SpellTeam", "", -270, 188, 230, 34, 19);
-    const totalTimer = ui.label(root, "SpellTotal", "", 0, 188, 190, 34, 19, "warning");
-    const questionTimer = ui.label(root, "SpellQuestion", "", 270, 188, 190, 34, 19, "warning");
-    const localPanel = ui.panel(root, "LocalSpellPanel", 0, 116, 700, 104, "panel", "spellLocal");
-    const localTitle = ui.label(localPanel, "LocalSpellTitle", "", -205, 26, 250, 36, 19, "spellLocal", 0);
-    const localInput = ui.label(localPanel, "LocalSpellInput", "", 0, -16, 360, 58, 31, "textPrimary");
-    const localProgress = ui.label(localPanel, "LocalSpellProgress", "", 245, 26, 150, 34, 17, "textMuted");
-    const teammate = ui.label(root, "TeammateSpell", "", 0, 42, 700, 38, 18, "spellPartner");
-    const status = ui.label(root, "SpellStatus", "", 0, 4, 760, 34, 17, "textMuted");
-
-    const letterRows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-    const letterKeys: SpellLetterKey[] = [];
-    letterRows.forEach((letters, rowIndex) => {
-      const keyWidth = 62;
-      const gap = 6;
-      const totalWidth = letters.length * keyWidth + (letters.length - 1) * gap;
-      Array.from(letters).forEach((letter, columnIndex) => {
-        let key!: SpellLetterKey;
-        const ref = ui.button(
-          root,
-          `Key${letter}`,
-          letter,
-          -totalWidth / 2 + keyWidth / 2 + columnIndex * (keyWidth + gap),
-          -51 - rowIndex * 51,
-          keyWidth,
-          43,
-          () => key.tap(),
-          "plain",
-          18
-        );
-        key = ref.node.addComponent(SpellLetterKey);
-        key.letterLabel = ref.label;
-        key.keyButton = ref.button;
-        letterKeys.push(key);
-      });
-    });
-    let controller!: CoopSpellScene;
-    const backspace = ui.button(root, "SpellBackspace", "⌫", -300, -213, 90, 44, () => controller.backspace(), "plain", 25);
-    const clear = ui.button(root, "SpellClear", "清空", -185, -213, 110, 44, () => controller.clearDraft(), "plain", 17);
-    const submit = ui.button(root, "SpellSubmit", "提交", 0, -213, 160, 48, () => {
-      void controller.submit();
-    });
-    const skip = ui.button(root, "SpellSkip", "跳过", 185, -213, 110, 44, () => {
-      void controller.skip();
-    }, "secondary", 17);
-    ui.button(root, "LeaveSpell", "←", -420, -274, 62, 46, () => controller.backHome(), "plain", 28);
-    controller = root.addComponent(CoopSpellScene);
-    controller.meaningLabel = meaning;
-    controller.wordLabel = word;
-    controller.teamScoreLabel = team;
-    controller.totalTimerLabel = totalTimer;
-    controller.questionTimerLabel = questionTimer;
-    controller.localTitleLabel = localTitle;
-    controller.localInputLabel = localInput;
-    controller.localProgressLabel = localProgress;
-    controller.teammateLabel = teammate;
-    controller.statusLabel = status;
-    controller.submitButton = submit.button;
-    controller.backspaceButton = backspace.button;
-    controller.clearButton = clear.button;
-    controller.skipButton = skip.button;
-    controller.letterKeys = letterKeys;
-    return root;
-  }
-
   private buildResult(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "ResultRuntimeScreen");
     const title = ui.label(root, "ResultTitle", "", 0, 170, 700, 70, 44);
@@ -552,45 +428,4 @@ export class RuntimeScreenFactory {
     return root;
   }
 
-  private createWordTargets(parent: Node, ui: RuntimeUi, firstY: number): PkWordTarget[] {
-    const targets: PkWordTarget[] = [];
-    for (let index = 0; index < 6; index += 1) {
-      const node = ui.node(
-        parent,
-        `WordTarget${index}`,
-        index % 2 === 0 ? -240 : 240,
-        firstY - Math.floor(index / 2) * 82,
-        260,
-        58
-      );
-      const graphics = node.addComponent(Graphics);
-      const visual = node.addComponent(ThemedWordTargetVisual);
-      visual.graphics = graphics;
-      visual.configure(ui.theme.targetStyle, ui.color("targetFill"), ui.color("targetStroke"));
-      const label = ui.label(node, "Word", "", 0, 0, 238, 48, 21, "targetText");
-      const button = node.addComponent(Button);
-      let target!: PkWordTarget;
-      node.on(Button.EventType.CLICK, () => target.tap(), this);
-      target = node.addComponent(PkWordTarget);
-      target.wordLabel = label;
-      target.tapButton = button;
-      target.leftBound = -340;
-      target.rightBound = 340;
-      targets.push(target);
-    }
-    return targets;
-  }
-
-  private createGameplayFeedbackPool(parent: Node, ui: RuntimeUi): GameplayFeedbackPool {
-    const host = ui.node(parent, "GameplayFeedback", 0, -92, 460, 70);
-    const labels = Array.from({ length: 3 }, (_, index) => {
-      const label = ui.label(host, `Feedback${index}`, "", 0, 0, 440, 54, 31, "success");
-      label.node.active = false;
-      return label;
-    });
-    const pool = host.addComponent(GameplayFeedbackPool);
-    pool.labels = labels;
-    pool.configure(ui.color("success"), ui.color("error"), ui.color("warning"));
-    return pool;
-  }
 }

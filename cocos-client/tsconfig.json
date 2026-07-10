@@ -21,7 +21,7 @@
     "types": []
   },
   "include": [
-    "assets/scripts/**/*.ts",
+    "assets/**/*.ts",
     "types/**/*.d.ts"
   ]
 }

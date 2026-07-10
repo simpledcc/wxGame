@@ -1,5 +1,5 @@
 import { _decorator, Color, Component, Label } from "cc";
-import type { FishingFeedback } from "../../store/FishingStore";
+import type { FishingFeedback } from "../../../scripts/store/FishingStore";
 
 const { ccclass, property } = _decorator;
 const FEEDBACK_LIFETIME_SECONDS = 0.85;

@@ -84,25 +84,30 @@ function testFeedbackRules(): void {
 }
 
 function testSceneCoverage(): void {
-  const controllers = [
+  const coreControllers = [
     "BootScene",
     "HomeScene",
     "BankScene",
     "StudyScene",
     "CoopSelectScene",
     "RoomScene",
-    "PkGameScene",
-    "CoopSharedScene",
-    "CoopSpellScene",
     "ResultScene",
     "HistoryScene",
     "FeedbackScene",
     "HelpScene"
   ];
-  controllers.forEach((name) => {
+  coreControllers.forEach((name) => {
     const sourcePath = `assets/scripts/scenes/${name}.ts`;
     assert.equal(fs.existsSync(path.join(root, sourcePath)), true, `${name} controller is required`);
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${name} meta is required`);
+  });
+  [
+    "assets/bundles/mode_pk/scripts/PkGameScene.ts",
+    "assets/bundles/mode_pk/scripts/CoopSharedScene.ts",
+    "assets/bundles/mode_spell/scripts/CoopSpellScene.ts"
+  ].forEach((sourcePath) => {
+    assert.equal(fs.existsSync(path.join(root, sourcePath)), true, `${sourcePath} is required`);
+    assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${sourcePath}.meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
   ["openStudy", "openPkRoom", "openCoopSelect", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract"]
@@ -125,6 +130,7 @@ function testSceneCoverage(): void {
   assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
   const shell = read("assets/scripts/components/HomePlaceholder.ts");
+  assert.match(shell, /gameplayBundles\.prepare/);
   assert.match(shell, /themes\.preloadAssets/);
   assert.match(shell, /RouteLoading/);
   assert.match(shell, /addComponent\(BlockInputEvents\)/);
@@ -138,6 +144,8 @@ function testComplianceSurface(): void {
     path.join(root, "assets", "scripts", "scenes"),
     path.join(root, "assets", "scripts", "components"),
     path.join(root, "assets", "scripts", "themes"),
+    path.join(root, "assets", "bundles", "mode_pk", "scripts"),
+    path.join(root, "assets", "bundles", "mode_spell", "scripts"),
     path.join(root, "assets", "scenes")
   ];
   const visibleSource = visibleRoots
@@ -161,7 +169,7 @@ function testComplianceSurface(): void {
 }
 
 function testPlatformBoundariesAndUploadRoot(): void {
-  const scriptFiles = listFiles(path.join(root, "assets", "scripts"), new Set([".ts"]));
+  const scriptFiles = listFiles(path.join(root, "assets"), new Set([".ts"]));
   const directWxUsers = scriptFiles
     .filter((filePath) => /\bwx\./.test(fs.readFileSync(filePath, "utf8")))
     .map((filePath) => path.relative(root, filePath).replace(/\\/g, "/"));
@@ -185,7 +193,7 @@ function testPlatformBoundariesAndUploadRoot(): void {
 function testAssetMetadataAndSceneReferences(): void {
   const assetsRoot = path.join(root, "assets");
   const metaFiles = listFiles(assetsRoot, new Set([".meta"]));
-  assert.ok(metaFiles.length >= 103, "committed Cocos asset metadata unexpectedly disappeared");
+  assert.ok(metaFiles.length >= 108, "committed Cocos asset metadata unexpectedly disappeared");
   const uuidOwners = new Map<string, string>();
   metaFiles.forEach((metaPath) => {
     const parsed = JSON.parse(fs.readFileSync(metaPath, "utf8")) as unknown;
@@ -233,15 +241,18 @@ function testAssetMetadataAndSceneReferences(): void {
 }
 
 function testSourceAssetBudget(): void {
-  const files = listFiles(path.join(root, "assets"), new Set([
-    ".ts", ".json", ".scene", ".meta", ".jpg", ".png", ".wav", ".md"
+  const payloadFiles = listFiles(path.join(root, "assets"), new Set([
+    ".ts", ".json", ".scene", ".jpg", ".png", ".wav", ".md"
   ]));
-  const totalBytes = files.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
+  const payloadBytes = payloadFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
+  const metadataBytes = listFiles(path.join(root, "assets"), new Set([".meta"]))
+    .reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
   const themeFiles = listFiles(path.join(root, "assets", "bundles"), new Set([
     ".json", ".meta", ".jpg", ".png"
   ]));
   const themeBytes = themeFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
-  assert.ok(totalBytes < 1_500_000, `Cocos source assets exceed 1.5 MB: ${totalBytes}`);
+  assert.ok(payloadBytes < 1_500_000, `Cocos source payload exceeds 1.5 MB: ${payloadBytes}`);
+  assert.ok(metadataBytes < 50_000, `Cocos source metadata exceeds 50 KB: ${metadataBytes}`);
   assert.ok(themeBytes < 250_000, `theme source assets exceed 250 KB: ${themeBytes}`);
 }
 

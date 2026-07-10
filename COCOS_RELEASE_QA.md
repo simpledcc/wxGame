@@ -2,7 +2,7 @@
 
 Date: 2026-07-10
 
-Status: engine-independent migration, runtime UI assembly, static release checks, and the deterministic WeChat build-pipeline tests pass. Creator import/visual verification, a real WeChat build, two-device testing, screenshots, and upload are pending because this machine has neither Cocos Creator nor WeChat Developer Tools.
+Status: Phase 8 development is complete in source and engine-independent tests, including gameplay Asset Bundle/subpackage separation. Phase 9 Creator import/visual verification, a real WeChat build, two-device testing, screenshots, and upload are pending because this machine has neither Cocos Creator nor WeChat Developer Tools.
 
 ## Automated Checks Passed
 
@@ -29,15 +29,15 @@ Status: engine-independent migration, runtime UI assembly, static release checks
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.
-- Source metadata: release QA parses all committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and permits only the four documented theme importer metas to remain Creator-generated.
+- Source metadata: release QA parses 108 committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and permits only the four documented theme importer metas to remain Creator-generated.
 - Interaction wiring: runtime execution clicks controls across every functional route, including room validation/copy/invite and Result-to-History; platform calls and destination state are asserted rather than inferred from source text.
 - Settlement lifecycle: the first finished snapshot cancels room polling, and entering History releases the finished room without deleting its persisted result.
 - Async session isolation: delayed catch/spell responses are keyed to a monotonic room-session version; leave/replacement makes them inert, canceled failures do not toast on the next screen, and old mode results reset when a different mode enters.
-- Gameplay: Phase 3-8 engine-independent tests pass, including room polling, all three multiplayer modes, timeout settlement, history, theme fallback, and race isolation.
+- Gameplay: Phase 3-8 engine-independent tests pass, including room polling, all three multiplayer modes, timeout settlement, history, theme fallback, race isolation, delayed gameplay Bundle loading, failed-load cleanup, and retry.
 - Spell source data: all 44 legacy banks and 6,351 prebuilt templates decode field-for-field from a 35 KB compact index; spell Room creation sends the selected pool with the production 240-item cap and no runtime random blank generation.
 - Theme presentation: pre-mount route loading, input blocking, stale-route rejection, bundle/asset fallback, cached sprite requests, pressed/disabled button states, insect/fish target geometry switching, and a three-slot gameplay feedback pool execute in the runtime Cocos mock.
 - Performance instrumentation: bounded frame sampling, full-session/per-route timing, 60-frame node-peak sampling, invalid-input handling, and DEV JSON export execute in pure and runtime-shell tests.
-- Build pipeline: fixed Creator/plugin inputs, upload-root isolation, required theme-bundle/config discovery, 4 MiB main and 30 MiB aggregate subpackage gates, empty/undeclared subpackage rejection, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
+- Build pipeline: fixed Creator/plugin inputs, upload-root isolation, all four required Bundle/config checks, mandatory `mode_pk`/`mode_spell` subpackages, 4 MiB main and 30 MiB aggregate subpackage gates, empty/undeclared subpackage rejection, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
 - Dependencies: production dependency audit reports zero vulnerabilities.
 - Patch hygiene: `git diff --check` passes; `miniprogram/` and `cloudfunctions/` remain unchanged by the Cocos migration.
 
@@ -47,11 +47,14 @@ Measured before Cocos import/build:
 
 | Item | Size |
 | --- | ---: |
-| `cocos-client/assets/` source | 1,493,272 bytes; static gate caps it at 1,500,000 bytes |
+| `cocos-client/assets/` payload excluding `.meta` | 1,477,672 bytes; static gate caps it at 1,500,000 bytes |
+| Committed Cocos metadata | 19,610 bytes; separate 50,000-byte gate leaves room for Creator importer metadata |
+| Total current `assets/` checkout | 1,497,282 bytes |
 | Generated word-bank TypeScript | 885,397 bytes |
 | Compact generated spell-template index | 35,374 bytes for 44 banks / 6,351 templates |
 | Theme bundle sources | about 212 KB including manifests/metadata |
 | Unique compressed theme backgrounds | 209,076 bytes |
+| Gameplay bundle sources | `mode_pk` 21,357 bytes; `mode_spell` 13,458 bytes |
 
 These are source measurements, not final WeChat package measurements. Creator may transform textures, generate imports, and split bundles.
 
@@ -59,14 +62,14 @@ These are source measurements, not final WeChat package measurements. Creator ma
 
 | Gate | Status | Required action |
 | --- | --- | --- |
-| Cocos 3.8.8 import | Pending | Open `cocos-client`; verify all 103 committed asset UUIDs remain unique and let Creator generate/retain the four importer metas currently pending for both `theme.json` and JPEG files |
+| Cocos 3.8.8 import | Pending | Open `cocos-client`; verify all 108 committed asset UUIDs remain unique, let Creator generate/retain the four pending theme importer metas, and confirm `mode_pk`/`mode_spell` register without script errors |
 | Runtime screen assembly | Implemented | Single `Home.scene` shell mounts every route/controller and its controls |
 | Runtime layout inspection | Pending | Preview all routes and the blocking preload layer at target landscape aspect ratios; correct any clipping/spacing |
 | Theme visual QA | Pending | Switch both themes; verify route backgrounds, insect/fish targets, feedback motion, fallback, contrast, and narrow-screen framing |
 | Two-device room QA | Pending | Create/join/ready/play/settle all three multiplayer modes on two real phones; exercise every PK robot difficulty and confirm co-op has no robot control |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
 | Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
-| WeChat package size | Pipeline ready; real build pending | Run `npm run build:wechat`; retain `build/wechatgame-report.json` with main/aggregate/per-subpackage bytes and both required theme Bundle locations |
+| WeChat package size | Pipeline ready; real build pending | Run `npm run build:wechat`; retain `build/wechatgame-report.json` with main/aggregate/per-subpackage bytes and all four Bundle locations; confirm both gameplay Bundles are subpackages |
 | Review screenshots | Pending | Capture Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 
@@ -74,7 +77,7 @@ These are source measurements, not final WeChat package measurements. Creator ma
 
 1. Keep Boot as the initial scene and do not change the repository `project.config.json` upload root yet.
 2. Open `Boot.scene`, preview, and verify `Home.scene` creates `RuntimeBackground` and `RuntimeScreens`.
-3. Traverse every route and verify all runtime Buttons/EditBoxes/targets/keyboard rows respond.
+3. Traverse every route and verify `mode_pk`/`mode_spell` load on first entry and all runtime Buttons/EditBoxes/targets/keyboard rows respond.
 4. Switch both themes in a development preview and check background import, text contrast, and fallback behavior.
 5. Keep the DEV theme switch absent from release builds.
 6. Extract runtime nodes into prefabs only after the first visual acceptance if editor-driven layout maintenance is preferred.

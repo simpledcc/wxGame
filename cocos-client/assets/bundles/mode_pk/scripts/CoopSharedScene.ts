@@ -1,11 +1,11 @@
 import { _decorator, Component, Label } from "cc";
-import { GameplayFeedbackPool } from "../components/pk/GameplayFeedbackPool";
-import { PkWordTarget } from "../components/pk/PkWordTarget";
-import { app } from "../core/App";
-import { getFishingTeamScore } from "../domain/FishingRules";
-import { getLocalRoomPlayer } from "../domain/RoomRules";
-import { FishingMatchError } from "../services/FishingMatchService";
-import type { FishingState } from "../store/FishingStore";
+import { GameplayFeedbackPool } from "./GameplayFeedbackPool";
+import { PkWordTarget } from "./PkWordTarget";
+import { app } from "../../../scripts/core/App";
+import { getFishingTeamScore } from "../../../scripts/domain/FishingRules";
+import { getLocalRoomPlayer } from "../../../scripts/domain/RoomRules";
+import { FishingMatchError } from "../../../scripts/services/FishingMatchService";
+import type { FishingState } from "../../../scripts/store/FishingStore";
 
 const { ccclass, property } = _decorator;
 

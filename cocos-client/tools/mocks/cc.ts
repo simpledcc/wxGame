@@ -160,6 +160,11 @@ export class EditBox extends Component {
 
 const deferredAssetLoads = new Set<string>();
 const pendingAssetLoads = new Map<string, Array<() => void>>();
+const deferredBundleLoads = new Set<string>();
+const pendingBundleLoads = new Map<
+  string,
+  Array<(error: Error | null, bundle?: MockBundle) => void>
+>();
 
 export function deferMockAssetLoad(bundleName: string, path: string): void {
   deferredAssetLoads.add(`${bundleName}:${path}`);
@@ -171,6 +176,26 @@ export function resolveMockAssetLoad(bundleName: string, path: string): void {
   const pending = pendingAssetLoads.get(key) || [];
   pendingAssetLoads.delete(key);
   pending.forEach((complete) => complete());
+}
+
+export function deferMockBundleLoad(bundleName: string): void {
+  deferredBundleLoads.add(bundleName);
+}
+
+export function resolveMockBundleLoad(bundleName: string): void {
+  deferredBundleLoads.delete(bundleName);
+  const bundle = bundles.get(bundleName) || new MockBundle(bundleName);
+  bundles.set(bundleName, bundle);
+  const pending = pendingBundleLoads.get(bundleName) || [];
+  pendingBundleLoads.delete(bundleName);
+  pending.forEach((complete) => complete(null, bundle));
+}
+
+export function rejectMockBundleLoad(bundleName: string, error = new Error("mock bundle load failed")): void {
+  deferredBundleLoads.delete(bundleName);
+  const pending = pendingBundleLoads.get(bundleName) || [];
+  pendingBundleLoads.delete(bundleName);
+  pending.forEach((complete) => complete(error));
 }
 
 class MockBundle {
@@ -200,6 +225,12 @@ export const assetManager = {
     return bundles.get(name) || null;
   },
   loadBundle(name: string, callback: (error: Error | null, bundle?: MockBundle) => void): void {
+    if (deferredBundleLoads.has(name)) {
+      const pending = pendingBundleLoads.get(name) || [];
+      pending.push(callback);
+      pendingBundleLoads.set(name, pending);
+      return;
+    }
     const bundle = bundles.get(name) || new MockBundle(name);
     bundles.set(name, bundle);
     callback(null, bundle);

@@ -1,15 +1,15 @@
 import { _decorator, Button, Component, Label } from "cc";
-import { SpellLetterKey } from "../components/spell/SpellLetterKey";
-import { app } from "../core/App";
+import { SpellLetterKey } from "./SpellLetterKey";
+import { app } from "../../../scripts/core/App";
 import {
   buildSpellCells,
   getSpellSegment,
   getSpellSubmission,
   isSpellSubmissionReady,
   LETTER_KEY_ROWS
-} from "../domain/CoopSpellRules";
-import type { CoopSpellState } from "../store/CoopSpellStore";
-import { CoopSpellError } from "../services/CoopSpellService";
+} from "../../../scripts/domain/CoopSpellRules";
+import type { CoopSpellState } from "../../../scripts/store/CoopSpellStore";
+import { CoopSpellError } from "../../../scripts/services/CoopSpellService";
 
 const { ccclass, property } = _decorator;
 

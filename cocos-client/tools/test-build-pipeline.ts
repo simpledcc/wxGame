@@ -18,6 +18,11 @@ assert.equal(contract.config.packages.wechatgame.orientation, "landscape");
 assert.equal(runBuild({ projectRoot, dryRun: true }), null);
 
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "wechat-build-inspection-"));
+const validSubpackages = [
+  { name: "theme_island", root: "subpackages/theme_island" },
+  { name: "mode_pk", root: "subpackages/mode_pk" },
+  { name: "mode_spell", root: "subpackages/mode_spell" }
+];
 
 function writeJson(relativePath: string, value: unknown): void {
   const target = path.join(fixture, relativePath);
@@ -38,7 +43,7 @@ try {
   fs.writeFileSync(path.join(fixture, "game.js"), "require('./src/application.js');\n", "utf8");
   writeJson("game.json", {
     deviceOrientation: "landscape",
-    subpackages: [{ name: "theme_island", root: "subpackages/theme_island" }]
+    subpackages: validSubpackages
   });
   writeJson("project.config.json", {
     appid: contract.appid,
@@ -49,20 +54,27 @@ try {
   fs.writeFileSync(path.join(fixture, "src", "application.js"), "console.log('fixture');\n", "utf8");
   writeJson("assets/theme_default/config.12345.json", {});
   writeJson("subpackages/theme_island/config.67890.json", {});
+  writeJson("subpackages/mode_pk/config.12345.json", {});
+  writeJson("subpackages/mode_spell/config.12345.json", {});
 
   const report = inspect();
-  assert.equal(report.subpackages.length, 1);
+  assert.equal(report.subpackages.length, 3);
   assert.equal(report.subpackages[0].fileCount, 1);
-  assert.equal(report.fileCount, 6);
+  assert.equal(report.fileCount, 8);
   assert.ok(report.mainPackage.bytes < report.totalBytes);
   assert.deepEqual(report.assetBundles.map((bundle: { name: string; packageType: string }) => ({
     name: bundle.name,
     packageType: bundle.packageType
   })), [
     { name: "theme_default", packageType: "main" },
-    { name: "theme_island", packageType: "subpackage" }
+    { name: "theme_island", packageType: "subpackage" },
+    { name: "mode_pk", packageType: "subpackage" },
+    { name: "mode_spell", packageType: "subpackage" }
   ]);
-  assert.equal(report.subpackageTotal.bytes, report.subpackages[0].bytes);
+  assert.equal(
+    report.subpackageTotal.bytes,
+    report.subpackages.reduce((total: number, item: { bytes: number }) => total + item.bytes, 0)
+  );
 
   assert.throws(() => inspect({ mainPackageLimitBytes: 1 }), /Main package is/);
   assert.throws(() => inspect({ subpackageTotalLimitBytes: 1 }), /Subpackages total is/);
@@ -74,6 +86,19 @@ try {
   writeJson("game.json", { deviceOrientation: "landscape", subpackages: [] });
   assert.throws(() => inspect(), /Asset Bundle subpackage is not declared.*theme_island/);
 
+  writeJson("game.json", { deviceOrientation: "landscape", subpackages: [validSubpackages[0]] });
+  fs.mkdirSync(path.join(fixture, "assets", "mode_pk"), { recursive: true });
+  fs.renameSync(
+    path.join(fixture, "subpackages", "mode_pk", "config.12345.json"),
+    path.join(fixture, "assets", "mode_pk", "config.12345.json")
+  );
+  assert.throws(() => inspect(), /Gameplay Asset Bundle must be a declared subpackage.*mode_pk/);
+  fs.renameSync(
+    path.join(fixture, "assets", "mode_pk", "config.12345.json"),
+    path.join(fixture, "subpackages", "mode_pk", "config.12345.json")
+  );
+  fs.rmSync(path.join(fixture, "assets", "mode_pk"), { recursive: true });
+
   writeJson("game.json", {
     deviceOrientation: "landscape",
     subpackages: [{ name: "invalid", root: "../outside" }]
@@ -81,20 +106,20 @@ try {
   assert.throws(() => inspect(), /Invalid subpackage root/);
   writeJson("game.json", {
     deviceOrientation: "landscape",
-    subpackages: [{ name: "theme_island", root: "subpackages/theme_island" }]
+    subpackages: validSubpackages
   });
 
   writeJson("game.json", {
     deviceOrientation: "landscape",
     subpackages: [
-      { name: "theme_island", root: "subpackages/theme_island" },
+      ...validSubpackages,
       { name: "empty", root: "subpackages/empty" }
     ]
   });
   assert.throws(() => inspect(), /Declared subpackage has no generated files/);
   writeJson("game.json", {
     deviceOrientation: "landscape",
-    subpackages: [{ name: "theme_island", root: "subpackages/theme_island" }]
+    subpackages: validSubpackages
   });
 
   writeJson("project.config.json", {

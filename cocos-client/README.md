@@ -48,6 +48,7 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Private feedback and Help controllers with no public nickname input.
 - Human room-name normalization to `玩家1`/`玩家2`, non-duplicated player rows, and legacy custom-name cleanup.
 - `ThemeManager`, pre-mount route assets, cached sprite requests, bundle/asset fallback, stale-load rejection, grass/insect and island/fish targets, and a hidden development switch.
+- Load-on-demand `mode_pk` and `mode_spell` Asset Bundles with registered screen builders, failed-load retry, and WeChat subpackage metadata; gameplay controllers are absent from the main runtime factory's static imports.
 - Runtime buttons consume theme normal/pressed/disabled colors and redraw only when their interaction state changes.
 - Fixed-capacity gameplay feedback labels that float and recycle without per-tap node allocation.
 - Bounded frame/route/node performance instrumentation with a DEV-only JSON report command.
@@ -179,7 +180,7 @@ npm run build:wechat
 npm run inspect:wechat-build
 ```
 
-Set `COCOS_CREATOR_PATH` when Creator is not discoverable through the Cocos Dashboard installation directory or `PATH`. The build writes `build/wechatgame/`, then records main/aggregate/per-subpackage sizes and both required theme Bundle locations in `build/wechatgame-report.json`. Missing theme configs, undeclared/empty subpackages, a main package over 4 MiB, or aggregate subpackages over 30 MiB fail inspection. See `../COCOS_WECHAT_BUILD_PIPELINE.md` for the fixed contract and external acceptance sequence.
+Set `COCOS_CREATOR_PATH` when Creator is not discoverable through the Cocos Dashboard installation directory or `PATH`. The build writes `build/wechatgame/`, then records main/aggregate/per-subpackage sizes and all four required Bundle locations in `build/wechatgame-report.json`. Missing Bundle configs, gameplay bundles outside declared subpackages, undeclared/empty subpackages, a main package over 4 MiB, or aggregate subpackages over 30 MiB fail inspection. See `../COCOS_WECHAT_BUILD_PIPELINE.md` for the fixed contract and external acceptance sequence.
 
 If TypeScript is installed:
 

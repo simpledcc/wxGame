@@ -33,6 +33,7 @@ import type { RoomSnapshot } from "../domain/RoomTypes";
 import { ThemeManager } from "../themes/ThemeManager";
 import { createCocosThemeBundlePort } from "../themes/CocosThemeBundlePort";
 import type { SpriteFrame } from "cc";
+import { createCocosGameplayBundlePort, GameplayBundleManager } from "./GameplayBundles";
 
 const CLOUD_ENV_ID = "cloud1-d3gre86i51a49821a";
 
@@ -53,6 +54,7 @@ export class App {
   readonly router = new SceneRouter(this.store);
   readonly themes: ThemeManager<SpriteFrame>;
   readonly performance = new PerformanceService();
+  readonly gameplayBundles = new GameplayBundleManager(createCocosGameplayBundlePort());
 
   readonly cloud: CloudService;
   readonly storage: StorageService;

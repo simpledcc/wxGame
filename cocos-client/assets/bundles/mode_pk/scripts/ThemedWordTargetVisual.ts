@@ -1,5 +1,5 @@
 import { _decorator, Color, Component, Graphics } from "cc";
-import type { ThemeTargetStyle } from "../../themes/ThemeTypes";
+import type { ThemeTargetStyle } from "../../../scripts/themes/ThemeTypes";
 
 const { ccclass, property } = _decorator;
 

@@ -3,6 +3,7 @@ const path = require("path");
 const {
   MAIN_PACKAGE_LIMIT_BYTES,
   REQUIRED_ASSET_BUNDLES,
+  REQUIRED_SUBPACKAGE_BUNDLES,
   SUBPACKAGE_TOTAL_LIMIT_BYTES,
   assertSafeBuildRoot,
   loadBuildContract,
@@ -88,7 +89,13 @@ function classifyFiles(files, definitions) {
   return { main, subpackages: [...subpackages.values()] };
 }
 
-function inspectAssetBundles(files, definitions, requiredNames = REQUIRED_ASSET_BUNDLES) {
+function inspectAssetBundles(
+  files,
+  definitions,
+  requiredNames = REQUIRED_ASSET_BUNDLES,
+  requiredSubpackages = REQUIRED_SUBPACKAGE_BUNDLES
+) {
+  const subpackageNames = new Set(requiredSubpackages);
   return requiredNames.map((name) => {
     const locations = [`assets/${name}`, `subpackages/${name}`];
     const populated = locations
@@ -110,6 +117,9 @@ function inspectAssetBundles(files, definitions, requiredNames = REQUIRED_ASSET_
     const packageDefinition = definitions.find((item) => item.root === bundle.root);
     if (bundle.root.startsWith("subpackages/") && !packageDefinition) {
       throw new Error(`Asset Bundle subpackage is not declared in game.json: ${name}`);
+    }
+    if (subpackageNames.has(name) && !packageDefinition) {
+      throw new Error(`Gameplay Asset Bundle must be a declared subpackage: ${name}`);
     }
     return {
       bytes: bundle.files.reduce((total, file) => total + file.bytes, 0),
@@ -182,7 +192,12 @@ function inspectWechatBuild(buildRoot, options = {}) {
   if (subpackageBytes > subpackageLimit) {
     throw new Error(`Subpackages total is ${subpackageBytes} bytes; limit is ${subpackageLimit} bytes.`);
   }
-  const assetBundles = inspectAssetBundles(files, definitions, options.requiredAssetBundles);
+  const assetBundles = inspectAssetBundles(
+    files,
+    definitions,
+    options.requiredAssetBundles,
+    options.requiredSubpackageBundles
+  );
 
   return {
     appid: projectConfig.appid,
