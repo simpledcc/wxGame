@@ -5,6 +5,7 @@
   "buildPath": "project://build",
   "outputName": "wechatgame",
   "startScene": "2f311a88-dcfc-4838-938d-0ea546208a74",
+  "mainBundleCompressionType": "subpackage",
   "scenes": [
     {
       "url": "db://assets/scenes/Boot.scene",

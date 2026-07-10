@@ -106,7 +106,7 @@ npm run inspect:wechat-build
 - 检查 Cocos 引擎模块裁剪和 separate engine 方案。
 - 每次只改变一种打包策略，并保留构建报告。
 
-不能直接手工移动 Cocos 生成文件来伪造分包。必须保证 Cocos 的 Asset Bundle 配置、生成目录和运行时加载路径一致。
+不能在构建后手工改包来伪造分包。当前 Cocos Creator 3.8.8 命令行构建对本项目两个玩法 Bundle 未稳定输出目标目录，因此阶段 1 使用受脚本控制的发布归一化步骤：`tools/normalize-wechat-subpackages.js` 只在构建目录内移动 Creator 已生成的 `mode_pk`/`mode_spell` Bundle，同步 `game.json`、`settings.*.json` 和分包入口，并由 `inspect-wechat-build` 做路径、包体和入口校验。这个步骤必须作为 `npm run build:wechat` 的固定流水线执行，不能手动修改构建产物。
 
 ### 任务 B：微信开发者工具预览
 

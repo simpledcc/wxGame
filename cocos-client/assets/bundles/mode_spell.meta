@@ -7,9 +7,12 @@
   "subMetas": {},
   "userData": {
     "isBundle": true,
+    "bundleConfigID": "default",
     "bundleName": "mode_spell",
     "priority": 4,
-    "compressionType": { "wechatgame": "subpackage" },
+    "compressionType": {
+      "wechatgame": "subpackage"
+    },
     "isRemoteBundle": false
   }
 }

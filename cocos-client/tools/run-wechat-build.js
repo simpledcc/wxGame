@@ -4,6 +4,7 @@ const { spawnSync } = require("child_process");
 const { findCocosCreator } = require("./cocos-cli");
 const { inspectWechatBuild } = require("./inspect-wechat-build");
 const { loadBuildContract } = require("./wechat-build-contract");
+const { normalizeWechatSubpackages } = require("./normalize-wechat-subpackages");
 
 function quote(value) {
   return /\s/.test(value) ? `"${value}"` : value;
@@ -48,6 +49,7 @@ function runBuild(options = {}) {
     throw new Error(`Cocos Creator build failed with exit code ${result.status}. See ${logPath}`);
   }
 
+  normalizeWechatSubpackages(contract.buildRoot);
   const report = inspectWechatBuild(contract.buildRoot, {
     expectedAppid: contract.appid,
     expectedOrientation: contract.orientation,
