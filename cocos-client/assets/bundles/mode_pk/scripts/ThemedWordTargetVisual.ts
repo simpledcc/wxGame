@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Graphics } from "cc";
+import { _decorator, Color, Component, Graphics, UITransform } from "cc";
 import type { ThemeTargetStyle } from "../../../scripts/themes/ThemeTypes";
 
 const { ccclass, property } = _decorator;
@@ -27,26 +27,36 @@ export class ThemedWordTargetVisual extends Component {
   }
 
   private drawFish(graphics: Graphics): void {
-    graphics.moveTo(86, 0);
-    graphics.lineTo(122, 25);
-    graphics.lineTo(122, -25);
+    const { width, height } = this.getSize();
+    graphics.moveTo(width * 0.28, 0);
+    graphics.lineTo(width * 0.46, height * 0.34);
+    graphics.lineTo(width * 0.46, -height * 0.34);
     graphics.close();
-    graphics.ellipse(-12, 0, 108, 27);
+    graphics.ellipse(-width * 0.05, 0, width * 0.38, height * 0.34);
     graphics.fill();
     graphics.stroke();
   }
 
   private drawInsect(graphics: Graphics): void {
-    graphics.roundRect(-116, -27, 232, 54, 26);
+    const { width, height } = this.getSize();
+    graphics.roundRect(-width / 2, -height / 2, width, height, height * 0.35);
     graphics.fill();
-    graphics.moveTo(-44, -24);
-    graphics.lineTo(-44, 24);
-    graphics.moveTo(42, -24);
-    graphics.lineTo(42, 24);
-    graphics.moveTo(-88, 22);
-    graphics.lineTo(-110, 38);
-    graphics.moveTo(-72, 25);
-    graphics.lineTo(-82, 43);
+    graphics.moveTo(-width * 0.18, -height * 0.44);
+    graphics.lineTo(-width * 0.18, height * 0.44);
+    graphics.moveTo(width * 0.18, -height * 0.44);
+    graphics.lineTo(width * 0.18, height * 0.44);
+    graphics.moveTo(-width * 0.34, height * 0.34);
+    graphics.lineTo(-width * 0.46, height * 0.58);
+    graphics.moveTo(-width * 0.22, height * 0.42);
+    graphics.lineTo(-width * 0.28, height * 0.64);
     graphics.stroke();
+  }
+
+  private getSize(): { width: number; height: number } {
+    const transform = this.node.getComponent(UITransform);
+    return {
+      width: Math.max(1, transform?.width || 260),
+      height: Math.max(1, transform?.height || 58)
+    };
   }
 }

@@ -154,8 +154,8 @@ function testShellLifecycleAndSceneAttachment(): void {
   assert.match(homeScene, /"titleLabel"/);
   assert.match(homeScene, /"bodyLabel"/);
   const ui = read("assets/scripts/components/ui/RuntimeUi.ts");
-  assert.match(ui, /DESIGN_WIDTH = 960/);
-  assert.match(ui, /DESIGN_HEIGHT = 640/);
+  assert.match(ui, /DESIGN_WIDTH = 640/);
+  assert.match(ui, /DESIGN_HEIGHT = 960/);
   assert.match(ui, /RuntimeButtonVisual/);
   assert.match(ui, /this\.color\("disabled"\)/);
   assert.match(ui, /this\.color\("primaryPressed"\)/);
@@ -182,10 +182,10 @@ function testSceneCanvasContract(): void {
     const items = JSON.parse(read(`assets/scenes/${sceneName}.scene`)) as SerializedSceneItem[];
     const canvasNode = items.find((item) => item.__type__ === "cc.Node" && item._name === "Canvas");
     assert.ok(canvasNode, `${sceneName} must serialize a Canvas node`);
-    assert.deepEqual(canvasNode._lpos, { __type__: "cc.Vec3", x: 480, y: 320, z: 0 });
+    assert.deepEqual(canvasNode._lpos, { __type__: "cc.Vec3", x: 320, y: 480, z: 0 });
     const components = (canvasNode._components || []).map((reference) => items[Number(reference.__id__)]);
     const transform = components.find((item) => item?.__type__ === "cc.UITransform");
-    assert.deepEqual(transform?._contentSize, { __type__: "cc.Size", width: 960, height: 640 });
+    assert.deepEqual(transform?._contentSize, { __type__: "cc.Size", width: 640, height: 960 });
     const widget = components.find((item) => item?.__type__ === "cc.Widget");
     assert.ok(widget, `${sceneName} Canvas must stay aligned to the viewport`);
     assert.equal(widget._alignFlags, 45);

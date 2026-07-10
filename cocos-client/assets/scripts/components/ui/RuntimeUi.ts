@@ -11,8 +11,14 @@ import { parseThemeColor } from "../../themes/ThemeCatalog";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
 import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 
-export const DESIGN_WIDTH = 960;
-export const DESIGN_HEIGHT = 640;
+export const DESIGN_WIDTH = 640;
+export const DESIGN_HEIGHT = 960;
+const LEGACY_WIDTH = 960;
+const LEGACY_HEIGHT = 640;
+const X_SCALE = DESIGN_WIDTH / LEGACY_WIDTH;
+const POSITION_Y_SCALE = DESIGN_HEIGHT / LEGACY_HEIGHT;
+const SIZE_Y_SCALE = 1.15;
+const FONT_SCALE = 0.92;
 const UI_LAYER = 1 << 25;
 
 export type RuntimeButtonKind = "primary" | "secondary" | "plain" | "danger";
@@ -36,7 +42,43 @@ export class RuntimeUi {
   constructor(readonly theme: ThemeManifest) {}
 
   root(parent: Node, name: string): Node {
-    const node = this.node(parent, name, 0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
+    const node = new Node(name);
+    node.layer = UI_LAYER;
+    parent.addChild(node);
+    node.setPosition(0, 0, 0);
+    node.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    return node;
+  }
+
+  gameIcon(parent: Node, name: string, x: number, y: number, size: number): Node {
+    const node = this.node(parent, name, x, y, size, size);
+    const transform = node.getComponent(UITransform);
+    const width = transform?.width || size * X_SCALE;
+    const height = transform?.height || size * SIZE_Y_SCALE;
+    const graphics = node.addComponent(Graphics);
+    const radius = Math.min(width, height) * 0.44;
+    graphics.fillColor = this.color("primary");
+    graphics.strokeColor = this.color("panel");
+    graphics.lineWidth = Math.max(2, Math.round(width * 0.035));
+    graphics.circle(0, 0, radius);
+    graphics.fill();
+    graphics.stroke();
+
+    graphics.fillColor = this.color("secondary");
+    graphics.strokeColor = this.color("panel");
+    graphics.lineWidth = Math.max(1, Math.round(width * 0.02));
+    graphics.roundRect(-width * 0.24, -height * 0.12, width * 0.48, height * 0.3, width * 0.06);
+    graphics.fill();
+    graphics.stroke();
+    graphics.moveTo(-width * 0.15, -height * 0.12);
+    graphics.lineTo(-width * 0.15, height * 0.18);
+    graphics.moveTo(0, -height * 0.12);
+    graphics.lineTo(0, height * 0.18);
+    graphics.moveTo(width * 0.15, -height * 0.12);
+    graphics.lineTo(width * 0.15, height * 0.18);
+    graphics.stroke();
+
+    this.label(node, `${name}Label`, "词", 0, 0, size * 0.72, size * 0.5, 28, "keyFill");
     return node;
   }
 
@@ -51,9 +93,9 @@ export class RuntimeUi {
     const node = new Node(name);
     node.layer = UI_LAYER;
     parent.addChild(node);
-    node.setPosition(x, y, 0);
+    node.setPosition(this.x(x), this.y(y), 0);
     if (width > 0 || height > 0) {
-      node.addComponent(UITransform).setContentSize(width, height);
+      node.addComponent(UITransform).setContentSize(this.width(width), this.height(height));
     }
     return node;
   }
@@ -70,11 +112,19 @@ export class RuntimeUi {
     radius = 8
   ): Node {
     const node = this.node(parent, name, x, y, width, height);
+    const actualWidth = this.width(width);
+    const actualHeight = this.height(height);
     const graphics = node.addComponent(Graphics);
     graphics.fillColor = this.color(fillToken);
     graphics.strokeColor = this.color(strokeToken);
     graphics.lineWidth = 2;
-    graphics.roundRect(-width / 2, -height / 2, width, height, radius);
+    graphics.roundRect(
+      -actualWidth / 2,
+      -actualHeight / 2,
+      actualWidth,
+      actualHeight,
+      Math.min(this.height(radius), actualHeight / 2)
+    );
     graphics.fill();
     graphics.stroke();
     return node;
@@ -95,8 +145,9 @@ export class RuntimeUi {
     const node = this.node(parent, name, x, y, width, height);
     const label = node.addComponent(Label);
     label.string = text;
-    label.fontSize = fontSize;
-    label.lineHeight = Math.max(fontSize + 4, Math.round(fontSize * 1.25));
+    const actualFontSize = this.font(fontSize);
+    label.fontSize = actualFontSize;
+    label.lineHeight = Math.max(actualFontSize + 4, Math.round(actualFontSize * 1.25));
     label.color = this.color(colorToken);
     label.horizontalAlign = horizontalAlign;
     label.verticalAlign = 1;
@@ -118,9 +169,17 @@ export class RuntimeUi {
     fontSize = 22
   ): RuntimeButtonRef {
     const node = this.node(parent, name, x, y, width, height);
+    const actualWidth = this.width(width);
+    const actualHeight = this.height(height);
     const background = node.addComponent(Graphics);
     background.fillColor = this.buttonColor(kind);
-    background.roundRect(-width / 2, -height / 2, width, height, 8);
+    background.roundRect(
+      -actualWidth / 2,
+      -actualHeight / 2,
+      actualWidth,
+      actualHeight,
+      Math.min(this.height(8), actualHeight / 2)
+    );
     background.fill();
     const label = this.label(
       node,
@@ -208,6 +267,26 @@ export class RuntimeUi {
   color(token: ThemeColorToken): Color {
     const [r, g, b, a] = parseThemeColor(this.theme.colors[token]);
     return new Color(r, g, b, a);
+  }
+
+  private x(value: number): number {
+    return Math.round(value * X_SCALE);
+  }
+
+  private y(value: number): number {
+    return Math.round(value * POSITION_Y_SCALE);
+  }
+
+  private width(value: number): number {
+    return Math.max(1, Math.round(value * X_SCALE));
+  }
+
+  private height(value: number): number {
+    return Math.max(1, Math.round(value * SIZE_Y_SCALE));
+  }
+
+  private font(value: number): number {
+    return Math.max(12, Math.round(value * FONT_SCALE));
   }
 
   private buttonPressedColor(kind: RuntimeButtonKind): Color {

@@ -65,7 +65,7 @@ function assertVisibleUiContract(root: Node, context: string): void {
       const right = x + transform.width / 2;
       const bottom = y - transform.height / 2;
       const top = y + transform.height / 2;
-      if (left < -480 || right > 480 || bottom < -320 || top > 320) {
+      if (left < -320 || right > 320 || bottom < -480 || top > 480) {
         violations.push(`${nodePath}=[${left},${bottom}]..[${right},${top}]`);
       }
     }

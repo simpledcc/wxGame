@@ -10,6 +10,7 @@ import {
 } from "cc";
 import { app } from "../core/App";
 import { CloudCallError } from "../services/CloudService";
+import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../components/ui/RuntimeUi";
 
 const { ccclass, property } = _decorator;
 const UI_LAYER = 1 << 25;
@@ -44,37 +45,39 @@ export class BootScene extends Component {
     gate.layer = UI_LAYER;
     this.node.addChild(gate);
     gate.setPosition(0, 0);
-    gate.addComponent(UITransform).setContentSize(960, 640);
+    gate.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
 
     const panel = gate.addComponent(Graphics);
     panel.fillColor = new Color(24, 32, 43, 245);
-    panel.roundRect(-430, -295, 860, 590, 16);
+    const panelWidth = DESIGN_WIDTH - 48;
+    const panelHeight = DESIGN_HEIGHT - 96;
+    panel.roundRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
     panel.fill();
 
     this.createText(
       gate,
       "PrivacyTitle",
       "隐私保护提示",
-      38,
-      195,
-      720,
+      34,
+      370,
+      520,
       58
     );
     this.createText(
       gate,
       "PrivacyBody",
       `为提供房间对战、成绩记录和问题反馈功能，游戏会处理微信用户标识、系统玩家名、游戏记录，以及你提交的反馈内容和可选联系方式。\n请阅读${app.privacy.contractName}，同意后才会初始化云服务并读取本地游戏记录。`,
-      22,
-      75,
-      720,
-      170
+      20,
+      170,
+      520,
+      280
     );
 
     this.contractButton = this.createButton(
       gate,
       "ContractButton",
       "查看隐私保护指引",
-      -55,
+      -20,
       new Color(55, 71, 90, 255),
       () => {
         void this.openContract();
@@ -84,7 +87,7 @@ export class BootScene extends Component {
       gate,
       "AcceptButton",
       "同意并进入",
-      -130,
+      -105,
       new Color(36, 160, 110, 255),
       () => {
         void this.acceptAndEnter();
@@ -94,7 +97,7 @@ export class BootScene extends Component {
       gate,
       "DeclineButton",
       "暂不进入",
-      -205,
+      -190,
       new Color(55, 71, 90, 255),
       () => this.declineAndStay()
     );
@@ -102,9 +105,9 @@ export class BootScene extends Component {
       gate,
       "PrivacyStatus",
       "同意前不会调用云能力",
-      20,
-      -266,
-      720,
+      18,
+      -365,
+      520,
       36,
       new Color(190, 205, 220, 255)
     );
@@ -213,12 +216,12 @@ export class BootScene extends Component {
     node.layer = UI_LAYER;
     parent.addChild(node);
     node.setPosition(0, y);
-    node.addComponent(UITransform).setContentSize(420, 62);
+    node.addComponent(UITransform).setContentSize(500, 62);
     const background = node.addComponent(Graphics);
     background.fillColor = color;
-    background.roundRect(-210, -31, 420, 62, 10);
+    background.roundRect(-250, -31, 500, 62, 10);
     background.fill();
-    this.createText(node, `${name}Label`, text, 24, 0, 400, 58);
+    this.createText(node, `${name}Label`, text, 22, 0, 480, 58);
     const button = node.addComponent(Button);
     node.on(Button.EventType.CLICK, handler, this);
     return button;

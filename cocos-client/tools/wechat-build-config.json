@@ -22,7 +22,7 @@
   "packages": {
     "wechatgame": {
       "appid": "wx063a1823d29bed9e",
-      "orientation": "landscape",
+      "orientation": "portrait",
       "buildOpenDataContextTemplate": false,
       "separateEngine": false,
       "startSceneAssetBundle": false

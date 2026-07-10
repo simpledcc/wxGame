@@ -46,6 +46,8 @@ declare module "cc" {
   }
 
   export class UITransform {
+    width: number;
+    height: number;
     setContentSize(width: number, height: number): void;
   }
 
@@ -60,6 +62,7 @@ declare module "cc" {
   export class SpriteFrame extends Asset {}
 
   export class Sprite {
+    node: Node;
     spriteFrame: SpriteFrame | null;
     color: Color;
   }

@@ -1,6 +1,6 @@
 import { Button, Graphics, type Node } from "cc";
 import { gameplayScreens } from "../../../scripts/core/GameplayBundles";
-import type { RuntimeUi } from "../../../scripts/components/ui/RuntimeUi";
+import { DESIGN_WIDTH, type RuntimeUi } from "../../../scripts/components/ui/RuntimeUi";
 import { CoopSharedScene } from "./CoopSharedScene";
 import { GameplayFeedbackPool } from "./GameplayFeedbackPool";
 import { PkGameScene } from "./PkGameScene";
@@ -71,8 +71,8 @@ class ModePkScreenBuilder {
       node.on(Button.EventType.CLICK, () => target.tap(), this);
       target.wordLabel = label;
       target.tapButton = button;
-      target.leftBound = -340;
-      target.rightBound = 340;
+      target.leftBound = -DESIGN_WIDTH / 2 + 100;
+      target.rightBound = DESIGN_WIDTH / 2 - 100;
       return target;
     });
   }

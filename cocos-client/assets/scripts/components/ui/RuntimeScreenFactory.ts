@@ -44,14 +44,15 @@ export class RuntimeScreenFactory {
   private buildHome(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "HomeRuntimeScreen");
     ui.title(root, app.themes.getCurrentTheme().copy.gameTitle);
-    const status = ui.label(root, "HomeStatus", "", 0, 210, 760, 72, 21, "textMuted");
+    ui.gameIcon(root, "HomeGameIcon", 0, 220, 92);
+    const status = ui.label(root, "HomeStatus", "", 0, 176, 760, 54, 19, "textMuted");
     const bestScores = app.historyStore.getBestScores();
     ui.label(
       root,
       "BestScores",
       `最佳：PK ${bestScores.pk?.score ?? "--"} · 默契 ${bestScores.coopShared?.score ?? "--"} · 拼词 ${bestScores.coopSpell?.score ?? "--"}`,
       0,
-      154,
+      130,
       820,
       38,
       19,
@@ -314,8 +315,8 @@ export class RuntimeScreenFactory {
 
   private buildHistory(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "HistoryRuntimeScreen");
-    const listRoot = ui.node(root, "HistoryList", 0, 0, 960, 640);
-    const detailRoot = ui.node(root, "HistoryDetail", 0, 0, 960, 640);
+    const listRoot = ui.root(root, "HistoryList");
+    const detailRoot = ui.root(root, "HistoryDetail");
     detailRoot.active = false;
     let controller!: HistoryScene;
     const title = ui.label(listRoot, "HistoryTitle", "", 0, 275, 620, 44, 32);

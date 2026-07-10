@@ -14,7 +14,7 @@ assert.equal(contract.config.platform, "wechatgame");
 assert.equal(contract.config.taskName, "wechatgame");
 assert.equal(contract.config.startScene, "2f311a88-dcfc-4838-938d-0ea546208a74");
 assert.equal(contract.config.packages.wechatgame.appid, contract.appid);
-assert.equal(contract.config.packages.wechatgame.orientation, "landscape");
+assert.equal(contract.config.packages.wechatgame.orientation, "portrait");
 assert.equal(runBuild({ projectRoot, dryRun: true }), null);
 
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "wechat-build-inspection-"));
@@ -42,7 +42,7 @@ function inspect(overrides: Record<string, unknown> = {}) {
 try {
   fs.writeFileSync(path.join(fixture, "game.js"), "require('./src/application.js');\n", "utf8");
   writeJson("game.json", {
-    deviceOrientation: "landscape",
+    deviceOrientation: "portrait",
     subpackages: validSubpackages
   });
   writeJson("project.config.json", {
@@ -83,10 +83,10 @@ try {
   assert.throws(() => inspect(), /Missing required Asset Bundle.*theme_default/);
   writeJson("assets/theme_default/config.12345.json", {});
 
-  writeJson("game.json", { deviceOrientation: "landscape", subpackages: [] });
+  writeJson("game.json", { deviceOrientation: "portrait", subpackages: [] });
   assert.throws(() => inspect(), /Asset Bundle subpackage is not declared.*theme_island/);
 
-  writeJson("game.json", { deviceOrientation: "landscape", subpackages: [validSubpackages[0]] });
+  writeJson("game.json", { deviceOrientation: "portrait", subpackages: [validSubpackages[0]] });
   fs.mkdirSync(path.join(fixture, "assets", "mode_pk"), { recursive: true });
   fs.renameSync(
     path.join(fixture, "subpackages", "mode_pk", "config.12345.json"),
@@ -100,17 +100,17 @@ try {
   fs.rmSync(path.join(fixture, "assets", "mode_pk"), { recursive: true });
 
   writeJson("game.json", {
-    deviceOrientation: "landscape",
+    deviceOrientation: "portrait",
     subpackages: [{ name: "invalid", root: "../outside" }]
   });
   assert.throws(() => inspect(), /Invalid subpackage root/);
   writeJson("game.json", {
-    deviceOrientation: "landscape",
+    deviceOrientation: "portrait",
     subpackages: validSubpackages
   });
 
   writeJson("game.json", {
-    deviceOrientation: "landscape",
+    deviceOrientation: "portrait",
     subpackages: [
       ...validSubpackages,
       { name: "empty", root: "subpackages/empty" }
@@ -118,7 +118,7 @@ try {
   });
   assert.throws(() => inspect(), /Declared subpackage has no generated files/);
   writeJson("game.json", {
-    deviceOrientation: "landscape",
+    deviceOrientation: "portrait",
     subpackages: validSubpackages
   });
 

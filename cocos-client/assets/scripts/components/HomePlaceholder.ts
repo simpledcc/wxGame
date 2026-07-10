@@ -173,6 +173,19 @@ export class HomePlaceholder extends Component {
       const frame = await app.themes.loadSpriteFrame(getRouteBackgroundAssetKey(route));
       if (sequence === this.backgroundSequence && this.backgroundSprite) {
         this.backgroundSprite.spriteFrame = frame;
+        const transform = this.backgroundSprite.node.getComponent(UITransform);
+        const sourceFrame = frame as unknown as { width?: number; height?: number };
+        const sourceWidth = Number(sourceFrame.width || DESIGN_WIDTH);
+        const sourceHeight = Number(sourceFrame.height || DESIGN_HEIGHT);
+        const sourceAspect = sourceHeight > 0 ? sourceWidth / sourceHeight : 1;
+        const targetAspect = DESIGN_WIDTH / DESIGN_HEIGHT;
+        const coverWidth = sourceAspect >= targetAspect
+          ? DESIGN_HEIGHT * sourceAspect
+          : DESIGN_WIDTH;
+        const coverHeight = sourceAspect >= targetAspect
+          ? DESIGN_HEIGHT
+          : DESIGN_WIDTH / sourceAspect;
+        transform?.setContentSize(coverWidth, coverHeight);
         this.backgroundSprite.color = new Color(255, 255, 255, 255);
       }
     } catch {
