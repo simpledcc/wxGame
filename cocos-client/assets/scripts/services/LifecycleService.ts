@@ -144,6 +144,7 @@ export class LifecycleService {
 
   private resumeRoomPolling(): void {
     if (this.hidden) return;
+    if (this.roomStore.getRoom()?.state === "finished") return;
     const roomId = this.roomStore.getState().roomId;
     if (!roomId) return;
     if (!this.polling.isRunning()) {

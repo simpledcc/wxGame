@@ -22,6 +22,11 @@ export type UnlockWordBankResult =
       coins: number;
     };
 
+export interface WordBankProgressSnapshot {
+  wordCoins: number;
+  unlockedBankIds: string[];
+}
+
 export class WordBankStore {
   private bankId = DEFAULT_BANK_ID;
   private wordCoins = INITIAL_WORD_COINS;
@@ -60,6 +65,21 @@ export class WordBankStore {
 
   getUnlockedBankIds(): string[] {
     return [...this.unlockedBankIds];
+  }
+
+  getProgressSnapshot(): WordBankProgressSnapshot {
+    return {
+      wordCoins: this.wordCoins,
+      unlockedBankIds: [...this.unlockedBankIds]
+    };
+  }
+
+  restoreProgress(catalog: WordBankDataSource, snapshot: WordBankProgressSnapshot): void {
+    const coins = Number(snapshot.wordCoins);
+    this.wordCoins = Number.isFinite(coins) && coins >= 0
+      ? Math.floor(coins)
+      : INITIAL_WORD_COINS;
+    this.unlockedBankIds = normalizeUnlockedBankIds(catalog, snapshot.unlockedBankIds);
   }
 
   getWrongWords(): WordItem[] {

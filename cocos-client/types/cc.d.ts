@@ -1,10 +1,16 @@
 declare module "cc" {
   export class Node {
+    static readonly EventType: {
+      TOUCH_START: string;
+      TOUCH_END: string;
+      TOUCH_CANCEL: string;
+    };
     constructor(name?: string);
     name: string;
     active: boolean;
     layer: number;
     position: Vec3;
+    readonly children: Node[];
     addChild(child: Node): void;
     addComponent<T>(type: new (...args: any[]) => T): T;
     getComponent<T>(type: new (...args: any[]) => T): T | null;
@@ -22,6 +28,12 @@ declare module "cc" {
   }
 
   export class Label {
+    static readonly Overflow: {
+      NONE: number;
+      CLAMP: number;
+      SHRINK: number;
+      RESIZE_HEIGHT: number;
+    };
     node: Node;
     string: string;
     fontSize: number;
@@ -30,6 +42,7 @@ declare module "cc" {
     horizontalAlign: number;
     verticalAlign: number;
     enableWrapText: boolean;
+    overflow: number;
   }
 
   export class UITransform {
@@ -39,6 +52,8 @@ declare module "cc" {
   export class Color {
     constructor(r?: number, g?: number, b?: number, a?: number);
   }
+
+  export class BlockInputEvents extends Component {}
 
   export class Asset {}
 
@@ -54,6 +69,11 @@ declare module "cc" {
     strokeColor: Color;
     lineWidth: number;
     roundRect(x: number, y: number, width: number, height: number, radius: number): void;
+    circle(cx: number, cy: number, radius: number): void;
+    ellipse(cx: number, cy: number, radiusX: number, radiusY: number): void;
+    moveTo(x: number, y: number): void;
+    lineTo(x: number, y: number): void;
+    close(): void;
     fill(): void;
     stroke(): void;
     clear(): void;

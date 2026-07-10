@@ -20,9 +20,8 @@ export class HomeScene extends Component {
     const bank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     if (this.statusLabel) {
       this.statusLabel.string = [
-        state.cloudReady ? "云环境已连接" : "正在连接云环境",
-        `词库：${getWordBankLabel(bank, true)}`,
-        `金币：${app.wordBankStore.getWordCoins()}`
+        `${state.cloudReady ? "云环境已连接" : "正在连接云环境"} · 系统玩家：${app.playerStore.getLocalPlayer().displayName} · 金币：${app.wordBankStore.getWordCoins()}`,
+        `当前词库：${getWordBankLabel(bank, true)}`
       ].join("\n");
     }
   }
@@ -62,5 +61,23 @@ export class HomeScene extends Component {
 
   openHelp(): void {
     app.router.navigate("help");
+  }
+
+  async openPrivacyContract(): Promise<void> {
+    try {
+      const opened = await app.privacy.openContract();
+      if (!opened) app.runtime.showToast("暂时无法打开隐私保护指引");
+    } catch {
+      app.runtime.showToast("隐私保护指引暂时无法打开，请稍后重试");
+    }
+  }
+
+  async copyPerformanceReport(): Promise<void> {
+    try {
+      await app.runtime.setClipboardText(app.performance.serializeSnapshot());
+      app.runtime.showToast("性能报告已复制");
+    } catch {
+      app.runtime.showToast("性能报告复制失败");
+    }
   }
 }

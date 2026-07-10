@@ -18,6 +18,10 @@ Implemented:
 - A room session coordinator for create, join, refresh, optimistic ready, bot, start, copy, invite, resume, and leave.
 - Atomic room replacement: invalid codes and failed create/join requests preserve the current room, local identity, and polling session.
 - Accepted join recovery: if `joinRoom` succeeds but the first document read fails, the client keeps the new room ID/code/openid, enters Room, shows a retrying sync state, and lets polling recover without submitting join twice.
+- The runtime Room screen exposes low/medium/high robot difficulty controls for PK rooms, keeps the selected difficulty synchronized from authoritative snapshots, and replaces an existing robot through the same cloud contract.
+- Player rows render normalized human names once (`玩家1（我）`) and keep robot identity/readiness distinct instead of duplicating the stored name.
+- Every Room command now participates in one pending-action UI lock: create, join, ready, robot, start, copy, invite, refresh, and back cannot be submitted through covered controls while a cloud action is active.
+- Runtime buttons redraw only when pressed/interactable state changes, so a blocked Room action visibly uses the active theme's disabled color instead of remaining visually clickable.
 - `RoomScene` and `CoopSelectScene` controller foundations for later Cocos node binding.
 - Automatic route changes from waiting room to PK, 默契捕词赛, 同舟拼词记, or result.
 - Lazy player identity acquisition from successful create/join responses; Boot performs no identity cloud-function request.
@@ -45,8 +49,8 @@ Scene classes contain display binding and command entry points only. Poll timing
 
 - Room documents are still read directly because the production database rules already allow reads and the old client uses this path.
 - All writes continue through existing cloud functions.
-- Room codes are normalized to uppercase alphanumeric text and must contain 6 characters before join.
-- PK rooms may add or replace a test robot.
+- Room codes are normalized by one shared domain function to uppercase alphanumeric text and must contain exactly 6 characters before join. The EditBox is capped at 6; overlong links/API values remain invalid instead of being silently truncated. Sharing, clipboard and invitation lifecycle reuse the same normalization.
+- PK rooms may add or replace a low/medium/high test robot; the three runtime controls map directly to the existing `addBot` difficulty contract.
 - Both co-op modes reject robots and require two real players.
 - Any player in the room can start after both players are ready, preserving the existing client and cloud behavior.
 - Selected bank words are capped at 240 and wrong words at 200, matching current cloud normalization.
@@ -79,14 +83,14 @@ npm run test:phase4
 npm run typecheck
 ```
 
-`test:phase4` covers room option rules, snapshot normalization, create, join, failed replacement preservation, accepted-join sync recovery, optimistic ready, robot restrictions, start, direct room reads, polling deduplication, sharing fallback, and route selection.
+`test:phase4` covers room option rules, exact six-character code normalization, rejection of overlong codes, snapshot normalization, create, join, failed replacement preservation, accepted-join sync recovery, optimistic ready, all three robot difficulties, co-op robot restrictions, start, direct room reads, polling deduplication, sharing fallback, and route selection. Lifecycle tests reject overlong invitation queries, while the runtime shell verifies the EditBox limit, difficulty-button enable/selected states, non-duplicated player rows, the all-command pending lock, and disabled theme visuals from real controller updates.
 
 ## 6. External Acceptance Still Pending
 
 The following design-document acceptance items cannot be proved on this machine because Cocos Creator and WeChat Developer Tools are not installed:
 
 - Preview the runtime Room screen in Creator; prefab extraction is optional after visual acceptance.
-- Verify room code, player rows, ready state, buttons, and narrow-phone layout visually.
+- Verify room code, player rows, ready state, the three robot difficulty controls, buttons, and narrow-phone layout visually.
 - Verify two real devices can enter the same room and see each other's ready state.
 - Verify invitation launch parameters enter the invited room on a real WeChat client.
 - Capture Phase 4 screenshots.

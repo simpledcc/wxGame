@@ -32,6 +32,7 @@ export class BankScene extends Component {
 
   unlockSelectedBank(): void {
     const bankId = app.store.getState().bankPickerSelectedBankId;
+    const previousProgress = app.wordBankStore.getProgressSnapshot();
     const result = app.wordBankStore.unlockBank(app.wordBankCatalog, bankId);
     if (!result.ok) {
       app.runtime.showToast(this.getUnlockErrorText(result.reason));
@@ -39,7 +40,8 @@ export class BankScene extends Component {
       return;
     }
     if (!app.persistWordBankProgress()) {
-      app.runtime.showToast("词库已解锁，但本地保存失败");
+      app.wordBankStore.restoreProgress(app.wordBankCatalog, previousProgress);
+      app.runtime.showToast("解锁失败，本地保存不可用，金币未扣除");
       this.renderStatus();
       return;
     }

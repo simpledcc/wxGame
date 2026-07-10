@@ -7,13 +7,15 @@ Status: engine-independent migration, runtime UI assembly, static release checks
 ## Automated Checks Passed
 
 - Platform boundary: direct `wx.*` use is isolated to `WechatRuntimePort`.
-- Privacy: cloud and personal local storage remain gated by current privacy acceptance.
+- Privacy: Boot contract/accept/decline controls render on `UI_2D`; decline leaves cloud init at zero, acceptance boots once, and Home retains a privacy-contract entry.
 - Startup identity: boot initializes cloud without calling `getOpenId`; identity is remembered from create/join responses.
 - Lifecycle: launch/show invitations wait for boot, cold invitations enter `Home.scene` while preserving the room route, hide stops room polling, show resumes the active room, and gameplay rejects room switching.
 - UGC: Home/room expose no custom nickname input; live human names normalize to `玩家1`/`玩家2`; old `playerName` storage is deleted on boot.
-- Feedback: content is locally length-checked, submitted through the protected cloud function, and displays the privacy-contract entry.
+- Feedback: content is locally length-checked, submitted through the protected cloud function, displays the privacy-contract entry, locks duplicate submission, and ignores success/failure after its route is destroyed.
+- Local economy: a word-bank unlock writes the unlocked-bank list before the coin deduction and uses compensating rollback; storage or controller failure cannot leave deducted coins without the matching unlock.
 - Cloud writes: client database rules remain read-only; writes stay in cloud functions.
 - Production contracts: all 11 cloud handler sources retain the request/response markers and typed Cocos service coverage frozen by the migration baseline.
+- Cloud diagnostics: missing functions, invalid environments, permission failures, network failures, and timeouts map to bounded public messages; Boot never displays a raw initialization error.
 - Compliance copy: visible Cocos sources contain no commercial/payment, membership, chat, signature, message-board, or red-packet copy.
 - Placeholder copy: visible Home sources no longer contain migration/placeholder text.
 - Functional coverage: Boot, Home, Bank, Study, co-op selection, Room, PK, shared co-op, spell co-op, Result, History, Feedback, and Help controllers exist with Cocos metadata.
@@ -23,8 +25,19 @@ Status: engine-independent migration, runtime UI assembly, static release checks
 - Remote settlement: real App subscriptions convert remotely finished PK/spell snapshots into result/history state before routing, without another finish cloud call.
 - Room replacement: invalid or failed create/join attempts retain the active room, identity, and polling until a replacement succeeds or the player explicitly leaves.
 - Join recovery: a server-accepted join with an initial document-read failure retains the new identity/session, enters Room, and retries polling without a duplicate join request.
+- Room robot parity: PK exposes low/medium/high difficulty controls backed by authoritative snapshots; co-op keeps them disabled, and player rows do not duplicate normalized names.
+- Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
+- Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
+- Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.
+- Source metadata: release QA parses all committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and permits only the four documented theme importer metas to remain Creator-generated.
+- Interaction wiring: runtime execution clicks controls across every functional route, including room validation/copy/invite and Result-to-History; platform calls and destination state are asserted rather than inferred from source text.
+- Settlement lifecycle: the first finished snapshot cancels room polling, and entering History releases the finished room without deleting its persisted result.
+- Async session isolation: delayed catch/spell responses are keyed to a monotonic room-session version; leave/replacement makes them inert, canceled failures do not toast on the next screen, and old mode results reset when a different mode enters.
 - Gameplay: Phase 3-8 engine-independent tests pass, including room polling, all three multiplayer modes, timeout settlement, history, theme fallback, and race isolation.
-- Build pipeline: fixed Creator inputs, upload-root isolation, synthetic package inspection, main/subpackage byte accounting, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
+- Spell source data: all 44 legacy banks and 6,351 prebuilt templates decode field-for-field from a 35 KB compact index; spell Room creation sends the selected pool with the production 240-item cap and no runtime random blank generation.
+- Theme presentation: pre-mount route loading, input blocking, stale-route rejection, bundle/asset fallback, cached sprite requests, pressed/disabled button states, insect/fish target geometry switching, and a three-slot gameplay feedback pool execute in the runtime Cocos mock.
+- Performance instrumentation: bounded frame sampling, full-session/per-route timing, 60-frame node-peak sampling, invalid-input handling, and DEV JSON export execute in pure and runtime-shell tests.
+- Build pipeline: fixed Creator/plugin inputs, upload-root isolation, required theme-bundle/config discovery, 4 MiB main and 30 MiB aggregate subpackage gates, empty/undeclared subpackage rejection, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
 - Dependencies: production dependency audit reports zero vulnerabilities.
 - Patch hygiene: `git diff --check` passes; `miniprogram/` and `cloudfunctions/` remain unchanged by the Cocos migration.
 
@@ -34,8 +47,9 @@ Measured before Cocos import/build:
 
 | Item | Size |
 | --- | ---: |
-| `cocos-client/assets/` source | 1,419,218 bytes; static gate caps it at 1,500,000 bytes |
+| `cocos-client/assets/` source | 1,493,272 bytes; static gate caps it at 1,500,000 bytes |
 | Generated word-bank TypeScript | 885,397 bytes |
+| Compact generated spell-template index | 35,374 bytes for 44 banks / 6,351 templates |
 | Theme bundle sources | about 212 KB including manifests/metadata |
 | Unique compressed theme backgrounds | 209,076 bytes |
 
@@ -45,14 +59,14 @@ These are source measurements, not final WeChat package measurements. Creator ma
 
 | Gate | Status | Required action |
 | --- | --- | --- |
-| Cocos 3.8.8 import | Pending | Open `cocos-client`, let Creator import JPEGs and regenerate local cache |
+| Cocos 3.8.8 import | Pending | Open `cocos-client`; verify all 103 committed asset UUIDs remain unique and let Creator generate/retain the four importer metas currently pending for both `theme.json` and JPEG files |
 | Runtime screen assembly | Implemented | Single `Home.scene` shell mounts every route/controller and its controls |
-| Runtime layout inspection | Pending | Preview all routes at target landscape aspect ratios and correct any clipping/spacing |
-| Theme visual QA | Pending | Bind `ThemeBinding`, switch both themes, verify fallback and narrow-screen framing |
-| Two-device room QA | Pending | Create/join/ready/play/settle all three multiplayer modes on two real phones |
+| Runtime layout inspection | Pending | Preview all routes and the blocking preload layer at target landscape aspect ratios; correct any clipping/spacing |
+| Theme visual QA | Pending | Switch both themes; verify route backgrounds, insect/fish targets, feedback motion, fallback, contrast, and narrow-screen framing |
+| Two-device room QA | Pending | Create/join/ready/play/settle all three multiplayer modes on two real phones; exercise every PK robot difficulty and confirm co-op has no robot control |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
-| Performance | Pending | Run 30-second Home idle, rapid PK taps, rapid spell input, three-minute polling, and low-end device profiling |
-| WeChat package size | Pipeline ready; real build pending | Run `npm run build:wechat`; retain `build/wechatgame-report.json` with main package and every declared subpackage |
+| Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
+| WeChat package size | Pipeline ready; real build pending | Run `npm run build:wechat`; retain `build/wechatgame-report.json` with main/aggregate/per-subpackage bytes and both required theme Bundle locations |
 | Review screenshots | Pending | Capture Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 

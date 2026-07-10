@@ -28,7 +28,7 @@ export interface CoopSpellServiceOptions {
 }
 
 export class CoopSpellError extends Error {
-  constructor(message: string) {
+  constructor(message: string, readonly silent = false) {
     super(message);
     this.name = "CoopSpellError";
   }
@@ -99,6 +99,8 @@ export class CoopSpellService {
     const room = this.requireSpellRoom();
     const question = this.requireQuestion(room);
     const localOpenId = this.requireLocalOpenId();
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     const segment = getSpellSegment(question, room.players, localOpenId);
     if (!segment) throw new CoopSpellError("还没有分配拼词片段");
     const state = this.spellStore.getState();
@@ -112,11 +114,12 @@ export class CoopSpellService {
     const questionId = question.id;
     try {
       const response = await this.rooms.catchFish({
-        roomId: this.requireRoomId(),
+        roomId,
         action: "submitCoopSpell",
         questionId,
         answer: optimistic.answer
       });
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return response;
       if (this.spellStore.getState().activeQuestionId !== questionId) {
         await this.roomSession.refresh().catch(() => undefined);
         return response;
@@ -139,6 +142,9 @@ export class CoopSpellService {
       await this.roomSession.refresh().catch(() => undefined);
       return response;
     } catch (error) {
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) {
+        throw new CoopSpellError("操作已取消", true);
+      }
       const message = error instanceof Error ? error.message : "提交失败";
       this.spellStore.rollbackSubmit(questionId, message);
       throw error;
@@ -193,8 +199,10 @@ export class CoopSpellService {
     if (!room || !isCoopSpellRoom(room)) {
       this.cancelQuestionTimer();
       this.cancelTotalTimer();
-      if (!room) {
+      if (!room || this.activeRoomId) {
         this.activeRoomId = "";
+        this.remoteMatchStartedAt = 0;
+        this.localMatchStartedAt = 0;
         this.spellStore.reset();
       }
       return;
@@ -233,6 +241,8 @@ export class CoopSpellService {
   private async skipQuestion(manual: boolean, expectedQuestionId: string): Promise<CatchFishResponse> {
     const room = this.requireSpellRoom();
     const question = this.requireQuestion(room);
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     if (question.id !== expectedQuestionId) {
       throw new CoopSpellError("题目已更新");
     }
@@ -242,10 +252,11 @@ export class CoopSpellService {
     }
     try {
       const response = await this.rooms.catchFish({
-        roomId: this.requireRoomId(),
+        roomId,
         action: manual ? "skipCoopSpell" : "timeoutCoopSpell",
         questionId: question.id
       });
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return response;
       if (this.spellStore.getState().activeQuestionId !== question.id) {
         await this.roomSession.refresh().catch(() => undefined);
         return response;
@@ -269,6 +280,9 @@ export class CoopSpellService {
       await this.roomSession.refresh().catch(() => undefined);
       return response;
     } catch (error) {
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) {
+        throw new CoopSpellError("操作已取消", true);
+      }
       const message = error instanceof Error ? error.message : "无法切换当前单词";
       this.spellStore.rollbackSkip(question.id, message);
       if (!manual) this.scheduleQuestionRetry(question.id, 500);
@@ -331,8 +345,11 @@ export class CoopSpellService {
       return;
     }
     this.lastFinishAttemptAt = now;
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     try {
-      await this.rooms.finishGame(this.requireRoomId());
+      await this.rooms.finishGame(roomId);
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return;
       await this.roomSession.refresh();
       this.spellStore.endFinish();
     } catch (error) {
@@ -429,6 +446,11 @@ export class CoopSpellService {
     const openid = this.playerStore.getLocalPlayer().openid;
     if (!openid) throw new CoopSpellError("你不在这个房间中");
     return openid;
+  }
+
+  private isCurrentRoomSession(roomId: string, sessionVersion: number): boolean {
+    return this.roomStore.getSessionVersion() === sessionVersion
+      && this.roomStore.getState().roomId === roomId;
   }
 
   private syncMatchClock(room: RoomSnapshot): void {

@@ -21,7 +21,14 @@ export class Component {
   update?(_deltaTime: number): void;
 }
 
+export class BlockInputEvents extends Component {}
+
 export class Node {
+  static readonly EventType = {
+    TOUCH_START: "touch-start",
+    TOUCH_END: "touch-end",
+    TOUCH_CANCEL: "touch-cancel"
+  };
   active = true;
   private destroyed = false;
   layer = 0;
@@ -97,6 +104,12 @@ export class UITransform extends Component {
 }
 
 export class Label extends Component {
+  static readonly Overflow = {
+    NONE: 0,
+    CLAMP: 1,
+    SHRINK: 2,
+    RESIZE_HEIGHT: 3
+  };
   string = "";
   fontSize = 20;
   lineHeight = 24;
@@ -104,6 +117,7 @@ export class Label extends Component {
   horizontalAlign = 1;
   verticalAlign = 1;
   enableWrapText = true;
+  overflow = Label.Overflow.NONE;
 }
 
 export class Graphics extends Component {
@@ -111,6 +125,11 @@ export class Graphics extends Component {
   strokeColor = new Color();
   lineWidth = 1;
   roundRect(_x: number, _y: number, _width: number, _height: number, _radius: number): void {}
+  circle(_cx: number, _cy: number, _radius: number): void {}
+  ellipse(_cx: number, _cy: number, _radiusX: number, _radiusY: number): void {}
+  moveTo(_x: number, _y: number): void {}
+  lineTo(_x: number, _y: number): void {}
+  close(): void {}
   fill(): void {}
   stroke(): void {}
   clear(): void {}
@@ -139,13 +158,38 @@ export class EditBox extends Component {
   placeholderLabel: Label | null = null;
 }
 
+const deferredAssetLoads = new Set<string>();
+const pendingAssetLoads = new Map<string, Array<() => void>>();
+
+export function deferMockAssetLoad(bundleName: string, path: string): void {
+  deferredAssetLoads.add(`${bundleName}:${path}`);
+}
+
+export function resolveMockAssetLoad(bundleName: string, path: string): void {
+  const key = `${bundleName}:${path}`;
+  deferredAssetLoads.delete(key);
+  const pending = pendingAssetLoads.get(key) || [];
+  pendingAssetLoads.delete(key);
+  pending.forEach((complete) => complete());
+}
+
 class MockBundle {
+  constructor(private readonly bundleName: string) {}
+
   load<T extends Asset>(
-    _path: string,
+    path: string,
     type: Constructor<T>,
     callback: (error: Error | null, asset?: T) => void
   ): void {
-    callback(null, new type());
+    const key = `${this.bundleName}:${path}`;
+    const complete = (): void => callback(null, new type());
+    if (deferredAssetLoads.has(key)) {
+      const pending = pendingAssetLoads.get(key) || [];
+      pending.push(complete);
+      pendingAssetLoads.set(key, pending);
+      return;
+    }
+    complete();
   }
 }
 
@@ -156,7 +200,7 @@ export const assetManager = {
     return bundles.get(name) || null;
   },
   loadBundle(name: string, callback: (error: Error | null, bundle?: MockBundle) => void): void {
-    const bundle = bundles.get(name) || new MockBundle();
+    const bundle = bundles.get(name) || new MockBundle(name);
     bundles.set(name, bundle);
     callback(null, bundle);
   }

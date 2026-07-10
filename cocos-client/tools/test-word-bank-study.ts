@@ -10,11 +10,27 @@ import {
   normalizeUnlockedBankIds,
   resolveBankSelection
 } from "../assets/scripts/domain/WordBankRules";
-import { ALL_REVIEW_WORD_BANK_UNLOCK_COST, PRIVACY_VERSION, REVIEW_WORD_BANK_UNLOCK_COST, WORD_BANK_UNLOCK_COST } from "../assets/scripts/domain/StorageKeys";
+import { ALL_REVIEW_WORD_BANK_UNLOCK_COST, PRIVACY_VERSION, REVIEW_WORD_BANK_UNLOCK_COST, STORAGE_KEYS, WORD_BANK_UNLOCK_COST } from "../assets/scripts/domain/StorageKeys";
 import { PrivacyService } from "../assets/scripts/services/PrivacyService";
 import { StorageService } from "../assets/scripts/services/StorageService";
 import { GameStore } from "../assets/scripts/store/GameStore";
 import { WordBankStore } from "../assets/scripts/store/WordBankStore";
+
+class OneShotStorageFailureRuntime extends MemoryRuntimePort {
+  private failCoinsWrite = false;
+
+  failNextCoinsWrite(): void {
+    this.failCoinsWrite = true;
+  }
+
+  override setStorage<T>(key: string, value: T): void {
+    if (key === STORAGE_KEYS.wordCoins && this.failCoinsWrite) {
+      this.failCoinsWrite = false;
+      throw new Error("simulated second-key write failure");
+    }
+    super.setStorage(key, value);
+  }
+}
 
 function testCatalogAndUnlockRules(): void {
   assert.equal(getDefaultBankId(WORD_BANK_DATA), "jilin-g1a-b1-welcome");
@@ -122,17 +138,44 @@ async function testWordBankProgressPersistence(): Promise<void> {
   );
 }
 
+function testWordBankProgressWriteCompensation(): void {
+  const previousBanks = ["jilin-g1a-b1-welcome"];
+  const runtime = new OneShotStorageFailureRuntime({
+    storage: {
+      privacyAcceptedVersion: PRIVACY_VERSION,
+      wordCoins: 50,
+      unlockedWordBanks: previousBanks
+    }
+  });
+  const storage = new StorageService(runtime);
+  const privacy = new PrivacyService(storage, runtime);
+  storage.configurePrivacyGate(() => privacy.hasAcceptedCurrentVersion());
+  runtime.failNextCoinsWrite();
+
+  assert.throws(
+    () => storage.writeWordBankProgress(40, ["jilin-g1a-b1-u1", ...previousBanks]),
+    /simulated second-key write failure/
+  );
+  assert.equal(runtime.getStorage("wordCoins"), 50, "failed unlock must restore the previous coin value");
+  assert.deepEqual(
+    runtime.getStorage("unlockedWordBanks"),
+    previousBanks,
+    "failed unlock must restore the previous bank list"
+  );
+}
+
 function main(): void {
   testCatalogAndUnlockRules();
   testWordBankStoreSelection();
   testStudyRevealFlow();
   testBankReturnRoute();
+  testWordBankProgressWriteCompensation();
 }
 
 async function run(): Promise<void> {
   main();
   await testWordBankProgressPersistence();
-  console.log("Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, picker return route, and unlock persistence.");
+  console.log("Stage 3 core OK: word bank catalog, atomic unlock persistence, study reveal flow, and picker return route.");
 }
 
 void run();

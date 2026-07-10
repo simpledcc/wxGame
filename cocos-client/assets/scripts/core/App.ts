@@ -11,6 +11,7 @@ import { RoomSessionService } from "../services/RoomSessionService";
 import { ShareService } from "../services/ShareService";
 import { AudioService } from "../services/AudioService";
 import { LifecycleService } from "../services/LifecycleService";
+import { PerformanceService } from "../services/PerformanceService";
 import { FishingMatchService } from "../services/FishingMatchService";
 import { CoopSpellService } from "../services/CoopSpellService";
 import { GameStore } from "../store/GameStore";
@@ -25,6 +26,7 @@ import { CoopSpellStore } from "../store/CoopSpellStore";
 import { SceneRouter } from "./SceneRouter";
 import { Logger } from "./Logger";
 import { WORD_BANK_DATA } from "../data/WordBankData.generated";
+import { SPELL_TEMPLATE_DATA } from "../data/SpellTemplateData.generated";
 import { getDefaultBankId, getWordBank, getWordBankLabel } from "../domain/WordBankRules";
 import { getRoomGameplayRoute } from "../domain/RoomRules";
 import type { RoomSnapshot } from "../domain/RoomTypes";
@@ -37,6 +39,7 @@ const CLOUD_ENV_ID = "cloud1-d3gre86i51a49821a";
 export class App {
   readonly logger = new Logger("App");
   readonly wordBankCatalog = WORD_BANK_DATA;
+  readonly spellTemplateData = SPELL_TEMPLATE_DATA;
   readonly runtime: RuntimePort;
   readonly store = new GameStore();
   readonly playerStore = new PlayerStore();
@@ -49,6 +52,7 @@ export class App {
   readonly coopSpellStore = new CoopSpellStore();
   readonly router = new SceneRouter(this.store);
   readonly themes: ThemeManager<SpriteFrame>;
+  readonly performance = new PerformanceService();
 
   readonly cloud: CloudService;
   readonly storage: StorageService;
@@ -201,6 +205,7 @@ export class App {
       return;
     }
     if (room.state === "finished") {
+      this.roomPolling.stop();
       this.router.navigate("result");
     }
   }

@@ -9,6 +9,7 @@ import {
 } from "cc";
 import { parseThemeColor } from "../../themes/ThemeCatalog";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
+import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 
 export const DESIGN_WIDTH = 960;
 export const DESIGN_HEIGHT = 640;
@@ -21,6 +22,7 @@ export interface RuntimeButtonRef {
   button: Button;
   label: Label;
   background: Graphics;
+  visual: RuntimeButtonVisual;
 }
 
 export interface RuntimeEditRef {
@@ -99,6 +101,7 @@ export class RuntimeUi {
     label.horizontalAlign = horizontalAlign;
     label.verticalAlign = 1;
     label.enableWrapText = true;
+    label.overflow = Label.Overflow.SHRINK;
     return label;
   }
 
@@ -131,8 +134,21 @@ export class RuntimeUi {
       kind === "plain" || kind === "secondary" ? "textPrimary" : "keyFill"
     );
     const button = node.addComponent(Button);
+    const visual = node.addComponent(RuntimeButtonVisual);
+    visual.configure(
+      button,
+      background,
+      width,
+      height,
+      this.buttonColor(kind),
+      this.buttonPressedColor(kind),
+      this.color("disabled")
+    );
+    node.on(Node.EventType.TOUCH_START, () => visual.setPressed(true), this);
+    node.on(Node.EventType.TOUCH_END, () => visual.setPressed(false), this);
+    node.on(Node.EventType.TOUCH_CANCEL, () => visual.setPressed(false), this);
     node.on(Button.EventType.CLICK, handler, this);
-    return { node, button, label, background };
+    return { node, button, label, background, visual };
   }
 
   edit(
@@ -192,6 +208,12 @@ export class RuntimeUi {
   color(token: ThemeColorToken): Color {
     const [r, g, b, a] = parseThemeColor(this.theme.colors[token]);
     return new Color(r, g, b, a);
+  }
+
+  private buttonPressedColor(kind: RuntimeButtonKind): Color {
+    if (kind === "plain") return this.color("panelBorder");
+    if (kind === "danger") return this.color("error");
+    return this.color("primaryPressed");
   }
 
   private buttonColor(kind: RuntimeButtonKind): Color {

@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const {
   MAIN_PACKAGE_LIMIT_BYTES,
+  REQUIRED_ASSET_BUNDLES,
+  SUBPACKAGE_TOTAL_LIMIT_BYTES,
   assertSafeBuildRoot,
   loadBuildContract,
   readJson
@@ -86,6 +88,39 @@ function classifyFiles(files, definitions) {
   return { main, subpackages: [...subpackages.values()] };
 }
 
+function inspectAssetBundles(files, definitions, requiredNames = REQUIRED_ASSET_BUNDLES) {
+  return requiredNames.map((name) => {
+    const locations = [`assets/${name}`, `subpackages/${name}`];
+    const populated = locations
+      .map((root) => ({
+        root,
+        files: files.filter((file) => file.path.startsWith(`${root}/`))
+      }))
+      .filter((entry) => entry.files.length > 0);
+    if (!populated.length) {
+      throw new Error(`Missing required Asset Bundle in generated build: ${name}`);
+    }
+    if (populated.length > 1) {
+      throw new Error(`Asset Bundle appears in multiple generated locations: ${name}`);
+    }
+    const bundle = populated[0];
+    if (!bundle.files.some((file) => /\/config(?:\.[^/]+)?\.json$/.test(file.path))) {
+      throw new Error(`Asset Bundle is missing its generated config JSON: ${name}`);
+    }
+    const packageDefinition = definitions.find((item) => item.root === bundle.root);
+    if (bundle.root.startsWith("subpackages/") && !packageDefinition) {
+      throw new Error(`Asset Bundle subpackage is not declared in game.json: ${name}`);
+    }
+    return {
+      bytes: bundle.files.reduce((total, file) => total + file.bytes, 0),
+      fileCount: bundle.files.length,
+      name,
+      packageType: packageDefinition ? "subpackage" : "main",
+      root: bundle.root
+    };
+  });
+}
+
 function inspectWechatBuild(buildRoot, options = {}) {
   const projectRoot = options.projectRoot || path.resolve(__dirname, "..");
   if (!options.allowExternalBuildRoot) {
@@ -134,19 +169,31 @@ function inspectWechatBuild(buildRoot, options = {}) {
 
   const definitions = packageDefinitions(gameConfig);
   const packages = classifyFiles(files, definitions);
-  const limit = options.mainPackageLimitBytes || MAIN_PACKAGE_LIMIT_BYTES;
-  if (packages.main.bytes > limit) {
-    throw new Error(`Main package is ${packages.main.bytes} bytes; limit is ${limit} bytes.`);
+  const emptySubpackages = packages.subpackages.filter((item) => item.fileCount === 0);
+  if (emptySubpackages.length) {
+    throw new Error(`Declared subpackage has no generated files: ${emptySubpackages.map((item) => item.root).join(", ")}`);
   }
+  const mainLimit = options.mainPackageLimitBytes || MAIN_PACKAGE_LIMIT_BYTES;
+  if (packages.main.bytes > mainLimit) {
+    throw new Error(`Main package is ${packages.main.bytes} bytes; limit is ${mainLimit} bytes.`);
+  }
+  const subpackageBytes = packages.subpackages.reduce((total, item) => total + item.bytes, 0);
+  const subpackageLimit = options.subpackageTotalLimitBytes || SUBPACKAGE_TOTAL_LIMIT_BYTES;
+  if (subpackageBytes > subpackageLimit) {
+    throw new Error(`Subpackages total is ${subpackageBytes} bytes; limit is ${subpackageLimit} bytes.`);
+  }
+  const assetBundles = inspectAssetBundles(files, definitions, options.requiredAssetBundles);
 
   return {
     appid: projectConfig.appid,
+    assetBundles,
     buildRoot: path.resolve(buildRoot),
     checkedAt: new Date().toISOString(),
     fileCount: files.length,
-    mainPackage: { ...packages.main, limitBytes: limit },
+    mainPackage: { ...packages.main, limitBytes: mainLimit },
     orientation,
     subpackages: packages.subpackages,
+    subpackageTotal: { bytes: subpackageBytes, limitBytes: subpackageLimit },
     totalBytes: files.reduce((total, file) => total + file.bytes, 0)
   };
 }
@@ -159,8 +206,12 @@ function printReport(report) {
   console.log(`WeChat build OK: ${report.buildRoot}`);
   console.log(`Files: ${report.fileCount}; total: ${formatBytes(report.totalBytes)}`);
   console.log(`Main package: ${formatBytes(report.mainPackage.bytes)} / ${formatBytes(report.mainPackage.limitBytes)}`);
+  console.log(`Subpackages total: ${formatBytes(report.subpackageTotal.bytes)} / ${formatBytes(report.subpackageTotal.limitBytes)}`);
   for (const item of report.subpackages) {
     console.log(`Subpackage ${item.name} (${item.root}): ${formatBytes(item.bytes)}`);
+  }
+  for (const bundle of report.assetBundles) {
+    console.log(`Asset Bundle ${bundle.name}: ${bundle.root} (${bundle.packageType}, ${formatBytes(bundle.bytes)})`);
   }
 }
 
@@ -190,6 +241,7 @@ if (require.main === module) {
 
 module.exports = {
   classifyFiles,
+  inspectAssetBundles,
   inspectWechatBuild,
   normalizePackageRoot,
   packageDefinitions,

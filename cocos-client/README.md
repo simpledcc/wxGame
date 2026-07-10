@@ -15,20 +15,23 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Runtime adapter boundary for WeChat APIs.
 - Typed cloud function contracts from `../COCOS_MIGRATION_PHASE0_BASELINE.md`.
 - Typed local storage keys from the Phase 0 baseline.
-- Privacy gate before cloud and personal local storage access.
+- UI-layer privacy contract/accept/decline gate before cloud and personal local storage access, plus a persistent Home contract entry.
+- Fixed `系统玩家：玩家` identity display without custom nickname input.
 - Cloud, storage, share, and logging service wrappers.
 - Legacy storage snapshot hydration for coins, unlocked banks, history, best scores, wrong words, and muted state.
 - Generated word bank data from the legacy WeChat client.
+- Lossless compact data for all 44 legacy spell banks and 6,351 prebuilt templates, with source-hash and field-level drift checks.
 - Word bank unlock and selection rules.
 - Study session rules for hidden Chinese, current-word reveal, and next/previous word.
 - Read-only room document access compatible with the production database rules.
 - Normalized room state, room action rules, and a single authoritative `RoomStore`.
-- Create, join, ready, robot, start, copy, invite, resume, and leave flows.
+- Create, join, ready, low/medium/high PK robot selection, start, copy, invite, resume, and leave flows.
 - Non-overlapping room polling at the legacy 1000 ms / 600 ms cadence.
 - Deferred launch/show invitation handling after privacy-approved boot, with no startup `getOpenId` request.
 - Cold invitations load the persistent Home scene while preserving the invited room route.
 - Background polling pause and foreground room refresh through the runtime lifecycle boundary.
 - Accepted room joins survive an initial snapshot-read failure and expose an automatic-retry state.
+- Room cloud commands and back navigation share one pending lock with theme-visible disabled states.
 - `CoopSelectScene` and `RoomScene` controller scripts ready for Cocos node binding.
 - Optimistic PK target input with authoritative cloud correction.
 - PK score, combo, stun, power-up, bot, and timeout settlement rules.
@@ -38,12 +41,16 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Shared co-op bot/power-up restrictions and `CoopSharedScene` controller foundation.
 - `coopShared` settlement/history under the fixed name `默契捕词赛`.
 - Question-scoped spell drafts and optimistic submit/wait behavior with late-response isolation.
+- Selected-bank `roomSpellQuestions` in spell-room creation, capped at 240 and reconstructed without runtime random blank generation.
 - Local 20-second question and selected-duration total countdown anchors with server-directed timeout retry.
 - `CoopSpellScene`, QWERTY key, local-large/teammate-compact status, and spell-aware result controllers.
 - Three-mode history pagination, best scores, and per-word/per-player spell details.
 - Private feedback and Help controllers with no public nickname input.
-- Human room-name normalization to `玩家1`/`玩家2` and legacy custom-name cleanup.
-- `ThemeManager`, default grass and alternate island bundles, generic bindings, failure fallback, and a hidden development switch.
+- Human room-name normalization to `玩家1`/`玩家2`, non-duplicated player rows, and legacy custom-name cleanup.
+- `ThemeManager`, pre-mount route assets, cached sprite requests, bundle/asset fallback, stale-load rejection, grass/insect and island/fish targets, and a hidden development switch.
+- Runtime buttons consume theme normal/pressed/disabled colors and redraw only when their interaction state changes.
+- Fixed-capacity gameplay feedback labels that float and recycle without per-tap node allocation.
+- Bounded frame/route/node performance instrumentation with a DEV-only JSON report command.
 - Static release checks for scene coverage, compliance copy, platform isolation, upload-root safety, and source budgets.
 - A persistent `Home.scene` runtime shell that constructs all route controls and mounts the existing scene controllers without hand-authored scene JSON.
 
@@ -79,6 +86,12 @@ Regenerate Cocos word bank data after the legacy word bank source changes:
 
 ```bash
 npm run generate:word-banks
+```
+
+The command regenerates both `WordBankData.generated.ts` and the compact `SpellTemplateData.generated.ts` index. Verify exact legacy equivalence with:
+
+```bash
+npm run test:spell-data
 ```
 
 Run Home/Bank/Study core checks:
@@ -132,6 +145,14 @@ npm run test:shell-runtime
 npm run typecheck:shell-runtime
 ```
 
+Run the engine-independent performance instrumentation checks:
+
+```bash
+npm run test:performance
+```
+
+Real-device capture instructions and report fields are documented in `../COCOS_RUNTIME_PERFORMANCE.md`.
+
 Run every engine-independent check:
 
 ```bash
@@ -158,7 +179,7 @@ npm run build:wechat
 npm run inspect:wechat-build
 ```
 
-Set `COCOS_CREATOR_PATH` when Creator is not discoverable through the Cocos Dashboard installation directory or `PATH`. The build writes `build/wechatgame/`, then records main/subpackage sizes in `build/wechatgame-report.json`. See `../COCOS_WECHAT_BUILD_PIPELINE.md` for the fixed contract and external acceptance sequence.
+Set `COCOS_CREATOR_PATH` when Creator is not discoverable through the Cocos Dashboard installation directory or `PATH`. The build writes `build/wechatgame/`, then records main/aggregate/per-subpackage sizes and both required theme Bundle locations in `build/wechatgame-report.json`. Missing theme configs, undeclared/empty subpackages, a main package over 4 MiB, or aggregate subpackages over 30 MiB fail inspection. See `../COCOS_WECHAT_BUILD_PIPELINE.md` for the fixed contract and external acceptance sequence.
 
 If TypeScript is installed:
 

@@ -1,5 +1,6 @@
 export const THEME_IDS = ["default", "island"] as const;
 export type ThemeId = typeof THEME_IDS[number];
+export type ThemeTargetStyle = "insect" | "fish";
 
 export const THEME_ASSET_KEYS = [
   "homeBackground",
@@ -36,7 +37,7 @@ export interface ThemeManifest {
   id: ThemeId;
   label: string;
   bundleName: string;
-  targetStyle: "insect" | "fish";
+  targetStyle: ThemeTargetStyle;
   assets: Record<ThemeAssetKey, string>;
   colors: Record<ThemeColorToken, string>;
   copy: {

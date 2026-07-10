@@ -15,6 +15,9 @@ Implemented and verified:
 - `Logger`
 - WeChat and in-memory runtime adapters needed by these services.
 - Boot-scene privacy gate that keeps users outside the game until consent is recorded.
+- Explicit `暂不进入` handling that removes consent, keeps the user on Boot, and performs no cloud initialization.
+- Runtime-created Boot controls pinned to the Cocos `UI_2D` layer so the privacy gate is visible to the Canvas camera.
+- A permanent Home privacy-contract entry after consent, without reintroducing nickname or other UGC input.
 - Local platform-service tests for privacy, storage, cloud failure handling, log redaction, and sharing fallback.
 
 ## 2. Privacy Gate
@@ -27,12 +30,16 @@ Behavior:
 - Boot shows a privacy gate first when the current privacy version has not been accepted.
 - The privacy contract button calls the WeChat native privacy contract API when available.
 - If native privacy contract viewing is unavailable, Boot keeps the user on the consent screen and shows a clear toast.
+- Declining leaves the privacy gate active with a clear status; the user may still read the contract and decide again.
+- Home displays the fixed system identity and keeps the privacy contract reachable after entering the game.
 
 Acceptance covered:
 
 - No cloud init before consent.
 - No local personal storage read before consent.
 - User can open the privacy contract entry before accepting.
+- User can explicitly decline without cloud initialization or route advancement.
+- Accepting after a decline initializes cloud once and enters Home.
 - Consent persists through the legacy `privacyAcceptedVersion` key.
 
 ## 3. Storage Compatibility
@@ -125,6 +132,8 @@ Expected platform test output:
 ```text
 Platform services OK: privacy, storage, cloud, logging, and sharing.
 ```
+
+Current hardening also classifies missing cloud functions, invalid cloud environments, permission failures, network failures, and timeouts into bounded public messages. Cloud initialization wraps raw platform failures in `CloudCallError`, and Boot displays only that sanitized diagnostic; server payloads and environment internals are not exposed. Platform tests inject the missing-function, invalid-environment, permission, and timeout paths.
 
 ## 8. Not Migrated In This Phase
 

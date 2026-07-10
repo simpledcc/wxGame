@@ -42,6 +42,7 @@ export class ResultScene extends Component {
   }
 
   openHistory(): void {
+    app.roomSession.leave();
     app.router.navigate("history");
   }
 

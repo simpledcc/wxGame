@@ -1,10 +1,13 @@
-import { Button, Label, Node } from "cc";
+import { Button, Graphics, Label, Node } from "cc";
 import { DEV } from "cc/env";
 import { HistoryRecordItem } from "../history/HistoryRecordItem";
+import { GameplayFeedbackPool } from "../pk/GameplayFeedbackPool";
 import { PkWordTarget } from "../pk/PkWordTarget";
+import { ThemedWordTargetVisual } from "../pk/ThemedWordTargetVisual";
 import { SpellLetterKey } from "../spell/SpellLetterKey";
 import { app } from "../../core/App";
 import type { GameDuration } from "../../domain/GameTypes";
+import { ROOM_CODE_LENGTH } from "../../domain/RoomRules";
 import { getWordBank, getWordBankLabel } from "../../domain/WordBankRules";
 import { BankScene } from "../../scenes/BankScene";
 import { CoopSelectScene } from "../../scenes/CoopSelectScene";
@@ -94,7 +97,10 @@ export class RuntimeScreenFactory {
     ui.button(root, "BankButton", "换词库", 210, -45, 330, 58, () => controller.openBankPicker(), "plain");
     ui.button(root, "HistoryButton", "战绩记录", -210, -120, 330, 58, () => controller.openHistory(), "plain");
     ui.button(root, "HelpButton", "玩法说明", 210, -120, 330, 58, () => controller.openHelp(), "plain");
-    ui.button(root, "FeedbackButton", "问题反馈", 0, -195, 330, 54, () => controller.openFeedback(), "plain");
+    ui.button(root, "FeedbackButton", "问题反馈", -170, -195, 300, 54, () => controller.openFeedback(), "plain");
+    ui.button(root, "HomePrivacy", "隐私保护指引", 170, -195, 300, 54, () => {
+      void controller.openPrivacyContract();
+    }, "plain", 18);
 
     if (DEV) {
       ui.label(root, "ThemeDevTitle", "DEV THEME", -320, -262, 120, 30, 14, "textMuted");
@@ -104,6 +110,9 @@ export class RuntimeScreenFactory {
       ui.button(root, "IslandTheme", "海岛", -110, -262, 92, 34, () => {
         void app.themes.select("island");
       }, "plain", 15);
+      ui.button(root, "PerformanceReport", "性能报告", 20, -262, 130, 34, () => {
+        void controller.copyPerformanceReport();
+      }, "plain", 14);
     }
 
     controller = root.addComponent(HomeScene);
@@ -227,34 +236,50 @@ export class RuntimeScreenFactory {
     const root = ui.root(parent, "RoomRuntimeScreen");
     ui.title(root, "双人房间");
     let controller!: RoomScene;
-    ui.backButton(root, () => controller.backHome());
+    const back = ui.backButton(root, () => controller.backHome());
     const mode = ui.label(root, "RoomMode", "", 0, 222, 700, 40, 23);
     const roomCode = ui.label(root, "RoomCode", "------", 0, 178, 360, 44, 30, "secondary");
     const players = ui.label(root, "RoomPlayers", "", 0, 92, 700, 102, 21, "textPrimary");
     const status = ui.label(root, "RoomStatus", "", 0, 17, 760, 54, 19, "textMuted");
-    const input = ui.edit(root, "RoomCodeInput", "输入 6 位房间码", -190, -55, 360, 52, 8);
-    ui.button(root, "CreateRoom", "创建房间", 240, -55, 210, 52, () => {
+    const input = ui.edit(
+      root,
+      "RoomCodeInput",
+      `输入 ${ROOM_CODE_LENGTH} 位房间码`,
+      -190,
+      -55,
+      360,
+      52,
+      ROOM_CODE_LENGTH
+    );
+    const create = ui.button(root, "CreateRoom", "创建房间", 240, -55, 210, 52, () => {
       void controller.createSelectedRoom();
     });
-    ui.button(root, "JoinRoom", "加入", 390, -55, 90, 52, () => {
+    const join = ui.button(root, "JoinRoom", "加入", 390, -55, 90, 52, () => {
       void controller.joinEnteredRoom();
     }, "secondary", 18);
-    const ready = ui.button(root, "Ready", "准备 / 取消", -285, -128, 190, 50, () => {
+    ui.label(root, "BotDifficultyTitle", "机器人难度", 0, -93, 180, 20, 14, "textMuted");
+    const ready = ui.button(root, "Ready", "准备 / 取消", -305, -128, 170, 50, () => {
       void controller.toggleReady();
     });
-    const bot = ui.button(root, "AddBot", "机器人", -70, -128, 170, 50, () => {
-      void controller.addDefaultBot();
-    }, "plain", 18);
-    const start = ui.button(root, "StartRoom", "开始游戏", 170, -128, 220, 50, () => {
+    const botLow = ui.button(root, "BotLow", "低", -105, -128, 90, 50, () => {
+      void controller.addLowBot();
+    }, "plain", 17);
+    const botMedium = ui.button(root, "BotMedium", "中", 0, -128, 90, 50, () => {
+      void controller.addMediumBot();
+    }, "plain", 17);
+    const botHigh = ui.button(root, "BotHigh", "高", 105, -128, 90, 50, () => {
+      void controller.addHighBot();
+    }, "plain", 17);
+    const start = ui.button(root, "StartRoom", "开始游戏", 305, -128, 170, 50, () => {
       void controller.startGame();
     }, "secondary");
-    ui.button(root, "CopyCode", "复制房间码", -210, -200, 220, 46, () => {
+    const copy = ui.button(root, "CopyCode", "复制房间码", -210, -200, 220, 46, () => {
       void controller.copyRoomCode();
     }, "plain", 17);
-    ui.button(root, "InviteFriend", "邀请好友", 35, -200, 190, 46, () => {
+    const invite = ui.button(root, "InviteFriend", "邀请好友", 35, -200, 190, 46, () => {
       void controller.inviteFriend();
     }, "plain", 17);
-    ui.button(root, "RefreshRoom", "刷新", 240, -200, 120, 46, () => {
+    const refresh = ui.button(root, "RefreshRoom", "刷新", 240, -200, 120, 46, () => {
       void controller.refreshRoom();
     }, "plain", 17);
     controller = root.addComponent(RoomScene);
@@ -263,8 +288,16 @@ export class RuntimeScreenFactory {
     controller.modeLabel = mode;
     controller.playersLabel = players;
     controller.statusLabel = status;
+    controller.createButton = create.button;
+    controller.joinButton = join.button;
+    controller.copyButton = copy.button;
+    controller.inviteButton = invite.button;
+    controller.refreshButton = refresh.button;
+    controller.backButton = back.button;
     controller.readyButton = ready.button;
-    controller.addBotButton = bot.button;
+    controller.addBotButton = botMedium.button;
+    controller.botDifficultyButtons = [botLow.button, botMedium.button, botHigh.button];
+    controller.botDifficultyLabels = [botLow.label, botMedium.label, botHigh.label];
     controller.startButton = start.button;
     return root;
   }
@@ -278,6 +311,7 @@ export class RuntimeScreenFactory {
     const combo = ui.label(root, "PkCombo", "", 0, 166, 220, 34, 19, "secondary");
     const status = ui.label(root, "PkStatus", "", 0, -220, 700, 40, 18, "textMuted");
     const targets = this.createWordTargets(root, ui, 125);
+    const feedbackPool = this.createGameplayFeedbackPool(root, ui);
     let controller!: PkGameScene;
     const power = ui.button(root, "PowerUp", "使用道具", 255, -272, 200, 46, () => {
       void controller.useFirstPowerUp();
@@ -292,6 +326,7 @@ export class RuntimeScreenFactory {
     controller.statusLabel = status;
     controller.powerUpButton = power.button;
     controller.wordTargets = targets;
+    controller.feedbackPool = feedbackPool;
     return root;
   }
 
@@ -303,6 +338,7 @@ export class RuntimeScreenFactory {
     const timer = ui.label(root, "SharedTimer", "", 340, 205, 120, 40, 24, "warning");
     const status = ui.label(root, "SharedStatus", "", 0, -220, 720, 40, 18, "textMuted");
     const targets = this.createWordTargets(root, ui, 125);
+    const feedbackPool = this.createGameplayFeedbackPool(root, ui);
     let controller!: CoopSharedScene;
     ui.button(root, "LeaveShared", "←", -420, -272, 62, 46, () => controller.backHome(), "plain", 28);
     controller = root.addComponent(CoopSharedScene);
@@ -312,6 +348,7 @@ export class RuntimeScreenFactory {
     controller.timerLabel = timer;
     controller.statusLabel = status;
     controller.wordTargets = targets;
+    controller.feedbackPool = feedbackPool;
     return root;
   }
 
@@ -518,17 +555,18 @@ export class RuntimeScreenFactory {
   private createWordTargets(parent: Node, ui: RuntimeUi, firstY: number): PkWordTarget[] {
     const targets: PkWordTarget[] = [];
     for (let index = 0; index < 6; index += 1) {
-      const node = ui.panel(
+      const node = ui.node(
         parent,
         `WordTarget${index}`,
         index % 2 === 0 ? -240 : 240,
         firstY - Math.floor(index / 2) * 82,
         260,
-        58,
-        "targetFill",
-        "targetStroke",
-        8
+        58
       );
+      const graphics = node.addComponent(Graphics);
+      const visual = node.addComponent(ThemedWordTargetVisual);
+      visual.graphics = graphics;
+      visual.configure(ui.theme.targetStyle, ui.color("targetFill"), ui.color("targetStroke"));
       const label = ui.label(node, "Word", "", 0, 0, 238, 48, 21, "targetText");
       const button = node.addComponent(Button);
       let target!: PkWordTarget;
@@ -541,5 +579,18 @@ export class RuntimeScreenFactory {
       targets.push(target);
     }
     return targets;
+  }
+
+  private createGameplayFeedbackPool(parent: Node, ui: RuntimeUi): GameplayFeedbackPool {
+    const host = ui.node(parent, "GameplayFeedback", 0, -92, 460, 70);
+    const labels = Array.from({ length: 3 }, (_, index) => {
+      const label = ui.label(host, `Feedback${index}`, "", 0, 0, 440, 54, 31, "success");
+      label.node.active = false;
+      return label;
+    });
+    const pool = host.addComponent(GameplayFeedbackPool);
+    pool.labels = labels;
+    pool.configure(ui.color("success"), ui.color("error"), ui.color("warning"));
+    return pool;
   }
 }

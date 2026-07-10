@@ -1,8 +1,10 @@
 import { _decorator, Component, Label } from "cc";
+import { GameplayFeedbackPool } from "../components/pk/GameplayFeedbackPool";
 import { PkWordTarget } from "../components/pk/PkWordTarget";
 import { app } from "../core/App";
 import { getFishingTeamScore } from "../domain/FishingRules";
 import { getLocalRoomPlayer } from "../domain/RoomRules";
+import { FishingMatchError } from "../services/FishingMatchService";
 import type { FishingState } from "../store/FishingStore";
 
 const { ccclass, property } = _decorator;
@@ -26,6 +28,9 @@ export class CoopSharedScene extends Component {
 
   @property([PkWordTarget])
   wordTargets: PkWordTarget[] = [];
+
+  @property(GameplayFeedbackPool)
+  feedbackPool: GameplayFeedbackPool | null = null;
 
   private unsubscribeRoom: (() => void) | null = null;
   private unsubscribeFishing: (() => void) | null = null;
@@ -60,6 +65,7 @@ export class CoopSharedScene extends Component {
 
   private tapFish(fishId: string): void {
     void app.fishingMatch.catchFish(fishId).catch((error: unknown) => {
+      if (error instanceof FishingMatchError && error.silent) return;
       app.runtime.showToast(error instanceof Error ? error.message : "操作失败");
     });
   }
@@ -67,6 +73,7 @@ export class CoopSharedScene extends Component {
   private render(): void {
     const room = app.roomStore.getRoom();
     const fishing = app.fishingStore.getState();
+    this.feedbackPool?.show(fishing.feedback);
     if (!room) {
       this.renderMissingRoom();
       return;

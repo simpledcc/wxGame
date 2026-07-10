@@ -4,6 +4,8 @@ import {
   buildRoomGameOptions,
   getRoomActionAvailability,
   getRoomGameplayRoute,
+  isValidRoomCode,
+  normalizeRoomCode,
   normalizeRoomSnapshot
 } from "../assets/scripts/domain/RoomRules";
 import type { RoomSnapshot } from "../assets/scripts/domain/RoomTypes";
@@ -85,6 +87,10 @@ class ManualScheduler {
 }
 
 async function testRoomSessionFlow(): Promise<void> {
+  assert.equal(normalizeRoomCode(" ab-12cd-extra "), "AB12CDE");
+  assert.equal(isValidRoomCode(" ab-12cd-extra "), false);
+  assert.equal(isValidRoomCode(" ab-12cd "), true);
+  assert.equal(isValidRoomCode("abc"), false);
   const documents: Record<string, RoomSnapshot> = {};
   const initialRoom = createRoom();
   let failCreate = false;
@@ -174,6 +180,10 @@ async function testRoomSessionFlow(): Promise<void> {
 
   await assert.rejects(
     () => session.join("123"),
+    (error: unknown) => error instanceof RoomSessionError && error.code === "INVALID_ROOM_CODE"
+  );
+  await assert.rejects(
+    () => session.join("AB12CD-extra"),
     (error: unknown) => error instanceof RoomSessionError && error.code === "INVALID_ROOM_CODE"
   );
   assert.equal(store.getState().roomId, "room-1");

@@ -9,8 +9,10 @@ import {
   UITransform
 } from "cc";
 import { app } from "../core/App";
+import { CloudCallError } from "../services/CloudService";
 
 const { ccclass, property } = _decorator;
+const UI_LAYER = 1 << 25;
 
 @ccclass("BootScene")
 export class BootScene extends Component {
@@ -21,6 +23,7 @@ export class BootScene extends Component {
   private gateStatus: Label | null = null;
   private acceptButton: Button | null = null;
   private contractButton: Button | null = null;
+  private declineButton: Button | null = null;
   private entering = false;
 
   async start(): Promise<void> {
@@ -38,13 +41,14 @@ export class BootScene extends Component {
     }
 
     const gate = new Node("PrivacyGate");
+    gate.layer = UI_LAYER;
     this.node.addChild(gate);
     gate.setPosition(0, 0);
     gate.addComponent(UITransform).setContentSize(960, 640);
 
     const panel = gate.addComponent(Graphics);
     panel.fillColor = new Color(24, 32, 43, 245);
-    panel.roundRect(-420, -260, 840, 520, 16);
+    panel.roundRect(-430, -295, 860, 590, 16);
     panel.fill();
 
     this.createText(
@@ -52,25 +56,25 @@ export class BootScene extends Component {
       "PrivacyTitle",
       "隐私保护提示",
       38,
-      165,
+      195,
       720,
       58
     );
     this.createText(
       gate,
       "PrivacyBody",
-      `开始游戏前，请阅读${app.privacy.contractName}\n同意后才会初始化云服务并读取本地游戏记录\n不同意时将停留在当前页面`,
-      24,
-      55,
+      `为提供房间对战、成绩记录和问题反馈功能，游戏会处理微信用户标识、系统玩家名、游戏记录，以及你提交的反馈内容和可选联系方式。\n请阅读${app.privacy.contractName}，同意后才会初始化云服务并读取本地游戏记录。`,
+      22,
+      75,
       720,
-      130
+      170
     );
 
     this.contractButton = this.createButton(
       gate,
       "ContractButton",
       "查看隐私保护指引",
-      -90,
+      -55,
       new Color(55, 71, 90, 255),
       () => {
         void this.openContract();
@@ -80,20 +84,28 @@ export class BootScene extends Component {
       gate,
       "AcceptButton",
       "同意并进入",
-      -170,
+      -130,
       new Color(36, 160, 110, 255),
       () => {
         void this.acceptAndEnter();
       }
+    );
+    this.declineButton = this.createButton(
+      gate,
+      "DeclineButton",
+      "暂不进入",
+      -205,
+      new Color(55, 71, 90, 255),
+      () => this.declineAndStay()
     );
     this.gateStatus = this.createText(
       gate,
       "PrivacyStatus",
       "同意前不会调用云能力",
       20,
-      -230,
+      -266,
       720,
-      40,
+      36,
       new Color(190, 205, 220, 255)
     );
     this.gateRoot = gate;
@@ -120,6 +132,15 @@ export class BootScene extends Component {
     await this.enterHome();
   }
 
+  private declineAndStay(): void {
+    app.privacy.declineCurrentVersion();
+    this.setStatus("等待隐私授权");
+    if (this.gateStatus) {
+      this.gateStatus.string = "你已选择暂不进入，可查看指引后重新决定";
+    }
+    this.setControlsEnabled(true);
+  }
+
   private async enterHome(): Promise<void> {
     if (this.entering) {
       return;
@@ -139,10 +160,12 @@ export class BootScene extends Component {
       const joinedInvite = await app.lifecycle.activate();
       const targetRoute = joinedInvite ? app.store.getState().route : "home";
       app.router.enterRuntimeShell(targetRoute);
-    } catch {
+    } catch (error) {
       this.showPrivacyGate();
       if (this.gateStatus) {
-        this.gateStatus.string = "初始化失败，请检查网络后重试";
+        this.gateStatus.string = error instanceof CloudCallError
+          ? error.message
+          : "初始化失败，请检查网络后重试";
       }
       this.setStatus("初始化失败");
       this.setControlsEnabled(true);
@@ -162,6 +185,7 @@ export class BootScene extends Component {
     color = new Color(255, 255, 255, 255)
   ): Label {
     const node = new Node(name);
+    node.layer = UI_LAYER;
     parent.addChild(node);
     node.setPosition(0, y);
     node.addComponent(UITransform).setContentSize(width, height);
@@ -173,6 +197,7 @@ export class BootScene extends Component {
     label.horizontalAlign = 1;
     label.verticalAlign = 1;
     label.enableWrapText = true;
+    label.overflow = Label.Overflow.SHRINK;
     return label;
   }
 
@@ -185,6 +210,7 @@ export class BootScene extends Component {
     handler: () => void
   ): Button {
     const node = new Node(name);
+    node.layer = UI_LAYER;
     parent.addChild(node);
     node.setPosition(0, y);
     node.addComponent(UITransform).setContentSize(420, 62);
@@ -204,6 +230,9 @@ export class BootScene extends Component {
     }
     if (this.contractButton) {
       this.contractButton.interactable = enabled;
+    }
+    if (this.declineButton) {
+      this.declineButton.interactable = enabled;
     }
   }
 

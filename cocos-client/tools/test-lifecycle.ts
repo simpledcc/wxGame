@@ -98,6 +98,11 @@ async function testLifecycleCoordinator(): Promise<void> {
   await flushAsyncHandlers();
   assert.equal(runtime.toastMessages.at(-1), "邀请房间码无效");
 
+  runtime.emitAppShow({ query: { roomCode: "ab12cd-extra" } });
+  await flushAsyncHandlers();
+  assert.deepEqual(roomSession.joins, ["AB12CD"], "overlong invitation codes must not be truncated");
+  assert.equal(runtime.toastMessages.at(-1), "邀请房间码无效");
+
   roomSession.failCode = "NO12PE";
   runtime.emitAppShow({ query: { roomCode: "no12pe" } });
   await flushAsyncHandlers();

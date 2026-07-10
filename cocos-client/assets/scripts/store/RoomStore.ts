@@ -27,6 +27,7 @@ interface RoomStoreEvents {
 
 export class RoomStore {
   private readonly events = new EventBus<RoomStoreEvents>();
+  private sessionVersion = 0;
   private state: RoomSessionState = {
     roomId: "",
     roomCode: "",
@@ -50,11 +51,16 @@ export class RoomStore {
     return this.getState().room;
   }
 
+  getSessionVersion(): number {
+    return this.sessionVersion;
+  }
+
   subscribe(handler: (state: RoomSessionState) => void): () => void {
     return this.events.on("changed", handler);
   }
 
   enter(roomId: string, roomCode: string, room: RoomSnapshot | null = null): void {
+    this.sessionVersion += 1;
     const normalizedRoom = room
       ? normalizeRoomSnapshot(room, roomId, roomCode)
       : null;
@@ -100,6 +106,7 @@ export class RoomStore {
   }
 
   leave(): void {
+    this.sessionVersion += 1;
     this.state = {
       roomId: "",
       roomCode: "",

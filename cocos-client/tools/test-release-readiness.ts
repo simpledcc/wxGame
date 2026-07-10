@@ -10,6 +10,12 @@ import {
 
 const root = path.resolve(__dirname, "..");
 const repositoryRoot = path.resolve(root, "..");
+const creatorImportMetaAllowlist = new Set([
+  "assets/bundles/theme_default/theme.json",
+  "assets/bundles/theme_default/textures/gameplay-bg.jpg",
+  "assets/bundles/theme_island/theme.json",
+  "assets/bundles/theme_island/textures/gameplay-bg.jpg"
+]);
 
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -26,6 +32,46 @@ function listFiles(directory: string, extensions: Set<string>): string[] {
   };
   visit(directory);
   return result;
+}
+
+function listDirectories(directory: string): string[] {
+  const result: string[] = [];
+  const visit = (current: string): void => {
+    fs.readdirSync(current, { withFileTypes: true }).forEach((entry) => {
+      if (!entry.isDirectory()) return;
+      const fullPath = path.join(current, entry.name);
+      result.push(fullPath);
+      visit(fullPath);
+    });
+  };
+  visit(directory);
+  return result;
+}
+
+function relativeAssetPath(filePath: string): string {
+  return path.relative(root, filePath).replace(/\\/g, "/");
+}
+
+function collectUuids(value: unknown, output: string[]): void {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectUuids(item, output));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  const source = value as Record<string, unknown>;
+  if (typeof source.uuid === "string" && source.uuid) output.push(source.uuid);
+  Object.values(source).forEach((item) => collectUuids(item, output));
+}
+
+function collectSceneReferences(value: unknown, output: number[]): void {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectSceneReferences(item, output));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  const source = value as Record<string, unknown>;
+  if (Number.isInteger(source.__id__)) output.push(Number(source.__id__));
+  Object.values(source).forEach((item) => collectSceneReferences(item, output));
 }
 
 function testFeedbackRules(): void {
@@ -59,12 +105,32 @@ function testSceneCoverage(): void {
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${name} meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
-  ["openStudy", "openPkRoom", "openCoopSelect", "openBankPicker", "openHistory", "openFeedback", "openHelp"]
+  ["openStudy", "openPkRoom", "openCoopSelect", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract"]
     .forEach((handler) => assert.match(home, new RegExp(`\\b${handler}\\b`)));
   assert.doesNotMatch(home, /EditBox|playerName|nickNameInput/);
+  assert.match(home, /系统玩家/);
+  const boot = read("assets/scripts/scenes/BootScene.ts");
+  assert.match(boot, /暂不进入/);
+  assert.match(boot, /declineCurrentVersion/);
+  assert.match(boot, /UI_LAYER/);
   const room = read("assets/scripts/scenes/RoomScene.ts");
   assert.match(room, /roomCodeInput/);
+  assert.match(room, /addLowBot/);
+  assert.match(room, /addMediumBot/);
+  assert.match(room, /addHighBot/);
+  assert.match(room, /botDifficultyButtons/);
+  assert.match(room, /setSessionControls/);
+  assert.match(room, /getSpellTemplatesForBank/);
+  assert.match(room, /roomSpellQuestions/);
+  assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
+  const shell = read("assets/scripts/components/HomePlaceholder.ts");
+  assert.match(shell, /themes\.preloadAssets/);
+  assert.match(shell, /RouteLoading/);
+  assert.match(shell, /addComponent\(BlockInputEvents\)/);
+  const themeManager = read("assets/scripts/themes/ThemeManager.ts");
+  assert.match(themeManager, /preloadAssets/);
+  assert.match(themeManager, /资源加载失败，已回退草地主题/);
 }
 
 function testComplianceSurface(): void {
@@ -116,6 +182,56 @@ function testPlatformBoundariesAndUploadRoot(): void {
   assert.match(lifecycleSource, /roomSession\.join\(roomCode\)/);
 }
 
+function testAssetMetadataAndSceneReferences(): void {
+  const assetsRoot = path.join(root, "assets");
+  const metaFiles = listFiles(assetsRoot, new Set([".meta"]));
+  assert.ok(metaFiles.length >= 103, "committed Cocos asset metadata unexpectedly disappeared");
+  const uuidOwners = new Map<string, string>();
+  metaFiles.forEach((metaPath) => {
+    const parsed = JSON.parse(fs.readFileSync(metaPath, "utf8")) as unknown;
+    const uuids: string[] = [];
+    collectUuids(parsed, uuids);
+    assert.ok(uuids.length > 0, `${relativeAssetPath(metaPath)} has no UUID`);
+    uuids.forEach((uuid) => {
+      assert.equal(uuidOwners.has(uuid), false, `duplicate Cocos UUID ${uuid} in ${relativeAssetPath(metaPath)}`);
+      uuidOwners.set(uuid, relativeAssetPath(metaPath));
+    });
+  });
+
+  listDirectories(assetsRoot).forEach((directory) => {
+    assert.equal(fs.existsSync(`${directory}.meta`), true, `${relativeAssetPath(directory)} has no directory meta`);
+  });
+
+  const sourceFiles = listFiles(assetsRoot, new Set([
+    ".ts", ".json", ".scene", ".jpg", ".png", ".wav", ".md"
+  ]));
+  sourceFiles.forEach((sourcePath) => {
+    if (fs.existsSync(`${sourcePath}.meta`)) return;
+    const relativePath = relativeAssetPath(sourcePath);
+    assert.equal(
+      creatorImportMetaAllowlist.has(relativePath),
+      true,
+      `${relativePath} is missing Cocos importer metadata`
+    );
+  });
+  creatorImportMetaAllowlist.forEach((relativePath) => {
+    assert.equal(fs.existsSync(path.join(root, relativePath)), true, `${relativePath} allowlist entry is stale`);
+  });
+
+  ["Boot", "Home"].forEach((sceneName) => {
+    const items = JSON.parse(read(`assets/scenes/${sceneName}.scene`)) as unknown[];
+    assert.ok(Array.isArray(items) && items.length > 0, `${sceneName}.scene must contain serialized objects`);
+    const references: number[] = [];
+    collectSceneReferences(items, references);
+    references.forEach((reference) => {
+      assert.ok(
+        reference >= 0 && reference < items.length,
+        `${sceneName}.scene has out-of-range __id__ ${reference}/${items.length}`
+      );
+    });
+  });
+}
+
 function testSourceAssetBudget(): void {
   const files = listFiles(path.join(root, "assets"), new Set([
     ".ts", ".json", ".scene", ".meta", ".jpg", ".png", ".wav", ".md"
@@ -134,8 +250,9 @@ function main(): void {
   testSceneCoverage();
   testComplianceSurface();
   testPlatformBoundariesAndUploadRoot();
+  testAssetMetadataAndSceneReferences();
   testSourceAssetBudget();
-  console.log("Release static QA OK: scene coverage, private feedback, no public UGC/commercial copy, adapter isolation, and source budgets.");
+  console.log("Release static QA OK: scenes, metadata UUIDs/references, compliance, adapter isolation, and source budgets.");
 }
 
 main();

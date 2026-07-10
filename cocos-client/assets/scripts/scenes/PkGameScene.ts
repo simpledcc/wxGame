@@ -1,7 +1,9 @@
 import { _decorator, Button, Component, Label } from "cc";
+import { GameplayFeedbackPool } from "../components/pk/GameplayFeedbackPool";
 import { PkWordTarget } from "../components/pk/PkWordTarget";
 import { app } from "../core/App";
 import { getLocalRoomPlayer } from "../domain/RoomRules";
+import { FishingMatchError } from "../services/FishingMatchService";
 import type { FishingState } from "../store/FishingStore";
 import type { RoomSessionState } from "../store/RoomStore";
 
@@ -33,6 +35,9 @@ export class PkGameScene extends Component {
   @property([PkWordTarget])
   wordTargets: PkWordTarget[] = [];
 
+  @property(GameplayFeedbackPool)
+  feedbackPool: GameplayFeedbackPool | null = null;
+
   private unsubscribeRoom: (() => void) | null = null;
   private unsubscribeFishing: (() => void) | null = null;
 
@@ -62,6 +67,7 @@ export class PkGameScene extends Component {
     try {
       await app.fishingMatch.usePowerUp();
     } catch (error) {
+      if (error instanceof FishingMatchError && error.silent) return;
       app.runtime.showToast(error instanceof Error ? error.message : "道具使用失败");
     }
   }
@@ -74,6 +80,7 @@ export class PkGameScene extends Component {
 
   private tapFish(fishId: string): void {
     void app.fishingMatch.catchFish(fishId).catch((error: unknown) => {
+      if (error instanceof FishingMatchError && error.silent) return;
       app.runtime.showToast(error instanceof Error ? error.message : "操作失败");
     });
   }
@@ -81,6 +88,7 @@ export class PkGameScene extends Component {
   private render(): void {
     const roomState = app.roomStore.getState();
     const fishingState = app.fishingStore.getState();
+    this.feedbackPool?.show(fishingState.feedback);
     const room = roomState.room;
     if (!room) {
       this.renderMissingRoom();

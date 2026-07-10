@@ -22,6 +22,8 @@ export class FeedbackScene extends Component {
   submitButton: Button | null = null;
 
   private submitting = false;
+  private destroyed = false;
+  private submitSequence = 0;
 
   onLoad(): void {
     app.store.setRoute("feedback");
@@ -34,8 +36,14 @@ export class FeedbackScene extends Component {
     this.render();
   }
 
+  onDestroy(): void {
+    this.destroyed = true;
+    this.submitSequence += 1;
+    this.submitting = false;
+  }
+
   async submit(): Promise<void> {
-    if (this.submitting) return;
+    if (this.destroyed || this.submitting) return;
     const draft = normalizeFeedbackDraft(
       this.contentInput?.string || "",
       this.contactInput?.string || ""
@@ -46,6 +54,7 @@ export class FeedbackScene extends Component {
       app.runtime.showToast(validationError);
       return;
     }
+    const sequence = ++this.submitSequence;
     this.submitting = true;
     this.render("正在检查并提交...");
     const room = app.roomStore.getRoom();
@@ -62,22 +71,33 @@ export class FeedbackScene extends Component {
         duration: state.duration,
         clientVersion: "3.8.8"
       });
+      if (!this.isCurrentSubmission(sequence)) return;
       if (this.contentInput) this.contentInput.string = "";
       if (this.contactInput) this.contactInput.string = "";
       this.render("反馈已提交，谢谢你的帮助");
     } catch (error) {
+      if (!this.isCurrentSubmission(sequence)) return;
       const message = error instanceof Error ? error.message : "提交失败，请稍后再试";
       this.render(message);
       app.runtime.showToast(message);
     } finally {
+      if (!this.isCurrentSubmission(sequence)) return;
       this.submitting = false;
       this.render(this.statusLabel?.string || "");
     }
   }
 
   async openPrivacyContract(): Promise<void> {
-    const opened = await app.privacy.openContract();
-    if (!opened) app.runtime.showToast("暂时无法打开隐私保护指引");
+    try {
+      const opened = await app.privacy.openContract();
+      if (!this.destroyed && !opened) {
+        app.runtime.showToast("暂时无法打开隐私保护指引");
+      }
+    } catch {
+      if (!this.destroyed) {
+        app.runtime.showToast("隐私保护指引暂时无法打开，请稍后重试");
+      }
+    }
   }
 
   backHome(): void {
@@ -85,7 +105,12 @@ export class FeedbackScene extends Component {
   }
 
   private render(message = "请描述遇到的问题或建议"): void {
+    if (this.destroyed) return;
     if (this.statusLabel) this.statusLabel.string = message;
     if (this.submitButton) this.submitButton.interactable = !this.submitting;
+  }
+
+  private isCurrentSubmission(sequence: number): boolean {
+    return !this.destroyed && sequence === this.submitSequence;
   }
 }

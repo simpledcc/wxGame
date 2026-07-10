@@ -17,6 +17,8 @@ export type CloudFailureCode =
   | "TIMEOUT"
   | "NETWORK"
   | "PERMISSION"
+  | "FUNCTION_NOT_FOUND"
+  | "ENVIRONMENT"
   | "FUNCTION_ERROR";
 
 export class CloudCallError extends Error {
@@ -28,9 +30,7 @@ export class CloudCallError extends Error {
     readonly retryable: boolean,
     publicMessage?: string
   ) {
-    super(publicMessage || (code === "TIMEOUT"
-      ? "云服务响应超时，请重试"
-      : "云服务暂时不可用，请稍后重试"));
+    super(publicMessage || getDefaultPublicMessage(code));
     this.name = "CloudCallError";
   }
 }
@@ -58,6 +58,18 @@ function classifyFailure(error: unknown): CloudFailureCode {
   if (/timeout|timed out|超时/i.test(message)) {
     return "TIMEOUT";
   }
+  if (
+    /-501000|FUNCTION_NOT_FOUND/i.test(message)
+    || /function(?:name)?[^\n]{0,48}(?:could\s+not\s+be\s+found|not\s+(?:be\s+)?found|not\s+exist|does\s+not\s+exist|不存在|未部署)/i.test(message)
+  ) {
+    return "FUNCTION_NOT_FOUND";
+  }
+  if (
+    /-60100[23]|INVALID_ENV/i.test(message)
+    || /(?:environment|env(?:id)?)[^\n]{0,48}(?:invalid|not\s+exist|does\s+not\s+exist|不存在|无效)/i.test(message)
+  ) {
+    return "ENVIRONMENT";
+  }
   if (/network|socket|request:fail|connection/i.test(message)) {
     return "NETWORK";
   }
@@ -68,18 +80,25 @@ function classifyFailure(error: unknown): CloudFailureCode {
 }
 
 function getSafePublicMessage(error: unknown, code: CloudFailureCode): string | undefined {
-  if (code === "TIMEOUT") {
-    return "云服务响应超时，请重试";
-  }
   const message = getFailureMessage(error);
   const match = message.match(
     /(房间不存在|房间已满|游戏已经开始|请输入房间码|你不在这个房间中|双人合作需要两名(?:真实)?玩家|同舟拼词记需要两名真实玩家|两名玩家都准备后才能开始|双方准备后才能开始|准备后才能开始|当前房间无法开始|当前词库没有[^，。;；\n]{0,24}|错题库为空[^，。;；\n]{0,24})/
   );
-  return match?.[1];
+  return match?.[1] || getDefaultPublicMessage(code);
 }
 
 function isRetryable(code: CloudFailureCode): boolean {
   return code === "TIMEOUT" || code === "NETWORK" || code === "FUNCTION_ERROR";
+}
+
+function getDefaultPublicMessage(code: CloudFailureCode): string {
+  if (code === "CLOUD_NOT_READY") return "游戏服务尚未初始化，请稍后重试";
+  if (code === "TIMEOUT") return "云服务响应超时，请重试";
+  if (code === "NETWORK") return "网络连接失败，请检查网络后重试";
+  if (code === "PERMISSION") return "游戏服务权限配置有误，请联系管理员";
+  if (code === "FUNCTION_NOT_FOUND") return "游戏服务尚未部署完整，请联系管理员";
+  if (code === "ENVIRONMENT") return "游戏云环境配置不可用，请联系管理员";
+  return "云服务暂时不可用，请稍后重试";
 }
 
 export class CloudService {
@@ -103,6 +122,8 @@ export class CloudService {
       return;
     }
     if (!this.initPromise) {
+      const requestId = createRequestId();
+      const startedAt = Date.now();
       this.initPromise = this.runtime.initCloud(envId)
         .then(() => {
           this.initialized = true;
@@ -110,10 +131,23 @@ export class CloudService {
         })
         .catch((error) => {
           this.initPromise = null;
+          const code = classifyFailure(error);
+          const elapsedMs = Date.now() - startedAt;
+          const wrapped = new CloudCallError(
+            code,
+            "cloud.init",
+            requestId,
+            elapsedMs,
+            isRetryable(code),
+            getSafePublicMessage(error, code)
+          );
           this.logger.error("cloud.init.fail", {
-            reason: classifyFailure(error)
+            requestId,
+            elapsedMs,
+            reason: code,
+            retryable: wrapped.retryable
           });
-          throw error;
+          throw wrapped;
         });
     }
     await this.initPromise;

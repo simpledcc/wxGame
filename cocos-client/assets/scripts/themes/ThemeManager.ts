@@ -21,6 +21,7 @@ export class ThemeManager<TAsset = unknown> {
   private readonly events = new EventBus<ThemeEvents>();
   private readonly loadedBundles = new Set<string>();
   private readonly bundlePromises = new Map<string, Promise<void>>();
+  private readonly assetPromises = new Map<string, Promise<TAsset>>();
   private requestSequence = 0;
   private state: ThemeState = {
     requestedId: DEFAULT_THEME_ID,
@@ -121,10 +122,72 @@ export class ThemeManager<TAsset = unknown> {
     };
   }
 
+  async preloadAssets(keys: readonly ThemeAssetKey[]): Promise<void> {
+    await Promise.all(Array.from(new Set(keys)).map((key) => this.loadSpriteFrame(key)));
+  }
+
   async loadSpriteFrame(key: ThemeAssetKey): Promise<TAsset> {
-    const reference = this.resolveAsset(key);
-    await this.loadBundleOnce(reference.bundleName);
-    return this.bundles.loadSpriteFrame(reference.bundleName, reference.path);
+    const requestedTheme = this.getCurrentTheme();
+    try {
+      return await this.loadThemeSpriteFrame(requestedTheme, key);
+    } catch (error) {
+      if (this.state.currentId !== requestedTheme.id) throw error;
+      const reason = error instanceof Error ? error.message : String(error);
+      if (requestedTheme.id === DEFAULT_THEME_ID) {
+        this.patch({
+          loading: false,
+          fallbackUsed: true,
+          error: `默认主题资源加载失败：${reason}`
+        });
+        throw error;
+      }
+
+      const fallback = getThemeManifest(DEFAULT_THEME_ID);
+      try {
+        const asset = await this.loadThemeSpriteFrame(fallback, key);
+        if (this.state.currentId === requestedTheme.id) {
+          this.patch({
+            currentId: DEFAULT_THEME_ID,
+            loading: false,
+            fallbackUsed: true,
+            error: `${requestedTheme.label}资源加载失败，已回退草地主题`
+          });
+        }
+        return asset;
+      } catch (fallbackError) {
+        const fallbackReason = fallbackError instanceof Error
+          ? fallbackError.message
+          : String(fallbackError);
+        if (this.state.currentId === requestedTheme.id) {
+          this.patch({
+            currentId: DEFAULT_THEME_ID,
+            loading: false,
+            fallbackUsed: true,
+            error: `${requestedTheme.label}资源失败：${reason}；默认资源失败：${fallbackReason}`
+          });
+        }
+        throw fallbackError;
+      }
+    }
+  }
+
+  private loadThemeSpriteFrame(theme: ThemeManifest, key: ThemeAssetKey): Promise<TAsset> {
+    const reference: ThemeAssetReference = {
+      bundleName: theme.bundleName,
+      path: theme.assets[key]
+    };
+    const cacheKey = `${reference.bundleName}:${reference.path}`;
+    const existing = this.assetPromises.get(cacheKey);
+    if (existing) return existing;
+
+    const pending = this.loadBundleOnce(reference.bundleName)
+      .then(() => this.bundles.loadSpriteFrame(reference.bundleName, reference.path))
+      .catch((error) => {
+        this.assetPromises.delete(cacheKey);
+        throw error;
+      });
+    this.assetPromises.set(cacheKey, pending);
+    return pending;
   }
 
   private loadBundleOnce(bundleName: string): Promise<void> {

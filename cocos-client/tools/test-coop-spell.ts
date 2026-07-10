@@ -432,12 +432,93 @@ async function testSpellQuestionIsolationAndHistory(): Promise<void> {
   const storedRecords = runtime.getStorage<MatchRecord[]>("matchRecords") || [];
   assert.equal(storedRecords[0].spellHistory?.length, 3);
   assert.equal(runtime.getStorage<Record<string, { score: number }>>("bestScoresByMode")?.coopSpell.score, -100);
+
+  roomStore.enter("pk-room", "PK0001", {
+    ...cloneRoom(documents["spell-room"]),
+    _id: "pk-room",
+    roomCode: "PK0001",
+    state: "waiting",
+    fishes: [],
+    spellQuestion: null,
+    spellSubmissions: {},
+    spellHistory: [],
+    gameOptions: buildRoomGameOptions({
+      modeKey: "pk",
+      duration: 60,
+      bankId: "jilin-g1a-b1-welcome",
+      wordMode: "regular",
+      words: [{ word: "team", meaning: "团队" }],
+      wrongWords: []
+    })
+  });
+  assert.equal(spellStore.getState().result, null, "entering a non-spell room must clear stale spell results");
+  service.dispose();
+}
+
+async function testAbandonedSpellResponse(): Promise<void> {
+  const question = createQuestion("abandoned", "team", "团队");
+  let resolveSubmit: ((response: CatchFishResponse) => void) | null = null;
+  let refreshCalls = 0;
+  const runtime = new MemoryRuntimePort({
+    storage: { privacyAcceptedVersion: PRIVACY_VERSION },
+    cloudHandlers: {
+      catchFish: () => new Promise<CatchFishResponse>((resolve) => {
+        resolveSubmit = resolve;
+      })
+    }
+  });
+  const storage = new StorageService(runtime);
+  const privacy = new PrivacyService(storage, runtime);
+  storage.configurePrivacyGate(() => privacy.hasAcceptedCurrentVersion());
+  const cloud = new CloudService(runtime, () => privacy.requireAccepted("room"));
+  await cloud.init("env-test");
+  const roomStore = new RoomStore();
+  const playerStore = new PlayerStore();
+  const spellStore = new CoopSpellStore();
+  playerStore.setOpenId("player-1");
+  const roomSession = {
+    refresh: async () => {
+      refreshCalls += 1;
+      return null;
+    }
+  } as unknown as RoomSessionService;
+  const scheduler = new ManualScheduler();
+  const service = new CoopSpellService(
+    new RoomService(cloud),
+    roomSession,
+    roomStore,
+    playerStore,
+    spellStore,
+    new WordBankStore(),
+    new HistoryStore(),
+    storage,
+    { schedule: scheduler.schedule, cancel: scheduler.cancel }
+  );
+  roomStore.enter("spell-room", "SPELL1", createSpellRoom(question));
+  assert.equal(service.addLetter("t"), true);
+  assert.equal(service.addLetter("e"), true);
+  const pendingSubmit = service.submit();
+  assert.ok(resolveSubmit);
+  roomStore.leave();
+  (resolveSubmit as (response: CatchFishResponse) => void)({
+    delta: 0,
+    correct: true,
+    submitted: true,
+    waitingPartner: true,
+    finished: false
+  });
+  await pendingSubmit;
+  assert.equal(roomStore.getRoom(), null, "late spell submit must not restore an abandoned room");
+  assert.equal(refreshCalls, 0, "late spell submit must not refresh after session replacement");
+  assert.deepEqual(spellStore.getState().draft, []);
+  assert.equal(spellStore.getState().result, null);
   service.dispose();
 }
 
 async function main(): Promise<void> {
   await testSpellQuestionIsolationAndHistory();
-  console.log("Phase 7 co-op spell OK: isolated drafts, late responses, dual clocks, timeout retry, settlement, and details.");
+  await testAbandonedSpellResponse();
+  console.log("Phase 7 co-op spell OK: isolated drafts/sessions, abandoned responses, dual clocks, settlement, and details.");
 }
 
 void main();

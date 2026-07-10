@@ -15,8 +15,8 @@ Implemented:
 - Bank picker return-route state.
 - Study session rules for hidden Chinese, current-word reveal, next/previous, and shuffle.
 - `BankScene` and `StudyScene` controller scripts that future Cocos UI nodes can call.
-- Word-bank unlock progress writes back to legacy-compatible `wordCoins` and `unlockedWordBanks` keys.
-- Tests covering word bank rules, unlock behavior, study reveal behavior, and picker return route.
+- Word-bank unlock progress writes back to legacy-compatible `wordCoins` and `unlockedWordBanks` keys as one compensated operation. The unlock list is written before the coin deduction, a failed second write restores both previous values, and the Bank controller rolls back its in-memory deduction.
+- Tests covering word bank rules, atomic unlock behavior, study reveal behavior, picker return route, and the mounted Bank controller failure path.
 
 ## 2. Generated Word Bank Data
 
@@ -103,7 +103,7 @@ cocos-client/assets/scripts/scenes/BankScene.ts
 cocos-client/assets/scripts/scenes/StudyScene.ts
 ```
 
-These scripts are controller foundations. Final visual layout, Cocos scene assets, and interactive prefabs are still pending.
+These controllers are mounted as functional pages by the persistent `Home.scene` runtime shell. Creator preview and final visual acceptance remain pending, but the controls and return flows execute in the Cocos runtime mock.
 
 ## 7. Verification
 
@@ -122,19 +122,17 @@ npm audit --omit=dev
 Expected Stage 3 test output:
 
 ```text
-Stage 3 core OK: word bank catalog, unlock rules, study reveal flow, picker return route, and unlock persistence.
+Stage 3 core OK: word bank catalog, atomic unlock persistence, study reveal flow, and picker return route.
 ```
 
-## 8. Not Complete Yet
+## 8. External Visual Acceptance
 
-Remaining Phase 3 visual work:
+Remaining Phase 3 external work:
 
-- Build real Home scene UI in Cocos instead of placeholder labels.
-- Build Bank scene UI with province/unit pages, coins, locked badges, and confirm/back buttons.
-- Build Study scene UI with large word card, hidden Chinese switch, reveal-current button, and large next button.
-- Verify Boot -> Home -> Bank -> Study interaction visually in Cocos preview.
-- Capture screenshots after the UI exists.
+- Verify the runtime-built Home -> Bank -> Study interaction visually in Cocos preview.
+- Inspect locked badges, long bank labels, coin status, study controls, and return routing at target landscape aspect ratios.
+- Capture current Creator screenshots for Home, Bank, and Study.
 
 ## 9. Next Step
 
-The Home, Bank, and Study visual layouts remain an explicit Creator backlog. Because Creator is unavailable on the current machine, Phase 4 engine-independent room work proceeded while preserving this visual acceptance gate.
+Home, Bank, and Study runtime layouts and interactions are implemented. Creator import, font/layout inspection, and current screenshots remain the explicit external acceptance gate.

@@ -11,6 +11,7 @@ Implemented:
 - `FishingRules` for target validation, same-word aliases, hit/miss prediction, stun checks, timer calculation, and bot delays.
 - `FishingStore` for synchronous click feedback, optimistic score/combo state, pending actions, correction feedback, timers, and the latest result.
 - `FishingMatchService` for `catchFish`, power-ups, authoritative correction, robot turns, timeout `finishGame`, wrong words, and match persistence.
+- Catch, power-up, robot, and timeout responses are scoped to the monotonic `RoomStore` session version; leaving or replacing a room makes delayed responses inert instead of restoring an abandoned room.
 - `PkWordTarget`, a reusable moving Cocos target component with stable bounds, cloud-provided direction/speed, and tap binding.
 - `PkGameScene` controller bindings for prompt, scores, timer, combo, target slots, power-up action, and status feedback.
 - `ResultScene` controller bindings for result title, score, player rows, history entry, and home return.
@@ -18,6 +19,7 @@ Implemented:
 - Legacy-compatible `wrongWords`, `matchRecords`, and `bestScoresByMode` writes.
 - Per-mode history limits: up to 50 records each for `pk`, `coopShared`, and `coopSpell`.
 - Safe system player names in newly normalized history records.
+- Reachable low/medium/high robot selection in the runtime Room screen, preserving the legacy 5000/3000/1000 ms scheduling choices.
 
 ## 2. Optimistic Input And Correction
 
@@ -37,6 +39,8 @@ If room polling observes the new authoritative local score before the cloud call
 
 Wrong words are saved only after the server confirms a negative score. Stale taps and stunned responses do not pollute `wrongWords`.
 
+Gameplay cancellation is silent after navigation: a rejected old request cannot show an error toast on the new screen.
+
 ## 3. Legacy Rule Compatibility
 
 - Correct target: `+100`.
@@ -46,6 +50,7 @@ Wrong words are saved only after the server confirms a negative score. Stale tap
 - Power-ups remain `pesticide` and `swatter`.
 - Swatter stun duration remains 5000 ms.
 - Bot delays remain 5000/3000/1000 ms for low/medium/high.
+- Room snapshots drive the selected difficulty indicator; changing difficulty replaces the PK robot through the existing cloud function rather than introducing client-only bot state.
 - The client never calculates the final winner authoritatively; it waits for the finished room snapshot.
 
 ## 4. History And Storage
@@ -85,6 +90,7 @@ The Phase 5 test proves:
 - confirmed misses persist the correct target into `wrongWords`;
 - power-up use updates score and inventory;
 - high-difficulty robot scheduling uses 1000 ms;
+- the runtime Room controller exposes and synchronizes all three robot difficulty choices;
 - timeout calls `finishGame`, handles an early `not_timeout`, and retries through an independent timer before refreshing the finished room;
 - result, history, and best score are persisted;
 - history keeps 50 records per mode;

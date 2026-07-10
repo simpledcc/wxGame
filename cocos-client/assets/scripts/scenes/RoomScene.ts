@@ -5,9 +5,11 @@ import {
   getLocalRoomPlayer,
   getRoomActionAvailability,
   getRoomModeLabel,
-  getRoomStartStatusText
+  getRoomStartStatusText,
+  isBotPlayer
 } from "../domain/RoomRules";
 import type { BotDifficulty } from "../domain/GameTypes";
+import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
 import type { RoomSessionState } from "../store/RoomStore";
 
 const { ccclass, property } = _decorator;
@@ -20,6 +22,13 @@ const ACTION_LABELS: Record<string, string> = {
   start: "正在开始游戏...",
   copy: "正在复制房间码...",
   invite: "正在打开邀请..."
+};
+
+const BOT_DIFFICULTIES: BotDifficulty[] = ["low", "medium", "high"];
+const BOT_DIFFICULTY_LABELS: Record<BotDifficulty, string> = {
+  low: "低",
+  medium: "中",
+  high: "高"
 };
 
 @ccclass("RoomScene")
@@ -43,7 +52,31 @@ export class RoomScene extends Component {
   readyButton: Button | null = null;
 
   @property(Button)
+  createButton: Button | null = null;
+
+  @property(Button)
+  joinButton: Button | null = null;
+
+  @property(Button)
+  copyButton: Button | null = null;
+
+  @property(Button)
+  inviteButton: Button | null = null;
+
+  @property(Button)
+  refreshButton: Button | null = null;
+
+  @property(Button)
+  backButton: Button | null = null;
+
+  @property(Button)
   addBotButton: Button | null = null;
+
+  @property([Button])
+  botDifficultyButtons: Button[] = [];
+
+  @property([Label])
+  botDifficultyLabels: Label[] = [];
 
   @property(Button)
   startButton: Button | null = null;
@@ -71,13 +104,22 @@ export class RoomScene extends Component {
       app.runtime.showToast("当前词库暂无可用单词");
       return;
     }
+    const roomSpellQuestions = state.selectedMode === "coopSpell"
+      ? getSpellTemplatesForBank(
+          app.spellTemplateData,
+          app.wordBankCatalog,
+          state.bankId,
+          words
+        )
+      : [];
     const gameOptions = buildRoomGameOptions({
       modeKey: state.selectedMode,
       duration: state.duration,
       bankId: state.bankId,
       wordMode: state.wordMode,
       words,
-      wrongWords: app.wordBankStore.getWrongWords()
+      wrongWords: app.wordBankStore.getWrongWords(),
+      roomSpellQuestions
     });
     try {
       await app.roomSession.create(gameOptions);
@@ -172,6 +214,7 @@ export class RoomScene extends Component {
 
   private render(state: RoomSessionState): void {
     const room = state.room;
+    this.setSessionControls(state, !!room);
     if (this.roomCodeLabel) {
       this.roomCodeLabel.string = state.roomCode || "------";
     }
@@ -188,7 +231,7 @@ export class RoomScene extends Component {
             ? (state.syncError ? `${state.syncError}，正在自动重试` : "正在同步房间...")
             : "创建新房间，或输入 6 位房间码加入");
       }
-      this.setRoomButtons(false, false, false);
+      this.setRoomButtons(false, false, false, "medium");
       return;
     }
 
@@ -202,8 +245,10 @@ export class RoomScene extends Component {
       this.playersLabel.string = room.players.length
         ? room.players.map((player, index) => {
             const identity = player.openid === localOpenId ? "（我）" : "";
-            const role = player.isBot ? "机器人" : `玩家${index + 1}`;
-            return `${role}${identity} ${player.nickName} · ${player.ready ? "已准备" : "未准备"}`;
+            const displayName = isBotPlayer(player)
+              ? `机器人 ${player.nickName || "对手"}`
+              : `${player.nickName || `玩家${index + 1}`}${identity}`;
+            return `${displayName} · ${player.ready ? "已准备" : "未准备"}`;
           }).join("\n")
         : "等待玩家加入";
     }
@@ -214,21 +259,51 @@ export class RoomScene extends Component {
           ? "正在同步房间..."
           : getRoomStartStatusText(availability.startBlockReason));
     }
+    const bot = room.players.find(isBotPlayer);
+    const selectedDifficulty = bot?.botDifficulty || room.gameOptions.botDifficulty || "medium";
     this.setRoomButtons(
       availability.canToggleReady,
       availability.canAddBot,
-      availability.canStart
+      availability.canStart,
+      selectedDifficulty
     );
     if (this.readyButton && localPlayer) {
       this.readyButton.interactable = availability.canToggleReady && !state.pendingAction;
     }
   }
 
-  private setRoomButtons(canReady: boolean, canAddBot: boolean, canStart: boolean): void {
+  private setRoomButtons(
+    canReady: boolean,
+    canAddBot: boolean,
+    canStart: boolean,
+    selectedDifficulty: BotDifficulty
+  ): void {
     const busy = !!app.roomStore.getState().pendingAction;
     if (this.readyButton) this.readyButton.interactable = canReady && !busy;
-    if (this.addBotButton) this.addBotButton.interactable = canAddBot && !busy;
+    const difficultyButtons = this.botDifficultyButtons.length
+      ? this.botDifficultyButtons
+      : (this.addBotButton ? [this.addBotButton] : []);
+    difficultyButtons.forEach((button) => {
+      button.interactable = canAddBot && !busy;
+    });
+    this.botDifficultyLabels.forEach((label, index) => {
+      const difficulty = BOT_DIFFICULTIES[index];
+      if (!difficulty) return;
+      label.string = `${difficulty === selectedDifficulty ? "✓ " : ""}${BOT_DIFFICULTY_LABELS[difficulty]}`;
+    });
     if (this.startButton) this.startButton.interactable = canStart && !busy;
+  }
+
+  private setSessionControls(state: RoomSessionState, hasRoom: boolean): void {
+    const busy = !!state.pendingAction;
+    if (this.createButton) this.createButton.interactable = !busy;
+    if (this.joinButton) this.joinButton.interactable = !busy;
+    if (this.copyButton) this.copyButton.interactable = hasRoom && !busy;
+    if (this.inviteButton) this.inviteButton.interactable = hasRoom && !busy;
+    if (this.refreshButton) {
+      this.refreshButton.interactable = !!state.roomId && !state.syncing && !busy;
+    }
+    if (this.backButton) this.backButton.interactable = !busy;
   }
 
   private getSelectedModeLabel(): string {

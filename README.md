@@ -6,7 +6,7 @@
 
 ## Cocos 迁移
 
-新的 Cocos Creator 客户端位于 `cocos-client/`，旧 `miniprogram/` 仍是稳定上传版本。迁移架构、当前完成度和外部验收门槛分别见 `COCOS_MIGRATION_DESIGN.md`、`COCOS_WORKSPACE.md` 与 `COCOS_RELEASE_QA.md`。在 `cocos-client/` 下运行 `npm run verify` 可执行全部不依赖游戏引擎的检查。
+新的 Cocos Creator 客户端位于 `cocos-client/`，旧 `miniprogram/` 仍是稳定上传版本。迁移架构、逐项完成证据和外部验收门槛分别见 `COCOS_MIGRATION_DESIGN.md`、`COCOS_MIGRATION_COMPLETION_MATRIX.md` 与 `COCOS_RELEASE_QA.md`。在 `cocos-client/` 下运行 `npm run verify` 可执行全部不依赖游戏引擎的检查。
 
 ## 项目类型
 

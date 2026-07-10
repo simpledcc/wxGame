@@ -264,6 +264,26 @@ async function testOptimisticPkFlow(): Promise<void> {
   assert.equal(roomStore.getRoom()?.players[0].score, 200);
   assert.equal(roomStore.getRoom()?.players[0].powerUps?.length, 0);
 
+  resolveCatch = null;
+  const abandonedCatch = service.catchFish("fish-target");
+  assert.ok(resolveCatch);
+  const abandonedRoom = cloneRoom(documents["room-1"]);
+  roomStore.leave();
+  (resolveCatch as (response: CatchFishResponse) => void)({
+    delta: 100,
+    correct: true,
+    finished: false,
+    players: abandonedRoom.players,
+    fishes: abandonedRoom.fishes,
+    usedWords: abandonedRoom.usedWords,
+    currentMeaning: abandonedRoom.currentMeaning,
+    targetFishId: abandonedRoom.targetFishId
+  });
+  await abandonedCatch;
+  assert.equal(roomStore.getRoom(), null, "a late catch response must not restore an abandoned room");
+  assert.equal(fishingStore.getState().pendingAction, null);
+  roomStore.enter("room-1", "AB12CD", documents["room-1"]);
+
   scheduler.runDelay(1000);
   await flushAsync();
   assert.equal(roomStore.getRoom()?.players[1].score, 100);
@@ -324,7 +344,7 @@ async function main(): Promise<void> {
   testFishingRules();
   testHistoryLimitsPerMode();
   await testOptimisticPkFlow();
-  console.log("Phase 5 PK core OK: optimistic input, correction, bot, power-up, timeout, wrong words, and history.");
+  console.log("Phase 5 PK core OK: optimistic input, correction, abandoned-response isolation, bot, timeout, and history.");
 }
 
 void main();

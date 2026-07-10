@@ -9,6 +9,7 @@ import {
   LETTER_KEY_ROWS
 } from "../domain/CoopSpellRules";
 import type { CoopSpellState } from "../store/CoopSpellStore";
+import { CoopSpellError } from "../services/CoopSpellService";
 
 const { ccclass, property } = _decorator;
 
@@ -102,6 +103,7 @@ export class CoopSpellScene extends Component {
     try {
       await app.coopSpell.submit();
     } catch (error) {
+      if (error instanceof CoopSpellError && error.silent) return;
       app.runtime.showToast(error instanceof Error ? error.message : "提交失败");
     }
   }
@@ -110,6 +112,7 @@ export class CoopSpellScene extends Component {
     try {
       await app.coopSpell.skip(true);
     } catch (error) {
+      if (error instanceof CoopSpellError && error.silent) return;
       app.runtime.showToast(error instanceof Error ? error.message : "跳过失败");
     }
   }

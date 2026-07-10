@@ -20,6 +20,7 @@ import { normalizeSpellRound } from "./MatchRecordRules";
 
 export const ROOM_CODE_LENGTH = 6;
 export const ROOM_WORD_LIMIT = 240;
+export const ROOM_SPELL_QUESTION_LIMIT = 240;
 export const WRONG_WORD_LIMIT = 200;
 
 export interface RoomCreationSettings {
@@ -29,6 +30,7 @@ export interface RoomCreationSettings {
   wordMode: WordMode;
   words: WordItem[];
   wrongWords: WordItem[];
+  roomSpellQuestions?: SpellTemplate[];
   botDifficulty?: BotDifficulty;
 }
 
@@ -67,11 +69,13 @@ function normalizeWords(words: WordItem[] | undefined, limit: number): WordItem[
 }
 
 function normalizeSpellTemplates(templates: SpellTemplate[] | undefined): SpellTemplate[] {
-  return (Array.isArray(templates) ? templates : []).map((template) => ({
-    ...template,
-    blankPositions: [...(template.blankPositions ?? [])],
-    slots: (template.slots ?? []).map((slot) => ({ ...slot }))
-  }));
+  return (Array.isArray(templates) ? templates : [])
+    .slice(0, ROOM_SPELL_QUESTION_LIMIT)
+    .map((template) => ({
+      ...template,
+      blankPositions: [...(template.blankPositions ?? [])],
+      slots: (template.slots ?? []).map((slot) => ({ ...slot }))
+    }));
 }
 
 export function normalizeRoomCode(value: string): string {
@@ -79,7 +83,7 @@ export function normalizeRoomCode(value: string): string {
     .trim()
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 8);
+    .slice(0, ROOM_CODE_LENGTH + 1);
 }
 
 export function isValidRoomCode(value: string): boolean {
@@ -121,6 +125,7 @@ export function buildRoomGameOptions(settings: RoomCreationSettings): GameOption
     mode: settings.wordMode,
     wrongWords: settings.wordMode === "mistakes" ? settings.wrongWords : [],
     roomWords: settings.words,
+    roomSpellQuestions: settings.modeKey === "coopSpell" ? settings.roomSpellQuestions : [],
     botDifficulty: settings.botDifficulty ?? "medium",
     matchMode,
     coopMode

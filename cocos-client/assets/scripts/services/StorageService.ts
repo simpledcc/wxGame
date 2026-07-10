@@ -141,12 +141,22 @@ export class StorageService {
   }
 
   writeWordBankProgress(wordCoins: number, unlockedWordBanks: string[]): void {
+    this.assertPrivacyAccepted();
     const coins = Number(wordCoins);
-    this.set(
-      "wordCoins",
-      Number.isFinite(coins) && coins >= 0 ? Math.floor(coins) : INITIAL_WORD_COINS
-    );
-    this.set("unlockedWordBanks", normalizeStringArray(unlockedWordBanks));
+    const normalizedCoins = Number.isFinite(coins) && coins >= 0
+      ? Math.floor(coins)
+      : INITIAL_WORD_COINS;
+    const normalizedBanks = normalizeStringArray(unlockedWordBanks);
+    const previousCoins = this.runtime.getStorage(STORAGE_KEYS.wordCoins);
+    const previousBanks = this.runtime.getStorage(STORAGE_KEYS.unlockedWordBanks);
+    try {
+      this.runtime.setStorage(STORAGE_KEYS.unlockedWordBanks, normalizedBanks);
+      this.runtime.setStorage(STORAGE_KEYS.wordCoins, normalizedCoins);
+    } catch (error) {
+      this.restoreRuntimeValue(STORAGE_KEYS.wordCoins, previousCoins);
+      this.restoreRuntimeValue(STORAGE_KEYS.unlockedWordBanks, previousBanks);
+      throw error;
+    }
   }
 
   writeWrongWords(words: WordItem[]): void {
@@ -182,6 +192,18 @@ export class StorageService {
   private assertPrivacyAccepted(): void {
     if (!this.privacyAccepted()) {
       throw new PrivacyRequiredError("storage");
+    }
+  }
+
+  private restoreRuntimeValue(key: string, value: unknown): void {
+    try {
+      if (value === undefined) {
+        this.runtime.removeStorage(key);
+      } else {
+        this.runtime.setStorage(key, value);
+      }
+    } catch {
+      // Preserve the original write failure; each key is compensated independently.
     }
   }
 }

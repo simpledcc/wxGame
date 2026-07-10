@@ -5,6 +5,8 @@ const BOOT_SCENE_UUID = "2f311a88-dcfc-4838-938d-0ea546208a74";
 const HOME_SCENE_UUID = "87946c61-a2ef-4735-9e40-9dbd2753bf88";
 const EXPECTED_ORIENTATION = "landscape";
 const MAIN_PACKAGE_LIMIT_BYTES = 4 * 1024 * 1024;
+const SUBPACKAGE_TOTAL_LIMIT_BYTES = 30 * 1024 * 1024;
+const REQUIRED_ASSET_BUNDLES = ["theme_default", "theme_island"];
 
 function readJson(filePath) {
   try {
@@ -39,6 +41,7 @@ function loadBuildContract(projectRoot = path.resolve(__dirname, "..")) {
   const errors = [];
 
   if (config.platform !== "wechatgame") errors.push("platform must be wechatgame");
+  if (config.taskName !== "wechatgame") errors.push("taskName must be wechatgame");
   if (config.buildPath !== "project://build") errors.push("buildPath must be project://build");
   if (config.outputName !== "wechatgame") errors.push("outputName must be wechatgame");
   if (config.startScene !== BOOT_SCENE_UUID) errors.push("Boot.scene must be the startScene");
@@ -85,6 +88,8 @@ module.exports = {
   EXPECTED_ORIENTATION,
   HOME_SCENE_UUID,
   MAIN_PACKAGE_LIMIT_BYTES,
+  REQUIRED_ASSET_BUNDLES,
+  SUBPACKAGE_TOTAL_LIMIT_BYTES,
   assertSafeBuildRoot,
   isInside,
   loadBuildContract,

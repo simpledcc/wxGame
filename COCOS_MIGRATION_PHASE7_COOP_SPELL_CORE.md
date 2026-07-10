@@ -11,11 +11,16 @@ Implemented:
 - `CoopSpellStore` for question-scoped drafts, optimistic submissions, input locking, advancing state, dual countdowns, errors, and result state.
 - `CoopSpellService` for submit/wait, manual skip, automatic timeout, server-directed retry, total-time settlement, wrong-word persistence, and match history.
 - Strict isolation by `spellQuestion.id`; a late callback from an old question can refresh the room but cannot restore its draft or submitted state.
+- Strict isolation by room-session version; a response after leave/replacement cannot refresh or restore the abandoned room, and entering a non-spell room clears stale spell result state.
 - JSON-string/object compatibility for `spellQuestion`, matching the deployed cloud database format.
 - Local anchors for the 20-second question timer and selected total duration, avoiding device clock skew after a snapshot arrives.
 - `SpellLetterKey` and `CoopSpellScene` controllers with a QWERTY keyboard, local large input area, teammate compact status, submit/delete/clear/skip controls, and independent timers.
 - `HistoryRecordItem` and `HistoryScene` controllers with three mode tabs, per-mode best scores, record pagination, and three-round detail pages so every per-word/per-player spell result remains reachable in long matches.
 - `ResultScene` support for `coopSpell` team results.
+- Lossless migration of all 44 legacy spell banks and 6,351 prebuilt templates from `spellWordBankData.js` through a compact generated index.
+- Each compact record stores only its source word index and four blank positions; runtime expansion restores the exact legacy key, word, meaning, mask, positions, and slot answers without random blank generation.
+- `RoomScene` now sends the selected bank's prebuilt `roomSpellQuestions` during spell-room creation, capped at the production cloud limit of 240; non-spell rooms carry none.
+- Wrong-word/future banks use the same stable FNV/LCG blank-position algorithm as `startCoopSpell`, so fallback remains deterministic across clients.
 
 ## 2. Architecture Choice
 
@@ -60,6 +65,7 @@ Without this normalization, spreading a string would create character-index prop
 - If `timeoutCoopSpell` returns `tooEarly`, the client retries after the server-provided `retryAfter` delay.
 - A question change clears draft, optimistic submission, pending action, and prior advancing state in one store transition.
 - Late submit/skip responses compare their original question ID with the current store ID before applying any local result.
+- Submit, skip, and total-settlement responses also compare their captured room ID/session version before any refresh, score, history, or draft mutation.
 - Input stays locked between a completed round response and the authoritative next room snapshot.
 
 ## 5. History Detail
@@ -78,6 +84,7 @@ The public display continues to use system labels `玩家1` / `玩家2`; it does
 Run from `cocos-client`:
 
 ```bash
+npm run test:spell-data
 npm run test:phase7
 npm run test:shell-runtime
 npm run verify
@@ -94,6 +101,8 @@ The Phase 7 test covers:
 - timeout question switch and draft clearing;
 - local dual-clock behavior under simulated device clock skew;
 - finish settlement, three round reasons, history details, and best-score persistence.
+
+`test:spell-data` hashes the legacy source, expands every compact record, and compares all 6,351 templates field-for-field across 44 banks. It also proves deterministic fallback, the 240-item payload cap, and that PK does not carry spell templates.
 
 The runtime shell execution test also opens a seven-round spell record and verifies its three detail pages advance from rounds 1-3 to rounds 4-6.
 It also injects a remotely finished spell-room snapshot into a real `App` and verifies result/history creation happens before Result routing without a duplicate `finishGame` call.

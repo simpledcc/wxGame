@@ -39,7 +39,7 @@ const TAP_BLOCK_MESSAGES: Record<FishingTapBlockReason, string> = {
 };
 
 export class FishingMatchError extends Error {
-  constructor(message: string) {
+  constructor(message: string, readonly silent = false) {
     super(message);
     this.name = "FishingMatchError";
   }
@@ -82,6 +82,8 @@ export class FishingMatchService {
 
   async catchFish(fishId: string): Promise<CatchFishResponse> {
     const room = this.requireFishingRoom();
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     if (this.fishingStore.getState().pendingAction) {
       throw new FishingMatchError("操作正在提交，请稍候");
     }
@@ -97,9 +99,10 @@ export class FishingMatchService {
     this.fishingStore.beginCatch(evaluation);
     try {
       const response = await this.rooms.catchFish({
-        roomId: this.requireRoomId(),
+        roomId,
         fishId
       });
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return response;
       const currentRoom = this.roomStore.getRoom() || room;
       const applied = applyCatchResponse(currentRoom, response);
       if (applied.hasSnapshot) {
@@ -120,6 +123,9 @@ export class FishingMatchService {
       }
       return response;
     } catch (error) {
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) {
+        throw new FishingMatchError("操作已取消", true);
+      }
       const message = error instanceof Error ? error.message : "操作失败，请重试";
       this.fishingStore.failPending(message);
       throw error;
@@ -128,6 +134,8 @@ export class FishingMatchService {
 
   async usePowerUp(powerUpId?: string): Promise<CatchFishResponse> {
     const room = this.requireFishingRoom();
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     if (room.gameOptions.matchMode === "coop") {
       throw new FishingMatchError("默契捕词赛不使用道具");
     }
@@ -145,10 +153,11 @@ export class FishingMatchService {
     }
     try {
       const response = await this.rooms.catchFish({
-        roomId: this.requireRoomId(),
+        roomId,
         action: "usePowerUp",
         powerUpId: selected.id
       });
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return response;
       if (response.stunned) {
         throw new FishingMatchError("被苍蝇拍击中，暂时无法使用道具");
       }
@@ -160,6 +169,9 @@ export class FishingMatchService {
       await this.roomSession.refresh().catch(() => undefined);
       return response;
     } catch (error) {
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) {
+        throw new FishingMatchError("操作已取消", true);
+      }
       const message = error instanceof Error ? error.message : "道具使用失败";
       this.fishingStore.failPending(message);
       await this.roomSession.refresh().catch(() => undefined);
@@ -196,7 +208,7 @@ export class FishingMatchService {
     if (!room || !isFishingRoom(room)) {
       this.cancelBotTimer();
       this.cancelFinishTimer();
-      if (!room) {
+      if (!room || this.activeRoomId) {
         this.activeRoomId = "";
         this.fishingStore.reset();
       }
@@ -246,12 +258,14 @@ export class FishingMatchService {
 
   private async runBotCatch(roomId: string, targetFishId: string, key: string): Promise<void> {
     if (this.botKey !== key || this.roomStore.getState().roomId !== roomId) return;
+    const sessionVersion = this.roomStore.getSessionVersion();
     try {
       const response = await this.rooms.catchFish({
         roomId,
         action: "botCatch",
         targetFishId
       });
+      if (!this.isCurrentRoomSession(roomId, sessionVersion) || this.botKey !== key) return;
       if (response.bot && response.correct) {
         this.fishingStore.showBotFeedback(response.delta);
       }
@@ -298,8 +312,11 @@ export class FishingMatchService {
       return;
     }
     this.lastFinishAttemptAt = now;
+    const roomId = this.requireRoomId();
+    const sessionVersion = this.roomStore.getSessionVersion();
     try {
-      await this.rooms.finishGame(this.requireRoomId());
+      await this.rooms.finishGame(roomId);
+      if (!this.isCurrentRoomSession(roomId, sessionVersion)) return;
       await this.roomSession.refresh();
       this.fishingStore.endFinish();
     } catch (error) {
@@ -408,6 +425,11 @@ export class FishingMatchService {
     const openid = this.playerStore.getLocalPlayer().openid;
     if (!openid) throw new FishingMatchError("你不在这个房间中");
     return openid;
+  }
+
+  private isCurrentRoomSession(roomId: string, sessionVersion: number): boolean {
+    return this.roomStore.getSessionVersion() === sessionVersion
+      && this.roomStore.getState().roomId === roomId;
   }
 
   private cancelBotTimer(): void {

@@ -31,6 +31,7 @@ Set `COCOS_CREATOR_PATH` or `COCOS_CREATOR` when Creator is not in a standard Da
 `cocos-client/tools/wechat-build-config.json` fixes these release inputs:
 
 - Platform: `wechatgame`.
+- Build plugin task: `taskName=wechatgame`, matching the Cocos 3.8 platform-plugin contract.
 - Output: `cocos-client/build/wechatgame/`.
 - Initial scene: `Boot.scene`.
 - Included runtime scenes: Boot and Home.
@@ -49,12 +50,16 @@ The inspector fails the build when any of these conditions is found:
 - Generated project type is not `game`.
 - Generated AppID or orientation differs from the fixed contract.
 - Main package exceeds 4 MiB.
+- Declared subpackages contain no generated files or exceed 30 MiB in total.
+- Either `theme_default` or `theme_island` is missing from both `assets/` and `subpackages/`.
+- A required theme bundle lacks its generated `config.json`/`config.<hash>.json`.
+- A theme emitted below `subpackages/` is not declared by `game.json`.
 - Release output contains `.map` source maps.
 - Output embeds `cloudfunctions`, the legacy `miniprogram`, or `node_modules`.
 - Subpackage roots are invalid or duplicated.
 - Generated output contains symbolic links.
 
-The JSON report records total bytes, main-package bytes/file count, and every declared subpackage's bytes/file count. It is generated outside the upload root at `cocos-client/build/wechatgame-report.json`.
+The JSON report records total bytes, main-package bytes/file count, aggregate and per-subpackage bytes, and each required theme bundle's generated root, package type, bytes, and file count. It is generated outside the upload root at `cocos-client/build/wechatgame-report.json`.
 
 ## Execution On A Creator Machine
 
@@ -62,7 +67,7 @@ The JSON report records total bytes, main-package bytes/file count, and every de
 2. Run `npm run verify`.
 3. Run `npm run build:wechat:dry-run` and confirm the project, config, and output paths.
 4. Run `npm run build:wechat`.
-5. Review `build/wechatgame-report.json` and Creator's `build/wechat-build.log`.
+5. Review `build/wechatgame-report.json` and Creator's `build/wechat-build.log`; confirm both required themes are listed and every package limit is green.
 6. Import `cocos-client/build/wechatgame/` into WeChat Developer Tools as a Mini Game.
 7. Complete the route, privacy, invitation, background recovery, two-device, performance, screenshot, and development-upload gates in `COCOS_RELEASE_QA.md`.
 8. Keep a known-good legacy upload and the accepted Cocos development build before changing any production upload-root configuration.
@@ -72,3 +77,5 @@ The JSON report records total bytes, main-package bytes/file count, and every de
 - [Cocos Creator command-line publishing](https://docs.cocos.com/creator/3.8/manual/en/editor/publish/publish-in-command-line.html)
 - [Cocos Creator WeChat Mini Game publishing](https://docs.cocos.com/creator/3.8/manual/zh/editor/publish/publish-wechatgame.html)
 - [Cocos Creator build options](https://docs.cocos.com/creator/3.8/manual/en/editor/publish/build-options.html)
+- [Cocos Creator Mini Game subpackages](https://docs.cocos.com/creator/3.8/manual/en/editor/publish/subpackage.html)
+- [Cocos Creator Asset Bundle configuration and output](https://docs.cocos.com/creator/3.8/manual/en/asset/bundle.html)

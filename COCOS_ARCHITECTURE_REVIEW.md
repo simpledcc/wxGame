@@ -64,6 +64,22 @@ This is the best fit for the current constraint that this machine does not have 
 - Separated accepted join from initial snapshot availability: document-read failure is now a recoverable polling state rather than a false join failure.
 - Added a deterministic Creator CLI contract with fixed Boot/Home scenes, AppID/orientation validation, and a generated-output boundary that cannot overlap the stable legacy client.
 - Added a standalone WeChat package inspector with main/subpackage byte reports, a 4 MiB main-package gate, source-map/forbidden-path checks, and synthetic fixture coverage in `npm run test:build-pipeline`.
+- Connected semantic Home/gameplay/spell backgrounds to runtime routes and deduplicated concurrent/aliased theme asset requests.
+- Made `targetStyle` observable in gameplay through reusable insect/fish geometry and added a fixed-capacity feedback pool so taps do not allocate effect nodes.
+- Added `COCOS_MIGRATION_COMPLETION_MATRIX.md` so source evidence and external Creator/WeChat/device proof cannot be conflated.
+- Added bounded runtime performance instrumentation with per-route aggregates, recent-frame P95, sampled node peaks, and a DEV-only clipboard report; it creates a real-device evidence path without exposing diagnostics in release UI.
+- Closed the Boot/Home privacy presentation gap: runtime controls use `UI_2D`, explicit decline cannot initialize cloud or advance the route, and the fixed system identity plus privacy contract remain visible/reachable on Home.
+- Restored the legacy PK robot choice at the controller boundary: Room exposes low/medium/high commands as a compact segmented control, derives selection from authoritative room state, preserves co-op restrictions, and renders each normalized player name only once.
+- Moved semantic route assets onto a pre-mount boundary: the shell retains the current controller under an input-blocking loading layer, rejects stale completions, and lets `ThemeManager` recover from both bundle-level and asset-level failures.
+- Added a state-driven runtime button visual that consumes normal/pressed/disabled theme tokens and redraws only on interaction-state transitions; Room now locks every covered command and back navigation from the same pending action.
+- Hardened the Creator-to-WeChat artifact boundary: the config carries the official `wechatgame` plugin task name, while the inspector proves both theme Bundle configs exist, rejects undeclared/empty subpackages, and enforces both main-package and aggregate-subpackage limits.
+- Replaced the missing 1.8 MB spell-source migration with a 35 KB lossless packed index: four-byte records point into the existing word catalog and restore every legacy template exactly. Room creation now supplies this data explicitly instead of relying on cloud fallback or runtime random generation.
+- Corrected `Home.scene`'s serialized editor viewport offsets to the same centered `960x640` Canvas contract as Boot, then made the static shell test parse and enforce both scenes' transform and Widget geometry.
+- Bound every generated and serialized Label with Cocos shrink overflow, then added runtime traversal that rejects route/loading nodes outside the fixed design area or labels that could resize their transforms.
+- Replaced three room-code behaviors with one domain rule used by the EditBox, join flow, lifecycle invitation parser and sharing; overlong external values are now invalid rather than silently truncated.
+- Extended release QA to parse the Cocos asset graph itself: committed meta UUIDs must be unique, every asset directory must have metadata, only four documented importer metas may be absent, and all Boot/Home internal object references must resolve.
+- Expanded runtime-shell evidence from route mounting to real button execution across all screens. This exposed and fixed a finished-room polling leak: App now cancels polling on settlement, and Result releases the completed session before opening persisted History.
+- Added a monotonic session version at the RoomStore boundary. Fishing and spelling operations reject late responses after leave/replacement, gameplay scenes suppress cancellation noise, non-active mode stores reset, and finished rooms cannot be restarted by foreground recovery.
 
 ## Next Practical Steps
 

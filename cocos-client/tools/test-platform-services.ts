@@ -11,6 +11,13 @@ import { PrivacyService } from "../assets/scripts/services/PrivacyService";
 import { ShareService } from "../assets/scripts/services/ShareService";
 import { StorageService } from "../assets/scripts/services/StorageService";
 
+class InvalidEnvironmentRuntime extends MemoryRuntimePort {
+  override async initCloud(): Promise<void> {
+    this.cloudInitCount += 1;
+    throw new Error("cloud.init failed: envId invalid, environment does not exist -601002");
+  }
+}
+
 async function testPrivacyAndLegacyStorage(): Promise<void> {
   const records = Array.from({ length: 55 }, (_, index) => ({
     id: `record-${index}`,
@@ -58,6 +65,11 @@ async function testPrivacyAndLegacyStorage(): Promise<void> {
 
   privacy.acceptCurrentVersion();
   assert.equal(runtime.getStorage("privacyAcceptedVersion"), PRIVACY_VERSION);
+  privacy.declineCurrentVersion();
+  assert.equal(runtime.getStorage("privacyAcceptedVersion"), undefined);
+  await assert.rejects(() => cloud.init("env-declined"), PrivacyRequiredError);
+  assert.equal(runtime.cloudInitCount, 0);
+  privacy.acceptCurrentVersion();
   storage.clearLegacyPlayerName();
   assert.equal(runtime.getStorage("playerName"), undefined);
   const snapshot = storage.readLegacySnapshot();
@@ -99,6 +111,12 @@ async function testCloudCallsAndFailures(): Promise<void> {
       },
       joinRoom: () => {
         throw { errMsg: "cloud.callFunction:fail Error: 房间不存在 request=private-openid" };
+      },
+      addBot: () => {
+        throw new Error("cloud.callFunction:fail errCode: -501000 FunctionName parameter could not be found");
+      },
+      toggleReady: () => {
+        throw new Error("cloud.callFunction:fail forbidden permission denied");
       },
       submitFeedback: () => new Promise(() => {})
     },
@@ -143,6 +161,28 @@ async function testCloudCallsAndFailures(): Promise<void> {
   );
 
   await assert.rejects(
+    () => cloud.call("addBot", { roomId: "room-safe", difficulty: "low" }),
+    (error: unknown) => {
+      assert.ok(error instanceof CloudCallError);
+      assert.equal(error.code, "FUNCTION_NOT_FOUND");
+      assert.equal(error.message, "游戏服务尚未部署完整，请联系管理员");
+      assert.equal(error.retryable, false);
+      return true;
+    }
+  );
+
+  await assert.rejects(
+    () => cloud.call("toggleReady", { roomId: "room-safe", ready: true }),
+    (error: unknown) => {
+      assert.ok(error instanceof CloudCallError);
+      assert.equal(error.code, "PERMISSION");
+      assert.equal(error.message, "游戏服务权限配置有误，请联系管理员");
+      assert.equal(error.retryable, false);
+      return true;
+    }
+  );
+
+  await assert.rejects(
     () => cloud.call(
       "submitFeedback",
       { content: "private feedback" },
@@ -160,6 +200,28 @@ async function testCloudCallsAndFailures(): Promise<void> {
   assert.equal(serializedLogs.includes("private feedback"), false);
   assert.equal(serializedLogs.includes("req-success"), true);
   assert.equal(serializedLogs.includes("req-timeout"), true);
+}
+
+async function testCloudInitDiagnostics(): Promise<void> {
+  const runtime = new InvalidEnvironmentRuntime({
+    storage: { privacyAcceptedVersion: PRIVACY_VERSION }
+  });
+  const storage = new StorageService(runtime);
+  const privacy = new PrivacyService(storage, runtime);
+  storage.configurePrivacyGate(() => privacy.hasAcceptedCurrentVersion());
+  const cloud = new CloudService(runtime, () => privacy.requireAccepted("cloud"));
+
+  await assert.rejects(
+    () => cloud.init("missing-env"),
+    (error: unknown) => {
+      assert.ok(error instanceof CloudCallError);
+      assert.equal(error.code, "ENVIRONMENT");
+      assert.equal(error.message, "游戏云环境配置不可用，请联系管理员");
+      assert.equal(error.retryable, false);
+      return true;
+    }
+  );
+  assert.equal(runtime.cloudInitCount, 1);
 }
 
 async function testLoggerRedaction(): Promise<void> {
@@ -197,15 +259,21 @@ async function testShareFallbackAndGate(): Promise<void> {
   assert.equal(runtime.clipboardText, "");
 
   privacy.acceptCurrentVersion();
-  const result = await share.shareRoom("ab-12cd", "同舟拼词记");
+  const result = await share.shareRoom(" ab-12cd ", "同舟拼词记");
   assert.equal(result, "copied");
   assert.equal(runtime.clipboardText, "AB12CD");
+  assert.equal(runtime.shareMessages.length, 0);
   assert.deepEqual(runtime.toastMessages, ["房间码已复制"]);
+
+  await assert.rejects(() => share.copyRoomCode("AB12CD-extra"), /房间码无效/);
+  assert.equal(runtime.clipboardText, "AB12CD", "invalid copy must preserve the existing clipboard value");
+  assert.equal(runtime.shareMessages.length, 0, "invalid room codes must not reach the share adapter");
 }
 
 async function main(): Promise<void> {
   await testPrivacyAndLegacyStorage();
   await testCloudCallsAndFailures();
+  await testCloudInitDiagnostics();
   await testLoggerRedaction();
   await testShareFallbackAndGate();
   console.log("Platform services OK: privacy, storage, cloud, logging, and sharing.");
