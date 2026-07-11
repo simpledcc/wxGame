@@ -35,6 +35,7 @@
 | `npm run build:wechat` | 通过 | 2026-07-11 重新生成 `build/wechatgame`；随后包体检查通过。 |
 | `npm run inspect:wechat-build` | 通过 | 微信小游戏产物、横竖屏、必需 Bundle 和包体限制通过。 |
 | 微信开发者工具项目加载 | 已加载 | 项目 `word-fishing-wechatgame` 可打开，模拟器为 iPhone 12/13 竖屏；首页在本轮复核中正常渲染。 |
+| 微信预览二维码 | 已生成 | `cocos-client/build/wechatgame` 已成功生成真机预览二维码，文件位于被忽略的 `.codex-preview/v0-audit/cocos-preview.png`；开发者工具打包输出为总计 6,469,608 bytes、主包 4,108,623 bytes。该二维码用于补齐真实双机验收，非上线提交。 |
 | Web 视觉调试构建 | 产物已生成 | `tools/web-visual-build-config.json` 生成 `build/web-visual`（106 文件、13,224,452 bytes）；构建日志记录任务完成。父进程在引擎子进程 SIGTERM 后返回非零，因此该产物仅用于本地审计，不能作为发布构建。 |
 | Web 交互巡检 | 已完成部分页面 | `http://127.0.0.1:4173/` 使用 Cocos `web-mobile` 调试产物，已采集页面 PNG 和 Cocos profiler 实测值。 |
 | Web 多人画面审计 | 已完成本地模拟 | `http://127.0.0.1:4174/` 使用被忽略的 `build/web-visual-audit/`，已通过现有房间/路由/分包代码完成 PK、默契捕词、同舟拼词、拼词提交和结算画面巡检；审计替身不连接真实云端或真实玩家。 |
