@@ -295,6 +295,13 @@ $env:PYTHONIOENCODING='utf-8'
 - Browser console consistently reports `Can't add renderable component to this node because it already have one` on room and feedback screens. Root cause: `RuntimeUi.edit()` adds `EditBox` to the same node that `panel()` has already given a `Graphics` renderer. The room and feedback screenshots show the resulting large placeholder text leakage. Record this as V1 common-UI work; do not modify the business flow during V0.
 - Web preview uses `MemoryRuntimePort`, so it cannot create cloud rooms. V0 still needs real WeChat/phone screenshots for PK, shared co-op, spell co-op, result and spell-history detail, plus real multiplayer performance data.
 
+### 2026-07-11 Cocos V0 local multiplayer-render audit
+
+- Created only an ignored generated copy at `cocos-client/build/web-visual-audit/`; it injects `audit-wx-stub.js` before the Web entry so the existing `WechatRuntimePort`, room services, route transition and Cocos gameplay bundles can render deterministic audit rooms. It is not source code, is not tracked, does not connect to cloud development, and must never be used as a release build.
+- Captured deterministic 393 x 852 screenshots for PK room/ready/game, shared-coop room/game, spell room/ready/game/filled letters, and spell result under `cocos-client/build/visual-baseline/`. The spell flow entered `X` and `C`, submitted, and rendered a 100-point result page.
+- New V0 finding: completing a PK or shared-catch action triggers `GameplayFeedbackPool.onDestroy()` after its labels have been destroyed. `clear()` accesses `label.node.active`, produces `TypeError: Cannot set properties of null`, repeats destroy warnings, and leaves the runtime route loading overlay visible. The affected source is `cocos-client/assets/bundles/mode_pk/scripts/GameplayFeedbackPool.ts`; do not change it in V0. V1 must make the pool destruction-safe, then test PK and shared-coop completion in actual WeChat.
+- The pre-existing `RuntimeUi.edit()` Graphics/EditBox renderable-component conflict still appears when mounting room pages. Both findings are recorded in `COCOS_VISUAL_BASELINE_V0.md`; V0 remains open because local audit fixtures cannot prove real two-player cloud synchronization or true phone performance.
+
 
 1. Test the latest preview on phone:
    - create a normal `双人PK` room and verify existing gameplay still works

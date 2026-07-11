@@ -724,7 +724,7 @@ npm run inspect:wechat-build
 
 | 阶段 | 状态 | 结果证据 | 备注 |
 | --- | --- | --- | --- |
-| V0 视觉基线与问题审计 | 进行中 | `COCOS_VISUAL_BASELINE_V0.md`、`cocos-client/build/visual-baseline/` | 已完成代码、资源、包体、Web 实测截图、FPS/Draw Call 和节点基线；待微信真机多人对局、结算、性能 JSON 与 PK 遮罩复测。 |
+| V0 视觉基线与问题审计 | 进行中 | `COCOS_VISUAL_BASELINE_V0.md`、`cocos-client/build/visual-baseline/` | 已完成代码、资源、包体、Web 实测截图、FPS/Draw Call、节点基线，以及本地审计模拟的 PK/默契捕词/拼词/拼词结算路径；发现捕词模式结算时 `GameplayFeedbackPool` 销毁异常。待微信真机双人对局、结算、性能 JSON、3 分钟轮询和该错误的微信复验。 |
 | V1 视觉基础设施与美术样板 | 未开始 |  |  |
 | V2 首页、Boot 和导航升级 | 未开始 |  |  |
 | V3 词库与背单词升级 | 未开始 |  |  |
