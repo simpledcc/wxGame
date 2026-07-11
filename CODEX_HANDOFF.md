@@ -287,6 +287,14 @@ $env:PYTHONIOENCODING='utf-8'
 - The original PK “正在加载界面…” overlay was not reproduced by the subsequent homepage run. Keep it as an unconfirmed V0 manual-reproduction item before changing `HomePlaceholder` or bundle loading logic.
 - V0 remains in progress. The source of truth is `COCOS_VISUAL_BASELINE_V0.md`; do not start V1 visual work until the screenshot/performance/PK reproduction gates are closed.
 
+### 2026-07-11 Cocos V0 Web visual audit supplement
+
+- Added the non-business build config `cocos-client/tools/web-visual-build-config.json`. It produces the ignored local preview `cocos-client/build/web-visual/` for Cocos `web-mobile` visual inspection only; it must never replace the WeChat release build.
+- Captured Web debug screenshots under ignored `cocos-client/build/visual-baseline/`: Boot, home at 360/393/430, bank paging, study normal/hidden meaning, cooperative selection, PK/spell rooms, history, help and feedback validation.
+- Web profiler measurements: home at 393×852 was 60 FPS, 1.20 ms frame time, 34 Draw Calls, 876 triangles, 5.14 MiB texture memory and 36.07 MiB buffer memory. See `COCOS_VISUAL_BASELINE_V0.md` for the full table and route-node baseline.
+- Browser console consistently reports `Can't add renderable component to this node because it already have one` on room and feedback screens. Root cause: `RuntimeUi.edit()` adds `EditBox` to the same node that `panel()` has already given a `Graphics` renderer. The room and feedback screenshots show the resulting large placeholder text leakage. Record this as V1 common-UI work; do not modify the business flow during V0.
+- Web preview uses `MemoryRuntimePort`, so it cannot create cloud rooms. V0 still needs real WeChat/phone screenshots for PK, shared co-op, spell co-op, result and spell-history detail, plus real multiplayer performance data.
+
 
 1. Test the latest preview on phone:
    - create a normal `双人PK` room and verify existing gameplay still works
