@@ -1,0 +1,261 @@
+﻿{
+    "schemaVersion":  1,
+    "generatedAt":  "2026-07-11T00:00:00+08:00",
+    "evidenceType":  "Cocos V0 visual baseline",
+    "count":  36,
+    "totalBytes":  956174,
+    "files":  [
+                  {
+                      "file":  "S03-boot-privacy-393x852.png",
+                      "bytes":  39453,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "d9621efe78f2ca613f84d346b4e82eecc8566b93ea39f98c9ed520d82db14618"
+                  },
+                  {
+                      "file":  "S03-boot-privacy-430x932.png",
+                      "bytes":  42814,
+                      "width":  430,
+                      "height":  932,
+                      "sha256":  "d7f779674ec67a905886d987900e87cf6db7d420e6a13f5255641e50579352d0"
+                  },
+                  {
+                      "file":  "S04-home-360x800.png",
+                      "bytes":  25992,
+                      "width":  360,
+                      "height":  800,
+                      "sha256":  "4f4c97949f455ee56d5f77701295365c5d49c1be7905faac7f1fb9e8f485b46d"
+                  },
+                  {
+                      "file":  "S04-home-393x852.png",
+                      "bytes":  28561,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "590c82c312a3b1bb2182bfff86fe8e92c4382d0c99edec2d81f9d0cf40ca3a11"
+                  },
+                  {
+                      "file":  "S04-home-430x932.png",
+                      "bytes":  32341,
+                      "width":  430,
+                      "height":  932,
+                      "sha256":  "c8075db5ac21ce043bcebb610d7286ef6612d338ccc7ab791924364e7b1ca8b4"
+                  },
+                  {
+                      "file":  "S04-home-after-study-393x852.png",
+                      "bytes":  28725,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "5194723ae16edc448ebf26f31f5e06c9ef6d735de99525ac9b417ac4de32221d"
+                  },
+                  {
+                      "file":  "S04-home-performance-report-430x932.png",
+                      "bytes":  32702,
+                      "width":  430,
+                      "height":  932,
+                      "sha256":  "19df4b9181446d5568cc7910afd1bae9e39b9d1437f8b1c0c6ddee9ec1cc9977"
+                  },
+                  {
+                      "file":  "S05-bank-393x852.png",
+                      "bytes":  27547,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "6a4ecb8b075eb1d0d40d6b329278a4a91b01e0b6f82ea6cba80b20f332f8c26c"
+                  },
+                  {
+                      "file":  "S05-bank-page2-393x852.png",
+                      "bytes":  28335,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "75e8696e5197848d1896f61c656809557fc458720792844312e1e594f04d7ce0"
+                  },
+                  {
+                      "file":  "S06-study-393x852.png",
+                      "bytes":  23768,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "9a0c2783e6c259c7f9e9ec8bb98e7c3f753487085e03e5210a027ee7c5df0f6b"
+                  },
+                  {
+                      "file":  "S06-study-hidden-meaning-393x852.png",
+                      "bytes":  22466,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "36df4b3098f0e788c6471e80402341644da75f19facf8da65b7d42802a00685c"
+                  },
+                  {
+                      "file":  "S07-room-pk-430x932.png",
+                      "bytes":  29112,
+                      "width":  430,
+                      "height":  932,
+                      "sha256":  "b83160a78d01079099c8ff0513784e03a88e2757d5ed498a8fcddd4be19adce0"
+                  },
+                  {
+                      "file":  "S07-room-spell-393x852.png",
+                      "bytes":  25555,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "b60c6f5069685fef57b4bcd831ef99e281766ff9a12dc3cad4d130b79843f197"
+                  },
+                  {
+                      "file":  "S08-audit-boot-393x852.png",
+                      "bytes":  39511,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "123f21c4edf5f0cc3bb3ef2988c5e5c1921dad5b59bba764f04b216ab91c6139"
+                  },
+                  {
+                      "file":  "S08-audit-home-393x852.png",
+                      "bytes":  28672,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "fe0f79530087e8322ee1e03f029ba69d89589b39ed81a187c3b898512d99de3d"
+                  },
+                  {
+                      "file":  "S08-audit-pk-game-393x852.png",
+                      "bytes":  21451,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "a1b69f373c743232271d7db7d8a5bc5ae30fef5826d9e2b23a457a65739dfbf2"
+                  },
+                  {
+                      "file":  "S08-audit-pk-ready-393x852.png",
+                      "bytes":  27062,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "6b785524c6fc31d5f56ff7e5fe642968c541b8a34c27365c8e69c13cba89d56d"
+                  },
+                  {
+                      "file":  "S08-audit-pk-room-393x852.png",
+                      "bytes":  25985,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "8f16c70964f7811bb3044c4165dc85ed46654e44d96ac5b4c88a80e5f88722aa"
+                  },
+                  {
+                      "file":  "S08-audit-pk-room-initial-393x852.png",
+                      "bytes":  25243,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "60d96ec023c0f734224828a471e6481749950294ecbb4bc5214d56c894f2aef2"
+                  },
+                  {
+                      "file":  "S09-audit-coop-select-393x852.png",
+                      "bytes":  27980,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "63c05cbb1d48f8cf544bf9e2851f9f9e53c737aca72c2fda23710c7bbec7f1e2"
+                  },
+                  {
+                      "file":  "S09-audit-shared-game-393x852.png",
+                      "bytes":  21463,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "a6b2915579578e551a552ef78f04f0d3ff23242ef5079b4e1fa18cf8575356a4"
+                  },
+                  {
+                      "file":  "S09-audit-shared-room-393x852.png",
+                      "bytes":  26960,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "c045a5c9b41e3dc29d2105f01174afc764f2b5e1ba0b90da2c9b0c65d8717da0"
+                  },
+                  {
+                      "file":  "S09-coop-select-393x852.png",
+                      "bytes":  27910,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "d885529232bbae5d2e52c8a178e5798c111fa5b98800a2f3345a77a07ad46bcf"
+                  },
+                  {
+                      "file":  "S10-audit-spell-boot-393x852.png",
+                      "bytes":  7261,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "a5f9b6c97abb99261dadcee70931bdfb19ce1049c012519f9297aa2adbc6ea1c"
+                  },
+                  {
+                      "file":  "S10-audit-spell-filled-393x852.png",
+                      "bytes":  23087,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "ebfab9f09cbf43fa714794183182b618eb3373039c2c7d10b777b6921c71ebc4"
+                  },
+                  {
+                      "file":  "S10-audit-spell-game-393x852.png",
+                      "bytes":  22799,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "68280a24639fb748becef84186f92e9b03a41c0df6f678b09aab3c56bc7b8a58"
+                  },
+                  {
+                      "file":  "S10-audit-spell-ready-393x852.png",
+                      "bytes":  23377,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "7335bd77b18f75a9310bd28425c2961d9a2a4c11978a830f600eb89d1f359292"
+                  },
+                  {
+                      "file":  "S10-audit-spell-room-393x852.png",
+                      "bytes":  28043,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "aa594eaa4a684d81746ef775d31e26539cfa1918e050781fd258e1aa677d9a05"
+                  },
+                  {
+                      "file":  "S10-audit-spell-room-created-393x852.png",
+                      "bytes":  23165,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "90465acee4350f08d43ac2bad1e6e574374c28c5460471d8084e3fdc47dc29e9"
+                  },
+                  {
+                      "file":  "S10-audit-spell-select-393x852.png",
+                      "bytes":  28002,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "9b63ce909e81cb6f4da81e40c0c5c5258f76de9a21cd4f9f82565f5781ebb5be"
+                  },
+                  {
+                      "file":  "S11-audit-pk-result-393x852.png",
+                      "bytes":  21476,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "f235f1604865829d9a44f402a8ddda1bf6ee95fec084b7eb32e2805f14b84b9c"
+                  },
+                  {
+                      "file":  "S11-audit-spell-result-393x852.png",
+                      "bytes":  17817,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "f834734cbe40eb53e70c203d660d17cfc865571313eb0d23e0f3b37e1e845da3"
+                  },
+                  {
+                      "file":  "S11-help-393x852.png",
+                      "bytes":  29485,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "5d77485d3a598a545787e5c707333157a450211ce544ced92f5521e55bd96023"
+                  },
+                  {
+                      "file":  "S12-history-393x852.png",
+                      "bytes":  18846,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "b9d65f027368e39d7f442da4c3576e7e23f92fb0d80e0a3ee267f8934a6c5101"
+                  },
+                  {
+                      "file":  "S13-feedback-393x852.png",
+                      "bytes":  26602,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "e4dfed66004d3872a9d80a975edf459bfd44dd742af841ac050f2d9f0865506b"
+                  },
+                  {
+                      "file":  "S13-feedback-validation-393x852.png",
+                      "bytes":  26606,
+                      "width":  393,
+                      "height":  852,
+                      "sha256":  "c17461d61139d619e4850d796104343b925978223de80100b279548a2ecff89c"
+                  }
+              ]
+}
