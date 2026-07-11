@@ -279,6 +279,15 @@ $env:PYTHONIOENCODING='utf-8'
 
 ## Suggested Next Steps
 
+### 2026-07-11 Cocos V0 audit update
+
+- `develop/cocos-migration` has passed `npm run verify`, `npm run build:wechat:dry-run`, and `npm run inspect:wechat-build` for the V0 visual baseline.
+- The WeChat DevTools iPhone 12/13 simulator now renders the Cocos home screen after the user authorized “Trust and Run”; the trust dialog did not reappear during the follow-up inspection.
+- Controlled Windows automation can observe the simulator but its synthetic clicks are not forwarded into the game canvas. Do not treat this as a confirmed player-side input bug; use a manual DevTools interaction or a real phone to finish S03/S05-S13 screenshots and performance measurements.
+- The original PK “正在加载界面…” overlay was not reproduced by the subsequent homepage run. Keep it as an unconfirmed V0 manual-reproduction item before changing `HomePlaceholder` or bundle loading logic.
+- V0 remains in progress. The source of truth is `COCOS_VISUAL_BASELINE_V0.md`; do not start V1 visual work until the screenshot/performance/PK reproduction gates are closed.
+
+
 1. Test the latest preview on phone:
    - create a normal `双人PK` room and verify existing gameplay still works
    - create a `默契捕词赛` room and verify either player can answer and team score changes
