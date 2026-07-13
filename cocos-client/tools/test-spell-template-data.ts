@@ -12,7 +12,8 @@ const spellSourcePath = path.join(repositoryRoot, "miniprogram", "spellWordBankD
 const legacySpellBanks = require(spellSourcePath).SPELL_WORD_BANKS as Record<string, unknown[]>;
 
 function testSourceHashAndExactTemplates(): void {
-  const hash = crypto.createHash("sha256").update(fs.readFileSync(spellSourcePath)).digest("hex");
+  const source = fs.readFileSync(spellSourcePath, "utf8").replace(/\r\n?/g, "\n");
+  const hash = crypto.createHash("sha256").update(source, "utf8").digest("hex");
   assert.equal(SPELL_TEMPLATE_SOURCE_SHA256, hash, "generated spell data is stale");
   assert.equal(Object.keys(SPELL_TEMPLATE_DATA).length, 44);
 

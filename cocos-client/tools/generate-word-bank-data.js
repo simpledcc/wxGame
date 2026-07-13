@@ -25,7 +25,8 @@ function writeJsonIfMissing(filePath, data) {
 }
 
 function sourceHash(filePath) {
-  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+  const source = fs.readFileSync(filePath, "utf8").replace(/\r\n?/g, "\n");
+  return crypto.createHash("sha256").update(source, "utf8").digest("hex");
 }
 
 function writeGeneratedText(filePath, text) {
