@@ -25,7 +25,6 @@ function createRoom(
 ): RoomSnapshot {
   const gameOptions = buildRoomGameOptions({
     modeKey: "pk",
-    duration: 60,
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",
     words: [{ word: "exchange", meaning: "交换" }],
@@ -281,7 +280,6 @@ async function testPollingDeduplicatesReads(): Promise<void> {
 function testRoomRules(): void {
   const options = buildRoomGameOptions({
     modeKey: "coopSpell",
-    duration: 90,
     bankId: "wrong",
     wordMode: "mistakes",
     words: [
@@ -294,6 +292,8 @@ function testRoomRules(): void {
   assert.equal(options.coopMode, "spell");
   assert.equal(options.mode, "mistakes");
   assert.equal(options.roomWords?.length, 1);
+  assert.equal("duration" in options, false, "pre-game room settings must not send a duration");
+  assert.equal("botDifficulty" in options, false, "pre-game room settings must not send robot options");
 
   const coopRoom = normalizeRoomSnapshot(createRoom({
     state: "waiting",

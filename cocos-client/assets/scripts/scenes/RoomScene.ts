@@ -4,8 +4,7 @@ import {
   buildRoomGameOptions,
   getLocalRoomPlayer,
   getRoomActionAvailability,
-  getRoomStartStatusText,
-  isBotPlayer
+  getRoomStartStatusText
 } from "../domain/RoomRules";
 import type { RoomSnapshot } from "../domain/RoomTypes";
 import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
@@ -121,7 +120,6 @@ export class RoomScene extends Component {
       : [];
     const gameOptions = buildRoomGameOptions({
       modeKey: state.selectedMode,
-      duration: state.duration,
       bankId: state.bankId,
       wordMode: state.wordMode,
       words,
@@ -260,15 +258,13 @@ export class RoomScene extends Component {
     const availability = getRoomActionAvailability(room, localOpenId);
     const localPlayer = getLocalRoomPlayer(room, localOpenId);
     if (this.modeLabel) {
-      this.modeLabel.string = `${this.getSelectedModeLabel(room)} · ${room.duration}秒`;
+      this.modeLabel.string = this.getSelectedModeLabel(room);
     }
     if (this.playersLabel) {
       this.playersLabel.string = room.players.length
         ? room.players.map((player, index) => {
             const identity = player.openid === localOpenId ? "（我）" : "";
-            const displayName = isBotPlayer(player)
-              ? `机器人 ${player.nickName || "对手"}`
-              : `${player.nickName || `玩家${index + 1}`}${identity}`;
+            const displayName = `玩家${index + 1}${identity}`;
             return `${displayName} · ${player.ready ? "已准备" : "未准备"}`;
           }).join("\n")
         : "等待玩家加入";

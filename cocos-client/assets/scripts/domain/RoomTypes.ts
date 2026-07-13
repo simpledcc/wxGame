@@ -95,13 +95,13 @@ export interface FishSnapshot {
 }
 
 export interface GameOptions {
-  duration: GameDuration;
+  duration?: GameDuration;
   bankId: string;
   mode: WordMode;
   wrongWords: WordItem[];
   roomWords?: WordItem[];
   roomSpellQuestions?: SpellTemplate[];
-  botDifficulty: BotDifficulty;
+  botDifficulty?: BotDifficulty;
   matchMode: MatchMode;
   coopMode: CoopMode;
 }
@@ -174,4 +174,3 @@ export interface MatchRecord {
     score: number;
   }>;
 }
-

@@ -1,4 +1,4 @@
-import type { GameDuration, GameModeKey, WordMode } from "../domain/GameTypes";
+import type { GameModeKey, WordMode } from "../domain/GameTypes";
 import { EventBus } from "../core/EventBus";
 
 export type RouteName =
@@ -26,7 +26,6 @@ export interface AppState {
   selectedMode: GameModeKey;
   roomEntryIntent: RoomEntryIntent;
   roomAutoReady: boolean;
-  duration: GameDuration;
   bankId: string;
   wordMode: WordMode;
   bankReturnRoute: RouteName;
@@ -47,7 +46,6 @@ export class GameStore {
     selectedMode: "pk",
     roomEntryIntent: "neutral",
     roomAutoReady: true,
-    duration: 60,
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",
     bankReturnRoute: "home",

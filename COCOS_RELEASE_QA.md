@@ -1,21 +1,21 @@
 # Cocos Release QA Record
 
-Date: 2026-07-13
+Date: 2026-07-14
 
-Status: Phase 8 source development is complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup have passed for H5. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+Status: Phase 8 source development and H7 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup have passed for the current source. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
 
 ## Latest Real Build Evidence
 
-- Source baseline: H5 commit `005c713`; H6 completion is the commit containing this updated record
-- `npm run verify`: `PASSED` after H6 on 2026-07-13 in `47.4s`
-- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8` in `48.5s`
-- Generated package: `89` files, `6,488,045` bytes total
+- Source baseline: H6 commit `bfd2870`; H7 completion is the commit containing this updated record
+- `npm run verify`: `PASSED` after H7 on 2026-07-14 in `50.2s`
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
+- Generated package: `89` files, `6,487,834` bytes total
 - Main package: `4,120,918 / 4,194,304` bytes; only `73,386` bytes remain
-- Subpackages: `2,367,127` bytes total; `mode_pk` `40,748` bytes and `mode_spell` `25,615` bytes
+- Subpackages: `2,366,916` bytes total; `mode_pk` `40,748` bytes and `mode_spell` `25,615` bytes
 - `npm run inspect:wechat-build`: `PASSED`; report retained at ignored local path `cocos-client/build/wechatgame-report.json`
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
 - H5 simulator traversal previously covered Home, mode catalog, create configuration, bank return, join, history and study with `0` reported Problems
-- H6 runtime tests require mutually exclusive create/join trees, release entry-form nodes after session acceptance, and reject hidden robot/manual-refresh controller regressions
+- H7 runtime tests additionally reject pre-game robot identity, duration state/display and duration/bot fields in newly built room options
 
 Known non-blocking Creator notices: legacy components still use primitive decorator types (`Boolean`, `String`, `Number`) instead of the Cocos-specific annotation types, and Babel reports styling de-optimization for the generated word-bank file over 500 KB. The build and package inspector pass, but these notices should be cleaned in the owning UI/gameplay streams before final release QA.
 
@@ -40,7 +40,7 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Remote settlement: real App subscriptions convert remotely finished PK/spell snapshots into result/history state before routing, without another finish cloud call.
 - Room replacement: invalid or failed create/join attempts retain the active room, identity, and polling until a replacement succeeds or the player explicitly leaves.
 - Join recovery: a server-accepted join with an initial document-read failure retains the new identity/session, enters Room, and retries polling without a duplicate join request.
-- Room robot parity: PK exposes low/medium/high difficulty controls backed by authoritative snapshots; co-op keeps them disabled, and player rows do not duplicate normalized names.
+- Preparation Room UI exposes no robot or duration selection and uses normalized Player 1/Player 2 rows; dormant gameplay robot compatibility remains covered only by the frozen lower-level tests.
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.

@@ -185,7 +185,6 @@ function makeRemoteFinishedRoom(modeKey: "pk" | "coopSpell"): RoomSnapshot {
     duration: 60,
     gameOptions: buildRoomGameOptions({
       modeKey,
-      duration: 60,
       bankId: "jilin-g1a-b1-welcome",
       wordMode: "regular",
       words: [
@@ -341,6 +340,7 @@ async function main(): Promise<void> {
   [0, 1, 2, 3].forEach((index) => assertOk(findDeep(canvas, `HomeLogoCharacter${index}`)?.getComponent(Label)));
   assertEqual(findDeep(canvas, "BestScores"), null, "new Home must not show the old score toolbar");
   assertEqual(findDeep(canvas, "DurationTitle"), null, "new Home must not show duration controls");
+  assertEqual("duration" in app.store.getState(), false, "pre-game state must not retain a duration setting");
   assertOk(findDeep(canvas, "HomePrivacy")?.getComponent(Button), "Home privacy entry is required");
   const initialHomeRoot = findDeep(canvas, "HomeRuntimeScreen");
   assertOk(initialHomeRoot);
@@ -515,6 +515,7 @@ async function main(): Promise<void> {
   assertEqual(autoReadyCount, 1, "enabled auto-ready must use the existing ready action once");
   assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
   assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "取消准备");
+  assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
   app.roomSession.create = originalCreateRoom;
   app.roomSession.toggleReady = originalToggleReady;
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);

@@ -52,7 +52,6 @@ function createSharedRoom(overrides: Partial<RoomSnapshot> = {}): RoomSnapshot {
     duration: 60,
     gameOptions: buildRoomGameOptions({
       modeKey: "coopShared",
-      duration: 60,
       bankId: "jilin-g1a-b1-welcome",
       wordMode: "regular",
       words: [

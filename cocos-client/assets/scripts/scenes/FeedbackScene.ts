@@ -68,7 +68,6 @@ export class FeedbackScene extends Component {
         mode: state.selectedMode,
         matchMode: room?.gameOptions.matchMode || "",
         coopMode: room?.gameOptions.coopMode || "",
-        duration: state.duration,
         clientVersion: "3.8.8"
       });
       if (!this.isCurrentSubmission(sequence)) return;

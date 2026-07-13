@@ -57,7 +57,7 @@ Status meanings:
 | Reused gameplay effect nodes | Fixed three-label `GameplayFeedbackPool` runtime test | Passed in source; frame-time proof pending |
 | Runtime performance evidence collection | Bounded `PerformanceService`, 60-frame shell execution, node sampling and DEV clipboard report test | Passed for instrumentation; target-device reports pending |
 | WeChat package boundaries | Dry-run and real inspector require four Bundle configs, place `mode_pk`/`mode_spell` in declared subpackages, and enforce forbidden-path, 4 MiB main and 30 MiB aggregate limits | Passed for current real package |
-| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H6 package at `6,488,045` total bytes, `4,120,918` main bytes and all four required Bundle roots/package types | Passed for current real package |
+| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H7 package at `6,487,834` total bytes, `4,120,918` main bytes and all four required Bundle roots/package types | Passed for current real package |
 
 ## Phase 9 External Evidence
 

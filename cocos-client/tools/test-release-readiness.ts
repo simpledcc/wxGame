@@ -121,7 +121,7 @@ function testSceneCoverage(): void {
   assert.match(boot, /UI_LAYER/);
   const room = read("assets/scripts/scenes/RoomScene.ts");
   assert.match(room, /roomCodeInput/);
-  assert.doesNotMatch(room, /addLowBot|addMediumBot|addHighBot|botDifficultyButtons|refreshRoom|refreshButton/);
+  assert.doesNotMatch(room, /addLowBot|addMediumBot|addHighBot|botDifficultyButtons|refreshRoom|refreshButton|isBotPlayer|机器人|state\.duration|room\.duration/);
   assert.match(room, /setSessionControls/);
   assert.match(room, /setLobbyButtons/);
   assert.match(room, /releaseEntryPanels/);
@@ -129,6 +129,8 @@ function testSceneCoverage(): void {
   assert.match(room, /roomSpellQuestions/);
   assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
+  const gameStore = read("assets/scripts/store/GameStore.ts");
+  assert.doesNotMatch(gameStore, /GameDuration|\bduration\s*:/);
   const coopSelect = read("assets/scripts/scenes/CoopSelectScene.ts");
   assert.doesNotMatch(coopSelect, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
   const shell = read("assets/scripts/components/HomePlaceholder.ts");

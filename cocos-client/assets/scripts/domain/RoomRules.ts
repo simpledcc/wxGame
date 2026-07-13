@@ -25,13 +25,11 @@ export const WRONG_WORD_LIMIT = 200;
 
 export interface RoomCreationSettings {
   modeKey: GameModeKey;
-  duration: GameDuration;
   bankId: string;
   wordMode: WordMode;
   words: WordItem[];
   wrongWords: WordItem[];
   roomSpellQuestions?: SpellTemplate[];
-  botDifficulty?: BotDifficulty;
 }
 
 export type RoomStartBlockReason =
@@ -92,7 +90,7 @@ export function isValidRoomCode(value: string): boolean {
 
 export function normalizeGameOptions(
   options: Partial<GameOptions> = {},
-  fallbackDuration: GameDuration = 60
+  fallbackDuration?: GameDuration
 ): GameOptions {
   const bankId = String(options.bankId ?? DEFAULT_BANK_ID).trim() || DEFAULT_BANK_ID;
   const mode: WordMode = bankId === WRONG_BANK_ID || options.mode === "mistakes"
@@ -100,17 +98,20 @@ export function normalizeGameOptions(
     : "regular";
   const matchMode = options.matchMode === "coop" ? "coop" : "pk";
   const coopMode = options.coopMode === "spell" ? "spell" : "shared";
-  const botDifficulty: BotDifficulty = ["low", "medium", "high"].includes(
-    String(options.botDifficulty)
-  ) ? options.botDifficulty as BotDifficulty : "medium";
+  const duration = options.duration == null && fallbackDuration == null
+    ? undefined
+    : normalizeDuration(options.duration ?? fallbackDuration);
+  const botDifficulty = ["low", "medium", "high"].includes(String(options.botDifficulty))
+    ? options.botDifficulty as BotDifficulty
+    : undefined;
   return {
-    duration: normalizeDuration(options.duration ?? fallbackDuration),
+    ...(duration == null ? {} : { duration }),
     bankId: mode === "mistakes" ? WRONG_BANK_ID : bankId,
     mode,
     wrongWords: normalizeWords(options.wrongWords, WRONG_WORD_LIMIT),
     roomWords: normalizeWords(options.roomWords, ROOM_WORD_LIMIT),
     roomSpellQuestions: normalizeSpellTemplates(options.roomSpellQuestions),
-    botDifficulty,
+    ...(botDifficulty == null ? {} : { botDifficulty }),
     matchMode,
     coopMode
   };
@@ -120,16 +121,14 @@ export function buildRoomGameOptions(settings: RoomCreationSettings): GameOption
   const matchMode = settings.modeKey === "pk" ? "pk" : "coop";
   const coopMode = settings.modeKey === "coopSpell" ? "spell" : "shared";
   return normalizeGameOptions({
-    duration: settings.duration,
     bankId: settings.bankId,
     mode: settings.wordMode,
     wrongWords: settings.wordMode === "mistakes" ? settings.wrongWords : [],
     roomWords: settings.words,
     roomSpellQuestions: settings.modeKey === "coopSpell" ? settings.roomSpellQuestions : [],
-    botDifficulty: settings.botDifficulty ?? "medium",
     matchMode,
     coopMode
-  }, settings.duration);
+  });
 }
 
 function normalizePlayer(player: PlayerSnapshot, index: number): PlayerSnapshot {

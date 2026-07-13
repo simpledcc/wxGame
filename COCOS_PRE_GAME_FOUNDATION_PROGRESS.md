@@ -15,8 +15,9 @@ Updated: 2026-07-13
 - Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
 - Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - H5 completion commit: `005c713` (`feat(pre-game): complete seven-page preparation flow dev_done`)
+- H6 completion commit: `bfd2870` (`refactor(pre-game): remove hidden preparation controls dev_done`)
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H6 PRE-GAME LOGIC SIMPLIFICATION DONE`
+- Current stage: `H7 PRE-GAME OPTION CLEANUP DONE`
 - Next stage: two-real-phone create/join/ready/start acceptance for the frozen pre-game flow; do not start H4 art work
 
 ## Baseline facts
@@ -77,6 +78,7 @@ Updated: 2026-07-13
 | H4 Formal art integration | `DESIGN_READY` | `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` defines assets, Bundle/loading architecture, fallback, QA and collaboration gates | Approved image files and a Creator 3.8.8 import owner are required before implementation |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
+| H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -216,6 +218,25 @@ Updated: 2026-07-13
 - Normalized runtime source payload: `1,484,332` bytes, down `2,324` bytes from the pre-H6 documentation audit
 - Generated package total: down `2,713` bytes from H5; the unchanged main-package margin remains `73,386` bytes
 - Forbidden gameplay Bundle, cloud function and legacy client diffs against H5 commit `005c713`: `PASSED`, empty
+
+## H7 pre-game option cleanup
+
+1. Removed `duration` from `GameStore`; no pre-game route can store or mutate a selected match length.
+2. Removed `duration` and `botDifficulty` from `RoomCreationSettings`; a newly created room request omits both fields and relies on the existing backend defaults.
+3. Kept room snapshot duration optional-game data intact because active gameplay countdown and legacy room recovery still require it.
+4. Removed duration display and robot identity branching from the preparation lobby; rows are shown only as Player 1/Player 2 plus ready state.
+5. Removed stale duration from feedback context and changed Help room guidance to the necessary two-player ready/start flow.
+6. Added static/runtime regression checks for absent pre-game duration state, absent robot copy/handlers and clean creation payloads.
+7. Kept gameplay Bundles, robot match services, countdown/settlement logic, cloud functions and the legacy mini-program unchanged per the narrowed user scope.
+
+### H7 final verification
+
+- `npm run verify`: `PASSED` in `50.2s`; all structure, platform, lifecycle, 11 cloud-contract, room, gameplay compatibility, UI, release and TypeScript checks passed
+- `npm audit --omit=dev`: `PASSED`, 0 vulnerabilities
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
+- `npm run inspect:wechat-build`: `PASSED`; `89` files, `6,487,834` total bytes, `4,120,918` main bytes and `2,366,916` subpackage bytes
+- WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
+- Gameplay Bundle, gameplay service, cloud function and legacy client diffs against H6 commit `bfd2870`: `PASSED`, empty
 
 ## G0 modified files
 

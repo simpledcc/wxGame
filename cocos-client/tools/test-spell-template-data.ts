@@ -46,7 +46,6 @@ function testPayloadLimitAndModeIsolation(): void {
 
   const spellOptions = buildRoomGameOptions({
     modeKey: "coopSpell",
-    duration: 60,
     bankId,
     wordMode: "regular",
     words: bank.words,
@@ -58,7 +57,6 @@ function testPayloadLimitAndModeIsolation(): void {
 
   const pkOptions = buildRoomGameOptions({
     modeKey: "pk",
-    duration: 60,
     bankId,
     wordMode: "regular",
     words: bank.words,

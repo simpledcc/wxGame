@@ -81,7 +81,6 @@ function createSpellRoom(question: SpellQuestion): RoomSnapshot {
     duration: 60,
     gameOptions: buildRoomGameOptions({
       modeKey: "coopSpell",
-      duration: 60,
       bankId: "jilin-g1a-b1-welcome",
       wordMode: "regular",
       words: [
@@ -444,7 +443,6 @@ async function testSpellQuestionIsolationAndHistory(): Promise<void> {
     spellHistory: [],
     gameOptions: buildRoomGameOptions({
       modeKey: "pk",
-      duration: 60,
       bankId: "jilin-g1a-b1-welcome",
       wordMode: "regular",
       words: [{ word: "team", meaning: "团队" }],
