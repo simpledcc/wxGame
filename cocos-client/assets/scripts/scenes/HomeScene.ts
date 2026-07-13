@@ -67,10 +67,9 @@ export class HomeScene extends Component {
     this.navigateOnce(() => app.router.openBankPicker("home"));
   }
 
-  openPkRoom(): void {
+  openModeCatalog(): void {
     this.navigateOnce(() => {
       app.roomSession.leave();
-      app.store.patch({ selectedMode: "pk", roomEntryIntent: "neutral" });
       app.router.navigate("coopSelect");
     });
   }

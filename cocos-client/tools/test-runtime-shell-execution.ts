@@ -444,6 +444,9 @@ async function main(): Promise<void> {
   assertEqual(app.store.getState().route, "room");
   assertEqual(app.store.getState().roomEntryIntent, "join");
   assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "加入房间");
+  assertEqual(findDeep(canvas, "RoomCreatePanel"), null, "join entry must not build the unused create form");
+  assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
+  assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
   assertOk(
     findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("输入好友的 6 位房间码"),
     "join entry must guide the player to enter a room code"
@@ -469,6 +472,8 @@ async function main(): Promise<void> {
   assertEqual(app.store.getState().route, "room", "available mode must open room configuration");
   assertEqual(app.store.getState().roomEntryIntent, "create");
   assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "创建房间");
+  assertEqual(findDeep(canvas, "RoomJoinPanel"), null, "create entry must not build the unused join form");
+  assertEqual(findDeep(canvas, "JoinRoom"), null, "create entry must not retain hidden join controls");
   assertOk(
     findDeep(canvas, "CreateGuidance")?.getComponent(Label)?.string.includes("创建后邀请好友"),
     "create configuration must explain the next step"
@@ -744,17 +749,17 @@ async function main(): Promise<void> {
       assertEqual(app.store.getState().route, "room");
     }
     if (routes[index] === "room") {
-      assertEqual(findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox)?.maxLength, 6);
+      assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
         findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string,
         "正在读取房间信息",
         "accepted joins without a snapshot must show a syncing state"
       );
       assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
-      assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
-      assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
-      assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, false);
-      assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, false);
+      assertEqual(findDeep(canvas, "CreateRoom"), null);
+      assertEqual(findDeep(canvas, "JoinRoom"), null);
+      assertEqual(findDeep(canvas, "RoomCreatePanel"), null);
+      assertEqual(findDeep(canvas, "RoomJoinPanel"), null);
       assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
       app.playerStore.setOpenId("player-1");
       const waitingRoom = makeWaitingPkRoom();
@@ -767,17 +772,6 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "InviteFriend")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "RefreshRoom"), null, "room refresh stays in background polling");
-
-      const roomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
-      assertOk(roomCodeInput);
-      roomCodeInput.string = "ABC";
-      const callsBeforeInvalidJoin = appRuntime.cloudCalls.length;
-      const toastsBeforeDisabledJoin = appRuntime.toastMessages.length;
-      findDeep(canvas, "JoinRoom")?.emit(Button.EventType.CLICK);
-      await flushMany();
-      assertEqual(appRuntime.cloudCalls.length, callsBeforeInvalidJoin, "disabled join must not call joinRoom");
-      assertEqual(app.roomStore.getState().roomId, "pending-room", "disabled join must retain the active room");
-      assertEqual(appRuntime.toastMessages.length, toastsBeforeDisabledJoin, "disabled join must not execute its handler");
 
       findDeep(canvas, "CopyCode")?.emit(Button.EventType.CLICK);
       await flushMany();
@@ -799,9 +793,6 @@ async function main(): Promise<void> {
       app.roomStore.setPendingAction("create");
       [
         "BackButton",
-        "CreateRoom",
-        "JoinRoom",
-        "AutoReady",
         "Ready",
         "StartRoom",
         "CopyCode",
@@ -815,8 +806,6 @@ async function main(): Promise<void> {
         assertEqual(visual?.isShowingDisabledState(), true, `${name} must display its disabled color`);
       });
       app.roomStore.setPendingAction(null);
-      assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
-      assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "BackButton")?.getComponent(Button)?.interactable, true);
 
       app.store.patch({ selectedMode: "coopSpell" });

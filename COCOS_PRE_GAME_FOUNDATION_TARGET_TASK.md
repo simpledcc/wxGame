@@ -220,9 +220,8 @@ HomeRuntimeScreen
 
 行为：
 
-- 设置现有 PK/房间入口需要的模式状态。
-- 清理旧房间会话沿用 `HomeScene.openPkRoom()` 的既有行为。
-- 导航到 `room`。
+- 首页通过 `HomeScene.openModeCatalog()` 清理旧房间会话并导航到玩法目录。
+- 用户选择已开放玩法后，目录控制器设置现有 PK/房间入口需要的模式状态，再导航到 `room` 创建配置页。
 - 不在首页调用 `createRoom` 云函数。
 - 不自动替用户确认词库、时长或模式。
 

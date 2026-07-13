@@ -7,7 +7,6 @@ import {
   getRoomStartStatusText,
   isBotPlayer
 } from "../domain/RoomRules";
-import type { BotDifficulty } from "../domain/GameTypes";
 import type { RoomSnapshot } from "../domain/RoomTypes";
 import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
 import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
@@ -19,17 +18,9 @@ const ACTION_LABELS: Record<string, string> = {
   create: "正在创建房间...",
   join: "正在加入房间...",
   ready: "正在更新准备状态...",
-  bot: "正在设置机器人...",
   start: "正在开始游戏...",
   copy: "正在复制房间码...",
   invite: "正在打开邀请..."
-};
-
-const BOT_DIFFICULTIES: BotDifficulty[] = ["low", "medium", "high"];
-const BOT_DIFFICULTY_LABELS: Record<BotDifficulty, string> = {
-  low: "低",
-  medium: "中",
-  high: "高"
 };
 
 @ccclass("RoomScene")
@@ -86,22 +77,10 @@ export class RoomScene extends Component {
   inviteButton: Button | null = null;
 
   @property(Button)
-  refreshButton: Button | null = null;
-
-  @property(Button)
   backButton: Button | null = null;
 
   @property(Button)
   leaveButton: Button | null = null;
-
-  @property(Button)
-  addBotButton: Button | null = null;
-
-  @property([Button])
-  botDifficultyButtons: Button[] = [];
-
-  @property([Label])
-  botDifficultyLabels: Label[] = [];
 
   @property(Button)
   startButton: Button | null = null;
@@ -197,22 +176,6 @@ export class RoomScene extends Component {
     }
   }
 
-  async addDefaultBot(): Promise<void> {
-    await this.addBot("medium");
-  }
-
-  async addLowBot(): Promise<void> {
-    await this.addBot("low");
-  }
-
-  async addMediumBot(): Promise<void> {
-    await this.addBot("medium");
-  }
-
-  async addHighBot(): Promise<void> {
-    await this.addBot("high");
-  }
-
   async startGame(): Promise<void> {
     try {
       await app.roomSession.startGame();
@@ -240,33 +203,21 @@ export class RoomScene extends Component {
     }
   }
 
-  async refreshRoom(): Promise<void> {
-    try {
-      await app.roomSession.refresh();
-    } catch (error) {
-      this.showError(error, "同步房间失败");
-    }
-  }
-
   backHome(): void {
     app.roomSession.leave();
     app.router.navigate("home");
-  }
-
-  private async addBot(difficulty: BotDifficulty): Promise<void> {
-    try {
-      await app.roomSession.addBot(difficulty);
-    } catch (error) {
-      this.showError(error, "设置机器人失败");
-    }
   }
 
   private render(state: RoomSessionState): void {
     const room = state.room;
     const hasSession = !!state.roomId || !!room;
     const intent = app.store.getState().roomEntryIntent;
-    if (this.createPanel) this.createPanel.active = !hasSession && intent === "create";
-    if (this.joinPanel) this.joinPanel.active = !hasSession && intent === "join";
+    if (hasSession) {
+      this.releaseEntryPanels();
+    } else {
+      if (this.createPanel) this.createPanel.active = intent === "create";
+      if (this.joinPanel) this.joinPanel.active = intent === "join";
+    }
     if (this.lobbyPanel) this.lobbyPanel.active = hasSession;
     this.setSessionControls(state, hasSession);
     this.renderAutoReady();
@@ -301,7 +252,7 @@ export class RoomScene extends Component {
             ? (state.syncError ? `${state.syncError}，正在自动重试` : "正在同步房间...")
             : "创建新房间，或输入 6 位房间码加入");
       }
-      this.setRoomButtons(false, false, false, "medium");
+      this.setLobbyButtons(false, false);
       return;
     }
 
@@ -329,41 +280,15 @@ export class RoomScene extends Component {
           ? "正在同步房间..."
           : getRoomStartStatusText(availability.startBlockReason));
     }
-    const bot = room.players.find(isBotPlayer);
-    const selectedDifficulty = bot?.botDifficulty || room.gameOptions.botDifficulty || "medium";
-    this.setRoomButtons(
-      availability.canToggleReady,
-      availability.canAddBot,
-      availability.canStart,
-      selectedDifficulty
-    );
-    if (this.readyButton && localPlayer) {
-      this.readyButton.interactable = availability.canToggleReady && !state.pendingAction;
-    }
+    this.setLobbyButtons(availability.canToggleReady, availability.canStart);
     if (this.readyLabel) {
       this.readyLabel.string = localPlayer?.ready ? "取消准备" : "我准备好了";
     }
   }
 
-  private setRoomButtons(
-    canReady: boolean,
-    canAddBot: boolean,
-    canStart: boolean,
-    selectedDifficulty: BotDifficulty
-  ): void {
+  private setLobbyButtons(canReady: boolean, canStart: boolean): void {
     const busy = !!app.roomStore.getState().pendingAction;
     if (this.readyButton) this.readyButton.interactable = canReady && !busy;
-    const difficultyButtons = this.botDifficultyButtons.length
-      ? this.botDifficultyButtons
-      : (this.addBotButton ? [this.addBotButton] : []);
-    difficultyButtons.forEach((button) => {
-      button.interactable = canAddBot && !busy;
-    });
-    this.botDifficultyLabels.forEach((label, index) => {
-      const difficulty = BOT_DIFFICULTIES[index];
-      if (!difficulty) return;
-      label.string = `${difficulty === selectedDifficulty ? "✓ " : ""}${BOT_DIFFICULTY_LABELS[difficulty]}`;
-    });
     if (this.startButton) this.startButton.interactable = canStart && !busy;
   }
 
@@ -373,12 +298,22 @@ export class RoomScene extends Component {
     if (this.joinButton) this.joinButton.interactable = !hasSession && !busy;
     if (this.copyButton) this.copyButton.interactable = !!state.room && !busy;
     if (this.inviteButton) this.inviteButton.interactable = !!state.room && !busy;
-    if (this.refreshButton) {
-      this.refreshButton.interactable = !!state.roomId && !state.syncing && !busy;
-    }
     if (this.backButton) this.backButton.interactable = !busy;
     if (this.leaveButton) this.leaveButton.interactable = !busy;
     if (this.autoReadyButton) this.autoReadyButton.interactable = !busy;
+  }
+
+  private releaseEntryPanels(): void {
+    this.createPanel?.destroy();
+    this.joinPanel?.destroy();
+    this.createPanel = null;
+    this.joinPanel = null;
+    this.roomCodeInput = null;
+    this.selectedBankLabel = null;
+    this.autoReadyLabel = null;
+    this.createButton = null;
+    this.joinButton = null;
+    this.autoReadyButton = null;
   }
 
   private getSelectedModeLabel(room: RoomSnapshot | null = null): string {

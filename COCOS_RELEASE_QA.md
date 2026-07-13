@@ -1,8 +1,23 @@
 # Cocos Release QA Record
 
-Date: 2026-07-10
+Date: 2026-07-13
 
-Status: Phase 8 development is complete in source and engine-independent tests, including gameplay Asset Bundle/subpackage separation. Phase 9 Creator import/visual verification, a real WeChat build, two-device testing, screenshots, and upload are pending because this machine has neither Cocos Creator nor WeChat Developer Tools.
+Status: Phase 8 source development is complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup have passed for H5. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+
+## Latest Real Build Evidence
+
+- Source baseline: H5 commit `005c713`; H6 completion is the commit containing this updated record
+- `npm run verify`: `PASSED` after H6 on 2026-07-13 in `47.4s`
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8` in `48.5s`
+- Generated package: `89` files, `6,488,045` bytes total
+- Main package: `4,120,918 / 4,194,304` bytes; only `73,386` bytes remain
+- Subpackages: `2,367,127` bytes total; `mode_pk` `40,748` bytes and `mode_spell` `25,615` bytes
+- `npm run inspect:wechat-build`: `PASSED`; report retained at ignored local path `cocos-client/build/wechatgame-report.json`
+- WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
+- H5 simulator traversal previously covered Home, mode catalog, create configuration, bank return, join, history and study with `0` reported Problems
+- H6 runtime tests require mutually exclusive create/join trees, release entry-form nodes after session acceptance, and reject hidden robot/manual-refresh controller regressions
+
+Known non-blocking Creator notices: legacy components still use primitive decorator types (`Boolean`, `String`, `Number`) instead of the Cocos-specific annotation types, and Babel reports styling de-optimization for the generated word-bank file over 500 KB. The build and package inspector pass, but these notices should be cleaned in the owning UI/gameplay streams before final release QA.
 
 ## Automated Checks Passed
 
@@ -29,7 +44,7 @@ Status: Phase 8 development is complete in source and engine-independent tests, 
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.
-- Source metadata: release QA parses 108 committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and permits only the four documented theme importer metas to remain Creator-generated.
+- Source metadata: release QA parses the current 113 committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and reserves the documented H4 importer path for Creator-generated metadata.
 - Interaction wiring: runtime execution clicks controls across every functional route, including room validation/copy/invite and Result-to-History; platform calls and destination state are asserted rather than inferred from source text.
 - Settlement lifecycle: the first finished snapshot cancels room polling, and entering History releases the finished room without deleting its persisted result.
 - Async session isolation: delayed catch/spell responses are keyed to a monotonic room-session version; leave/replacement makes them inert, canceled failures do not toast on the next screen, and old mode results reset when a different mode enters.
@@ -47,30 +62,30 @@ Measured before Cocos import/build:
 
 | Item | Size |
 | --- | ---: |
-| `cocos-client/assets/` payload excluding `.meta` | 1,477,672 bytes; static gate caps it at 1,500,000 bytes |
-| Committed Cocos metadata | 19,610 bytes; separate 50,000-byte gate leaves room for Creator importer metadata |
-| Total current `assets/` checkout | 1,497,282 bytes |
-| Generated word-bank TypeScript | 885,397 bytes |
-| Compact generated spell-template index | 35,374 bytes for 44 banks / 6,351 templates |
-| Theme bundle sources | about 212 KB including manifests/metadata |
+| `cocos-client/assets/` normalized runtime payload excluding `.meta` | 1,484,332 bytes; static gate caps it at 1,500,000 bytes |
+| Committed Cocos metadata | 113 files / 21,672 bytes; separate 50,000-byte gate leaves room for Creator importer metadata |
+| Total current `assets/` checkout | 1,507,062 bytes |
+| Generated word-bank TypeScript | 852,771 bytes in the current Windows checkout |
+| Compact generated spell-template index | 35,326 bytes for 44 banks / 6,351 templates |
+| Theme bundle sources | 214,537 bytes including manifests/metadata |
 | Unique compressed theme backgrounds | 209,076 bytes |
-| Gameplay bundle sources | `mode_pk` 21,357 bytes; `mode_spell` 13,458 bytes |
+| Gameplay bundle sources | `mode_pk` 22,035 bytes; `mode_spell` 13,458 bytes |
 
-These are source measurements, not final WeChat package measurements. Creator may transform textures, generate imports, and split bundles.
+These are historical source measurements. The current final generated-package measurements are recorded in “Latest Real Build Evidence” above.
 
 ## External Gates
 
 | Gate | Status | Required action |
 | --- | --- | --- |
-| Cocos 3.8.8 import | Pending | Open `cocos-client`; verify all 108 committed asset UUIDs remain unique, let Creator generate/retain the four pending theme importer metas, and confirm `mode_pk`/`mode_spell` register without script errors |
+| Cocos 3.8.8 import | Passed for current source/build | Creator 3.8.8 imported and built the project; static release QA still guards committed UUID/reference integrity |
 | Runtime screen assembly | Implemented | Single `Home.scene` shell mounts every route/controller and its controls |
-| Runtime layout inspection | Pending | Preview all routes and the blocking preload layer at target landscape aspect ratios; correct any clipping/spacing |
+| Runtime layout inspection | Partial | H5 pre-game routes passed portrait simulator traversal; inspect gameplay, privacy, result and loading states at all target portrait ratios |
 | Theme visual QA | Pending | Switch both themes; verify route backgrounds, insect/fish targets, feedback motion, fallback, contrast, and narrow-screen framing |
-| Two-device room QA | Pending | Create/join/ready/play/settle all three multiplayer modes on two real phones; exercise every PK robot difficulty and confirm co-op has no robot control |
+| Two-device room QA | Pending | Create/join/ready/start on two real phones for the current preparation flow; later gameplay milestones must separately verify each enabled multiplayer mode |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
 | Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
-| WeChat package size | Pipeline ready; real build pending | Run `npm run build:wechat`; retain `build/wechatgame-report.json` with main/aggregate/per-subpackage bytes and all four Bundle locations; confirm both gameplay Bundles are subpackages |
-| Review screenshots | Pending | Capture Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow |
+| WeChat package size | Passed for current build | Keep the current byte record; H4 art must use Bundle/subpackage budget because main-package margin is only `73,386` bytes |
+| Review screenshots | Partial | V0 screenshots and H5 simulator inspection exist; capture final current Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow before upload |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 
 ## Creator Verification Checklist

@@ -12,7 +12,7 @@ Legacy uploadable client in this checkout:
 
 `miniprogram/`
 
-The `C:\work\...` backup and archive paths below are historical records from an older machine. They are not the active checkout and have not been reverified here.
+The explicitly listed backup and archive paths below are historical records. They are not the active checkout and have not been reverified for current Cocos development.
 
 ## Historical Backup Record
 
@@ -30,7 +30,7 @@ Archive SHA256:
 
 ## Rules
 
-- Continue Cocos migration in `D:\demo\wexin\cocos-client`.
+- Continue Cocos migration from the current Git worktree's `cocos-client/` directory; do not hard-code another computer's absolute path.
 - Do not replace or delete the legacy `miniprogram/` implementation until a later migration phase explicitly performs the production switch.
 - Keep `cloudfunctions/` contracts compatible with the production backend while the Cocos client is migrated incrementally.
 - Treat `cocos-client/build/`, `library/`, `temp/`, `local/`, and `profiles/` as generated directories.
@@ -52,5 +52,6 @@ Archive SHA256:
 - `npm run build:wechat:dry-run` and `npm run test:build-pipeline` validate the fixed Creator command, output isolation, generated package contract, and package-size accounting without requiring the engine.
 - Generated-package inspection also requires both theme Bundle configs, rejects undeclared/empty subpackages, and enforces 4 MiB main plus 30 MiB aggregate subpackage limits.
 - This machine has Cocos Creator 3.8.8 and WeChat Developer Tools. Actual WeChat builds and local tool launches must still be recorded per task; installation alone is not acceptance evidence.
-- The H5 source has a successful Cocos Creator 3.8.8 WeChat build and WeChat Developer Tools run. The generated package is `6,490,758` bytes total, with `4,120,918 / 4,194,304` bytes in the main package and `2,369,840` bytes in subpackages; future art must not consume the remaining main-package margin.
+- Commit `005c713` established the H5 baseline; the current H6 worktree also has successful Cocos Creator 3.8.8 WeChat builds and Developer Tools runs. The H6 package is `6,488,045` bytes total, with `4,120,918 / 4,194,304` bytes in the main package and `2,367,127` bytes in subpackages; future art must not consume the remaining main-package margin.
+- The 2026-07-13 H6 validation passed `npm run verify` in `47.4s`, rebuilt WeChat in `48.5s`, and reopened the package through the Developer Tools CLI. Known non-blocking Creator notices are recorded in `COCOS_RELEASE_QA.md` rather than being treated as runtime failures.
 - `COCOS_MIGRATION_COMPLETION_MATRIX.md` is the authoritative phase-by-phase distinction between current source evidence and missing external proof.

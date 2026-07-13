@@ -1,6 +1,6 @@
 # Cocos Migration Completion Matrix
 
-Date: 2026-07-10
+Date: 2026-07-13
 
 Purpose: track the design document requirement-by-requirement and distinguish implemented source code from evidence that requires Cocos Creator, WeChat Developer Tools, cloud access, or real devices.
 
@@ -15,15 +15,15 @@ Status meanings:
 | Design phase | Source deliverables | Current evidence | Status |
 | --- | --- | --- | --- |
 | 0 - frozen baseline | Cloud contracts, storage keys, flows, screenshot inventory | `COCOS_MIGRATION_PHASE0_BASELINE.md`; production-source contract test covers all 11 handlers | Passed; fresh Cocos screenshots remain a Phase 9 gate |
-| 1 - Cocos skeleton | Isolated project, Boot/Home scenes, TypeScript structure, WeChat build | Structure/type checks and deterministic build contract pass; no Creator export exists on this machine | Implemented / external proof pending |
+| 1 - Cocos skeleton | Isolated project, Boot/Home scenes, TypeScript structure, WeChat build | Structure/type checks, Creator 3.8.8 build and generated-package inspection pass | Passed for skeleton/build |
 | 2 - platform services | Cloud, storage, privacy, share, logger | Platform/lifecycle tests execute privacy gates, redaction, storage migration, cloud failure and invitation handling | Passed for engine-independent scope |
-| 3 - Home/Bank/Study | Functional routes, unlocks, study behavior, default UI | Stage 3 tests plus the runtime Cocos mock mount and operate the real controllers | Implemented / visual proof pending |
-| 4 - room flow | Create/join/copy/invite/ready/start, low/medium/high PK robot controls, normalized player rows, unified pending UI and authoritative snapshots | Room service/flow/lifecycle/runtime tests cover success, replacement failure, accepted-join recovery, robot selection, non-duplicated names and all-command busy locking | Implemented / two-device proof pending |
-| 5 - PK | Moving targets, immediate feedback, cloud correction, three robot difficulties, power-ups, result/history | Phase 5 and runtime tests cover optimistic timing order, reconciliation, reachable difficulty controls and remote settlement | Implemented / device latency proof pending |
+| 3 - Home/Bank/Study | Functional routes, unlocks, study behavior, default UI | Stage 3/runtime tests plus H5 WeChat simulator traversal cover Home, Bank and Study | Passed for current pre-game scope; phone visual proof pending |
+| 4 - room flow | Create/join/copy/invite/ready/start, normalized player rows, unified pending UI and authoritative snapshots | Room service/flow/lifecycle/runtime tests cover success, replacement failure, accepted-join recovery, non-duplicated names and all visible-command busy locking; H6 removes hidden robot/manual-refresh page controls | Implemented / two-device proof pending |
+| 5 - PK | Moving targets, immediate feedback, cloud correction, dormant robot compatibility, power-ups, result/history | Phase 5 and runtime tests cover optimistic timing order, reconciliation and remote settlement; current H6 preparation UI does not expose robot entry | Implemented / gameplay device proof pending |
 | 6 - shared co-op | Team scoring, two-human restrictions, result/history | Phase 6 and production contract tests | Implemented / two-device proof pending |
 | 7 - spell co-op | 44 prebuilt template banks, QWERTY input, question isolation, dual timers, timeout, detail history | Exact 6,351-template source comparison plus Phase 7/runtime history tests; Room creation carries the selected 240-item pool | Implemented / two-device proof pending |
-| 8 - themes and gameplay bundles | Two theme bundles, preloaded route assets, target skins, fallback, themed controls, plus load-on-demand `mode_pk`/`mode_spell` gameplay bundles | Phase 8/static/runtime tests prove Bundle routing, no main-package gameplay imports, delayed loads, failed-load retry, latest-route mounting, input blocking and target switching; build fixtures require both modes as WeChat subpackages | Development complete / Phase 9 engine proof pending |
-| 9 - release QA | Creator import, real generated package, device record, screenshots, compliance record, development upload | Static compliance/build-pipeline checks pass; engine/device/build/upload artifacts are absent | Pending external validation |
+| 8 - themes and gameplay bundles | Two theme bundles, preloaded route assets, target skins, fallback, themed controls, plus load-on-demand `mode_pk`/`mode_spell` gameplay bundles | Phase 8 tests pass and the real generated package places both gameplay modes in declared subpackages | Development/build proof passed; gameplay visual/device proof pending |
+| 9 - release QA | Creator import, real generated package, device record, screenshots, compliance record, development upload | Creator build, package report, H5 simulator traversal and static compliance pass; two-device/performance/final screenshots/upload remain | External validation in progress |
 
 ## Cross-Cutting Requirements
 
@@ -41,10 +41,10 @@ Status meanings:
 | Serialized scene viewport contract | Static shell test parses Boot/Home scenes and requires centered `960x640` Canvases, identical viewport Widget flags and zero edge offsets | Passed in serialized source; Creator aspect-ratio proof pending |
 | Stable runtime text/layout bounds | Boot, all routes and the loading overlay use shrinking Labels; runtime traversal rejects any active `UITransform` outside the `960x640` design area | Passed in source/runtime mock; real font/aspect-ratio proof pending |
 | One room-code contract | Input length, join validation, invitation lifecycle, sharing and clipboard use the same six-character domain normalization; overlong external codes are rejected | Passed |
-| Source metadata integrity | Release QA parses 108 committed metas, rejects UUID duplication/missing directory metadata and validates every Boot/Home internal object reference; four theme importer metas remain an explicit Creator-import gate | Passed for committed source; importer output pending |
+| Source metadata integrity | Release QA parses the current 113 committed metas, rejects UUID duplication/missing directory metadata and validates every Boot/Home internal object reference; future H4 imports must commit Creator-generated metadata with each image | Passed for current committed source |
 | No public nickname/chat/payment surface | Release source scan and runtime control inventory | Passed |
 | Local gameplay feedback before cloud response | Deferred-response Phase 5 test | Passed |
-| Legacy PK robot choices remain reachable | Runtime Room test exercises low/medium/high controls and authoritative selected state; Phase 5 verifies high uses the 1000 ms delay | Passed in source/runtime mock; real match proof pending |
+| Dormant PK robot compatibility remains isolated | Lower-level room/gameplay tests retain difficulty behavior, while H6 static/runtime tests reject robot controls from the visible preparation page | Passed; not part of the current visible flow |
 | Cloud-backed Room controls prevent duplicate taps | Runtime controller test applies a pending action and verifies create/join/ready/bot/start/copy/invite/refresh/back plus themed disabled visuals | Passed in source/runtime mock |
 | Non-overlapping polling and hide/show recovery | Room/lifecycle tests | Passed; real weak-network proof pending |
 | Finished-room polling release | Runtime test starts a real polling timer, applies a finished snapshot, requires immediate stop, then clicks Result-to-History and proves the room is released while its record remains | Passed |
@@ -56,20 +56,17 @@ Status meanings:
 | Route-specific theme presentation | Route asset rules plus runtime target-style switch test | Passed in source; visual proof pending |
 | Reused gameplay effect nodes | Fixed three-label `GameplayFeedbackPool` runtime test | Passed in source; frame-time proof pending |
 | Runtime performance evidence collection | Bounded `PerformanceService`, 60-frame shell execution, node sampling and DEV clipboard report test | Passed for instrumentation; target-device reports pending |
-| WeChat package boundaries | Dry-run contract and synthetic inspector require four Bundle configs, force `mode_pk`/`mode_spell` into declared subpackages, and cover empty/undeclared packages, forbidden paths, 4 MiB main and 30 MiB aggregate limits | Passed for tooling; real package absent |
-| Main/subpackage/Bundle byte record | Inspector writes package totals and all four required Bundle roots/package types to `build/wechatgame-report.json` | Pending real Creator build |
+| WeChat package boundaries | Dry-run and real inspector require four Bundle configs, place `mode_pk`/`mode_spell` in declared subpackages, and enforce forbidden-path, 4 MiB main and 30 MiB aggregate limits | Passed for current real package |
+| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H6 package at `6,488,045` total bytes, `4,120,918` main bytes and all four required Bundle roots/package types | Passed for current real package |
 
 ## Phase 9 External Evidence
 
-Phase 8 development is complete. Overall migration/release acceptance still requires:
+Phase 8 development and the current Creator/WeChat package build are complete. Overall migration/release acceptance still requires:
 
-1. Creator 3.8.8 imports the project, preserves the 108 committed metas, generates the four pending theme JSON/JPEG importer metas, loads both gameplay bundles, and previews Boot -> Home without script/import errors.
-2. Every route is visually inspected at target landscape aspect ratios, including both themes and long text.
-3. A real `build/wechatgame/` passes `npm run inspect:wechat-build`; its JSON size report is retained.
-4. WeChat Developer Tools imports and runs that exact generated directory.
-5. Two real devices complete room create/join/ready/start/settle for PK, shared co-op and spell co-op.
-6. Hide/show, invitation return, reconnect and timeout recovery are exercised on the real runtime.
-7. Home idle, rapid target taps, rapid spelling, three-minute polling and a low-end device profile are recorded with the DEV JSON reports described in `COCOS_RUNTIME_PERFORMANCE.md`.
-8. Current Cocos screenshots and a successful development upload record are retained.
+1. Every route is visually inspected at target portrait aspect ratios, including both themes, loading/error states and long text.
+2. Two real devices complete room create/join/ready/start/settle for PK, shared co-op and spell co-op.
+3. Hide/show, invitation return, reconnect and timeout recovery are exercised on the real runtime.
+4. Home idle, rapid target taps, rapid spelling, three-minute polling and a low-end device profile are recorded with the DEV JSON reports described in `COCOS_RUNTIME_PERFORMANCE.md`.
+5. Final current Cocos screenshots and a successful development upload record are retained.
 
-`COCOS_RELEASE_QA.md` is the execution checklist for those Phase 9 gates. Passing `npm run verify` proves the Phase 8 source target, not final Creator/WeChat/device acceptance.
+`COCOS_RELEASE_QA.md` is the execution checklist for those Phase 9 gates. The current real build proves package generation, not final two-device, performance or upload acceptance.

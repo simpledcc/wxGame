@@ -1,4 +1,4 @@
-import { Button, Node, UITransform } from "cc";
+import { Button, Label, Node, UITransform } from "cc";
 import { HistoryRecordItem } from "../history/HistoryRecordItem";
 import { app } from "../../core/App";
 import { gameplayScreens, type GameplayRoute } from "../../core/GameplayBundles";
@@ -15,7 +15,7 @@ import { RoomScene } from "../../scenes/RoomScene";
 import { StudyScene } from "../../scenes/StudyScene";
 import type { RouteName } from "../../store/GameStore";
 import { PreGameUi, type PreGameActionButtonRef } from "./PreGameUi";
-import { RuntimeUi, type RuntimeButtonRef } from "./RuntimeUi";
+import { RuntimeUi, type RuntimeButtonRef, type RuntimeEditRef } from "./RuntimeUi";
 
 export class RuntimeScreenFactory {
   build(parent: Node, route: RouteName): Node {
@@ -75,7 +75,7 @@ export class RuntimeScreenFactory {
     home.label(bank.node, "CurrentBankChange", "更换 ›", 220, 0, 88, 42, 18, "homeText");
     home.actionButton(
       safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, 76, 560, 96,
-      () => controller.openPkRoom(), "create", "createRoom"
+      () => controller.openModeCatalog(), "create", "createRoom"
     );
     home.actionButton(
       safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, -20, 560, 80,
@@ -351,9 +351,7 @@ export class RuntimeScreenFactory {
         action.visual.refresh();
       }
     });
-    const status = home.label(safe.node, "CoopStatus", "", 0, -394, 540, 38, 16, "homeTextMuted");
     controller = root.addComponent(CoopSelectScene);
-    controller.statusLabel = status;
     return root;
   }
 
@@ -363,40 +361,53 @@ export class RuntimeScreenFactory {
     const safe = home.safeArea(root, "RoomSafeArea");
     let controller!: RoomScene;
     const entryIntent = app.store.getState().roomEntryIntent;
+    const roomState = app.roomStore.getState();
+    const hasSession = !!roomState.roomId || !!roomState.room;
     const headerTitle = entryIntent === "join" ? "加入房间" : entryIntent === "create" ? "创建房间" : "双人房间";
     const header = home.pageHeader(safe, "RoomHeader", headerTitle, "两名真实玩家加入并准备后，由房主开始", () => controller.backHome());
 
-    const createPanel = home.group(safe.node, "RoomCreatePanel", 0, -18, safe.width, 760);
-    const selectedModeCard = home.card(createPanel, "SelectedModeCard", 0, 236, 560, 154, 22);
-    home.visualSlot(selectedModeCard, "joinRoom", -216, 0, 88, 88);
-    home.label(selectedModeCard, "SelectedModeCaption", "已选模式", -116, 45, 300, 34, 17, "homeTextMuted", 0);
-    home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, 5, 400, 52, 31, "homeText", 0);
-    home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -42, 400, 34, 18, "homeTextMuted", 0);
-    const bankCard = home.card(createPanel, "CreateBankCard", 0, 78, 560, 124, 22);
-    home.visualSlot(bankCard, "wordBank", -224, 0, 72, 72);
-    home.label(bankCard, "CreateBankCaption", "当前词库", -124, 32, 250, 30, 16, "homeTextMuted", 0);
-    const selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -10, 360, 48, 24, "homeText", 0);
-    home.button(bankCard, "ChangeRoomBank", "更换", 205, 0, 126, 80, () => controller.changeBank(), "practice", 18);
-    const guidance = home.card(createPanel, "CreateGuidanceCard", 0, -56, 560, 96, 20);
-    home.visualSlot(guidance, "practice", -225, 0, 60, 60);
-    home.label(guidance, "CreateGuidance", "创建后邀请好友，双方准备完成即可开始", 32, 0, 430, 58, 19, "homeText", 0);
-    const create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并进入准备房间", "房", 0, -178, 560, 96, () => {
-      void controller.createSelectedRoom();
-    }, "create", "createRoom");
-    const autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -286, 430, 80, () => {
-      controller.toggleAutoReady();
-    }, "surface", 18);
+    let createPanel: Node | null = null;
+    let selectedBank: Label | null = null;
+    let create: PreGameActionButtonRef | null = null;
+    let autoReady: RuntimeButtonRef | null = null;
+    if (!hasSession && entryIntent === "create") {
+      createPanel = home.group(safe.node, "RoomCreatePanel", 0, -18, safe.width, 760);
+      const selectedModeCard = home.card(createPanel, "SelectedModeCard", 0, 236, 560, 154, 22);
+      home.visualSlot(selectedModeCard, "joinRoom", -216, 0, 88, 88);
+      home.label(selectedModeCard, "SelectedModeCaption", "已选模式", -116, 45, 300, 34, 17, "homeTextMuted", 0);
+      home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, 5, 400, 52, 31, "homeText", 0);
+      home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -42, 400, 34, 18, "homeTextMuted", 0);
+      const bankCard = home.card(createPanel, "CreateBankCard", 0, 78, 560, 124, 22);
+      home.visualSlot(bankCard, "wordBank", -224, 0, 72, 72);
+      home.label(bankCard, "CreateBankCaption", "当前词库", -124, 32, 250, 30, 16, "homeTextMuted", 0);
+      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -10, 360, 48, 24, "homeText", 0);
+      home.button(bankCard, "ChangeRoomBank", "更换", 205, 0, 126, 80, () => controller.changeBank(), "practice", 18);
+      const guidance = home.card(createPanel, "CreateGuidanceCard", 0, -56, 560, 96, 20);
+      home.visualSlot(guidance, "practice", -225, 0, 60, 60);
+      home.label(guidance, "CreateGuidance", "创建后邀请好友，双方准备完成即可开始", 32, 0, 430, 58, 19, "homeText", 0);
+      create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并进入准备房间", "房", 0, -178, 560, 96, () => {
+        void controller.createSelectedRoom();
+      }, "create", "createRoom");
+      autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -286, 430, 80, () => {
+        controller.toggleAutoReady();
+      }, "surface", 18);
+    }
 
-    const joinPanel = home.group(safe.node, "RoomJoinPanel", 0, -18, safe.width, 760);
-    const joinCard = home.card(joinPanel, "JoinCodeCard", 0, 42, 560, 540, 24);
-    home.visualSlot(joinCard, "joinRoom", 0, 194, 100, 100);
-    home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 118, 480, 48, 28, "homeText");
-    home.label(joinCard, "JoinCodeHint", "房间码支持英文字母和数字", 0, 74, 480, 34, 17, "homeTextMuted");
-    const input = home.edit(joinCard, "RoomCodeInput", `输入 ${ROOM_CODE_LENGTH} 位房间码`, 0, 0, 500, 88, ROOM_CODE_LENGTH);
-    home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -88, 480, 54, 18, "homeTextMuted");
-    const join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -190, 500, 92, () => {
-      void controller.joinEnteredRoom();
-    }, "join", "joinRoom");
+    let joinPanel: Node | null = null;
+    let input: RuntimeEditRef | null = null;
+    let join: PreGameActionButtonRef | null = null;
+    if (!hasSession && entryIntent === "join") {
+      joinPanel = home.group(safe.node, "RoomJoinPanel", 0, -18, safe.width, 760);
+      const joinCard = home.card(joinPanel, "JoinCodeCard", 0, 42, 560, 540, 24);
+      home.visualSlot(joinCard, "joinRoom", 0, 194, 100, 100);
+      home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 118, 480, 48, 28, "homeText");
+      home.label(joinCard, "JoinCodeHint", "房间码支持英文字母和数字", 0, 74, 480, 34, 17, "homeTextMuted");
+      input = home.edit(joinCard, "RoomCodeInput", `输入 ${ROOM_CODE_LENGTH} 位房间码`, 0, 0, 500, 88, ROOM_CODE_LENGTH);
+      home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -88, 480, 54, 18, "homeTextMuted");
+      join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -190, 500, 92, () => {
+        void controller.joinEnteredRoom();
+      }, "join", "joinRoom");
+    }
 
     const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, -18, safe.width, 760);
     const codeCard = home.card(lobbyPanel, "RoomCodeCard", 0, 276, 560, 92);
@@ -425,10 +436,10 @@ export class RuntimeScreenFactory {
     const leave = home.button(lobbyPanel, "LeaveRoom", "离开房间", 0, -382, 360, 80, () => controller.backHome(), "join", 19);
 
     controller = root.addComponent(RoomScene);
-    controller.roomCodeInput = input.editBox;
+    controller.roomCodeInput = input?.editBox ?? null;
     controller.pageTitleLabel = header.titleLabel;
     controller.selectedBankLabel = selectedBank;
-    controller.autoReadyLabel = autoReady.label;
+    controller.autoReadyLabel = autoReady?.label ?? null;
     controller.readyLabel = ready.label;
     controller.createPanel = createPanel;
     controller.joinPanel = joinPanel;
@@ -437,15 +448,15 @@ export class RuntimeScreenFactory {
     controller.modeLabel = mode;
     controller.playersLabel = players;
     controller.statusLabel = status;
-    controller.createButton = create.button;
-    controller.joinButton = join.button;
+    controller.createButton = create?.button ?? null;
+    controller.joinButton = join?.button ?? null;
     controller.copyButton = copy.button;
     controller.inviteButton = invite.button;
     controller.backButton = header.backButton.button;
     controller.leaveButton = leave.button;
     controller.readyButton = ready.button;
     controller.startButton = start.button;
-    controller.autoReadyButton = autoReady.button;
+    controller.autoReadyButton = autoReady?.button ?? null;
     return root;
   }
 

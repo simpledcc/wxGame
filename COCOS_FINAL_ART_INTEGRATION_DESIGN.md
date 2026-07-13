@@ -353,7 +353,7 @@ export interface HomeArtManager {
 无 Creator 的电脑可执行：
 
 ```powershell
-Set-Location D:\demo\wexin\cocos-client
+Set-Location <repo-root>\cocos-client
 npm run verify
 npm run build:wechat:dry-run
 ```

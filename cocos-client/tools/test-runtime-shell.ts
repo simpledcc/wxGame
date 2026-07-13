@@ -99,10 +99,12 @@ function testExpectedControls(): void {
   const roomController = read("assets/scripts/scenes/RoomScene.ts");
   const explicitLeaves = roomController.match(/app\.roomSession\.leave\(\)/g) || [];
   assert.equal(explicitLeaves.length, 1, "RoomScene may leave only from the explicit back action");
-  assert.match(roomController, /botDifficultyButtons/);
-  ["createButton", "joinButton", "copyButton", "inviteButton", "refreshButton", "backButton"]
+  assert.doesNotMatch(roomController, /addBotButton|botDifficultyButtons|botDifficultyLabels|refreshButton|refreshRoom/);
+  ["createButton", "joinButton", "copyButton", "inviteButton", "backButton"]
     .forEach((binding) => assert.match(roomController, new RegExp(`\\b${binding}\\b`)));
   assert.match(roomController, /setSessionControls/);
+  assert.match(roomController, /setLobbyButtons/);
+  assert.match(roomController, /releaseEntryPanels/);
   assert.match(roomController, /createPanel/);
   assert.match(roomController, /joinPanel/);
   assert.match(roomController, /lobbyPanel/);
@@ -111,6 +113,9 @@ function testExpectedControls(): void {
   assert.match(roomController, /app\.spellTemplateData/);
   assert.match(roomController, /roomSpellQuestions/);
   assert.match(roomController, /机器人 \$\{player\.nickName/);
+  const coopSelectController = read("assets/scripts/scenes/CoopSelectScene.ts");
+  assert.doesNotMatch(coopSelectController, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
+  assert.match(coopSelectController, /openTrialRoom/);
   const homeController = read("assets/scripts/scenes/HomeScene.ts");
   assert.match(homeController, /openPrivacyContract/);
   assert.match(homeController, /refreshDisplay/);

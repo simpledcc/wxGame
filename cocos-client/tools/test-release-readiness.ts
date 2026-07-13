@@ -110,7 +110,7 @@ function testSceneCoverage(): void {
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${sourcePath}.meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
-  ["openStudy", "openPkRoom", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract", "toggleMuted"]
+  ["openStudy", "openModeCatalog", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract", "toggleMuted"]
     .forEach((handler) => assert.match(home, new RegExp(`\\b${handler}\\b`)));
   assert.doesNotMatch(home, /EditBox|playerName|nickNameInput/);
   assert.match(home, /playerStore\.getLocalPlayer\(\)\.displayName/);
@@ -121,15 +121,16 @@ function testSceneCoverage(): void {
   assert.match(boot, /UI_LAYER/);
   const room = read("assets/scripts/scenes/RoomScene.ts");
   assert.match(room, /roomCodeInput/);
-  assert.match(room, /addLowBot/);
-  assert.match(room, /addMediumBot/);
-  assert.match(room, /addHighBot/);
-  assert.match(room, /botDifficultyButtons/);
+  assert.doesNotMatch(room, /addLowBot|addMediumBot|addHighBot|botDifficultyButtons|refreshRoom|refreshButton/);
   assert.match(room, /setSessionControls/);
+  assert.match(room, /setLobbyButtons/);
+  assert.match(room, /releaseEntryPanels/);
   assert.match(room, /getSpellTemplatesForBank/);
   assert.match(room, /roomSpellQuestions/);
   assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
+  const coopSelect = read("assets/scripts/scenes/CoopSelectScene.ts");
+  assert.doesNotMatch(coopSelect, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
   const shell = read("assets/scripts/components/HomePlaceholder.ts");
   assert.match(shell, /gameplayBundles\.prepare/);
   assert.match(shell, /themes\.preloadAssets/);
@@ -194,7 +195,7 @@ function testPlatformBoundariesAndUploadRoot(): void {
 function testAssetMetadataAndSceneReferences(): void {
   const assetsRoot = path.join(root, "assets");
   const metaFiles = listFiles(assetsRoot, new Set([".meta"]));
-  assert.ok(metaFiles.length >= 108, "committed Cocos asset metadata unexpectedly disappeared");
+  assert.ok(metaFiles.length >= 113, "committed Cocos asset metadata unexpectedly disappeared");
   const uuidOwners = new Map<string, string>();
   metaFiles.forEach((metaPath) => {
     const parsed = JSON.parse(fs.readFileSync(metaPath, "utf8")) as unknown;

@@ -59,7 +59,7 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 
 1. Open Cocos Creator 3.x.
 2. Choose `Open Project`.
-3. Select this directory: `D:\demo\wexin\cocos-client`.
+3. Select the current Git worktree's `cocos-client/` directory.
 4. Let Cocos generate its local `library/`, `temp/`, `local/`, and `profiles/` folders.
 5. Open `assets/scenes/Boot.scene`.
 6. Click Preview. Boot initializes the app shell and routes to Home.
