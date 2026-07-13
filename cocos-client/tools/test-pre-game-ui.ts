@@ -146,6 +146,8 @@ function main(): void {
   action.button.interactable = false;
   action.visual.refresh();
   assertEqual(action.visual.isShowingDisabledState(), true);
+  action.node.emit(Button.EventType.CLICK);
+  assertEqual(actionCount, 1, "disabled pre-game buttons must not execute their action");
   assertVisualMatchesHitArea(action.node, action.visual);
 
   const surfaceAction = preGame.actionButton(

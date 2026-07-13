@@ -1,6 +1,7 @@
 import { _decorator, Component, Label } from "cc";
 import { app } from "../core/App";
 import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
+import type { RoomEntryIntent } from "../store/GameStore";
 
 const { ccclass, property } = _decorator;
 
@@ -67,11 +68,11 @@ export class HomeScene extends Component {
   }
 
   openPkRoom(): void {
-    this.openRoom();
+    this.openRoom("create");
   }
 
   openJoinRoom(): void {
-    this.openRoom();
+    this.openRoom("join");
   }
 
   openHistory(): void {
@@ -108,10 +109,10 @@ export class HomeScene extends Component {
     }
   }
 
-  private openRoom(): void {
+  private openRoom(intent: Exclude<RoomEntryIntent, "neutral">): void {
     this.navigateOnce(() => {
       app.roomSession.leave();
-      app.store.patch({ selectedMode: "pk" });
+      app.store.patch({ selectedMode: "pk", roomEntryIntent: intent });
       app.router.navigate("room");
     });
   }
@@ -119,6 +120,11 @@ export class HomeScene extends Component {
   private navigateOnce(action: () => void): void {
     if (!this.active || this.navigating) return;
     this.navigating = true;
-    action();
+    try {
+      action();
+    } catch {
+      this.navigating = false;
+      if (this.active) app.runtime.showToast("页面暂时无法打开，请重试");
+    }
   }
 }

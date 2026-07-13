@@ -12,8 +12,9 @@ Updated: 2026-07-13
 - Goal completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA.
 - Visual-status reference commit: `83cb214` (`docs(home): clarify visual fidelity and add reference`)
 - Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
+- Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `POST-GOAL HOME FORM ENHANCEMENT DONE`
+- Current stage: `POST-GOAL BUTTON LOGIC AUDIT DONE`
 - Next stage: optional bitmap replacement and Creator visual QA; no further route/Store work is required for the Home form
 
 ## Baseline facts
@@ -69,6 +70,7 @@ Updated: 2026-07-13
 | G4 Interaction and real data binding | `DONE` | All visible entries use existing controllers/routes and live stores; settings/privacy/loading/rapid-tap tests pass | None |
 | G5 Code verification and handoff | `DONE` | Full `npm run verify`, build dry-run, scope audit and documentation pass | None |
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
+| H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 
 ## G0 work completed
 
@@ -148,6 +150,16 @@ Updated: 2026-07-13
 9. Removed the decorative card behind the character fallback so the programmatic companion floats like the reference artwork slot.
 10. Kept all buttons at target-device touch height and retained existing create/join/practice/bank/help/history/settings/privacy/feedback behavior.
 
+## H2 button and room-entry logic audit
+
+1. Added a UI-only `roomEntryIntent` so Home “创建房间” and “加入房间” keep distinct guidance after entering the shared room screen; no cloud or room protocol changed.
+2. Disabled create/join while a room is active or an accepted join is still syncing, preventing a second session operation from replacing the current local session.
+3. Guarded both reusable button factories so disabled buttons cannot execute handlers even when a synthetic or duplicated click event is delivered.
+4. Added Home navigation failure recovery so a synchronous route failure shows a retry message and does not leave the Home controller permanently locked.
+5. Disabled word-bank previous/next buttons at the first and last page instead of accepting no-op boundary clicks.
+6. Confirmed `RuntimeUi.edit()` already uses a child `Graphics` background and a clean `EditBox` host; the older V0 handoff warning is closed by the G1 implementation and layering test.
+7. Kept gameplay Bundles, cloud functions, mini-program source, AppID, room protocol, scoring and synchronization contracts unchanged.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -211,6 +223,21 @@ No generated word/template payload changed after regeneration.
 - `COCOS_HOME_ASSET_MANIFEST.md`
 - `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
 - `docs/design/home/README.md`
+
+## H2 modified files
+
+- `cocos-client/assets/scripts/components/ui/PreGameUi.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeUi.ts`
+- `cocos-client/assets/scripts/scenes/CoopSelectScene.ts`
+- `cocos-client/assets/scripts/scenes/HomeScene.ts`
+- `cocos-client/assets/scripts/scenes/RoomScene.ts`
+- `cocos-client/assets/scripts/store/GameStore.ts`
+- `cocos-client/tools/test-pre-game-ui.ts`
+- `cocos-client/tools/test-runtime-shell-execution.ts`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+- `COCOS_VISUAL_BASELINE_V0.md`
+- `CODEX_HANDOFF.md`
 
 ## Tests
 
@@ -290,6 +317,14 @@ No generated word/template payload changed after regeneration.
 - Normalized runtime source payload: `1,469,232` bytes under the unchanged `1,500,000`-byte gate (`30,768` bytes remaining)
 - Text payload measurement canonicalizes CRLF/CR to LF; image/audio bytes remain exact, so the gate is reproducible across both computers
 - Forbidden-path diff from `83cb214`: empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`
+
+### H2 final verification
+
+- `npm run test:pre-game-ui`: `PASSED` (disabled pre-game actions are blocked)
+- `npm run test:shell-runtime`: `PASSED` (entry intent, active-session locks, disabled callbacks, paging bounds and navigation retry)
+- `npm run verify`: `PASSED` (all static, platform, lifecycle, cloud-contract, gameplay, UI and type checks)
+- Structure contract: `122` required files checked
+- Creator/WeChat/phone verification: `NOT_REQUIRED` for this code-only logic audit
 
 Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
 

@@ -214,7 +214,8 @@ export class RoomScene extends Component {
 
   private render(state: RoomSessionState): void {
     const room = state.room;
-    this.setSessionControls(state, !!room);
+    const hasSession = !!state.roomId || !!room;
+    this.setSessionControls(state, hasSession);
     if (this.roomCodeLabel) {
       this.roomCodeLabel.string = state.roomCode || "------";
     }
@@ -222,7 +223,9 @@ export class RoomScene extends Component {
       if (this.modeLabel) this.modeLabel.string = this.getSelectedModeLabel();
       const joiningAccepted = !!state.roomId;
       if (this.playersLabel) {
-        this.playersLabel.string = joiningAccepted ? "正在读取房间信息" : "尚未进入房间";
+        this.playersLabel.string = joiningAccepted
+          ? "正在读取房间信息"
+          : this.getEntryGuidance();
       }
       if (this.statusLabel) {
         this.statusLabel.string = state.pendingAction
@@ -294,12 +297,12 @@ export class RoomScene extends Component {
     if (this.startButton) this.startButton.interactable = canStart && !busy;
   }
 
-  private setSessionControls(state: RoomSessionState, hasRoom: boolean): void {
+  private setSessionControls(state: RoomSessionState, hasSession: boolean): void {
     const busy = !!state.pendingAction;
-    if (this.createButton) this.createButton.interactable = !busy;
-    if (this.joinButton) this.joinButton.interactable = !busy;
-    if (this.copyButton) this.copyButton.interactable = hasRoom && !busy;
-    if (this.inviteButton) this.inviteButton.interactable = hasRoom && !busy;
+    if (this.createButton) this.createButton.interactable = !hasSession && !busy;
+    if (this.joinButton) this.joinButton.interactable = !hasSession && !busy;
+    if (this.copyButton) this.copyButton.interactable = !!state.room && !busy;
+    if (this.inviteButton) this.inviteButton.interactable = !!state.room && !busy;
     if (this.refreshButton) {
       this.refreshButton.interactable = !!state.roomId && !state.syncing && !busy;
     }
@@ -311,6 +314,13 @@ export class RoomScene extends Component {
     if (mode === "coopShared") return "默契捕词赛";
     if (mode === "coopSpell") return "同舟拼词记";
     return "双人PK";
+  }
+
+  private getEntryGuidance(): string {
+    const intent = app.store.getState().roomEntryIntent;
+    if (intent === "create") return "已选择创建房间\n确认词库与玩法后点击“创建房间”";
+    if (intent === "join") return "已选择加入房间\n输入好友的 6 位房间码";
+    return "尚未进入房间";
   }
 
   private showError(error: unknown, fallback: string): void {

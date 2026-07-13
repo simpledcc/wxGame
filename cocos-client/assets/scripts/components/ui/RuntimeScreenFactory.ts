@@ -177,6 +177,8 @@ export class RuntimeScreenFactory {
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
     const slotIds = Array.from({ length: pageSize }, () => "");
     const slots: RuntimeButtonRef[] = [];
+    let previous!: RuntimeButtonRef;
+    let next!: RuntimeButtonRef;
     for (let index = 0; index < pageSize; index += 1) {
       const column = index % 2;
       const row = Math.floor(index / 2);
@@ -214,12 +216,16 @@ export class RuntimeScreenFactory {
         slot.label.string = `${id === selectedId ? "✓ " : ""}${getWordBankLabel(bank, true)}${unlocked ? "" : " · 锁定"}`;
       });
       pageLabel.string = `${page + 1}/${pageCount}`;
+      previous.button.interactable = page > 0;
+      next.button.interactable = page < pageCount - 1;
+      previous.visual.refresh();
+      next.visual.refresh();
     };
-    ui.button(root, "PreviousBanks", "←", -105, -132, 68, 38, () => {
+    previous = ui.button(root, "PreviousBanks", "←", -105, -132, 68, 38, () => {
       page -= 1;
       renderPage();
     }, "plain", 24);
-    ui.button(root, "NextBanks", "→", 105, -132, 68, 38, () => {
+    next = ui.button(root, "NextBanks", "→", 105, -132, 68, 38, () => {
       page += 1;
       renderPage();
     }, "plain", 24);

@@ -448,7 +448,9 @@ export class PreGameUi {
     node.on(Node.EventType.TOUCH_START, () => visual.setPressed(true), this);
     node.on(Node.EventType.TOUCH_END, () => visual.setPressed(false), this);
     node.on(Node.EventType.TOUCH_CANCEL, () => visual.setPressed(false), this);
-    node.on(Button.EventType.CLICK, handler, this);
+    node.on(Button.EventType.CLICK, () => {
+      if (button.interactable) handler();
+    }, this);
   }
 
   private drawProgrammaticIcon(

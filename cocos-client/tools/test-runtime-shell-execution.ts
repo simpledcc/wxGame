@@ -394,6 +394,26 @@ async function main(): Promise<void> {
   assertEqual(appRuntime.privacyContractOpenCount, privacyOpenCount + 1);
   assertEqual(findDeep(canvas, "HomePrivacy")?.getComponent(Button)?.interactable, true);
 
+  const originalNavigate = app.router.navigate.bind(app.router);
+  let failNextNavigation = true;
+  app.router.navigate = ((route: RouteName) => {
+    if (failNextNavigation) {
+      failNextNavigation = false;
+      throw new Error("simulated navigation failure");
+    }
+    originalNavigate(route);
+  }) as typeof app.router.navigate;
+  findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
+  assertEqual(app.store.getState().route, "home");
+  assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "页面暂时无法打开，请重试");
+  findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "help", "failed Home navigation must allow a retry");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  app.router.navigate = originalNavigate;
+  assertEqual(app.store.getState().route, "home");
+
   app.store.setRoute("coopSelect");
   await flushMany();
   assertEqual(app.store.getState().route, "coopSelect");
@@ -419,6 +439,19 @@ async function main(): Promise<void> {
   unsubscribeRoomNavigation();
   assertEqual(roomNavigationCount, 1, "rapid Home taps must navigate only once");
   assertEqual(app.store.getState().route, "room");
+  assertEqual(app.store.getState().roomEntryIntent, "join");
+  assertOk(
+    findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("输入好友的 6 位房间码"),
+    "join entry must guide the player to enter a room code"
+  );
+  const entryRoomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
+  assertOk(entryRoomCodeInput);
+  entryRoomCodeInput.string = "ABC";
+  const callsBeforeEntryInvalidJoin = appRuntime.cloudCalls.length;
+  findDeep(canvas, "JoinRoom")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(appRuntime.cloudCalls.length, callsBeforeEntryInvalidJoin, "invalid room input must not call joinRoom");
+  assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "请输入 6 位房间码");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -426,6 +459,11 @@ async function main(): Promise<void> {
   findDeep(canvas, "CreateRoomButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "room", "create entry must open the existing room route");
+  assertEqual(app.store.getState().roomEntryIntent, "create");
+  assertOk(
+    findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("确认词库与玩法后点击“创建房间”"),
+    "create entry must guide the player to create a room"
+  );
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -604,8 +642,13 @@ async function main(): Promise<void> {
       const bankController = routeRoot.getComponent(BankScene);
       assertOk(bankController);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
+      assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
+      assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
+      findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
+      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "2/6");
+      assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, true);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
 
@@ -639,6 +682,8 @@ async function main(): Promise<void> {
         "正在读取房间信息",
         "accepted joins without a snapshot must show a syncing state"
       );
+      assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
+      assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
       app.playerStore.setOpenId("player-1");
       const waitingRoom = makeWaitingPkRoom();
       app.roomStore.applySnapshot(waitingRoom);
@@ -659,11 +704,12 @@ async function main(): Promise<void> {
       assertOk(roomCodeInput);
       roomCodeInput.string = "ABC";
       const callsBeforeInvalidJoin = appRuntime.cloudCalls.length;
+      const toastsBeforeDisabledJoin = appRuntime.toastMessages.length;
       findDeep(canvas, "JoinRoom")?.emit(Button.EventType.CLICK);
       await flushMany();
-      assertEqual(appRuntime.cloudCalls.length, callsBeforeInvalidJoin, "invalid room input must not call joinRoom");
-      assertEqual(app.roomStore.getState().roomId, "pending-room", "invalid join must retain the active room");
-      assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "请输入 6 位房间码");
+      assertEqual(appRuntime.cloudCalls.length, callsBeforeInvalidJoin, "disabled join must not call joinRoom");
+      assertEqual(app.roomStore.getState().roomId, "pending-room", "disabled join must retain the active room");
+      assertEqual(appRuntime.toastMessages.length, toastsBeforeDisabledJoin, "disabled join must not execute its handler");
 
       findDeep(canvas, "CopyCode")?.emit(Button.EventType.CLICK);
       await flushMany();
@@ -703,8 +749,8 @@ async function main(): Promise<void> {
         assertEqual(visual?.isShowingDisabledState(), true, `${name} must display its disabled color`);
       });
       app.roomStore.setPendingAction(null);
-      assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, true);
-      assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, true);
+      assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
+      assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "BackButton")?.getComponent(Button)?.interactable, true);
 
       app.roomStore.applySnapshot({

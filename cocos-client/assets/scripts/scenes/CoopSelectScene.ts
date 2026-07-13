@@ -25,13 +25,13 @@ export class CoopSelectScene extends Component {
 
   openSharedRoom(): void {
     app.roomSession.leave();
-    app.store.patch({ selectedMode: "coopShared" });
+    app.store.patch({ selectedMode: "coopShared", roomEntryIntent: "neutral" });
     app.router.navigate("room");
   }
 
   openSpellRoom(): void {
     app.roomSession.leave();
-    app.store.patch({ selectedMode: "coopSpell" });
+    app.store.patch({ selectedMode: "coopSpell", roomEntryIntent: "neutral" });
     app.router.navigate("room");
   }
 

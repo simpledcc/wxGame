@@ -16,12 +16,15 @@ export type RouteName =
   | "feedback"
   | "help";
 
+export type RoomEntryIntent = "neutral" | "create" | "join";
+
 export interface AppState {
   route: RouteName;
   booted: boolean;
   cloudReady: boolean;
   openid: string;
   selectedMode: GameModeKey;
+  roomEntryIntent: RoomEntryIntent;
   duration: GameDuration;
   bankId: string;
   wordMode: WordMode;
@@ -41,6 +44,7 @@ export class GameStore {
     cloudReady: false,
     openid: "",
     selectedMode: "pk",
+    roomEntryIntent: "neutral",
     duration: 60,
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",
