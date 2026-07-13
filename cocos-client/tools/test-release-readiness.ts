@@ -256,6 +256,15 @@ function testSourceAssetBudget(): void {
   assert.ok(themeBytes < 250_000, `theme source assets exceed 250 KB: ${themeBytes}`);
 }
 
+function testHomeAssetHandoff(): void {
+  const manifest = fs.readFileSync(path.resolve(root, "../COCOS_HOME_ASSET_MANIFEST.md"), "utf8");
+  [
+    "background", "logo", "avatar", "character", "createRoom", "joinRoom", "practice",
+    "wordBank", "catalog", "history", "settings", "privacy", "feedback"
+  ].forEach((key) => assert.ok(manifest.includes(`\`${key}\``), `Home asset manifest omits ${key}`));
+  assert.match(manifest, /do not copy it, crop it, or place it under `cocos-client\/assets\/`/);
+}
+
 function main(): void {
   testFeedbackRules();
   testSceneCoverage();
@@ -263,6 +272,7 @@ function main(): void {
   testPlatformBoundariesAndUploadRoot();
   testAssetMetadataAndSceneReferences();
   testSourceAssetBudget();
+  testHomeAssetHandoff();
   console.log("Release static QA OK: scenes, metadata UUIDs/references, compliance, adapter isolation, and source budgets.");
 }
 

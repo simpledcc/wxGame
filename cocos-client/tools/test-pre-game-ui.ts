@@ -4,9 +4,11 @@ import {
   EditBox,
   Graphics,
   Node,
+  SpriteFrame,
   UITransform
 } from "cc";
 import {
+  HOME_VISUAL_SLOT_KEYS,
   PRE_GAME_SAFE_INSETS,
   PreGameUi
 } from "../assets/scripts/components/ui/PreGameUi";
@@ -69,6 +71,34 @@ function main(): void {
   const topBar = preGame.topBar(safe);
   assertEqual(transform(topBar).width, safe.width);
   assertEqual(transform(topBar).height, 84);
+
+  const visualSlots = HOME_VISUAL_SLOT_KEYS.map((key, index) =>
+    preGame.visualSlot(root, key, 0, 400 - index * 8, key === "background" ? 640 : 96, key === "background" ? 960 : 96)
+  );
+  assertEqual(visualSlots.length, 13);
+  visualSlots.forEach((slot) => {
+    assertEqual(slot.spriteNode.active, false, `${slot.key} must start with its fallback`);
+    assertEqual(slot.fallbackNode.active, true);
+    assertEqual(slot.node.name, `Home${slot.key.charAt(0).toUpperCase()}${slot.key.slice(1)}Slot`);
+  });
+  const logoSlot = visualSlots[1];
+  const logoFrame = new SpriteFrame();
+  Object.assign(logoFrame, { width: 560, height: 220 });
+  preGame.setVisualAsset(logoSlot, logoFrame);
+  assertEqual(logoSlot.sprite.spriteFrame, logoFrame);
+  assertEqual(logoSlot.spriteNode.active, true);
+  assertEqual(logoSlot.fallbackNode.active, false);
+  assertEqual(transform(logoSlot.spriteNode).width, 96);
+  assertEqual(transform(logoSlot.spriteNode).height, 220 * (96 / 560));
+  preGame.setVisualAsset(logoSlot, null);
+  assertEqual(logoSlot.spriteNode.active, false);
+  assertEqual(logoSlot.fallbackNode.active, true);
+  assertEqual(transform(logoSlot.spriteNode).height, 96);
+  const backgroundFrame = new SpriteFrame();
+  Object.assign(backgroundFrame, { width: 720, height: 1280 });
+  preGame.setVisualAsset(visualSlots[0], backgroundFrame);
+  assertEqual(transform(visualSlots[0].spriteNode).width, 640);
+  assertOk(transform(visualSlots[0].spriteNode).height > 960, "background must use cover fitting");
   assertEqual(topBar.position.y, safe.height / 2 - 42);
 
   const card = preGame.card(safe.node, "FoundationCard", 0, 80, 560, 120);
@@ -151,7 +181,7 @@ function main(): void {
   assertOk(edit.backgroundNode.getComponent(Graphics), "Edit background must live on a child node");
   assertEqual(edit.backgroundNode.parent, edit.node);
 
-  console.log("Pre-game UI foundation OK: safe area, cards, actions, icons, modal, hit geometry, and EditBox layering passed.");
+  console.log("Pre-game UI foundation OK: visual slots, fallbacks, cards, controls, hit geometry, and EditBox layering passed.");
 }
 
 main();

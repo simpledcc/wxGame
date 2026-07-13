@@ -5,6 +5,8 @@ import {
   Graphics,
   Label,
   Node,
+  Sprite,
+  SpriteFrame,
   UITransform
 } from "cc";
 import { parseThemeColor } from "../../themes/ThemeCatalog";
@@ -30,6 +32,50 @@ export type PreGameActionKind =
   | "history"
   | "surface";
 
+export const HOME_VISUAL_SLOT_KEYS = [
+  "background",
+  "logo",
+  "avatar",
+  "character",
+  "createRoom",
+  "joinRoom",
+  "practice",
+  "wordBank",
+  "catalog",
+  "history",
+  "settings",
+  "privacy",
+  "feedback"
+] as const;
+export type HomeVisualSlotKey = typeof HOME_VISUAL_SLOT_KEYS[number];
+
+const HOME_VISUAL_FALLBACKS: Record<HomeVisualSlotKey, string> = {
+  background: "",
+  logo: "词斗乐园",
+  avatar: "我",
+  character: "伙伴",
+  createRoom: "房",
+  joinRoom: "友",
+  practice: "练",
+  wordBank: "词",
+  catalog: "玩",
+  history: "绩",
+  settings: "设",
+  privacy: "隐",
+  feedback: "言"
+};
+
+export interface HomeVisualSlotRef {
+  key: HomeVisualSlotKey;
+  width: number;
+  height: number;
+  node: Node;
+  spriteNode: Node;
+  sprite: Sprite;
+  fallbackNode: Node;
+  fallbackLabel: Label | null;
+}
+
 export interface PreGameSafeAreaRef {
   node: Node;
   width: number;
@@ -52,6 +98,69 @@ export interface PreGameModalRef {
 
 export class PreGameUi {
   constructor(readonly theme: ThemeManifest) {}
+
+  visualSlot(
+    parent: Node,
+    key: HomeVisualSlotKey,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): HomeVisualSlotRef {
+    const stem = key.charAt(0).toUpperCase() + key.slice(1);
+    const node = this.node(parent, `Home${stem}Slot`, x, y, width, height);
+    const fallbackNode = this.node(node, `Home${stem}Fallback`, 0, 0, width, height);
+    const background = fallbackNode.addComponent(Graphics);
+    background.fillColor = this.color(key === "background" ? "backgroundTint" : "homeCard");
+    background.strokeColor = this.color("homeCardBorder");
+    background.lineWidth = key === "background" ? 0 : 2;
+    background.roundRect(
+      -width / 2,
+      -height / 2,
+      width,
+      height,
+      key === "background" ? 0 : Math.min(width, height) * 0.22
+    );
+    background.fill();
+    if (background.lineWidth) background.stroke();
+
+    const fallback = HOME_VISUAL_FALLBACKS[key];
+    const fallbackLabel = fallback
+      ? this.label(
+          fallbackNode,
+          `Home${stem}FallbackLabel`,
+          fallback,
+          0,
+          0,
+          width * 0.84,
+          height * 0.72,
+          Math.min(38, height * 0.42),
+          "homeText"
+        )
+      : null;
+    const spriteNode = this.node(node, `Home${stem}Sprite`, 0, 0, width, height);
+    const sprite = spriteNode.addComponent(Sprite);
+    spriteNode.active = false;
+    return { key, width, height, node, spriteNode, sprite, fallbackNode, fallbackLabel };
+  }
+
+  setVisualAsset(slot: HomeVisualSlotRef, frame: SpriteFrame | null): void {
+    slot.sprite.spriteFrame = frame;
+    slot.spriteNode.active = frame !== null;
+    slot.fallbackNode.active = frame === null;
+    const transform = slot.spriteNode.getComponent(UITransform);
+    if (!frame) {
+      transform?.setContentSize(slot.width, slot.height);
+      return;
+    }
+    const source = frame as unknown as { width?: number; height?: number };
+    const sourceWidth = Math.max(1, Number(source.width) || slot.width);
+    const sourceHeight = Math.max(1, Number(source.height) || slot.height);
+    const scaleX = slot.width / sourceWidth;
+    const scaleY = slot.height / sourceHeight;
+    const scale = slot.key === "background" ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
+    transform?.setContentSize(sourceWidth * scale, sourceHeight * scale);
+  }
 
   safeArea(parent: Node, name = "PreGameSafeArea"): PreGameSafeAreaRef {
     const width = DESIGN_WIDTH - PRE_GAME_SAFE_INSETS.left - PRE_GAME_SAFE_INSETS.right;
