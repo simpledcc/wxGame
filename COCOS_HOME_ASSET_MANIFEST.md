@@ -6,15 +6,17 @@ Updated: 2026-07-13
 
 This is the handoff contract for Home art that is still missing from the V0 repository. The reference composite is design input only: do not copy it, crop it, or place it under `cocos-client/assets/`.
 
+The checked-in reference and the explicit comparison between current code and the target are in `docs/design/home/README.md`. The reference is documentation, not a current runtime screenshot.
+
 G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot()`. G3/G4 now mount every slot in the real Home; route and Store code do not depend on whether final art has arrived.
 
 ## Current V0 State
 
-- The portrait Home is complete in code and uses the existing theme-managed `homeBackground` as its real scene background.
+- The portrait Home structure, data and interaction are complete in code and use the existing theme-managed `homeBackground` as the current scene background.
 - Logo, safe avatar, character and function icons are mounted at stable locations and currently render the verified Graphics/Label fallbacks.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - Replacing a fallback with a final `SpriteFrame` requires no route, controller or Store change.
-- Dedicated bitmap art below is optional post-V0 polish and does not block the completed main-interface Goal.
+- Dedicated bitmap art below did not block the completed structural V0 Goal, but is required before claiming high-fidelity visual completion against the reference.
 
 ## Runtime Contract
 

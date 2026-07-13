@@ -12,7 +12,7 @@ Updated: 2026-07-13
 - Goal completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
 - Current stage: `G5 DONE`
-- Next stage: Goal complete; integration review/merge only
+- Next stage: structural V0 Goal complete; high-fidelity Home art integration is a separate future Goal
 
 ## Baseline facts
 
@@ -255,7 +255,8 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
-- Added reference assets: none
+- Added documentation-only reference: `docs/design/home/home-high-fidelity-reference.png` (`2,481,759` bytes); it remains outside `cocos-client/assets/` and the runtime package
+- Added visual-status handoff: `docs/design/home/README.md`
 - Mounted V0 slots: background, Logo, safe avatar, character, create/join/practice/bank/catalog/history/settings/privacy/feedback icons
 - Optional post-V0 art replacements: transparent Logo, dedicated safe avatar, dedicated Home background, character decoration and unified icon set; specifications are in `COCOS_HOME_ASSET_MANIFEST.md`
 - G0/G1 use no reference image in the Cocos runtime package
@@ -264,7 +265,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 ## Remaining risks after Goal completion
 
 1. The reproducible staged LF payload has `38,057` bytes remaining, while this pre-normalization Windows worktree has only `456`; future bitmap work should still use a reviewed lightweight Bundle rather than consume the main-package margin.
-2. Logo, avatar, character and function icons currently use verified programmatic fallbacks. Dedicated final art is a future visual-polish replacement, not a functional blocker for this V0 Goal.
+2. Logo, avatar, character and function icons currently use verified programmatic fallbacks. Dedicated final art was not a functional blocker for this structural V0 Goal, but remains required before the Home matches the high-fidelity reference.
 3. Creator import/rendering and WeChat device presentation are outside this Goal by user direction; the existing phone-start baseline remains accepted.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
@@ -283,7 +284,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 
 ## Next single action
 
-Review and merge the `dev_done` Goal completion commit from `feature/pre-game-ui-home-goal`. Do not start a new Home development stage from this file.
+Review the `dev_done` structural V0 completion commit and `docs/design/home/README.md`. Start a separate high-fidelity Home art Goal when the final background, Logo, character and icon work is authorized.
 
 ## Continue prompt
 
