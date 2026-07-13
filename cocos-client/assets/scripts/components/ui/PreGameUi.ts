@@ -2,6 +2,7 @@ import {
   BlockInputEvents,
   Button,
   Color,
+  EditBox,
   Graphics,
   Label,
   Node,
@@ -11,7 +12,12 @@ import {
 } from "cc";
 import { parseThemeColor } from "../../themes/ThemeCatalog";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
-import { DESIGN_HEIGHT, DESIGN_WIDTH, type RuntimeButtonRef } from "./RuntimeUi";
+import {
+  DESIGN_HEIGHT,
+  DESIGN_WIDTH,
+  type RuntimeButtonRef,
+  type RuntimeEditRef
+} from "./RuntimeUi";
 import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 
 const UI_LAYER = 1 << 25;
@@ -97,6 +103,13 @@ export interface PreGameModalRef {
   shade: Node;
   panel: Node;
   content: Node;
+}
+
+export interface PreGamePageHeaderRef {
+  node: Node;
+  backButton: PreGameActionButtonRef;
+  titleLabel: Label;
+  subtitleLabel: Label;
 }
 
 export class PreGameUi {
@@ -185,6 +198,42 @@ export class PreGameUi {
     return this.node(parent.node, name, 0, parent.height / 2 - height / 2, parent.width, height);
   }
 
+  pageHeader(
+    parent: PreGameSafeAreaRef,
+    name: string,
+    title: string,
+    subtitle: string,
+    backHandler: () => void
+  ): PreGamePageHeaderRef {
+    const node = this.topBar(parent, name, 96);
+    const backButton = this.iconButton(node, "BackButton", "‹", -252, 0, 80, backHandler);
+    const titleLabel = this.label(node, `${name}Title`, title, 38, 14, 430, 42, 30, "homeText", 0);
+    const subtitleLabel = this.label(
+      node,
+      `${name}Subtitle`,
+      subtitle,
+      38,
+      -24,
+      430,
+      30,
+      16,
+      "homeTextMuted",
+      0
+    );
+    return { node, backButton, titleLabel, subtitleLabel };
+  }
+
+  group(
+    parent: Node,
+    name: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): Node {
+    return this.node(parent, name, x, y, width, height);
+  }
+
   card(
     parent: Node,
     name: string,
@@ -197,6 +246,103 @@ export class PreGameUi {
     const node = this.node(parent, name, x, y, width, height);
     this.addRoundedBackground(node, width, height, radius, "homeCard", "homeCardBorder");
     return node;
+  }
+
+  button(
+    parent: Node,
+    name: string,
+    text: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    handler: () => void,
+    kind: PreGameActionKind = "surface",
+    fontSize = 20
+  ): RuntimeButtonRef {
+    const node = this.node(parent, name, x, y, width, height);
+    const radius = Math.min(18, height / 2);
+    const token = this.actionToken(kind);
+    const baseColor = this.color(token);
+    const textToken: ThemeColorToken = kind === "surface" ? "homeText" : "homeTextOnColor";
+    const background = this.addRoundedBackground(
+      node,
+      width,
+      height,
+      radius,
+      token,
+      kind === "surface" ? "homeCardBorder" : "homeTextOnColor"
+    );
+    const label = this.label(node, `${name}Label`, text, 0, 0, width - 18, height - 8, fontSize, textToken);
+    const button = node.addComponent(Button);
+    const visual = node.addComponent(RuntimeButtonVisual);
+    visual.configure(
+      button,
+      background,
+      width,
+      height,
+      radius,
+      baseColor,
+      this.darken(baseColor, kind === "surface" ? 0.08 : 0.14),
+      this.color("disabled")
+    );
+    this.bindButton(node, button, visual, handler);
+    return { node, button, label, background, visual };
+  }
+
+  edit(
+    parent: Node,
+    name: string,
+    placeholder: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    maxLength: number,
+    multiline = false
+  ): RuntimeEditRef {
+    const node = this.node(parent, name, x, y, width, height);
+    const backgroundNode = this.node(node, `${name}Background`, 0, 0, width, height);
+    const background = this.addRoundedBackground(
+      backgroundNode,
+      width,
+      height,
+      16,
+      "homeCard",
+      "homeCardBorder"
+    );
+    const textLabel = this.label(
+      node,
+      `${name}Text`,
+      "",
+      0,
+      0,
+      width - 32,
+      height - 18,
+      multiline ? 18 : 20,
+      "homeText",
+      0
+    );
+    const placeholderLabel = this.label(
+      node,
+      `${name}Placeholder`,
+      placeholder,
+      0,
+      0,
+      width - 32,
+      height - 18,
+      multiline ? 17 : 19,
+      "homeTextMuted",
+      0
+    );
+    const editBox = node.addComponent(EditBox);
+    editBox.string = "";
+    editBox.placeholder = placeholder;
+    editBox.maxLength = maxLength;
+    editBox.textLabel = textLabel;
+    editBox.placeholderLabel = placeholderLabel;
+    if (multiline) editBox.inputMode = EditBox.InputMode.ANY;
+    return { node, backgroundNode, background, editBox, textLabel, placeholderLabel };
   }
 
   actionButton(

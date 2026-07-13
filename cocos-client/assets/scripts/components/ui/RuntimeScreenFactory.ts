@@ -168,10 +168,13 @@ export class RuntimeScreenFactory {
 
   private buildBank(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "BankRuntimeScreen");
-    ui.title(root, "选择词库");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "BankSafeArea");
     let controller!: BankScene;
-    ui.backButton(root, () => controller.back());
-    const status = ui.label(root, "BankStatus", "", 0, 216, 780, 72, 19, "textMuted");
+    home.pageHeader(safe, "BankHeader", "选择词库", "为练习和比赛选择学习内容", () => controller.back());
+    const statusCard = home.card(safe.node, "BankStatusCard", 0, 292, 560, 94);
+    home.visualSlot(statusCard, "coin", -238, 0, 58, 58);
+    const status = home.label(statusCard, "BankStatus", "", 26, 0, 430, 76, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
     const pageSize = 8;
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
@@ -182,25 +185,25 @@ export class RuntimeScreenFactory {
     for (let index = 0; index < pageSize; index += 1) {
       const column = index % 2;
       const row = Math.floor(index / 2);
-      slots.push(ui.button(
-        root,
+      slots.push(home.button(
+        safe.node,
         `BankSlot${index}`,
         "",
-        column === 0 ? -215 : 215,
-        128 - row * 62,
-        390,
-        50,
+        column === 0 ? -144 : 144,
+        194 - row * 88,
+        272,
+        80,
         () => {
           const bankId = slotIds[index];
           if (!bankId) return;
           controller.selectBank(bankId);
           renderPage();
         },
-        "plain",
+        "surface",
         17
       ));
     }
-    const pageLabel = ui.label(root, "BankPage", "", 0, -132, 160, 34, 18, "textMuted");
+    const pageLabel = home.label(safe.node, "BankPage", "", 0, -164, 120, 44, 18, "homeTextMuted");
     const renderPage = (): void => {
       const selectedId = app.store.getState().bankPickerSelectedBankId;
       const pageCount = Math.max(1, Math.ceil(entries.length / pageSize));
@@ -221,19 +224,32 @@ export class RuntimeScreenFactory {
       previous.visual.refresh();
       next.visual.refresh();
     };
-    previous = ui.button(root, "PreviousBanks", "←", -105, -132, 68, 38, () => {
+    previous = home.iconButton(safe.node, "PreviousBanks", "‹", -105, -164, 80, () => {
       page -= 1;
       renderPage();
-    }, "plain", 24);
-    next = ui.button(root, "NextBanks", "→", 105, -132, 68, 38, () => {
+    });
+    next = home.iconButton(safe.node, "NextBanks", "›", 105, -164, 80, () => {
       page += 1;
       renderPage();
-    }, "plain", 24);
-    ui.button(root, "UnlockBank", "解锁所选", -205, -205, 280, 52, () => {
+    });
+    home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, -276, 272, 82, () => {
       controller.unlockSelectedBank();
       renderPage();
-    }, "secondary");
-    ui.button(root, "ConfirmBank", "确定选择", 205, -205, 280, 52, () => controller.confirmSelection());
+    }, "history", "coin");
+    home.actionButton(
+      safe.node,
+      "ConfirmBank",
+      "确定选择",
+      "用于练习和下一场比赛",
+      "词",
+      144,
+      -276,
+      272,
+      82,
+      () => controller.confirmSelection(),
+      "bank",
+      "wordBank"
+    );
     controller = root.addComponent(BankScene);
     controller.statusLabel = status;
     renderPage();
@@ -242,21 +258,49 @@ export class RuntimeScreenFactory {
 
   private buildStudy(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "StudyRuntimeScreen");
-    ui.title(root, "背单词");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "StudySafeArea");
     let controller!: StudyScene;
-    ui.backButton(root, () => controller.backHome());
-    const card = ui.panel(root, "StudyCard", 0, 50, 760, 310);
-    const word = ui.label(card, "StudyWord", "", 0, 78, 700, 82, 48);
-    const meaning = ui.label(card, "StudyMeaning", "", 0, -2, 680, 78, 25, "textMuted");
-    const status = ui.label(card, "StudyStatus", "", 0, -115, 220, 34, 19, "textMuted");
-    ui.button(root, "PreviousWord", "←", -330, -150, 72, 52, () => controller.previousWord(), "plain", 28);
-    ui.button(root, "RevealWord", "查看本词释义", -185, -150, 190, 52, () => controller.revealCurrentMeaning(), "plain", 18);
-    ui.button(root, "RandomWord", "随机", 30, -150, 110, 52, () => controller.randomWord(), "plain", 18);
-    ui.button(root, "NextWord", "→", 190, -150, 110, 52, () => controller.nextWord(), "primary", 28);
-    ui.button(root, "MarkWrong", "加入错题库", 340, -150, 150, 52, () => controller.markCurrentUnfamiliar(), "secondary", 17);
-    ui.button(root, "HideMeaning", "隐藏中文", -205, -220, 180, 48, () => controller.hideChinese(), "plain", 17);
-    ui.button(root, "ShowMeaning", "显示中文", 0, -220, 180, 48, () => controller.showChinese(), "plain", 17);
-    ui.button(root, "ChangeStudyBank", "换词库", 205, -220, 180, 48, () => controller.changeBank(), "plain", 17);
+    home.pageHeader(safe, "StudyHeader", "赛前练习", "熟悉当前词库，标记需要复习的单词", () => controller.backHome());
+    const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
+    home.actionButton(
+      safe.node,
+      "StudyBankBar",
+      getWordBankLabel(selectedBank, true),
+      "点击更换练习词库",
+      "词",
+      0,
+      292,
+      560,
+      82,
+      () => controller.changeBank(),
+      "surface",
+      "wordBank"
+    );
+    const card = home.card(safe.node, "StudyCard", 0, 86, 560, 300, 22);
+    home.visualSlot(card, "practice", 0, 92, 72, 72);
+    const word = home.label(card, "StudyWord", "", 0, 28, 500, 72, 48, "homeText");
+    const meaning = home.label(card, "StudyMeaning", "", 0, -45, 500, 66, 25, "homeTextMuted");
+    const status = home.label(card, "StudyStatus", "", 0, -116, 160, 36, 18, "homeTextMuted");
+    home.iconButton(safe.node, "PreviousWord", "‹", -232, -112, 80, () => controller.previousWord());
+    home.button(safe.node, "RandomWord", "随机一个", 0, -112, 264, 80, () => controller.randomWord(), "surface", 20);
+    home.iconButton(safe.node, "NextWord", "›", 232, -112, 80, () => controller.nextWord());
+    home.button(
+      safe.node,
+      "RevealWord",
+      "查看本词释义",
+      0,
+      -202,
+      560,
+      80,
+      () => controller.revealCurrentMeaning(),
+      "practice",
+      22
+    );
+    home.button(safe.node, "MarkWrong", "加入错题库", -144, -292, 272, 80, () => controller.markCurrentUnfamiliar(), "history", 20);
+    home.button(safe.node, "ChangeStudyBank", "更换词库", 144, -292, 272, 80, () => controller.changeBank(), "bank", 20);
+    home.button(safe.node, "HideMeaning", "隐藏中文", -144, -382, 272, 80, () => controller.hideChinese(), "surface", 19);
+    home.button(safe.node, "ShowMeaning", "显示中文", 144, -382, 272, 80, () => controller.showChinese(), "surface", 19);
     controller = root.addComponent(StudyScene);
     controller.wordLabel = word;
     controller.meaningLabel = meaning;
@@ -266,19 +310,36 @@ export class RuntimeScreenFactory {
 
   private buildCoopSelect(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "CoopSelectRuntimeScreen");
-    ui.title(root, "双人合作");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "CoopSelectSafeArea");
     let controller!: CoopSelectScene;
-    ui.backButton(root, () => controller.backHome());
-    const status = ui.label(root, "CoopStatus", "", 0, 195, 760, 72, 20, "textMuted");
-    const shared = ui.panel(root, "SharedInfo", -220, 35, 380, 230);
-    ui.label(shared, "SharedTitle", "默契捕词赛", 0, 65, 330, 44, 28);
-    ui.label(shared, "SharedBody", "两人都可捕获正确单词\n团队成绩为双方得分之和", 0, 0, 320, 80, 19, "textMuted");
-    ui.button(shared, "OpenShared", "进入房间", 0, -75, 250, 50, () => controller.openSharedRoom());
-    const spell = ui.panel(root, "SpellInfo", 220, 35, 380, 230);
-    ui.label(spell, "SpellTitle", "同舟拼词记", 0, 65, 330, 44, 28);
-    ui.label(spell, "SpellBody", "双方各填写两个空位\n每个单词限时 20 秒", 0, 0, 320, 80, 19, "textMuted");
-    ui.button(spell, "OpenSpell", "进入房间", 0, -75, 250, 50, () => controller.openSpellRoom(), "secondary");
-    ui.button(root, "CoopBank", "更换词库", 0, -170, 260, 50, () => controller.changeBank(), "plain");
+    home.pageHeader(safe, "CoopSelectHeader", "双人合作", "选择一种和好友共同完成的玩法", () => controller.backHome());
+    const statusCard = home.card(safe.node, "CoopStatusCard", 0, 292, 560, 94);
+    const status = home.label(statusCard, "CoopStatus", "", 0, 0, 520, 76, 18, "homeTextMuted");
+    const shared = home.card(safe.node, "SharedInfo", 0, 116, 560, 210, 22);
+    home.visualSlot(shared, "joinRoom", -226, 22, 74, 74);
+    home.label(shared, "SharedTitle", "默契捕词赛", 20, 58, 420, 42, 28, "homeText", 0);
+    home.label(shared, "SharedBody", "两人共同捕获正确单词，团队成绩为双方得分之和", 20, 12, 420, 58, 17, "homeTextMuted", 0);
+    home.button(shared, "OpenShared", "进入默契房间", 20, -66, 420, 80, () => controller.openSharedRoom(), "practice", 21);
+    const spell = home.card(safe.node, "SpellInfo", 0, -118, 560, 210, 22);
+    home.visualSlot(spell, "practice", -226, 22, 74, 74);
+    home.label(spell, "SpellTitle", "同舟拼词记", 20, 58, 420, 42, 28, "homeText", 0);
+    home.label(spell, "SpellBody", "双方各填写两个空位，每个单词限时 20 秒", 20, 12, 420, 58, 17, "homeTextMuted", 0);
+    home.button(spell, "OpenSpell", "进入拼词房间", 20, -66, 420, 80, () => controller.openSpellRoom(), "catalog", 21);
+    home.actionButton(
+      safe.node,
+      "CoopBank",
+      "更换当前词库",
+      "合作玩法使用同一套真实词库",
+      "词",
+      0,
+      -345,
+      560,
+      82,
+      () => controller.changeBank(),
+      "bank",
+      "wordBank"
+    );
     controller = root.addComponent(CoopSelectScene);
     controller.statusLabel = status;
     return root;
@@ -286,56 +347,64 @@ export class RuntimeScreenFactory {
 
   private buildRoom(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "RoomRuntimeScreen");
-    ui.title(root, "双人房间");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "RoomSafeArea");
     let controller!: RoomScene;
-    const back = ui.backButton(root, () => controller.backHome());
-    const mode = ui.label(root, "RoomMode", "", 0, 222, 700, 40, 23);
-    const roomCode = ui.label(root, "RoomCode", "------", 0, 178, 360, 44, 30, "secondary");
-    const players = ui.label(root, "RoomPlayers", "", 0, 92, 700, 102, 21, "textPrimary");
-    const status = ui.label(root, "RoomStatus", "", 0, 17, 760, 54, 19, "textMuted");
-    const input = ui.edit(
-      root,
+    const entryIntent = app.store.getState().roomEntryIntent;
+    const headerTitle = entryIntent === "join" ? "加入房间" : entryIntent === "create" ? "创建房间" : "双人房间";
+    const header = home.pageHeader(safe, "RoomHeader", headerTitle, "邀请好友，双方准备后开始对局", () => controller.backHome());
+    const modeCard = home.card(safe.node, "RoomModeCard", 0, 306, 560, 64);
+    const mode = home.label(modeCard, "RoomMode", "", 0, 0, 520, 46, 21, "homeText");
+    const codeCard = home.card(safe.node, "RoomCodeCard", 0, 226, 560, 76);
+    home.label(codeCard, "RoomCodeCaption", "房间码", -198, 0, 100, 34, 16, "homeTextMuted");
+    const roomCode = home.label(codeCard, "RoomCode", "------", 45, 0, 330, 46, 30, "homeText");
+    const playersCard = home.card(safe.node, "RoomPlayersCard", 0, 110, 560, 136);
+    const players = home.label(playersCard, "RoomPlayers", "", 0, 0, 520, 112, 20, "homeText");
+    const status = home.label(safe.node, "RoomStatus", "", 0, 20, 560, 44, 17, "homeTextMuted");
+    const input = home.edit(
+      safe.node,
       "RoomCodeInput",
       `输入 ${ROOM_CODE_LENGTH} 位房间码`,
-      -190,
-      -55,
-      360,
-      52,
+      -95,
+      -44,
+      370,
+      80,
       ROOM_CODE_LENGTH
     );
-    const create = ui.button(root, "CreateRoom", "创建房间", 240, -55, 210, 52, () => {
-      void controller.createSelectedRoom();
-    });
-    const join = ui.button(root, "JoinRoom", "加入", 390, -55, 90, 52, () => {
+    const join = home.button(safe.node, "JoinRoom", "加入", 190, -44, 170, 80, () => {
       void controller.joinEnteredRoom();
-    }, "secondary", 18);
-    ui.label(root, "BotDifficultyTitle", "机器人难度", 0, -93, 180, 20, 14, "textMuted");
-    const ready = ui.button(root, "Ready", "准备 / 取消", -305, -128, 170, 50, () => {
-      void controller.toggleReady();
-    });
-    const botLow = ui.button(root, "BotLow", "低", -105, -128, 90, 50, () => {
+    }, "join", 22);
+    const create = home.actionButton(safe.node, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0, -136, 560, 84, () => {
+      void controller.createSelectedRoom();
+    }, "create", "createRoom");
+    home.label(safe.node, "BotDifficultyTitle", "机器人难度（仅双人 PK）", 0, -190, 360, 22, 15, "homeTextMuted");
+    const botLow = home.button(safe.node, "BotLow", "低", -136, -243, 120, 80, () => {
       void controller.addLowBot();
-    }, "plain", 17);
-    const botMedium = ui.button(root, "BotMedium", "中", 0, -128, 90, 50, () => {
+    }, "surface", 19);
+    const botMedium = home.button(safe.node, "BotMedium", "中", 0, -243, 120, 80, () => {
       void controller.addMediumBot();
-    }, "plain", 17);
-    const botHigh = ui.button(root, "BotHigh", "高", 105, -128, 90, 50, () => {
+    }, "surface", 19);
+    const botHigh = home.button(safe.node, "BotHigh", "高", 136, -243, 120, 80, () => {
       void controller.addHighBot();
-    }, "plain", 17);
-    const start = ui.button(root, "StartRoom", "开始游戏", 305, -128, 170, 50, () => {
+    }, "surface", 19);
+    const ready = home.button(safe.node, "Ready", "准备 / 取消", -144, -323, 272, 80, () => {
+      void controller.toggleReady();
+    }, "practice", 19);
+    const start = home.button(safe.node, "StartRoom", "开始游戏", 144, -323, 272, 80, () => {
       void controller.startGame();
-    }, "secondary");
-    const copy = ui.button(root, "CopyCode", "复制房间码", -210, -200, 220, 46, () => {
+    }, "create", 21);
+    const copy = home.button(safe.node, "CopyCode", "复制房间码", -192, -403, 176, 80, () => {
       void controller.copyRoomCode();
-    }, "plain", 17);
-    const invite = ui.button(root, "InviteFriend", "邀请好友", 35, -200, 190, 46, () => {
+    }, "surface", 16);
+    const invite = home.button(safe.node, "InviteFriend", "邀请好友", 0, -403, 176, 80, () => {
       void controller.inviteFriend();
-    }, "plain", 17);
-    const refresh = ui.button(root, "RefreshRoom", "刷新", 240, -200, 120, 46, () => {
+    }, "surface", 16);
+    const refresh = home.button(safe.node, "RefreshRoom", "刷新房间", 192, -403, 176, 80, () => {
       void controller.refreshRoom();
-    }, "plain", 17);
+    }, "surface", 16);
     controller = root.addComponent(RoomScene);
     controller.roomCodeInput = input.editBox;
+    controller.pageTitleLabel = header.titleLabel;
     controller.roomCodeLabel = roomCode;
     controller.modeLabel = mode;
     controller.playersLabel = players;
@@ -345,7 +414,7 @@ export class RuntimeScreenFactory {
     controller.copyButton = copy.button;
     controller.inviteButton = invite.button;
     controller.refreshButton = refresh.button;
-    controller.backButton = back.button;
+    controller.backButton = header.backButton.button;
     controller.readyButton = ready.button;
     controller.addBotButton = botMedium.button;
     controller.botDifficultyButtons = [botLow.button, botMedium.button, botHigh.button];
@@ -356,12 +425,43 @@ export class RuntimeScreenFactory {
 
   private buildResult(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "ResultRuntimeScreen");
-    const title = ui.label(root, "ResultTitle", "", 0, 170, 700, 70, 44);
-    const score = ui.label(root, "ResultScore", "", 0, 85, 420, 60, 38, "secondary");
-    const players = ui.label(root, "ResultPlayers", "", 0, -5, 580, 110, 23, "textMuted");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "ResultSafeArea");
     let controller!: ResultScene;
-    ui.button(root, "ResultHome", "返回首页", -170, -165, 260, 56, () => controller.backHome());
-    ui.button(root, "ResultHistory", "查看战绩", 170, -165, 260, 56, () => controller.openHistory(), "plain");
+    home.pageHeader(safe, "ResultHeader", "本局结算", "成绩已保存，可在战绩记录中继续查看", () => controller.backHome());
+    const resultCard = home.card(safe.node, "ResultCard", 0, 74, 560, 470, 24);
+    home.visualSlot(resultCard, "history", 0, 150, 112, 112);
+    const title = home.label(resultCard, "ResultTitle", "", 0, 62, 500, 70, 38, "homeText");
+    const score = home.label(resultCard, "ResultScore", "", 0, -18, 440, 70, 42, "homeText");
+    const players = home.label(resultCard, "ResultPlayers", "", 0, -118, 480, 120, 22, "homeTextMuted");
+    home.actionButton(
+      safe.node,
+      "ResultHome",
+      "返回首页",
+      "继续准备下一场对局",
+      "房",
+      0,
+      -228,
+      560,
+      86,
+      () => controller.backHome(),
+      "create",
+      "createRoom"
+    );
+    home.actionButton(
+      safe.node,
+      "ResultHistory",
+      "查看战绩",
+      "回顾本局和历史最佳成绩",
+      "绩",
+      0,
+      -330,
+      560,
+      86,
+      () => controller.openHistory(),
+      "history",
+      "history"
+    );
     controller = root.addComponent(ResultScene);
     controller.titleLabel = title;
     controller.scoreLabel = score;
@@ -371,26 +471,30 @@ export class RuntimeScreenFactory {
 
   private buildHistory(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "HistoryRuntimeScreen");
-    const listRoot = ui.root(root, "HistoryList");
-    const detailRoot = ui.root(root, "HistoryDetail");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "HistorySafeArea");
+    const listRoot = home.group(safe.node, "HistoryList", 0, 0, safe.width, safe.height);
+    const detailRoot = home.group(safe.node, "HistoryDetail", 0, 0, safe.width, safe.height);
     detailRoot.active = false;
     let controller!: HistoryScene;
-    const title = ui.label(listRoot, "HistoryTitle", "", 0, 275, 620, 44, 32);
-    ui.backButton(listRoot, () => controller.back());
-    ui.button(listRoot, "HistoryPk", "双人PK", -245, 220, 190, 42, () => controller.showPk(), "plain", 17);
-    ui.button(listRoot, "HistoryShared", "默契捕词赛", 0, 220, 210, 42, () => controller.showCoopShared(), "plain", 17);
-    ui.button(listRoot, "HistorySpell", "同舟拼词记", 245, 220, 210, 42, () => controller.showCoopSpell(), "plain", 17);
-    const best = ui.label(listRoot, "HistoryBest", "", 0, 176, 500, 34, 19, "secondary");
-    const empty = ui.label(listRoot, "HistoryEmpty", "", 0, 18, 500, 42, 20, "textMuted");
+    home.pageHeader(safe, "HistoryHeader", "战绩记录", "按玩法回顾最近比赛和历史最佳", () => controller.back());
+    home.button(listRoot, "HistoryPk", "双人PK", -190, 288, 176, 80, () => controller.showPk(), "join", 17);
+    home.button(listRoot, "HistoryShared", "默契捕词", 0, 288, 176, 80, () => controller.showCoopShared(), "practice", 17);
+    home.button(listRoot, "HistorySpell", "同舟拼词", 190, 288, 176, 80, () => controller.showCoopSpell(), "catalog", 17);
+    const title = home.label(listRoot, "HistoryTitle", "", -110, 220, 320, 42, 27, "homeText", 0);
+    const best = home.label(listRoot, "HistoryBest", "", 190, 220, 220, 38, 18, "homeTextMuted");
+    const empty = home.label(listRoot, "HistoryEmpty", "", 0, -20, 500, 42, 20, "homeTextMuted");
     const items: HistoryRecordItem[] = [];
     for (let index = 0; index < 5; index += 1) {
-      const row = ui.panel(listRoot, `HistoryRow${index}`, 0, 126 - index * 58, 760, 50);
-      const rowTitle = ui.label(row, "Title", "", -185, 9, 370, 26, 17, "textPrimary", 0);
-      const meta = ui.label(row, "Meta", "", -140, -13, 460, 22, 13, "textMuted", 0);
-      const rowScore = ui.label(row, "Score", "", 300, 0, 120, 30, 18, "secondary");
+      const row = home.card(listRoot, `HistoryRow${index}`, 0, 140 - index * 84, 560, 80, 16);
+      const rowTitle = home.label(row, "Title", "", -90, 14, 350, 30, 17, "homeText", 0);
+      const meta = home.label(row, "Meta", "", -75, -16, 380, 26, 13, "homeTextMuted", 0);
+      const rowScore = home.label(row, "Score", "", 210, 0, 110, 34, 18, "homeText");
       const button = row.addComponent(Button);
       let item!: HistoryRecordItem;
-      row.on(Button.EventType.CLICK, () => item.open(), this);
+      row.on(Button.EventType.CLICK, () => {
+        if (button.interactable) item.open();
+      }, this);
       item = row.addComponent(HistoryRecordItem);
       item.titleLabel = rowTitle;
       item.metaLabel = meta;
@@ -398,38 +502,17 @@ export class RuntimeScreenFactory {
       item.detailButton = button;
       items.push(item);
     }
-    const page = ui.label(listRoot, "HistoryPage", "", 0, -180, 120, 32, 17, "textMuted");
-    const previous = ui.button(listRoot, "HistoryPrevious", "←", -105, -180, 68, 38, () => controller.previousPage(), "plain", 23);
-    const next = ui.button(listRoot, "HistoryNext", "→", 105, -180, 68, 38, () => controller.nextPage(), "plain", 23);
+    const page = home.label(listRoot, "HistoryPage", "", 0, -286, 120, 44, 17, "homeTextMuted");
+    const previous = home.iconButton(listRoot, "HistoryPrevious", "‹", -105, -286, 80, () => controller.previousPage());
+    const next = home.iconButton(listRoot, "HistoryNext", "›", 105, -286, 80, () => controller.nextPage());
 
-    const detailTitle = ui.label(detailRoot, "DetailTitle", "", 0, 245, 720, 52, 30);
-    const detailBody = ui.label(detailRoot, "DetailBody", "", 0, 10, 780, 400, 17, "textPrimary", 0);
-    const detailPage = ui.label(detailRoot, "DetailPage", "", 0, -225, 120, 32, 17, "textMuted");
-    const detailPrevious = ui.button(
-      detailRoot,
-      "DetailPrevious",
-      "←",
-      -105,
-      -225,
-      68,
-      38,
-      () => controller.previousDetailPage(),
-      "plain",
-      23
-    );
-    const detailNext = ui.button(
-      detailRoot,
-      "DetailNext",
-      "→",
-      105,
-      -225,
-      68,
-      38,
-      () => controller.nextDetailPage(),
-      "plain",
-      23
-    );
-    ui.button(detailRoot, "CloseDetail", "←", -420, 275, 62, 46, () => controller.closeDetail(), "plain", 28);
+    const detailCard = home.card(detailRoot, "HistoryDetailCard", 0, -5, 560, 680, 22);
+    home.iconButton(detailRoot, "CloseDetail", "‹", -242, 300, 80, () => controller.closeDetail());
+    const detailTitle = home.label(detailCard, "DetailTitle", "", 40, 278, 400, 54, 27, "homeText");
+    const detailBody = home.label(detailCard, "DetailBody", "", 0, 5, 500, 490, 17, "homeText", 0);
+    const detailPage = home.label(detailCard, "DetailPage", "", 0, -282, 120, 44, 17, "homeTextMuted");
+    const detailPrevious = home.iconButton(detailCard, "DetailPrevious", "‹", -105, -282, 80, () => controller.previousDetailPage());
+    const detailNext = home.iconButton(detailCard, "DetailNext", "›", 105, -282, 80, () => controller.nextDetailPage());
 
     controller = root.addComponent(HistoryScene);
     controller.titleLabel = title;
@@ -451,20 +534,23 @@ export class RuntimeScreenFactory {
 
   private buildFeedback(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "FeedbackRuntimeScreen");
-    ui.title(root, "问题反馈");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "FeedbackSafeArea");
     let controller!: FeedbackScene;
-    ui.backButton(root, () => controller.backHome());
-    ui.label(root, "FeedbackPrompt", "请描述遇到的问题或建议", 0, 205, 720, 40, 22);
-    const content = ui.edit(root, "FeedbackContent", "反馈内容（4-300 字）", 0, 95, 720, 150, 300, true);
-    const contact = ui.edit(root, "FeedbackContact", "联系方式（选填）", 0, -35, 720, 54, 80);
-    const status = ui.label(root, "FeedbackStatus", "", 0, -92, 720, 38, 18, "textMuted");
-    const privacy = ui.label(root, "FeedbackPrivacy", "", 0, -142, 760, 54, 15, "textMuted");
-    const submit = ui.button(root, "SubmitFeedback", "提交反馈", 0, -210, 300, 54, () => {
+    home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议", () => controller.backHome());
+    const promptCard = home.card(safe.node, "FeedbackPromptCard", 0, 292, 560, 82);
+    home.visualSlot(promptCard, "feedback", -238, 0, 56, 56);
+    home.label(promptCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 25, 0, 430, 52, 18, "homeTextMuted", 0);
+    const content = home.edit(safe.node, "FeedbackContent", "反馈内容（4-300 字）", 0, 126, 560, 220, 300, true);
+    const contact = home.edit(safe.node, "FeedbackContact", "联系方式（选填）", 0, -44, 560, 80, 80);
+    const status = home.label(safe.node, "FeedbackStatus", "", 0, -112, 560, 40, 18, "homeTextMuted");
+    const privacy = home.label(safe.node, "FeedbackPrivacy", "", 0, -168, 540, 58, 15, "homeTextMuted");
+    const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0, -258, 560, 86, () => {
       void controller.submit();
-    });
-    ui.button(root, "OpenPrivacy", "隐私保护指引", 300, -210, 190, 44, () => {
+    }, "join", "feedback");
+    home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0, -358, 560, 82, () => {
       void controller.openPrivacyContract();
-    }, "plain", 15);
+    }, "surface", "privacy");
     controller = root.addComponent(FeedbackScene);
     controller.contentInput = content.editBox;
     controller.contactInput = contact.editBox;
@@ -476,10 +562,13 @@ export class RuntimeScreenFactory {
 
   private buildHelp(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "HelpRuntimeScreen");
-    ui.title(root, "玩法说明");
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const safe = home.safeArea(root, "HelpSafeArea");
     let controller!: HelpScene;
-    ui.backButton(root, () => controller.backHome());
-    const body = ui.label(root, "HelpBody", "", 0, -5, 790, 500, 19, "textPrimary", 0);
+    home.pageHeader(safe, "HelpHeader", "玩法目录", "玩法说明：了解练习、对战和合作规则", () => controller.backHome());
+    const helpCard = home.card(safe.node, "HelpCard", 0, -16, 560, 690, 22);
+    home.visualSlot(helpCard, "catalog", 0, 280, 92, 92);
+    const body = home.label(helpCard, "HelpBody", "", 0, -35, 500, 560, 18, "homeText", 0);
     controller = root.addComponent(HelpScene);
     controller.bodyLabel = body;
     return root;

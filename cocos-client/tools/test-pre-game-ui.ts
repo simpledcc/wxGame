@@ -172,6 +172,36 @@ function main(): void {
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
 
+  const pageGroup = preGame.group(root, "FoundationPageGroup", 0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
+  const pageSafe = preGame.safeArea(pageGroup, "FoundationPageSafeArea");
+  const pageHeader = preGame.pageHeader(
+    pageSafe,
+    "FoundationPageHeader",
+    "选择词库",
+    "为练习和比赛选择学习内容",
+    () => undefined
+  );
+  assertEqual(pageHeader.titleLabel.string, "选择词库");
+  assertEqual(pageHeader.subtitleLabel.string, "为练习和比赛选择学习内容");
+  assertEqual(transform(pageHeader.backButton.node).height, 80);
+  const directButton = preGame.button(
+    pageSafe.node,
+    "FoundationTextButton",
+    "确定选择",
+    0,
+    0,
+    280,
+    80,
+    () => undefined,
+    "bank"
+  );
+  assertVisualMatchesHitArea(directButton.node, directButton.visual);
+  const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
+  assertOk(directEdit.node.getComponent(EditBox));
+  assertEqual(directEdit.node.getComponent(Graphics), null, "PreGame EditBox host must not carry Graphics");
+  assertOk(directEdit.backgroundNode.getComponent(Graphics));
+  assertEqual(directEdit.backgroundNode.parent, directEdit.node);
+
   const modal = preGame.modal(root, "FoundationModal", 520, 360);
   assertEqual(modal.root.active, false);
   assertOk(modal.root.getComponent(BlockInputEvents));
@@ -193,7 +223,7 @@ function main(): void {
   assertOk(edit.backgroundNode.getComponent(Graphics), "Edit background must live on a child node");
   assertEqual(edit.backgroundNode.parent, edit.node);
 
-  console.log("Pre-game UI foundation OK: visual slots, fallbacks, cards, controls, hit geometry, and EditBox layering passed.");
+  console.log("Pre-game UI foundation OK: page headers, visual slots, controls, hit geometry, and EditBox layering passed.");
 }
 
 main();

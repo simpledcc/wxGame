@@ -48,6 +48,9 @@ export class RoomScene extends Component {
   @property(Label)
   statusLabel: Label | null = null;
 
+  @property(Label)
+  pageTitleLabel: Label | null = null;
+
   @property(Button)
   readyButton: Button | null = null;
 
@@ -216,6 +219,16 @@ export class RoomScene extends Component {
     const room = state.room;
     const hasSession = !!state.roomId || !!room;
     this.setSessionControls(state, hasSession);
+    if (this.pageTitleLabel) {
+      const intent = app.store.getState().roomEntryIntent;
+      this.pageTitleLabel.string = hasSession
+        ? "房间大厅"
+        : intent === "join"
+          ? "加入房间"
+          : intent === "create"
+            ? "创建房间"
+            : "双人房间";
+    }
     if (this.roomCodeLabel) {
       this.roomCodeLabel.string = state.roomCode || "------";
     }

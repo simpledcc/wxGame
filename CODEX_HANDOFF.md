@@ -279,6 +279,15 @@ $env:PYTHONIOENCODING='utf-8'
 
 ## Suggested Next Steps
 
+### 2026-07-13 unified pre-game page update
+
+- Branch `feature/pre-game-ui-home-goal` now applies the Home visual system to Bank, Study, Co-op Select, Room, Result, History, Feedback and Help routes.
+- `COCOS_PRE_GAME_PAGES_DESIGN.md` is the source of truth for page hierarchy, color roles, control sizes and per-page behavior.
+- Create, join and active lobby still share `RoomRuntimeScreen`; `roomEntryIntent` controls the initial title and guidance, while an accepted room changes the title to “房间大厅”.
+- All business controllers, cloud contracts and gameplay Bundles remain unchanged. Continue to modify gameplay screens in their own branch/ownership stream.
+- Automated checks cover 360/393/430 target widths and require approximately 44px minimum touch height for every visible button on the unified pages.
+- Dedicated bitmap art and Creator screenshots remain optional follow-up work; current pages use the committed theme background and programmatic icon fallbacks.
+
 ### 2026-07-11 Cocos V0 audit update
 
 - `develop/cocos-migration` has passed `npm run verify`, `npm run build:wechat:dry-run`, and `npm run inspect:wechat-build` for the V0 visual baseline.

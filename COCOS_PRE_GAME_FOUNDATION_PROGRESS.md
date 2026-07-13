@@ -14,7 +14,7 @@ Updated: 2026-07-13
 - Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
 - Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `POST-GOAL BUTTON LOGIC AUDIT DONE`
+- Current stage: `POST-GOAL UNIFIED PRE-GAME PAGES DONE`
 - Next stage: optional bitmap replacement and Creator visual QA; no further route/Store work is required for the Home form
 
 ## Baseline facts
@@ -71,6 +71,7 @@ Updated: 2026-07-13
 | G5 Code verification and handoff | `DONE` | Full `npm run verify`, build dry-run, scope audit and documentation pass | None |
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
+| H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
 
 ## G0 work completed
 
@@ -160,6 +161,16 @@ Updated: 2026-07-13
 6. Confirmed `RuntimeUi.edit()` already uses a child `Graphics` background and a clean `EditBox` host; the older V0 handoff warning is closed by the G1 implementation and layering test.
 7. Kept gameplay Bundles, cloud functions, mini-program source, AppID, room protocol, scoring and synchronization contracts unchanged.
 
+## H3 unified pre-game and auxiliary pages
+
+1. Added reusable portrait page headers, direct-coordinate text buttons, layout groups and layered EditBoxes to `PreGameUi`.
+2. Migrated Bank, Study, Co-op Select, Room, Result, History, Feedback and Help builders away from the legacy landscape coordinate adapter.
+3. Preserved every existing node name, Scene controller binding and business action required by the runtime tests.
+4. Added create/join/lobby title transitions to `RoomScene` without changing room protocol or cloud requests.
+5. Reworked all visible route buttons to at least 80 design pixels high and verified 360/393/430 target-device touch sizes.
+6. Added per-route safe-area/header contracts, direct PreGame EditBox layering tests and disabled history-row click protection.
+7. Added `COCOS_PRE_GAME_PAGES_DESIGN.md` as the cross-computer design and acceptance source of truth.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -237,6 +248,19 @@ No generated word/template payload changed after regeneration.
 - `cocos-client/tools/test-runtime-shell-execution.ts`
 - `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
 - `COCOS_VISUAL_BASELINE_V0.md`
+- `CODEX_HANDOFF.md`
+
+## H3 modified files
+
+- `cocos-client/assets/scripts/components/ui/PreGameUi.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
+- `cocos-client/assets/scripts/scenes/BankScene.ts`
+- `cocos-client/assets/scripts/scenes/RoomScene.ts`
+- `cocos-client/tools/test-pre-game-ui.ts`
+- `cocos-client/tools/test-runtime-shell.ts`
+- `cocos-client/tools/test-runtime-shell-execution.ts`
+- `COCOS_PRE_GAME_PAGES_DESIGN.md`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
 - `CODEX_HANDOFF.md`
 
 ## Tests
@@ -326,6 +350,15 @@ No generated word/template payload changed after regeneration.
 - Structure contract: `122` required files checked
 - Creator/WeChat/phone verification: `NOT_REQUIRED` for this code-only logic audit
 
+### H3 final verification
+
+- `npm run test:pre-game-ui`: `PASSED` (page header, direct button, hit geometry and EditBox layering)
+- `npm run test:shell`: `PASSED` (all route controls and unified UI methods wired)
+- `npm run test:shell-runtime`: `PASSED` (all non-game routes, target-device buttons and business interactions)
+- `npm run verify`: `PASSED` (structure, platform, lifecycle, contracts, gameplay, themes, release and type checks)
+- Structure contract: `122` required files checked
+- Creator/WeChat/phone verification: `NOT_REQUIRED` for this code design stage
+
 Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
 
 ## Assets
@@ -340,7 +373,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 
 ## Remaining risks after Goal completion
 
-1. The reproducible staged LF payload has `38,057` bytes remaining, while this pre-normalization Windows worktree has only `456`; future bitmap work should still use a reviewed lightweight Bundle rather than consume the main-package margin.
+1. The release source-budget gate still passes after H3; future bitmap work should use a reviewed lightweight Bundle rather than consume main-package margin.
 2. Logo, avatar, coin, character and function icons now use recognizable verified programmatic visuals. Dedicated final art remains required before the Home matches the high-fidelity reference, but no button or business behavior is waiting on those images.
 3. Creator import/rendering and WeChat device presentation are outside this Goal by user direction; the existing phone-start baseline remains accepted.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
@@ -357,15 +390,19 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 - G3 mounted every G2 slot and replaced only the Home portion of `RuntimeScreenFactory`; other route builders remain intact.
 - G4 reused the existing Store, Router, room-session, privacy and audio contracts without changing their shared implementations.
 - G3-G5 changed no gameplay Bundle, Store, Router, App, scene serialization, theme manifest, build setting or cloud contract.
+- H2 added only the UI-only room entry intent and button guards; it changed no cloud or gameplay protocol.
+- H3 migrates all non-game route builders to `PreGameUi`; it changes no Store, Router, App, gameplay Bundle, theme manifest or cloud contract.
+- H3 adds one presentation-only `RoomScene.pageTitleLabel` binding and shortens the Bank status copy for the new card.
 
 ## Next single action
 
-Review the latest Home-form enhancement commit and `docs/design/home/README.md`. The next Home task should only replace the stable slots with approved background, Logo, character and icon bitmaps and perform Creator screenshot QA.
+Review `COCOS_PRE_GAME_PAGES_DESIGN.md` and the latest `dev_done` commit. The next visual task should add approved bitmap replacements or perform Creator screenshot QA without changing the completed route/business bindings.
 
 ## Continue prompt
 
 ```text
-The COCOS_PRE_GAME_FOUNDATION_TARGET_TASK.md Goal is complete on branch feature/pre-game-ui-home-goal.
-Read this progress file and the latest dev_done commit, run npm run verify after merging, and treat dedicated Home bitmap art or Creator/device presentation as a separate follow-up Goal.
+The unified pre-game page design is complete on branch feature/pre-game-ui-home-goal.
+Read COCOS_PRE_GAME_PAGES_DESIGN.md, this progress file and the latest dev_done commit; run npm run verify after merging.
+Treat dedicated bitmap art or Creator/device presentation as a separate follow-up Goal.
 Do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment as part of this completed Home Goal.
 ```

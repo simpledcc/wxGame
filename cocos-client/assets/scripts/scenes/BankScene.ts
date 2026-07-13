@@ -83,10 +83,8 @@ export class BankScene extends Component {
     const bank = getWordBank(app.wordBankCatalog, state.bankPickerSelectedBankId);
     const unlocked = app.wordBankStore.isUnlocked(app.wordBankCatalog, state.bankPickerSelectedBankId);
     this.statusLabel.string = [
-      "选择词库",
-      `当前：${getWordBankLabel(bank, false)}`,
-      unlocked ? "状态：已解锁" : "状态：未解锁",
-      `金币：${app.wordBankStore.getWordCoins()}`
+      `当前：${getWordBankLabel(bank, true)}`,
+      `${unlocked ? "已解锁" : "未解锁"} · 单词金币 ${app.wordBankStore.getWordCoins()}`
     ].join("\n");
   }
 

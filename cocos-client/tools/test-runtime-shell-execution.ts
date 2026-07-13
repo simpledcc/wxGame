@@ -80,7 +80,7 @@ function assertVisibleUiContract(root: Node, context: string): void {
   assertEqual(violations.length, 0, `${context} violates the fixed runtime UI contract: ${violations.join("; ")}`);
 }
 
-function assertHomeTargetDevices(root: Node): void {
+function assertPreGameTargetDevices(root: Node): void {
   const buttonHeights: Array<{ name: string; height: number }> = [];
   const collect = (node: Node, visible: boolean): void => {
     const active = visible && node.active;
@@ -345,7 +345,7 @@ async function main(): Promise<void> {
   const initialHomeRoot = findDeep(canvas, "HomeRuntimeScreen");
   assertOk(initialHomeRoot);
   assertVisibleUiContract(initialHomeRoot, "home route");
-  assertHomeTargetDevices(initialHomeRoot);
+  assertPreGameTargetDevices(initialHomeRoot);
 
   const playerModal = findDeep(canvas, "HomePlayerModal");
   assertEqual(playerModal?.active, false);
@@ -354,7 +354,7 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
   assertOk(playerModal);
   assertVisibleUiContract(playerModal, "Home player modal");
-  assertHomeTargetDevices(playerModal);
+  assertPreGameTargetDevices(playerModal);
   findDeep(canvas, "HomePlayerClose")?.emit(Button.EventType.CLICK);
   assertEqual(playerModal.active, false);
 
@@ -364,7 +364,7 @@ async function main(): Promise<void> {
   assertEqual(settingsModal?.active, true);
   assertOk(settingsModal);
   assertVisibleUiContract(settingsModal, "Home settings modal");
-  assertHomeTargetDevices(settingsModal);
+  assertPreGameTargetDevices(settingsModal);
   const mutedBefore = app.settingsStore.isMuted();
   findDeep(canvas, "HomeSoundToggle")?.emit(Button.EventType.CLICK);
   assertEqual(app.settingsStore.isMuted(), !mutedBefore);
@@ -440,6 +440,7 @@ async function main(): Promise<void> {
   assertEqual(roomNavigationCount, 1, "rapid Home taps must navigate only once");
   assertEqual(app.store.getState().route, "room");
   assertEqual(app.store.getState().roomEntryIntent, "join");
+  assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "加入房间");
   assertOk(
     findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("输入好友的 6 位房间码"),
     "join entry must guide the player to enter a room code"
@@ -460,6 +461,7 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "room", "create entry must open the existing room route");
   assertEqual(app.store.getState().roomEntryIntent, "create");
+  assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "创建房间");
   assertOk(
     findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("确认词库与玩法后点击“创建房间”"),
     "create entry must guide the player to create a room"
@@ -471,7 +473,11 @@ async function main(): Promise<void> {
   findDeep(canvas, "StudyButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "study");
-  assertOk(findDeep(canvas, "StudyRuntimeScreen"));
+  const studyRoot = findDeep(canvas, "StudyRuntimeScreen");
+  assertOk(studyRoot);
+  assertOk(findDeep(studyRoot, "StudySafeArea"));
+  assertOk(findDeep(studyRoot, "StudyHeader"));
+  assertPreGameTargetDevices(studyRoot);
   assertOk(findDeep(canvas, "RandomWord"));
   assertOk(findDeep(canvas, "MarkWrong"));
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
@@ -575,6 +581,15 @@ async function main(): Promise<void> {
     "HelpRuntimeScreen",
     "HomeRuntimeScreen"
   ];
+  const unifiedPageContracts: Partial<Record<RouteName, [string, string]>> = {
+    bank: ["BankSafeArea", "BankHeader"],
+    coopSelect: ["CoopSelectSafeArea", "CoopSelectHeader"],
+    room: ["RoomSafeArea", "RoomHeader"],
+    result: ["ResultSafeArea", "ResultHeader"],
+    history: ["HistorySafeArea", "HistoryHeader"],
+    feedback: ["FeedbackSafeArea", "FeedbackHeader"],
+    help: ["HelpSafeArea", "HelpHeader"]
+  };
   for (let index = 0; index < routes.length; index += 1) {
     const deferredPkPreload = routes[index] === "pkGame";
     const deferredSpellFailure = routes[index] === "coopSpell";
@@ -638,6 +653,12 @@ async function main(): Promise<void> {
     const routeRoot = findDeep(canvas, expectedRoots[index]);
     assertOk(routeRoot, `${routes[index]} did not mount`);
     assertVisibleUiContract(routeRoot, `${routes[index]} route`);
+    const unifiedContract = unifiedPageContracts[routes[index]];
+    if (unifiedContract) {
+      assertOk(findDeep(routeRoot, unifiedContract[0]), `${routes[index]} safe area is required`);
+      assertOk(findDeep(routeRoot, unifiedContract[1]), `${routes[index]} shared page header is required`);
+      assertPreGameTargetDevices(routeRoot);
+    }
     if (routes[index] === "bank") {
       const bankController = routeRoot.getComponent(BankScene);
       assertOk(bankController);
@@ -682,6 +703,7 @@ async function main(): Promise<void> {
         "正在读取房间信息",
         "accepted joins without a snapshot must show a syncing state"
       );
+      assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "房间大厅");
       assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
       app.playerStore.setOpenId("player-1");
