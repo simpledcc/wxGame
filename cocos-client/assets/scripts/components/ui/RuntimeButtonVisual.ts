@@ -47,6 +47,16 @@ export class RuntimeButtonVisual extends Component {
     this.lastInteractable = interactable;
     if (!interactable) this.pressed = false;
     this.background.clear();
+    this.background.fillColor = new Color(24, 42, 56, interactable ? 42 : 24);
+    const shadowOffset = this.pressed ? -1 : -4;
+    this.background.roundRect(
+      -this.width / 2,
+      -this.height / 2 + shadowOffset,
+      this.width,
+      this.height,
+      this.radius
+    );
+    this.background.fill();
     this.background.fillColor = interactable
       ? (this.pressed ? this.pressedColor : this.normalColor)
       : this.disabledColor;

@@ -7,7 +7,19 @@ const { ccclass, property } = _decorator;
 @ccclass("HomeScene")
 export class HomeScene extends Component {
   @property(Label)
-  statusLabel: Label | null = null;
+  playerLabel: Label | null = null;
+
+  @property(Label)
+  coinLabel: Label | null = null;
+
+  @property(Label)
+  bankLabel: Label | null = null;
+
+  @property(Label)
+  historySummaryLabel: Label | null = null;
+
+  private active = true;
+  private navigating = false;
 
   onLoad(): void {
     if (app.store.getState().route === "boot") {
@@ -16,13 +28,25 @@ export class HomeScene extends Component {
   }
 
   start(): void {
-    const state = app.store.getState();
+    this.refreshDisplay();
+  }
+
+  onDestroy(): void {
+    this.active = false;
+  }
+
+  refreshDisplay(): void {
     const bank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
-    if (this.statusLabel) {
-      this.statusLabel.string = [
-        `${state.cloudReady ? "云环境已连接" : "正在连接云环境"} · 系统玩家：${app.playerStore.getLocalPlayer().displayName} · 金币：${app.wordBankStore.getWordCoins()}`,
-        `当前词库：${getWordBankLabel(bank, true)}`
-      ].join("\n");
+    if (this.playerLabel) this.playerLabel.string = app.playerStore.getLocalPlayer().displayName;
+    if (this.coinLabel) this.coinLabel.string = String(app.wordBankStore.getWordCoins());
+    if (this.bankLabel) this.bankLabel.string = `当前词库：${getWordBankLabel(bank, true)}`;
+    if (this.historySummaryLabel) {
+      const best = app.historyStore.getBestScores();
+      const scores = [best.pk?.score, best.coopShared?.score, best.coopSpell?.score]
+        .filter((score): score is number => typeof score === "number");
+      this.historySummaryLabel.string = scores.length
+        ? `历史最高 ${Math.max(...scores)} 分`
+        : "暂无战绩，完成比赛后查看";
     }
   }
 
@@ -32,52 +56,69 @@ export class HomeScene extends Component {
       app.runtime.showToast("当前词库暂无单词");
       return;
     }
-    app.studyStore.start(words, { showMeaning: true });
-    app.router.navigate("study");
+    this.navigateOnce(() => {
+      app.studyStore.start(words, { showMeaning: true });
+      app.router.navigate("study");
+    });
   }
 
   openBankPicker(): void {
-    app.router.openBankPicker("home");
+    this.navigateOnce(() => app.router.openBankPicker("home"));
   }
 
   openPkRoom(): void {
-    app.roomSession.leave();
-    app.store.patch({ selectedMode: "pk" });
-    app.router.navigate("room");
+    this.openRoom();
   }
 
-  openCoopSelect(): void {
-    app.roomSession.leave();
-    app.router.navigate("coopSelect");
+  openJoinRoom(): void {
+    this.openRoom();
   }
 
   openHistory(): void {
-    app.router.navigate("history");
+    this.navigateOnce(() => app.router.navigate("history"));
   }
 
   openFeedback(): void {
-    app.router.navigate("feedback");
+    this.navigateOnce(() => app.router.navigate("feedback"));
   }
 
   openHelp(): void {
-    app.router.navigate("help");
+    this.navigateOnce(() => app.router.navigate("help"));
+  }
+
+  toggleMuted(): boolean {
+    const current = app.settingsStore.isMuted();
+    const next = !current;
+    try {
+      app.audio.setMuted(next);
+      app.settingsStore.setMuted(next);
+      return next;
+    } catch {
+      if (this.active) app.runtime.showToast("音效设置保存失败，请重试");
+      return current;
+    }
   }
 
   async openPrivacyContract(): Promise<void> {
     try {
       const opened = await app.privacy.openContract();
-      if (!opened) app.runtime.showToast("暂时无法打开隐私保护指引");
+      if (this.active && !opened) app.runtime.showToast("暂时无法打开隐私保护指引");
     } catch {
-      app.runtime.showToast("隐私保护指引暂时无法打开，请稍后重试");
+      if (this.active) app.runtime.showToast("隐私保护指引暂时无法打开，请稍后重试");
     }
   }
 
-  async copyPerformanceReport(): Promise<void> {
-    try {
-      await app.runtime.setClipboardText(app.performance.serializeSnapshot());
-      app.runtime.showToast("性能报告已复制");
-    } catch {
-      app.runtime.showToast("性能报告复制失败");
-    }
+  private openRoom(): void {
+    this.navigateOnce(() => {
+      app.roomSession.leave();
+      app.store.patch({ selectedMode: "pk" });
+      app.router.navigate("room");
+    });
+  }
+
+  private navigateOnce(action: () => void): void {
+    if (!this.active || this.navigating) return;
+    this.navigating = true;
+    action();
   }
 }

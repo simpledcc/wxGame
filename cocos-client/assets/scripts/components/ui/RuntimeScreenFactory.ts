@@ -1,9 +1,7 @@
 import { Button, Node } from "cc";
-import { DEV } from "cc/env";
 import { HistoryRecordItem } from "../history/HistoryRecordItem";
 import { app } from "../../core/App";
 import { gameplayScreens, type GameplayRoute } from "../../core/GameplayBundles";
-import type { GameDuration } from "../../domain/GameTypes";
 import { ROOM_CODE_LENGTH } from "../../domain/RoomRules";
 import { getWordBank, getWordBankLabel } from "../../domain/WordBankRules";
 import { BankScene } from "../../scenes/BankScene";
@@ -16,6 +14,7 @@ import { ResultScene } from "../../scenes/ResultScene";
 import { RoomScene } from "../../scenes/RoomScene";
 import { StudyScene } from "../../scenes/StudyScene";
 import type { RouteName } from "../../store/GameStore";
+import { PreGameUi, type PreGameActionButtonRef } from "./PreGameUi";
 import { RuntimeUi, type RuntimeButtonRef } from "./RuntimeUi";
 
 export class RuntimeScreenFactory {
@@ -43,76 +42,104 @@ export class RuntimeScreenFactory {
 
   private buildHome(parent: Node, ui: RuntimeUi): Node {
     const root = ui.root(parent, "HomeRuntimeScreen");
-    ui.title(root, app.themes.getCurrentTheme().copy.gameTitle);
-    ui.gameIcon(root, "HomeGameIcon", 0, 220, 92);
-    const status = ui.label(root, "HomeStatus", "", 0, 176, 760, 54, 19, "textMuted");
-    const bestScores = app.historyStore.getBestScores();
-    ui.label(
-      root,
-      "BestScores",
-      `最佳：PK ${bestScores.pk?.score ?? "--"} · 默契 ${bestScores.coopShared?.score ?? "--"} · 拼词 ${bestScores.coopSpell?.score ?? "--"}`,
-      0,
-      130,
-      820,
-      38,
-      19,
-      "textPrimary"
-    );
-    ui.label(root, "DurationTitle", "本局时长", -330, 104, 120, 36, 20, "textMuted", 0);
-    const durations: GameDuration[] = [30, 60, 90, 120];
-    const durationButtons: RuntimeButtonRef[] = [];
-    const renderDurations = (): void => {
-      const selected = app.store.getState().duration;
-      durationButtons.forEach((ref, index) => {
-        ref.label.string = `${durations[index]}s${durations[index] === selected ? " ✓" : ""}`;
-      });
-    };
-    durations.forEach((duration, index) => {
-      durationButtons.push(ui.button(
-        root,
-        `Duration${duration}`,
-        `${duration}s`,
-        -150 + index * 115,
-        104,
-        98,
-        42,
-        () => {
-          app.store.patch({ duration });
-          renderDurations();
-        },
-        "plain",
-        18
-      ));
-    });
-    renderDurations();
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    const backgroundSlot = home.visualSlot(root, "background", 0, 0, 640, 960);
+    backgroundSlot.fallbackNode.active = false;
+    const safe = home.safeArea(root, "HomeSafeArea");
+    const top = home.topBar(safe, "HomeTopBar", 80);
+    const playerCard = home.card(top, "HomePlayerCard", -155, 0, 280, 70, 18);
+    home.visualSlot(playerCard, "avatar", -97, 0, 62, 62);
+    const player = home.label(playerCard, "HomePlayerName", "", 10, 0, 142, 54, 22, "homeText", 0);
+    const coinCard = home.card(top, "HomeCoinCard", 96, 0, 176, 54, 18);
+    home.label(coinCard, "HomeCoinIcon", "★", -58, 0, 36, 38, 24, "homeHistory");
+    const coins = home.label(coinCard, "HomeCoins", "", 18, 0, 104, 40, 22, "homeText");
 
     let controller!: HomeScene;
-    ui.button(root, "StudyButton", "开始背", -210, 30, 330, 58, () => controller.openStudy());
-    ui.button(root, "PkButton", "双人PK", 210, 30, 330, 58, () => controller.openPkRoom(), "secondary");
-    ui.button(root, "CoopButton", "双人合作", -210, -45, 330, 58, () => controller.openCoopSelect());
-    ui.button(root, "BankButton", "换词库", 210, -45, 330, 58, () => controller.openBankPicker(), "plain");
-    ui.button(root, "HistoryButton", "战绩记录", -210, -120, 330, 58, () => controller.openHistory(), "plain");
-    ui.button(root, "HelpButton", "玩法说明", 210, -120, 330, 58, () => controller.openHelp(), "plain");
-    ui.button(root, "FeedbackButton", "问题反馈", -170, -195, 300, 54, () => controller.openFeedback(), "plain");
-    ui.button(root, "HomePrivacy", "隐私保护指引", 170, -195, 300, 54, () => {
-      void controller.openPrivacyContract();
-    }, "plain", 18);
+    let openSettings = (): void => undefined;
+    home.iconButton(top, "SettingsButton", "设", 248, 0, 80, () => openSettings(), "settings");
 
-    if (DEV) {
-      ui.label(root, "ThemeDevTitle", "DEV THEME", -320, -262, 120, 30, 14, "textMuted");
-      ui.button(root, "DefaultTheme", "草地", -215, -262, 92, 34, () => {
-        void app.themes.select("default");
-      }, "plain", 15);
-      ui.button(root, "IslandTheme", "海岛", -110, -262, 92, 34, () => {
-        void app.themes.select("island");
-      }, "plain", 15);
-      ui.button(root, "PerformanceReport", "性能报告", 20, -262, 130, 34, () => {
-        void controller.copyPerformanceReport();
-      }, "plain", 14);
-    }
+    home.visualSlot(safe.node, "logo", 0, 315, 460, 88);
+    home.label(safe.node, "HomeSubtitle", "和好友一起比拼单词实力", 0, 265, 480, 30, 19, "homeText");
+    const bank = home.actionButton(
+      safe.node, "CurrentBankBar", "", "点击更换比赛词库", "词", 0, 215, 560, 80,
+      () => controller.openBankPicker(), "surface", "wordBank"
+    );
+    home.actionButton(
+      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, 115, 560, 96,
+      () => controller.openPkRoom(), "create", "createRoom"
+    );
+    home.actionButton(
+      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, 18, 560, 80,
+      () => controller.openJoinRoom(), "join", "joinRoom"
+    );
+    home.actionButton(
+      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -144, -74, 272, 80,
+      () => controller.openStudy(), "practice", "practice"
+    );
+    home.actionButton(
+      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 144, -74, 272, 80,
+      () => controller.openBankPicker(), "bank", "wordBank"
+    );
+    home.actionButton(
+      safe.node, "HelpButton", "玩法目录", "了解玩法和比赛规则", "玩", -144, -164, 272, 80,
+      () => controller.openHelp(), "catalog", "catalog"
+    );
+    const history = home.actionButton(
+      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 144, -164, 272, 80,
+      () => controller.openHistory(), "history", "history"
+    );
+    home.visualSlot(safe.node, "character", 238, -282, 100, 120);
+
+    let privacy!: PreGameActionButtonRef;
+    privacy = home.actionButton(
+      safe.node, "HomePrivacy", "隐私保护指引", "", "隐", -144, -397, 272, 80,
+      () => {
+        if (!privacy.button.interactable) return;
+        privacy.button.interactable = false;
+        privacy.titleLabel.string = "正在打开...";
+        privacy.visual.refresh();
+        void controller.openPrivacyContract().finally(() => {
+          if (!privacy.node.active) return;
+          privacy.button.interactable = true;
+          privacy.titleLabel.string = "隐私保护指引";
+          privacy.visual.refresh();
+        });
+      }, "practice", "privacy"
+    );
+    home.actionButton(
+      safe.node, "FeedbackButton", "问题反馈", "", "言", 144, -397, 272, 80,
+      () => controller.openFeedback(), "bank", "feedback"
+    );
+
+    const settingsModal = home.modal(root, "HomeSettingsModal", 500, 330);
+    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 0, 105, 420, 48, 30);
+    const soundStatus = home.label(
+      settingsModal.content, "HomeSoundStatus", "", 0, 48, 420, 40, 20, "homeTextMuted"
+    );
+    let soundToggle!: PreGameActionButtonRef;
+    const renderSound = (): void => {
+      const muted = app.settingsStore.isMuted();
+      soundStatus.string = muted ? "当前音效：已静音" : "当前音效：已开启";
+      soundToggle.titleLabel.string = muted ? "开启音效" : "静音音效";
+    };
+    soundToggle = home.actionButton(
+      settingsModal.content, "HomeSoundToggle", "", "", "声", 0, -18, 360, 80,
+      () => { controller.toggleMuted(); renderSound(); }, "surface"
+    );
+    home.actionButton(
+      settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -102, 260, 80,
+      () => { settingsModal.root.active = false; }, "surface"
+    );
+    openSettings = (): void => {
+      renderSound();
+      settingsModal.root.active = true;
+    };
 
     controller = root.addComponent(HomeScene);
-    controller.statusLabel = status;
+    controller.playerLabel = player;
+    controller.coinLabel = coins;
+    controller.bankLabel = bank.titleLabel;
+    controller.historySummaryLabel = history.subtitleLabel;
     return root;
   }
 

@@ -8,10 +8,11 @@ Updated: 2026-07-13
 - Base commit: `387121a` (`docs: add first playable and pre-game UI plans`)
 - G0 stage commit: `0719691` (`chore(home): establish G0 development baseline`)
 - G1 stage commit: `d39168b` (`feat(home): complete G1 visual foundation`)
-- G2 stage commit: this progress update and the Home resource-slot foundation are committed together; use `git log -1` after checkout for the exact SHA.
+- G2 stage commit: `4e4472c` (`feat(home): complete G2 resource slots dev_done`)
+- Goal completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `G2 DONE`
-- Next stage: `G3 NOT_STARTED`
+- Current stage: `G5 DONE`
+- Next stage: Goal complete; integration review/merge only
 
 ## Baseline facts
 
@@ -62,9 +63,9 @@ Updated: 2026-07-13
 | G0 Baseline, ownership and progress | `DONE` | Branch/ownership recorded; full verify and build dry-run pass | None |
 | G1 Shared visual foundation | `DONE` | Tokens, primitives, geometry/EditBox fixes and dedicated runtime test pass | None |
 | G2 Home resource slots and style skeleton | `DONE` | 13 stable visual slots, SpriteFrame replacement/fallback test and art handoff manifest pass | None |
-| G3 Real Home layout | `NOT_STARTED` |  | Depends on G1/G2 |
-| G4 Interaction and real data binding | `NOT_STARTED` |  | Depends on G3 |
-| G5 Code verification and handoff | `NOT_STARTED` |  | Depends on G1-G4 |
+| G3 Real Home layout | `DONE` | Portrait Home hierarchy, 13 mounted visual slots, fixed 640x960 bounds and target-device checks pass | None |
+| G4 Interaction and real data binding | `DONE` | All visible entries use existing controllers/routes and live stores; settings/privacy/loading/rapid-tap tests pass | None |
+| G5 Code verification and handoff | `DONE` | Full `npm run verify`, build dry-run, scope audit and documentation pass | None |
 
 ## G0 work completed
 
@@ -101,6 +102,36 @@ Updated: 2026-07-13
 7. Kept the full-page reference composite outside `cocos-client/assets/` and added no runtime bitmap or hand-written image importer metadata.
 8. Kept the final Home layout, route wiring, Store binding, settings behavior and gameplay Bundles untouched for G3/G4.
 
+## G3 work completed
+
+1. Replaced the developer-oriented Home toolbar with a portrait game Home assembled in the existing persistent runtime shell.
+2. Added separate top-level player, coin and settings controls; no fake level, nickname, coin amount or nested-card presentation is used.
+3. Mounted the background, Logo, safe avatar, character and every function-icon resource slot from G2.
+4. Added the brand subtitle, current-bank bar, orange create-room primary action, blue join-room secondary action, 2x2 preparation grid and bottom privacy/feedback row.
+5. Kept the committed theme `homeBackground` visible behind the new Home; independent Logo/avatar/character/icon files remain replaceable through the verified fallback contract.
+6. Kept every control inside the `640x960` design area and verified 360x800, 393x852 and 430x932 targets with at least 44 CSS px touch height.
+7. Added SHRINK/fixed-width coverage for long word-bank labels and a nine-digit coin value without changing control geometry.
+
+## G4 work completed
+
+1. Bound player name to `PlayerStore`, coins and current bank to `WordBankStore`, and the Home history summary to `HistoryStore`.
+2. Bound create room and join room to the existing room route and PK mode preparation; Home performs no create/join cloud call.
+3. Bound practice, bank, help/catalog, history, feedback and privacy to the existing controllers, routes and platform service.
+4. Added a local settings modal backed only by the existing mute state and `AudioService`; no unsupported settings or new route were invented.
+5. Added pressed, disabled and privacy-loading feedback while keeping visual and hit geometry identical.
+6. Added single-navigation guards for rapid repeated taps and lifecycle guards so late privacy results do not update a destroyed Home.
+7. Verified returning Home refreshes the selected bank, coin count and best history score from their stores.
+8. Verified route/resource-load failures preserve a usable Home and existing Toast behavior.
+
+## G5 work completed
+
+1. Ran every command required by the Goal plus the complete repository verification chain.
+2. Confirmed the diff is empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`.
+3. Kept AppID, cloud environment, room/scoring contracts, Router, App, stores, scenes and build settings unchanged.
+4. Added repository LF policy for Cocos code/data so package-byte and generated-data checks remain reproducible across both development computers.
+5. Corrected the runtime payload measurement to exclude two documentation-only Markdown files while preserving the existing 1,500,000-byte gate for actual Cocos source/runtime assets.
+6. Recorded the final source, metadata and theme budgets below; Creator, WeChat DevTools and phone verification remain `NOT_REQUIRED` for this Goal.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -135,6 +166,20 @@ No generated word/template payload changed after regeneration.
 
 - `cocos-client/assets/scripts/components/ui/PreGameUi.ts`
 - `cocos-client/tools/test-pre-game-ui.ts`
+- `cocos-client/tools/test-release-readiness.ts`
+- `COCOS_HOME_ASSET_MANIFEST.md`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+
+## G3-G5 modified files
+
+- `.gitattributes`
+- `cocos-client/assets/scripts/components/ui/PreGameUi.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeButtonVisual.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeUi.ts`
+- `cocos-client/assets/scripts/scenes/HomeScene.ts`
+- `cocos-client/tools/test-runtime-shell.ts`
+- `cocos-client/tools/test-runtime-shell-execution.ts`
 - `cocos-client/tools/test-release-readiness.ts`
 - `COCOS_HOME_ASSET_MANIFEST.md`
 - `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
@@ -184,23 +229,44 @@ No generated word/template payload changed after regeneration.
 - Cocos metadata: `113` files / `22,331` bytes
 - Forbidden-path diff from G1: empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`
 
+### G3-G5 final verification
+
+- `npm run test:build-pipeline`: `PASSED`
+- `npm run test:phase8`: `PASSED`
+- `npm run test:shell`: `PASSED`
+- `npm run test:pre-game-ui`: `PASSED`
+- `npm run test:shell-runtime`: `PASSED`
+- `npm run test:release`: `PASSED`
+- `npm run typecheck`: `PASSED`
+- `npm run typecheck:shell-runtime`: `PASSED`
+- `npm run verify`: `PASSED` (all structure, platform, lifecycle, cloud-contract, gameplay, theme, Home runtime and release checks)
+- `npm run build:wechat:dry-run`: `PASSED`; build contract valid, no engine process required
+- `npm audit --omit=dev`: `PASSED`, 0 vulnerabilities
+- `git diff --check`: `PASSED`
+- Structure contract: `122` required files checked
+- Runtime source payload in the current historical-CRLF Windows worktree: `1,499,544` bytes under the unchanged `1,500,000`-byte gate (`456` bytes remaining)
+- Runtime source payload in the staged LF-normalized Git content used by fresh checkouts: `1,461,943` bytes (`38,057` bytes remaining)
+- Cocos metadata: `113` files / `22,331` bytes
+- Theme source assets: `25` files / `217,846` bytes under the `250,000`-byte gate
+- Forbidden-path diff from G2: empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`
+
 Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
 
 ## Assets
 
-- Added runtime assets: none (G2 adds only lightweight code contracts and programmatic fallback visuals)
+- Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
 - Added reference assets: none
-- Missing final assets: transparent Logo, safe avatar, final Home background, character decoration and unified Home icon set; specifications are in `COCOS_HOME_ASSET_MANIFEST.md`
+- Mounted V0 slots: background, Logo, safe avatar, character, create/join/practice/bank/catalog/history/settings/privacy/feedback icons
+- Optional post-V0 art replacements: transparent Logo, dedicated safe avatar, dedicated Home background, character decoration and unified icon set; specifications are in `COCOS_HOME_ASSET_MANIFEST.md`
 - G0/G1 use no reference image in the Cocos runtime package
 - Future asset ownership: Home/common assets belong to the pre-game UI stream; gameplay assets remain in their mode bundles
 
-## Known risks for G3
+## Remaining risks after Goal completion
 
-1. The Home reference requests a Settings button, while the current app has only `SettingsStore` and no route.
-2. Home is currently assembled inside a large `RuntimeScreenFactory`; extracting a focused Home builder is allowed only when it reduces ownership conflicts without changing routes.
-3. The static source-payload gate has only `1,866` bytes remaining. G3 should replace or extract existing Home builder code rather than append another large implementation, and final art needs a reviewed package-budget adjustment.
-4. No final Logo, safe avatar, Home background, character decoration or unified icon set exists yet; G3 must keep using the verified fallbacks.
-5. Other developers may change gameplay bundles concurrently; this branch must not reformat or move their files.
+1. The reproducible staged LF payload has `38,057` bytes remaining, while this pre-normalization Windows worktree has only `456`; future bitmap work should still use a reviewed lightweight Bundle rather than consume the main-package margin.
+2. Logo, avatar, character and function icons currently use verified programmatic fallbacks. Dedicated final art is a future visual-polish replacement, not a functional blocker for this V0 Goal.
+3. Creator import/rendering and WeChat device presentation are outside this Goal by user direction; the existing phone-start baseline remains accepted.
+4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
 
@@ -209,20 +275,20 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 - Theme JSON and TypeScript manifests remain field-for-field equal under `test:phase8`.
 - `PreGameUi` is additive; the current Home builder does not use it until G3.
 - G2 changed only `PreGameUi`, its tests and repository documentation; it did not change Store, Router, App, scenes, theme manifests, build settings or gameplay bundles.
-- G2 resource slots are additive and remain unmounted until the G3 Home builder adopts them.
+- G2 introduced the resource slots without mounting them; G3 then adopted all slots in the real Home builder.
 - Any required Store/Router change must be isolated and documented before implementation.
+- G3 mounted every G2 slot and replaced only the Home portion of `RuntimeScreenFactory`; other route builders remain intact.
+- G4 reused the existing Store, Router, room-session, privacy and audio contracts without changing their shared implementations.
+- G3-G5 changed no gameplay Bundle, Store, Router, App, scene serialization, theme manifest, build setting or cloud contract.
 
 ## Next single action
 
-Execute only G3:
-
-> Implement the real portrait Home layout using `PreGameUi` and the G2 visual slots: top information area, brand, current-bank bar, create/join primary actions, 2x2 secondary grid and footer. Keep programmatic fallbacks, bind no new business behavior yet, support long content and the 360/393/430 target widths, and do not modify gameplay bundles.
+Review and merge the `dev_done` Goal completion commit from `feature/pre-game-ui-home-goal`. Do not start a new Home development stage from this file.
 
 ## Continue prompt
 
 ```text
-Continue COCOS_PRE_GAME_FOUNDATION_TARGET_TASK.md on branch feature/pre-game-ui-home-goal.
-Read COCOS_PRE_GAME_FOUNDATION_PROGRESS.md and inspect remote changes first.
-G0, G1 and G2 are complete; execute only G3. Do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
-Run the G3 tests, update this progress file, commit and push the stage before stopping.
+The COCOS_PRE_GAME_FOUNDATION_TARGET_TASK.md Goal is complete on branch feature/pre-game-ui-home-goal.
+Read this progress file and the latest dev_done commit, run npm run verify after merging, and treat dedicated Home bitmap art or Creator/device presentation as a separate follow-up Goal.
+Do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment as part of this completed Home Goal.
 ```

@@ -52,38 +52,6 @@ export class RuntimeUi {
     return node;
   }
 
-  gameIcon(parent: Node, name: string, x: number, y: number, size: number): Node {
-    const node = this.node(parent, name, x, y, size, size);
-    const transform = node.getComponent(UITransform);
-    const width = transform?.width || size * X_SCALE;
-    const height = transform?.height || size * SIZE_Y_SCALE;
-    const graphics = node.addComponent(Graphics);
-    const radius = Math.min(width, height) * 0.44;
-    graphics.fillColor = this.color("primary");
-    graphics.strokeColor = this.color("panel");
-    graphics.lineWidth = Math.max(2, Math.round(width * 0.035));
-    graphics.circle(0, 0, radius);
-    graphics.fill();
-    graphics.stroke();
-
-    graphics.fillColor = this.color("secondary");
-    graphics.strokeColor = this.color("panel");
-    graphics.lineWidth = Math.max(1, Math.round(width * 0.02));
-    graphics.roundRect(-width * 0.24, -height * 0.12, width * 0.48, height * 0.3, width * 0.06);
-    graphics.fill();
-    graphics.stroke();
-    graphics.moveTo(-width * 0.15, -height * 0.12);
-    graphics.lineTo(-width * 0.15, height * 0.18);
-    graphics.moveTo(0, -height * 0.12);
-    graphics.lineTo(0, height * 0.18);
-    graphics.moveTo(width * 0.15, -height * 0.12);
-    graphics.lineTo(width * 0.15, height * 0.18);
-    graphics.stroke();
-
-    this.label(node, `${name}Label`, "词", 0, 0, size * 0.72, size * 0.5, 28, "keyFill");
-    return node;
-  }
-
   node(
     parent: Node,
     name: string,

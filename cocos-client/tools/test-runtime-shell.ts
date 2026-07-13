@@ -62,7 +62,10 @@ function testExpectedControls(): void {
   ].join("\n");
   const visibleBuilders = `${source}\n${gameplay}`;
   [
-    "开始背",
+    "赛前练习",
+    "选择词库",
+    "玩法目录",
+    "加入房间",
     "双人PK",
     "双人合作",
     "换词库",
@@ -78,6 +81,8 @@ function testExpectedControls(): void {
     "跳过",
     "提交反馈",
     "隐私保护指引",
+    "开启音效",
+    "关闭",
     "机器人难度"
   ].forEach((label) => assert.equal(visibleBuilders.includes(label), true, `runtime control missing: ${label}`));
   [
@@ -106,12 +111,19 @@ function testExpectedControls(): void {
   assert.match(roomController, /app\.spellTemplateData/);
   assert.match(roomController, /roomSpellQuestions/);
   assert.match(roomController, /机器人 \$\{player\.nickName/);
-  assert.match(source, /if \(DEV\) \{[\s\S]*PerformanceReport/);
   const homeController = read("assets/scripts/scenes/HomeScene.ts");
-  assert.match(homeController, /copyPerformanceReport/);
   assert.match(homeController, /openPrivacyContract/);
-  assert.match(homeController, /系统玩家/);
-  assert.match(homeController, /performance\.serializeSnapshot\(\)/);
+  assert.match(homeController, /refreshDisplay/);
+  assert.match(homeController, /navigateOnce/);
+  assert.match(homeController, /toggleMuted/);
+  assert.match(homeController, /audio\.setMuted/);
+  [
+    "HomeTopBar", "HomePlayerName", "HomeCoins", "SettingsButton", "CurrentBankBar",
+    "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
+    "HistoryButton", "HomePrivacy", "FeedbackButton", "HomeSettingsModal"
+  ].forEach((name) => assert.equal(source.includes(`\"${name}\"`), true, `modern Home node missing: ${name}`));
+  assert.doesNotMatch(source, /BestScores|DurationTitle|ThemeDevTitle|DEV THEME/);
+  assert.doesNotMatch(source, /Lv\.12|1200/);
   const bootController = read("assets/scripts/scenes/BootScene.ts");
   assert.match(bootController, /error instanceof CloudCallError/);
   assert.match(bootController, /error\.message/);
@@ -167,7 +179,7 @@ function testShellLifecycleAndSceneAttachment(): void {
 
 function testPreGameUiFoundation(): void {
   const source = read("assets/scripts/components/ui/PreGameUi.ts");
-  ["safeArea", "topBar", "card", "actionButton", "iconButton", "modal"]
+  ["visualSlot", "setVisualAsset", "safeArea", "topBar", "card", "actionButton", "iconButton", "modal"]
     .forEach((method) => assert.match(source, new RegExp(`\\b${method}\\(`)));
   assert.match(source, /DESIGN_WIDTH/);
   assert.match(source, /DESIGN_HEIGHT/);

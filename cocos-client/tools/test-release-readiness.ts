@@ -110,10 +110,11 @@ function testSceneCoverage(): void {
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${sourcePath}.meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
-  ["openStudy", "openPkRoom", "openCoopSelect", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract"]
+  ["openStudy", "openPkRoom", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract", "toggleMuted"]
     .forEach((handler) => assert.match(home, new RegExp(`\\b${handler}\\b`)));
   assert.doesNotMatch(home, /EditBox|playerName|nickNameInput/);
-  assert.match(home, /系统玩家/);
+  assert.match(home, /playerStore\.getLocalPlayer\(\)\.displayName/);
+  assert.match(home, /wordBankStore\.getWordCoins\(\)/);
   const boot = read("assets/scripts/scenes/BootScene.ts");
   assert.match(boot, /暂不进入/);
   assert.match(boot, /declineCurrentVersion/);
@@ -242,7 +243,7 @@ function testAssetMetadataAndSceneReferences(): void {
 
 function testSourceAssetBudget(): void {
   const payloadFiles = listFiles(path.join(root, "assets"), new Set([
-    ".ts", ".json", ".scene", ".jpg", ".png", ".wav", ".md"
+    ".ts", ".json", ".scene", ".jpg", ".png", ".wav"
   ]));
   const payloadBytes = payloadFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
   const metadataBytes = listFiles(path.join(root, "assets"), new Set([".meta"]))

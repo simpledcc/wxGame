@@ -79,6 +79,25 @@ function assertVisibleUiContract(root: Node, context: string): void {
   assertEqual(violations.length, 0, `${context} violates the fixed runtime UI contract: ${violations.join("; ")}`);
 }
 
+function assertHomeTargetDevices(root: Node): void {
+  const buttonHeights: Array<{ name: string; height: number }> = [];
+  const collect = (node: Node, visible: boolean): void => {
+    const active = visible && node.active;
+    if (!active) return;
+    const transform = node.getComponent(UITransform);
+    if (node.getComponent(Button) && transform) buttonHeights.push({ name: node.name, height: transform.height });
+    node.children.forEach((child) => collect(child, active));
+  };
+  collect(root, true);
+  [[360, 800], [393, 852], [430, 932]].forEach(([width, height]) => {
+    const scale = width / 640;
+    assertOk(960 * scale <= height, `${width}x${height} must contain the fixed portrait design height`);
+    buttonHeights.forEach((entry) => {
+      assertOk(entry.height * scale >= 44, `${entry.name} touch height is below 44 px at ${width}x${height}`);
+    });
+  });
+}
+
 async function flush(): Promise<void> {
   flushStartQueue();
   await Promise.resolve();
@@ -293,38 +312,63 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "RuntimeScreens"));
   assertOk(findDeep(canvas, "HomeRuntimeScreen"));
   assertOk(findDeep(canvas, "StudyButton")?.getComponent(Button));
-  assertOk(
-    findDeep(canvas, "HomeStatus")?.getComponent(Label)?.string.includes("系统玩家：玩家"),
-    "Home must display the fixed system player identity"
+  assertEqual(findDeep(canvas, "HomePlayerName")?.getComponent(Label)?.string, "玩家");
+  assertEqual(
+    findDeep(canvas, "HomeCoins")?.getComponent(Label)?.string,
+    String(app.wordBankStore.getWordCoins()),
+    "Home coins must come from WordBankStore"
   );
+  assertOk(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："));
+  assertEqual(
+    findDeep(canvas, "HistoryButtonSubtitle")?.getComponent(Label)?.string,
+    "暂无战绩，完成比赛后查看"
+  );
+  [
+    "Background", "Logo", "Avatar", "Character", "CreateRoom", "JoinRoom", "Practice",
+    "WordBank", "Catalog", "History", "Settings", "Privacy", "Feedback"
+  ].forEach((stem) => assertOk(findDeep(canvas, `Home${stem}Slot`), `Home ${stem} visual slot is required`));
+  [
+    "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
+    "HistoryButton", "SettingsButton", "HomePrivacy", "FeedbackButton"
+  ].forEach((name) => assertOk(findDeep(canvas, name)?.getComponent(Button), `${name} must be actionable`));
+  assertEqual(findDeep(canvas, "BestScores"), null, "new Home must not show the old score toolbar");
+  assertEqual(findDeep(canvas, "DurationTitle"), null, "new Home must not show duration controls");
   assertOk(findDeep(canvas, "HomePrivacy")?.getComponent(Button), "Home privacy entry is required");
   const initialHomeRoot = findDeep(canvas, "HomeRuntimeScreen");
   assertOk(initialHomeRoot);
   assertVisibleUiContract(initialHomeRoot, "home route");
+  assertHomeTargetDevices(initialHomeRoot);
 
-  findDeep(canvas, "Duration120")?.emit(Button.EventType.CLICK);
-  assertEqual(app.store.getState().duration, 120);
-  assertEqual(findDeep(canvas, "Duration120Label")?.getComponent(Label)?.string, "120s ✓");
-  findDeep(canvas, "Duration60")?.emit(Button.EventType.CLICK);
-  assertEqual(app.store.getState().duration, 60);
+  const settingsModal = findDeep(canvas, "HomeSettingsModal");
+  assertEqual(settingsModal?.active, false);
+  findDeep(canvas, "SettingsButton")?.emit(Button.EventType.CLICK);
+  assertEqual(settingsModal?.active, true);
+  assertOk(settingsModal);
+  assertVisibleUiContract(settingsModal, "Home settings modal");
+  assertHomeTargetDevices(settingsModal);
+  const mutedBefore = app.settingsStore.isMuted();
+  findDeep(canvas, "HomeSoundToggle")?.emit(Button.EventType.CLICK);
+  assertEqual(app.settingsStore.isMuted(), !mutedBefore);
+  assertEqual(app.audio.isMuted(), !mutedBefore, "settings modal must persist through AudioService");
+  assertEqual(
+    findDeep(canvas, "HomeSoundStatus")?.getComponent(Label)?.string,
+    mutedBefore ? "当前音效：已开启" : "当前音效：已静音"
+  );
+  findDeep(canvas, "HomeSettingsClose")?.emit(Button.EventType.CLICK);
+  assertEqual(settingsModal.active, false);
 
   for (let index = 0; index < 60; index += 1) shell.update(1 / 60);
   const performanceSnapshot = app.performance.getSnapshot();
   assertEqual(performanceSnapshot.totalFrames, 60);
   assertOk(performanceSnapshot.peakNodeCount > 0, "runtime shell must sample its node peak");
-  assertOk(findDeep(canvas, "PerformanceReport")?.getComponent(Button), "DEV performance report button is required");
-  findDeep(canvas, "PerformanceReport")?.emit(Button.EventType.CLICK);
-  await flush();
-  const copiedPerformance = JSON.parse(appRuntime.clipboardText);
-  assertEqual(copiedPerformance.schemaVersion, 1);
-  assertEqual(copiedPerformance.totalFrames, 60);
 
   const privacyOpenCount = appRuntime.privacyContractOpenCount;
   findDeep(canvas, "HomePrivacy")?.emit(Button.EventType.CLICK);
-  await flush();
+  await flushMany(2);
   assertEqual(appRuntime.privacyContractOpenCount, privacyOpenCount + 1);
+  assertEqual(findDeep(canvas, "HomePrivacy")?.getComponent(Button)?.interactable, true);
 
-  findDeep(canvas, "CoopButton")?.emit(Button.EventType.CLICK);
+  app.store.setRoute("coopSelect");
   await flushMany();
   assertEqual(app.store.getState().route, "coopSelect");
   assertOk(findDeep(canvas, "CoopSelectRuntimeScreen"));
@@ -332,6 +376,30 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().selectedMode, "coopSpell");
   assertEqual(app.store.getState().route, "room");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home");
+
+  let roomNavigationCount = 0;
+  let observedRoute = app.store.getState().route;
+  const unsubscribeRoomNavigation = app.store.subscribe((state) => {
+    if (state.route === "room" && observedRoute !== "room") roomNavigationCount += 1;
+    observedRoute = state.route;
+  });
+  const joinRoom = findDeep(canvas, "JoinRoomButton");
+  joinRoom?.emit(Button.EventType.CLICK);
+  joinRoom?.emit(Button.EventType.CLICK);
+  await flushMany();
+  unsubscribeRoomNavigation();
+  assertEqual(roomNavigationCount, 1, "rapid Home taps must navigate only once");
+  assertEqual(app.store.getState().route, "room");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home");
+
+  findDeep(canvas, "CreateRoomButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "room", "create entry must open the existing room route");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -358,6 +426,59 @@ async function main(): Promise<void> {
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "study", "bank back must return to its Study source");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home");
+
+  const selectedBankBeforeHomePicker = app.wordBankStore.getSelectedBankId();
+  findDeep(canvas, "CurrentBankBar")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "bank");
+  findDeep(canvas, "BankSlot0")?.emit(Button.EventType.CLICK);
+  findDeep(canvas, "ConfirmBank")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home", "Home bank entry must return to Home");
+  assertOk(
+    findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.includes("错题库"),
+    "Home must refresh the selected bank after returning"
+  );
+  findDeep(canvas, "BankButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "bank", "secondary bank entry must use the same picker");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home");
+  const bankTitle = findDeep(canvas, "CurrentBankBarTitle");
+  const bankTitleTransform = bankTitle?.getComponent(UITransform);
+  assertOk(bankTitleTransform);
+  bankTitle!.getComponent(Label)!.string = `当前词库：${"超长词库名称".repeat(12)}`;
+  assertEqual(bankTitle!.getComponent(Label)!.overflow, Label.Overflow.SHRINK);
+  assertEqual(bankTitleTransform.width, 450, "long bank text must retain its reserved width");
+  app.wordBankStore.setSelectedBankId(selectedBankBeforeHomePicker);
+  app.store.patch({ bankId: selectedBankBeforeHomePicker });
+
+  const progressBeforeLongCoins = app.wordBankStore.getProgressSnapshot();
+  app.wordBankStore.restoreProgress(app.wordBankCatalog, {
+    wordCoins: 123456789,
+    unlockedBankIds: progressBeforeLongCoins.unlockedBankIds
+  });
+  findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "help");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.string, "123456789");
+  assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
+  app.wordBankStore.restoreProgress(app.wordBankCatalog, progressBeforeLongCoins);
+
+  findDeep(canvas, "HistoryButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "history");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  findDeep(canvas, "FeedbackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "feedback");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -713,6 +834,13 @@ async function main(): Promise<void> {
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "home");
+    }
+    if (routes[index] === "home") {
+      assertEqual(
+        findDeep(canvas, "HistoryButtonSubtitle")?.getComponent(Label)?.string,
+        "历史最高 700 分",
+        "Home must refresh its real history summary after returning"
+      );
     }
   }
 

@@ -6,7 +6,15 @@ Updated: 2026-07-13
 
 This is the handoff contract for Home art that is still missing from the V0 repository. The reference composite is design input only: do not copy it, crop it, or place it under `cocos-client/assets/`.
 
-G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot()`. G3 may position these slots, but route and Store code must not depend on whether final art has arrived.
+G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot()`. G3/G4 now mount every slot in the real Home; route and Store code do not depend on whether final art has arrived.
+
+## Current V0 State
+
+- The portrait Home is complete in code and uses the existing theme-managed `homeBackground` as its real scene background.
+- Logo, safe avatar, character and function icons are mounted at stable locations and currently render the verified Graphics/Label fallbacks.
+- Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
+- Replacing a fallback with a final `SpriteFrame` requires no route, controller or Store change.
+- Dedicated bitmap art below is optional post-V0 polish and does not block the completed main-interface Goal.
 
 ## Runtime Contract
 
@@ -21,19 +29,19 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 | Slot key | Art | Suggested source | Alpha | Slice | Planned ownership | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `background` | Portrait village/learning-camp scene, no embedded text | 720x1280 JPG/PNG, <=180 KB | optional | none | existing lightweight theme Bundle (`homeBackground`) | existing generic theme background; final Home art missing |
-| `logo` | Word Battle Park logo, no subtitle | 560x220 PNG/WebP | yes | none | `home_common` | missing; layered text fallback |
-| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG/WebP | yes | none | `home_common` | missing; safe initial fallback |
-| `character` | Friendly learning companion decoration | 360x420 PNG/WebP | yes | none | `home_common` | missing; text silhouette fallback |
-| `createRoom` | House icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | missing; `房` fallback |
-| `joinRoom` | Two-player/friend icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | missing; `友` fallback |
-| `practice` | Open book/practice icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | missing; `练` fallback |
-| `wordBank` | Stacked books/word-bank icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | missing; `词` fallback |
-| `catalog` | Gamepad/mode catalog icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | missing; `玩` fallback |
-| `history` | Trophy/history icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | missing; `绩` fallback |
-| `settings` | Gear icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | missing; `设` fallback |
-| `privacy` | Shield/check icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | missing; `隐` fallback |
-| `feedback` | Message bubble icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | missing; `言` fallback |
+| `background` | Portrait village/learning-camp scene, no embedded text | 720x1280 JPG/PNG, <=180 KB | optional | none | existing lightweight theme Bundle (`homeBackground`) | mounted; committed theme background active, dedicated replacement optional |
+| `logo` | Word Battle Park logo, no subtitle | 560x220 PNG/WebP | yes | none | `home_common` | mounted; layered text fallback active |
+| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG/WebP | yes | none | `home_common` | mounted; safe initial fallback active |
+| `character` | Friendly learning companion decoration | 360x420 PNG/WebP | yes | none | `home_common` | mounted; text silhouette fallback active |
+| `createRoom` | House icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | mounted; `房` fallback active |
+| `joinRoom` | Two-player/friend icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | mounted; `友` fallback active |
+| `practice` | Open book/practice icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; `练` fallback active |
+| `wordBank` | Stacked books/word-bank icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted twice; `词` fallback active |
+| `catalog` | Gamepad/mode catalog icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; `玩` fallback active |
+| `history` | Trophy/history icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; `绩` fallback active |
+| `settings` | Gear icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; `设` fallback active |
+| `privacy` | Shield/check icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; `隐` fallback active |
+| `feedback` | Message bubble icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; `言` fallback active |
 
 Button panels remain programmatic for V0. If later replaced by bitmap panels, deliver clean nine-slice sources without text: primary 600x160 and secondary 280x150, with at least 28 px protected corners.
 

@@ -1,0 +1,6 @@
+cocos-client/**/*.ts text eol=lf
+cocos-client/**/*.js text eol=lf
+cocos-client/**/*.json text eol=lf
+cocos-client/**/*.scene text eol=lf
+cocos-client/**/*.meta text eol=lf
+cocos-client/**/*.md text eol=lf

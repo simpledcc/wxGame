@@ -105,15 +105,19 @@ export class PreGameUi {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
+    textToken: ThemeColorToken = "homeText"
   ): HomeVisualSlotRef {
     const stem = key.charAt(0).toUpperCase() + key.slice(1);
     const node = this.node(parent, `Home${stem}Slot`, x, y, width, height);
     const fallbackNode = this.node(node, `Home${stem}Fallback`, 0, 0, width, height);
     const background = fallbackNode.addComponent(Graphics);
-    background.fillColor = this.color(key === "background" ? "backgroundTint" : "homeCard");
+    const framed = key === "background" || key === "avatar" || key === "character";
+    background.fillColor = framed
+      ? this.color(key === "background" ? "backgroundTint" : "homeCard")
+      : new Color(255, 255, 255, 0);
     background.strokeColor = this.color("homeCardBorder");
-    background.lineWidth = key === "background" ? 0 : 2;
+    background.lineWidth = key === "avatar" || key === "character" ? 2 : 0;
     background.roundRect(
       -width / 2,
       -height / 2,
@@ -134,8 +138,8 @@ export class PreGameUi {
           0,
           width * 0.84,
           height * 0.72,
-          Math.min(38, height * 0.42),
-          "homeText"
+          Math.min(key === "logo" ? 54 : 38, height * (key === "logo" ? 0.58 : 0.42)),
+          textToken
         )
       : null;
     const spriteNode = this.node(node, `Home${stem}Sprite`, 0, 0, width, height);
@@ -199,7 +203,8 @@ export class PreGameUi {
     width: number,
     height: number,
     handler: () => void,
-    kind: PreGameActionKind
+    kind: PreGameActionKind,
+    visualKey?: HomeVisualSlotKey
   ): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, width, height);
     const radius = Math.min(22, height / 2);
@@ -229,6 +234,10 @@ export class PreGameUi {
       Math.min(34, iconSize * 0.5),
       textToken
     );
+    if (visualKey) {
+      iconLabel.node.active = false;
+      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken);
+    }
 
     const textLeft = -width / 2 + 30 + iconSize;
     const textWidth = Math.max(40, width - (textLeft + width / 2) - 20);
@@ -281,7 +290,8 @@ export class PreGameUi {
     x: number,
     y: number,
     size: number,
-    handler: () => void
+    handler: () => void,
+    visualKey?: HomeVisualSlotKey
   ): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, size, size);
     const radius = Math.min(18, size / 2);
@@ -306,6 +316,10 @@ export class PreGameUi {
       Math.min(30, size * 0.46),
       "homeText"
     );
+    if (visualKey) {
+      iconLabel.node.active = false;
+      this.visualSlot(iconSlot, visualKey, 0, 0, size - 14, size - 14);
+    }
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);
     visual.configure(
@@ -399,7 +413,17 @@ export class PreGameUi {
     strokeToken: ThemeColorToken
   ): Graphics {
     const graphics = node.addComponent(Graphics);
-    graphics.fillColor = this.color(fillToken);
+    const fillColor = this.color(fillToken);
+    graphics.fillColor = new Color(24, 42, 56, 36);
+    graphics.roundRect(
+      -width / 2,
+      -height / 2 - 4,
+      width,
+      height,
+      Math.min(radius, width / 2, height / 2)
+    );
+    graphics.fill();
+    graphics.fillColor = fillColor;
     graphics.strokeColor = this.color(strokeToken);
     graphics.lineWidth = 2;
     graphics.roundRect(-width / 2, -height / 2, width, height, Math.min(radius, width / 2, height / 2));
