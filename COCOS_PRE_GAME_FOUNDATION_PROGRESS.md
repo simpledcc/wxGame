@@ -14,8 +14,8 @@ Updated: 2026-07-13
 - Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
 - Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `POST-GOAL UNIFIED PRE-GAME PAGES DONE`
-- Next stage: optional bitmap replacement and Creator visual QA; no further route/Store work is required for the Home form
+- Current stage: `H4 FINAL ART INTEGRATION DESIGN READY`
+- Next stage: H4.0 formal asset freeze and Creator import ownership; no further route/Store work is required for the Home form
 
 ## Baseline facts
 
@@ -72,6 +72,7 @@ Updated: 2026-07-13
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
+| H4 Formal art integration | `DESIGN_READY` | `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` defines assets, Bundle/loading architecture, fallback, QA and collaboration gates | Approved image files and a Creator 3.8.8 import owner are required before implementation |
 
 ## G0 work completed
 
@@ -171,6 +172,15 @@ Updated: 2026-07-13
 6. Added per-route safe-area/header contracts, direct PreGame EditBox layering tests and disabled history-row click protection.
 7. Added `COCOS_PRE_GAME_PAGES_DESIGN.md` as the cross-computer design and acceptance source of truth.
 
+## H4 formal art integration design
+
+1. Defined theme-specific backgrounds and shared `home_common` ownership without moving art into gameplay Bundles.
+2. Defined the exact Logo, avatar, coin, character, function-icon and optional nine-slice skin delivery contract.
+3. Defined a dedicated `HomeArtManager` and page binder that reuse the existing Bundle adapter, deduplicate requests and preserve programmatic fallbacks.
+4. Defined priority loading, failed-key retry and route-destruction protection so art never blocks or changes business actions.
+5. Defined Creator import ownership, package budgets, visual checks, automated acceptance and a six-stage H4 execution line.
+6. Kept H4 implementation explicitly `NOT_STARTED`: no empty Bundle, placeholder bitmap or hand-authored importer metadata was added.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -261,6 +271,15 @@ No generated word/template payload changed after regeneration.
 - `cocos-client/tools/test-runtime-shell-execution.ts`
 - `COCOS_PRE_GAME_PAGES_DESIGN.md`
 - `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+
+## H4 design modified files
+
+- `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
+- `COCOS_HOME_ASSET_MANIFEST.md`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+- `CODEX_HANDOFF.md`
+
+This H4 design commit adds no runtime bitmap, Bundle, Creator metadata or application code.
 - `CODEX_HANDOFF.md`
 
 ## Tests
@@ -359,6 +378,13 @@ No generated word/template payload changed after regeneration.
 - Structure contract: `122` required files checked
 - Creator/WeChat/phone verification: `NOT_REQUIRED` for this code design stage
 
+### H4 design verification
+
+- `git diff --check`: `PASSED`
+- `npm run verify`: `PASSED` (122-file structure check, runtime suites, release checks and both TypeScript checks)
+- Runtime bitmap/Bundle changes: none
+- Creator/WeChat/phone verification: `NOT_REQUIRED` for the design-only commit; required gates for later H4 implementation are defined in `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
+
 Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
 
 ## Assets
@@ -396,13 +422,14 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 
 ## Next single action
 
-Review `COCOS_PRE_GAME_PAGES_DESIGN.md` and the latest `dev_done` commit. The next visual task should add approved bitmap replacements or perform Creator screenshot QA without changing the completed route/business bindings.
+Review `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` and the latest `dev_done` commit. Start H4.0 by freezing the approved bitmap delivery list and naming one Creator 3.8.8 import owner; do not create an empty Bundle or change completed route/business bindings.
 
 ## Continue prompt
 
 ```text
-The unified pre-game page design is complete on branch feature/pre-game-ui-home-goal.
-Read COCOS_PRE_GAME_PAGES_DESIGN.md, this progress file and the latest dev_done commit; run npm run verify after merging.
-Treat dedicated bitmap art or Creator/device presentation as a separate follow-up Goal.
+The unified pre-game page design is complete and the H4 formal-art integration design is ready on branch feature/pre-game-ui-home-goal.
+Read COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md, this progress file and the latest dev_done commit.
+Start at H4.0 only after approved image files exist, and name one computer as the Creator 3.8.8 import owner.
+Commit each image together with Creator-generated metadata; do not crop the reference composite or hand-write image importer metadata.
 Do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment as part of this completed Home Goal.
 ```

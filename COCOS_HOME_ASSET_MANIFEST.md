@@ -6,6 +6,8 @@ Updated: 2026-07-13
 
 This is the handoff contract for Home art that is still missing from the V0 repository. The reference composite is design input only: do not copy it, crop it, or place it under `cocos-client/assets/`.
 
+The formal H4 implementation sequence, loading architecture, collaboration rules and completion gates are defined in `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`. This manifest remains the authoritative per-file delivery list.
+
 The checked-in reference and the explicit comparison between current code and the target are in `docs/design/home/README.md`. The reference is documentation, not a current runtime screenshot.
 
 G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot()`. G3/G4 now mount every slot in the real Home; route and Store code do not depend on whether final art has arrived.
