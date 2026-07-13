@@ -286,6 +286,15 @@ $env:PYTHONIOENCODING='utf-8'
 
 ## Suggested Next Steps
 
+### 2026-07-14 full-screen pre-game visual update
+
+- Branch `feature/pre-game-ui-home-goal` now uses `ResolutionPolicy.FIXED_WIDTH` and a dynamic `960-1440` logical viewport for Boot and all persistent-shell routes.
+- Home, mode catalog, create/join/lobby, Bank, Study, History, Feedback, Help and Result share a full-height programmatic learning-park scene; formal bitmap backgrounds, characters and icons are still pending standalone asset delivery.
+- Runtime simulation now runs at `393x852` and checks the derived `640x1387` viewport for visible-node overflow while exercising the full preparation flow.
+- Cocos Creator 3.8.8 build and WeChat DevTools iPhone 12/13 inspection passed; the visible Home, Bank, Study, mode catalog, create-room and History screens have no top/bottom black bars.
+- Gameplay Bundles, game rules, timers, robot compatibility, cloud functions and the legacy mini-program client were not changed.
+- Next external action is two-real-phone create/join/ready/start acceptance. The next art action is to import approved standalone assets through Creator; never crop the reference composite.
+
 ### 2026-07-13 unified pre-game page update
 
 - Branch `feature/pre-game-ui-home-goal` now applies the Home visual system to Bank, Study, Co-op Select, Room, Result, History, Feedback and Help routes.

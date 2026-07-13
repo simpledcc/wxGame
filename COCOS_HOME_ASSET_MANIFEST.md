@@ -1,6 +1,6 @@
 # Cocos Home Asset Manifest
 
-Updated: 2026-07-13
+Updated: 2026-07-14
 
 ## Purpose
 
@@ -19,6 +19,7 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - Replacing a fallback with a final `SpriteFrame` requires no route, controller or Store change.
 - Dedicated bitmap art below did not block the completed structural V0 Goal, but is required before claiming high-fidelity visual completion against the reference.
+- H8 adds a full-viewport programmatic sky, cloud, hill, meadow, path, foliage and flower layer to every preparation page. It removes black bars and supplies a coherent scene while formal bitmap files are still pending.
 
 ## Runtime Contract
 

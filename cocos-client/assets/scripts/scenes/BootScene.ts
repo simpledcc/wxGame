@@ -10,7 +10,11 @@ import {
 } from "cc";
 import { app } from "../core/App";
 import { CloudCallError } from "../services/CloudService";
-import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../components/ui/RuntimeUi";
+import {
+  configurePortraitViewport,
+  DESIGN_WIDTH,
+  getPortraitViewportHeight
+} from "../components/ui/RuntimeUi";
 
 const { ccclass, property } = _decorator;
 const UI_LAYER = 1 << 25;
@@ -27,6 +31,10 @@ export class BootScene extends Component {
   private declineButton: Button | null = null;
   private entering = false;
 
+  onLoad(): void {
+    configurePortraitViewport();
+  }
+
   async start(): Promise<void> {
     if (!app.privacy.hasAcceptedCurrentVersion()) {
       this.showPrivacyGate();
@@ -41,16 +49,17 @@ export class BootScene extends Component {
       return;
     }
 
+    const viewportHeight = getPortraitViewportHeight();
     const gate = new Node("PrivacyGate");
     gate.layer = UI_LAYER;
     this.node.addChild(gate);
     gate.setPosition(0, 0);
-    gate.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    gate.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
 
     const panel = gate.addComponent(Graphics);
     panel.fillColor = new Color(24, 32, 43, 245);
     const panelWidth = DESIGN_WIDTH - 48;
-    const panelHeight = DESIGN_HEIGHT - 96;
+    const panelHeight = viewportHeight - 96;
     panel.roundRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
     panel.fill();
 
@@ -59,7 +68,7 @@ export class BootScene extends Component {
       "PrivacyTitle",
       "隐私保护提示",
       34,
-      370,
+      viewportHeight / 2 - 110,
       520,
       58
     );
@@ -68,7 +77,7 @@ export class BootScene extends Component {
       "PrivacyBody",
       `为提供房间对战、成绩记录和问题反馈功能，游戏会处理微信用户标识、系统玩家名、游戏记录，以及你提交的反馈内容和可选联系方式。\n请阅读${app.privacy.contractName}，同意后才会初始化云服务并读取本地游戏记录。`,
       20,
-      170,
+      viewportHeight / 2 - 310,
       520,
       280
     );
@@ -77,7 +86,7 @@ export class BootScene extends Component {
       gate,
       "ContractButton",
       "查看隐私保护指引",
-      -20,
+      -viewportHeight / 2 + 330,
       new Color(55, 71, 90, 255),
       () => {
         void this.openContract();
@@ -87,7 +96,7 @@ export class BootScene extends Component {
       gate,
       "AcceptButton",
       "同意并进入",
-      -105,
+      -viewportHeight / 2 + 235,
       new Color(36, 160, 110, 255),
       () => {
         void this.acceptAndEnter();
@@ -97,7 +106,7 @@ export class BootScene extends Component {
       gate,
       "DeclineButton",
       "暂不进入",
-      -190,
+      -viewportHeight / 2 + 140,
       new Color(55, 71, 90, 255),
       () => this.declineAndStay()
     );
@@ -106,7 +115,7 @@ export class BootScene extends Component {
       "PrivacyStatus",
       "同意前不会调用云能力",
       18,
-      -365,
+      -viewportHeight / 2 + 75,
       520,
       36,
       new Color(190, 205, 220, 255)

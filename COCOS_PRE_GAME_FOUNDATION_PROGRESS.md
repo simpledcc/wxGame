@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-13
+Updated: 2026-07-14
 
 ## Handoff
 
@@ -17,8 +17,8 @@ Updated: 2026-07-13
 - H5 completion commit: `005c713` (`feat(pre-game): complete seven-page preparation flow dev_done`)
 - H6 completion commit: `bfd2870` (`refactor(pre-game): remove hidden preparation controls dev_done`)
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H7 PRE-GAME OPTION CLEANUP DONE`
-- Next stage: two-real-phone create/join/ready/start acceptance for the frozen pre-game flow; do not start H4 art work
+- Current stage: `H8 FULL-SCREEN PRE-GAME VISUAL PASS DONE`
+- Next stage: two-real-phone create/join/ready/start acceptance; formal H4 bitmap integration waits for standalone approved assets
 
 ## Baseline facts
 
@@ -79,6 +79,7 @@ Updated: 2026-07-13
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
+| H8 Full-screen pre-game visual pass | `DONE` | Fixed-width dynamic viewport, full-screen scenery, seven-page long-screen layout, 393x852 route simulation, Creator build and DevTools visual inspection pass | Formal bitmap assets remain a separate H4 input |
 
 ## G0 work completed
 
@@ -237,6 +238,27 @@ Updated: 2026-07-13
 - `npm run inspect:wechat-build`: `PASSED`; `89` files, `6,487,834` total bytes, `4,120,918` main bytes and `2,366,916` subpackage bytes
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
 - Gameplay Bundle, gameplay service, cloud function and legacy client diffs against H6 commit `bfd2870`: `PASSED`, empty
+
+## H8 full-screen pre-game visual pass
+
+1. Switched Boot and the persistent Home shell to Cocos fixed-width portrait adaptation while preserving `640x960` as the minimum logical design baseline.
+2. Expanded runtime roots, theme cover background, loading shade, privacy gate, modal and safe-area geometry to the device-derived viewport height, capped at `1440` logical pixels.
+3. Added a reusable lightweight programmatic scene layer with sky, clouds, hills, meadow, learning path, foliage, flowers and theme-aware colors; no bitmap, baked text or gameplay resource was added.
+4. Added shared card/button highlights and repositioned Home, Bank, Study, mode catalog, Room, History and Feedback content against dynamic top/bottom anchors.
+5. Kept the seven-reference-page information architecture, node names, controller properties and all existing business handlers unchanged.
+6. Upgraded the runtime shell test to execute the complete route flow at `393x852`, proving the derived `640x1387` logical viewport has no visible-node overflow.
+7. Verified the generated package in WeChat Developer Tools with an iPhone 12/13 simulator: Home, Bank, Study, mode catalog, create-room and History fill the display without black bars or control overlap.
+8. Kept `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram` untouched; game rules, duration, robots, scoring, synchronization and cloud contracts remain outside H8.
+
+### H8 final verification
+
+- `npm run verify`: `PASSED` in `45.4s`, including the complete preparation-route traversal at a mocked `393x852` device size.
+- Portrait adaptation assertion: `393x852` derives a `640x1387` logical viewport; the reusable safe area is `1313` logical pixels high.
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`.
+- `npm run inspect:wechat-build`: `PASSED`; generated package `6,491,368` bytes, main package `4,120,918 / 4,194,304` bytes, subpackages `2,370,450` bytes.
+- WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`.
+- iPhone 12/13 simulator inspection: full-height Home rendered without black bars or overlapping controls; application errors `0`. The three visible warnings are WeChat platform/basic-library notices.
+- `git diff --check`: `PASSED`; forbidden-path diff remains empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`.
 
 ## G0 modified files
 

@@ -5,7 +5,10 @@ import {
   Graphics,
   Label,
   Node,
-  UITransform
+  ResolutionPolicy,
+  screen,
+  UITransform,
+  view
 } from "cc";
 import { parseThemeColor } from "../../themes/ThemeCatalog";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
@@ -13,6 +16,7 @@ import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 
 export const DESIGN_WIDTH = 640;
 export const DESIGN_HEIGHT = 960;
+export const MAX_PORTRAIT_VIEWPORT_HEIGHT = 1440;
 const LEGACY_WIDTH = 960;
 const LEGACY_HEIGHT = 640;
 const X_SCALE = DESIGN_WIDTH / LEGACY_WIDTH;
@@ -20,6 +24,22 @@ const POSITION_Y_SCALE = DESIGN_HEIGHT / LEGACY_HEIGHT;
 const SIZE_Y_SCALE = 1.15;
 const FONT_SCALE = 0.92;
 const UI_LAYER = 1 << 25;
+
+export function configurePortraitViewport(): void {
+  view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.FIXED_WIDTH);
+}
+
+export function getPortraitViewportHeight(): number {
+  const width = Number(screen.windowSize.width);
+  const height = Number(screen.windowSize.height);
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    return DESIGN_HEIGHT;
+  }
+  return Math.max(
+    DESIGN_HEIGHT,
+    Math.min(MAX_PORTRAIT_VIEWPORT_HEIGHT, Math.round(DESIGN_WIDTH * height / width))
+  );
+}
 
 export type RuntimeButtonKind = "primary" | "secondary" | "plain" | "danger";
 
@@ -48,7 +68,7 @@ export class RuntimeUi {
     node.layer = UI_LAYER;
     parent.addChild(node);
     node.setPosition(0, 0, 0);
-    node.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    node.addComponent(UITransform).setContentSize(DESIGN_WIDTH, getPortraitViewportHeight());
     return node;
   }
 

@@ -12,6 +12,7 @@ import {
   rejectMockBundleLoad,
   resolveMockAssetLoad,
   resolveMockBundleLoad,
+  setMockWindowSize,
   setMockScene
 } from "cc";
 import "../assets/bundles/mode_pk/scripts/ModePkScreenBuilder";
@@ -20,6 +21,10 @@ import { HomePlaceholder } from "../assets/scripts/components/HomePlaceholder";
 import { GameplayFeedbackPool } from "../assets/bundles/mode_pk/scripts/GameplayFeedbackPool";
 import { ThemedWordTargetVisual } from "../assets/bundles/mode_pk/scripts/ThemedWordTargetVisual";
 import { RuntimeButtonVisual } from "../assets/scripts/components/ui/RuntimeButtonVisual";
+import {
+  configurePortraitViewport,
+  getPortraitViewportHeight
+} from "../assets/scripts/components/ui/RuntimeUi";
 import { MemoryRuntimePort } from "../assets/scripts/adapters/RuntimePort";
 import { App, app } from "../assets/scripts/core/App";
 import { SceneRouter } from "../assets/scripts/core/SceneRouter";
@@ -55,6 +60,7 @@ function assertEqual(actual: unknown, expected: unknown, message = "values are n
 
 function assertVisibleUiContract(root: Node, context: string): void {
   const violations: string[] = [];
+  const viewportHeight = getPortraitViewportHeight();
   const visit = (node: Node, parentX: number, parentY: number, path: string): void => {
     if (!node.active) return;
     const x = parentX + node.position.x;
@@ -66,7 +72,7 @@ function assertVisibleUiContract(root: Node, context: string): void {
       const right = x + transform.width / 2;
       const bottom = y - transform.height / 2;
       const top = y + transform.height / 2;
-      if (left < -320 || right > 320 || bottom < -480 || top > 480) {
+      if (left < -320 || right > 320 || bottom < -viewportHeight / 2 || top > viewportHeight / 2) {
         violations.push(`${nodePath}=[${left},${bottom}]..[${right},${top}]`);
       }
     }
@@ -221,6 +227,8 @@ function makeWaitingPkRoom(): RoomSnapshot {
 }
 
 async function main(): Promise<void> {
+  setMockWindowSize(393, 852);
+  configurePortraitViewport();
   const appRuntime = app.runtime as MemoryRuntimePort;
   setMockScene(new Node("Boot"));
   const privacyBoot = new Node("PrivacyBoot");

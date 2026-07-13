@@ -10,7 +10,12 @@ import {
   UITransform
 } from "cc";
 import { RuntimeScreenFactory } from "./ui/RuntimeScreenFactory";
-import { DESIGN_HEIGHT, DESIGN_WIDTH } from "./ui/RuntimeUi";
+import {
+  configurePortraitViewport,
+  DESIGN_HEIGHT,
+  DESIGN_WIDTH,
+  getPortraitViewportHeight
+} from "./ui/RuntimeUi";
 import { app } from "../core/App";
 import { parseThemeColor } from "../themes/ThemeCatalog";
 import { getRouteBackgroundAssetKey } from "../themes/ThemeRouteRules";
@@ -41,6 +46,10 @@ export class HomePlaceholder extends Component {
   private performanceFrameCounter = 0;
   private unsubscribeStore: (() => void) | null = null;
   private unsubscribeTheme: (() => void) | null = null;
+
+  onLoad(): void {
+    configurePortraitViewport();
+  }
 
   start(): void {
     app.performance.reset();
@@ -76,29 +85,30 @@ export class HomePlaceholder extends Component {
   }
 
   private createRuntimeRoots(): void {
+    const viewportHeight = getPortraitViewportHeight();
     const backgroundRoot = new Node("RuntimeBackground");
     backgroundRoot.layer = 1 << 25;
     this.node.addChild(backgroundRoot);
     backgroundRoot.setPosition(0, 0, 0);
-    backgroundRoot.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    backgroundRoot.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
 
     const fallback = new Node("FallbackColor");
     fallback.layer = 1 << 25;
     backgroundRoot.addChild(fallback);
-    fallback.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    fallback.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
     this.fallbackGraphics = fallback.addComponent(Graphics);
 
     const image = new Node("ThemeBackground");
     image.layer = 1 << 25;
     backgroundRoot.addChild(image);
-    image.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    image.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
     this.backgroundSprite = image.addComponent(Sprite);
 
     this.screenHost = new Node("RuntimeScreens");
     this.screenHost.layer = 1 << 25;
     this.node.addChild(this.screenHost);
     this.screenHost.setPosition(0, 0, 0);
-    this.screenHost.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    this.screenHost.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
 
     this.createRouteLoadingOverlay();
   }
@@ -152,15 +162,16 @@ export class HomePlaceholder extends Component {
   private async applyBackground(route: RouteName, loadImage = true): Promise<void> {
     const sequence = ++this.backgroundSequence;
     const theme = app.themes.getCurrentTheme();
+    const viewportHeight = getPortraitViewportHeight();
     const [r, g, b, a] = parseThemeColor(theme.colors.backgroundTint);
     if (this.fallbackGraphics) {
       this.fallbackGraphics.clear();
       this.fallbackGraphics.fillColor = new Color(r, g, b, a);
       this.fallbackGraphics.roundRect(
         -DESIGN_WIDTH / 2,
-        -DESIGN_HEIGHT / 2,
+        -viewportHeight / 2,
         DESIGN_WIDTH,
-        DESIGN_HEIGHT,
+        viewportHeight,
         0
       );
       this.fallbackGraphics.fill();
@@ -178,12 +189,12 @@ export class HomePlaceholder extends Component {
         const sourceWidth = Number(sourceFrame.width || DESIGN_WIDTH);
         const sourceHeight = Number(sourceFrame.height || DESIGN_HEIGHT);
         const sourceAspect = sourceHeight > 0 ? sourceWidth / sourceHeight : 1;
-        const targetAspect = DESIGN_WIDTH / DESIGN_HEIGHT;
+        const targetAspect = DESIGN_WIDTH / viewportHeight;
         const coverWidth = sourceAspect >= targetAspect
-          ? DESIGN_HEIGHT * sourceAspect
+          ? viewportHeight * sourceAspect
           : DESIGN_WIDTH;
         const coverHeight = sourceAspect >= targetAspect
-          ? DESIGN_HEIGHT
+          ? viewportHeight
           : DESIGN_WIDTH / sourceAspect;
         transform?.setContentSize(coverWidth, coverHeight);
         this.backgroundSprite.color = new Color(255, 255, 255, 255);
@@ -200,20 +211,21 @@ export class HomePlaceholder extends Component {
   }
 
   private createRouteLoadingOverlay(): void {
+    const viewportHeight = getPortraitViewportHeight();
     const root = new Node("RouteLoading");
     root.layer = 1 << 25;
     root.active = false;
     this.node.addChild(root);
-    root.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    root.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
     root.addComponent(BlockInputEvents);
 
     const shade = new Node("RouteLoadingShade");
     shade.layer = 1 << 25;
     root.addChild(shade);
-    shade.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    shade.addComponent(UITransform).setContentSize(DESIGN_WIDTH, viewportHeight);
     const shadeGraphics = shade.addComponent(Graphics);
     shadeGraphics.fillColor = new Color(0, 0, 0, 112);
-    shadeGraphics.roundRect(-DESIGN_WIDTH / 2, -DESIGN_HEIGHT / 2, DESIGN_WIDTH, DESIGN_HEIGHT, 0);
+    shadeGraphics.roundRect(-DESIGN_WIDTH / 2, -viewportHeight / 2, DESIGN_WIDTH, viewportHeight, 0);
     shadeGraphics.fill();
 
     const panel = new Node("RouteLoadingPanel");

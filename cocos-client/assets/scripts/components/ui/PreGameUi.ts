@@ -15,6 +15,7 @@ import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
 import {
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
+  getPortraitViewportHeight,
   type RuntimeButtonRef,
   type RuntimeEditRef
 } from "./RuntimeUi";
@@ -115,6 +116,93 @@ export interface PreGamePageHeaderRef {
 export class PreGameUi {
   constructor(readonly theme: ThemeManifest) {}
 
+  scenicBackdrop(parent: Node, name = "PreGameScenery"): Node {
+    const viewportHeight = parent.getComponent(UITransform)?.height || getPortraitViewportHeight();
+    const root = this.node(parent, name, 0, 0, DESIGN_WIDTH, viewportHeight);
+    const island = this.theme.id === "island";
+
+    const sky = this.node(root, `${name}SkyWash`, 0, viewportHeight * 0.22, DESIGN_WIDTH, viewportHeight * 0.56);
+    const skyGraphics = sky.addComponent(Graphics);
+    skyGraphics.fillColor = island
+      ? new Color(105, 222, 229, 82)
+      : new Color(112, 203, 255, 82);
+    skyGraphics.roundRect(-DESIGN_WIDTH / 2, -viewportHeight * 0.28, DESIGN_WIDTH, viewportHeight * 0.56, 0);
+    skyGraphics.fill();
+
+    const meadow = this.node(root, `${name}MeadowWash`, 0, -viewportHeight * 0.28, DESIGN_WIDTH, viewportHeight * 0.44);
+    const meadowGraphics = meadow.addComponent(Graphics);
+    meadowGraphics.fillColor = island
+      ? new Color(82, 194, 168, 88)
+      : new Color(122, 198, 92, 82);
+    meadowGraphics.roundRect(-DESIGN_WIDTH / 2, -viewportHeight * 0.22, DESIGN_WIDTH, viewportHeight * 0.44, 0);
+    meadowGraphics.fill();
+
+    const hills = this.node(root, `${name}Hills`, 0, -viewportHeight * 0.09, DESIGN_WIDTH, 280);
+    const hillGraphics = hills.addComponent(Graphics);
+    hillGraphics.fillColor = island
+      ? new Color(65, 166, 153, 92)
+      : new Color(77, 154, 83, 88);
+    hillGraphics.moveTo(-320, -140);
+    hillGraphics.lineTo(-320, 18);
+    hillGraphics.lineTo(-235, 92);
+    hillGraphics.lineTo(-145, 36);
+    hillGraphics.lineTo(-35, 116);
+    hillGraphics.lineTo(78, 42);
+    hillGraphics.lineTo(184, 104);
+    hillGraphics.lineTo(320, 16);
+    hillGraphics.lineTo(320, -140);
+    hillGraphics.close();
+    hillGraphics.fill();
+
+    const pathHeight = Math.min(340, viewportHeight * 0.36);
+    const path = this.node(root, `${name}LearningPath`, 0, -viewportHeight * 0.31, DESIGN_WIDTH, pathHeight);
+    const pathGraphics = path.addComponent(Graphics);
+    pathGraphics.fillColor = island
+      ? new Color(255, 226, 163, 105)
+      : new Color(255, 223, 151, 112);
+    pathGraphics.moveTo(-58, pathHeight / 2);
+    pathGraphics.lineTo(56, pathHeight / 2);
+    pathGraphics.lineTo(172, -pathHeight / 2);
+    pathGraphics.lineTo(-196, -pathHeight / 2);
+    pathGraphics.close();
+    pathGraphics.fill();
+
+    const clouds = this.node(root, `${name}Clouds`, 0, viewportHeight / 2 - 180, DESIGN_WIDTH, 120);
+    const cloudGraphics = clouds.addComponent(Graphics);
+    cloudGraphics.fillColor = new Color(255, 255, 255, 118);
+    [[-215, -5, 48, 22], [-170, 3, 64, 30], [178, 4, 56, 25], [226, -7, 42, 20]]
+      .forEach(([x, y, rx, ry]) => {
+        cloudGraphics.ellipse(x, y, rx, ry);
+        cloudGraphics.fill();
+      });
+
+    const foliage = this.node(root, `${name}Foliage`, 0, 0, DESIGN_WIDTH, viewportHeight);
+    const foliageGraphics = foliage.addComponent(Graphics);
+    foliageGraphics.fillColor = island
+      ? new Color(22, 133, 119, 142)
+      : new Color(38, 127, 61, 142);
+    [[-300, viewportHeight / 2 - 42, 60, 34], [-268, viewportHeight / 2 - 78, 54, 30],
+      [300, viewportHeight / 2 - 52, 64, 36], [272, viewportHeight / 2 - 92, 48, 28],
+      [-304, -viewportHeight / 2 + 88, 42, 26], [302, -viewportHeight / 2 + 104, 46, 28]]
+      .forEach(([x, y, rx, ry]) => {
+        foliageGraphics.ellipse(x, y, rx, ry);
+        foliageGraphics.fill();
+      });
+
+    const sparkles = this.node(root, `${name}Sparkles`, 0, 0, DESIGN_WIDTH, viewportHeight);
+    const sparkleGraphics = sparkles.addComponent(Graphics);
+    [[-252, -viewportHeight / 2 + 152], [-210, -viewportHeight / 2 + 118],
+      [246, -viewportHeight / 2 + 170], [278, -viewportHeight / 2 + 132]]
+      .forEach(([x, y], index) => {
+        sparkleGraphics.fillColor = index % 2
+          ? new Color(255, 122, 112, 190)
+          : new Color(255, 210, 70, 200);
+        sparkleGraphics.circle(x, y, 7);
+        sparkleGraphics.fill();
+      });
+    return root;
+  }
+
   visualSlot(
     parent: Node,
     key: HomeVisualSlotKey,
@@ -187,8 +275,9 @@ export class PreGameUi {
   }
 
   safeArea(parent: Node, name = "PreGameSafeArea"): PreGameSafeAreaRef {
+    const viewportHeight = parent.getComponent(UITransform)?.height || getPortraitViewportHeight();
     const width = DESIGN_WIDTH - PRE_GAME_SAFE_INSETS.left - PRE_GAME_SAFE_INSETS.right;
-    const height = DESIGN_HEIGHT - PRE_GAME_SAFE_INSETS.top - PRE_GAME_SAFE_INSETS.bottom;
+    const height = viewportHeight - PRE_GAME_SAFE_INSETS.top - PRE_GAME_SAFE_INSETS.bottom;
     const x = (PRE_GAME_SAFE_INSETS.left - PRE_GAME_SAFE_INSETS.right) / 2;
     const y = (PRE_GAME_SAFE_INSETS.bottom - PRE_GAME_SAFE_INSETS.top) / 2;
     return { node: this.node(parent, name, x, y, width, height), width, height };
@@ -245,6 +334,7 @@ export class PreGameUi {
   ): Node {
     const node = this.node(parent, name, x, y, width, height);
     this.addRoundedBackground(node, width, height, radius, "homeCard", "homeCardBorder");
+    this.addHighlight(node, `${name}Highlight`, width - 24, height, radius);
     return node;
   }
 
@@ -273,6 +363,7 @@ export class PreGameUi {
       token,
       kind === "surface" ? "homeCardBorder" : "homeTextOnColor"
     );
+    this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
     const label = this.label(node, `${name}Label`, text, 0, 0, width - 18, height - 8, fontSize, textToken);
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);
@@ -373,6 +464,7 @@ export class PreGameUi {
       strokeToken
     );
     background.lineWidth = 2;
+    this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
     const iconSize = Math.max(44, Math.min(height - 20, width * 0.25));
     const iconSlot = this.node(node, `${name}IconSlot`, -width / 2 + 18 + iconSize / 2, 0, iconSize, iconSize);
@@ -457,6 +549,7 @@ export class PreGameUi {
       "homeCard",
       "homeCardBorder"
     );
+    this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
     const iconSlot = this.node(node, `${name}IconSlot`, 0, 0, size - 14, size - 14);
     const iconLabel = this.label(
       iconSlot,
@@ -505,13 +598,14 @@ export class PreGameUi {
     panelWidth: number,
     panelHeight: number
   ): PreGameModalRef {
-    const root = this.node(parent, name, 0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
+    const viewportHeight = parent.getComponent(UITransform)?.height || getPortraitViewportHeight();
+    const root = this.node(parent, name, 0, 0, DESIGN_WIDTH, viewportHeight);
     root.active = false;
     root.addComponent(BlockInputEvents);
-    const shade = this.node(root, `${name}Shade`, 0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
+    const shade = this.node(root, `${name}Shade`, 0, 0, DESIGN_WIDTH, viewportHeight);
     const shadeGraphics = shade.addComponent(Graphics);
     shadeGraphics.fillColor = this.color("homeModalShade");
-    shadeGraphics.roundRect(-DESIGN_WIDTH / 2, -DESIGN_HEIGHT / 2, DESIGN_WIDTH, DESIGN_HEIGHT, 0);
+    shadeGraphics.roundRect(-DESIGN_WIDTH / 2, -viewportHeight / 2, DESIGN_WIDTH, viewportHeight, 0);
     shadeGraphics.fill();
     const panel = this.card(root, `${name}Panel`, 0, 0, panelWidth, panelHeight, 20);
     const content = this.node(panel, `${name}Content`, 0, 0, panelWidth - 36, panelHeight - 36);
@@ -583,6 +677,14 @@ export class PreGameUi {
     graphics.fill();
     graphics.stroke();
     return graphics;
+  }
+
+  private addHighlight(parent: Node, name: string, width: number, height: number, radius: number): void {
+    const highlight = this.node(parent, name, 0, height / 2 - 7, width, 4);
+    const graphics = highlight.addComponent(Graphics);
+    graphics.fillColor = new Color(255, 255, 255, 88);
+    graphics.roundRect(-width / 2, -2, width, 4, Math.min(2, radius));
+    graphics.fill();
   }
 
   private bindButton(

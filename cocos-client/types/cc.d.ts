@@ -99,6 +99,21 @@ declare module "cc" {
     z: number;
   }
 
+  export const ResolutionPolicy: {
+    FIXED_WIDTH: number;
+  };
+
+  export const screen: {
+    windowSize: {
+      width: number;
+      height: number;
+    };
+  };
+
+  export const view: {
+    setDesignResolutionSize(width: number, height: number, resolutionPolicy: number): void;
+  };
+
   export class EditBox {
     static readonly InputMode: {
       ANY: number;

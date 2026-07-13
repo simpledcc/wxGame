@@ -13,6 +13,25 @@ export class Vec3 {
   constructor(public x = 0, public y = 0, public z = 0) {}
 }
 
+export const ResolutionPolicy = {
+  FIXED_WIDTH: 4
+};
+
+export const screen = {
+  windowSize: { width: 640, height: 960 }
+};
+
+export function setMockWindowSize(width: number, height: number): void {
+  screen.windowSize = { width, height };
+}
+
+export const view = {
+  designResolution: { width: 640, height: 960, policy: ResolutionPolicy.FIXED_WIDTH },
+  setDesignResolutionSize(width: number, height: number, policy: number): void {
+    this.designResolution = { width, height, policy };
+  }
+};
+
 export class Component {
   node!: Node;
   onLoad?(): void;

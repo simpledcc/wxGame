@@ -4,6 +4,7 @@ import {
   EditBox,
   Graphics,
   Node,
+  setMockWindowSize,
   SpriteFrame,
   UITransform
 } from "cc";
@@ -16,6 +17,7 @@ import { RuntimeButtonVisual } from "../assets/scripts/components/ui/RuntimeButt
 import {
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
+  getPortraitViewportHeight,
   RuntimeUi
 } from "../assets/scripts/components/ui/RuntimeUi";
 import { getThemeManifest } from "../assets/scripts/themes/ThemeCatalog";
@@ -223,7 +225,18 @@ function main(): void {
   assertOk(edit.backgroundNode.getComponent(Graphics), "Edit background must live on a child node");
   assertEqual(edit.backgroundNode.parent, edit.node);
 
-  console.log("Pre-game UI foundation OK: page headers, visual slots, controls, hit geometry, and EditBox layering passed.");
+  setMockWindowSize(393, 852);
+  const tallRoot = new Node("TallPhoneRoot");
+  tallRoot.addComponent(UITransform).setContentSize(DESIGN_WIDTH, getPortraitViewportHeight());
+  const tallScenery = preGame.scenicBackdrop(tallRoot, "TallPhoneScenery");
+  const tallSafe = preGame.safeArea(tallRoot, "TallPhoneSafeArea");
+  assertEqual(transform(tallRoot).height, 1387);
+  assertEqual(transform(tallScenery).height, 1387);
+  assertEqual(tallSafe.height, 1313);
+  assertEqual(tallSafe.node.position.y, -3);
+  setMockWindowSize(640, 960);
+
+  console.log("Pre-game UI foundation OK: long-screen scenery, page headers, controls, hit geometry, and EditBox layering passed.");
 }
 
 main();
