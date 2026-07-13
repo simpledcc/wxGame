@@ -1,6 +1,7 @@
 import {
   Button,
   EditBox,
+  Graphics,
   Label,
   Node,
   UITransform,
@@ -324,13 +325,20 @@ async function main(): Promise<void> {
     "暂无战绩，完成比赛后查看"
   );
   [
-    "Background", "Logo", "Avatar", "Character", "CreateRoom", "JoinRoom", "Practice",
+    "Background", "Logo", "Avatar", "Coin", "Character", "CreateRoom", "JoinRoom", "Practice",
     "WordBank", "Catalog", "History", "Settings", "Privacy", "Feedback"
   ].forEach((stem) => assertOk(findDeep(canvas, `Home${stem}Slot`), `Home ${stem} visual slot is required`));
   [
     "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
-    "HistoryButton", "SettingsButton", "HomePrivacy", "FeedbackButton"
+    "HistoryButton", "HomeAvatarButton", "HomeCoinButton", "SettingsButton", "HomePrivacy", "FeedbackButton"
   ].forEach((name) => assertOk(findDeep(canvas, name)?.getComponent(Button), `${name} must be actionable`));
+  [
+    "Avatar", "Coin", "Character", "CreateRoom", "JoinRoom", "Practice", "WordBank",
+    "Catalog", "History", "Settings", "Privacy", "Feedback"
+  ].forEach((stem) => {
+    assertOk(findDeep(canvas, `Home${stem}VectorIcon`)?.getComponent(Graphics), `${stem} must have a vector fallback`);
+  });
+  [0, 1, 2, 3].forEach((index) => assertOk(findDeep(canvas, `HomeLogoCharacter${index}`)?.getComponent(Label)));
   assertEqual(findDeep(canvas, "BestScores"), null, "new Home must not show the old score toolbar");
   assertEqual(findDeep(canvas, "DurationTitle"), null, "new Home must not show duration controls");
   assertOk(findDeep(canvas, "HomePrivacy")?.getComponent(Button), "Home privacy entry is required");
@@ -338,6 +346,17 @@ async function main(): Promise<void> {
   assertOk(initialHomeRoot);
   assertVisibleUiContract(initialHomeRoot, "home route");
   assertHomeTargetDevices(initialHomeRoot);
+
+  const playerModal = findDeep(canvas, "HomePlayerModal");
+  assertEqual(playerModal?.active, false);
+  findDeep(canvas, "HomeAvatarButton")?.emit(Button.EventType.CLICK);
+  assertEqual(playerModal?.active, true);
+  assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
+  assertOk(playerModal);
+  assertVisibleUiContract(playerModal, "Home player modal");
+  assertHomeTargetDevices(playerModal);
+  findDeep(canvas, "HomePlayerClose")?.emit(Button.EventType.CLICK);
+  assertEqual(playerModal.active, false);
 
   const settingsModal = findDeep(canvas, "HomeSettingsModal");
   assertEqual(settingsModal?.active, false);
@@ -356,6 +375,13 @@ async function main(): Promise<void> {
   );
   findDeep(canvas, "HomeSettingsClose")?.emit(Button.EventType.CLICK);
   assertEqual(settingsModal.active, false);
+
+  findDeep(canvas, "HomeCoinButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "bank", "coin entry must open the existing bank and coin-spend route");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "home");
 
   for (let index = 0; index < 60; index += 1) shell.update(1 / 60);
   const performanceSnapshot = app.performance.getSnapshot();
@@ -453,7 +479,7 @@ async function main(): Promise<void> {
   assertOk(bankTitleTransform);
   bankTitle!.getComponent(Label)!.string = `当前词库：${"超长词库名称".repeat(12)}`;
   assertEqual(bankTitle!.getComponent(Label)!.overflow, Label.Overflow.SHRINK);
-  assertEqual(bankTitleTransform.width, 450, "long bank text must retain its reserved width");
+  assertEqual(bankTitleTransform.width, 350, "long bank text must retain space for the change affordance");
   app.wordBankStore.setSelectedBankId(selectedBankBeforeHomePicker);
   app.store.patch({ bankId: selectedBankBeforeHomePicker });
 

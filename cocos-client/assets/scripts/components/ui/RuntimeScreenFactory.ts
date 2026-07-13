@@ -1,4 +1,4 @@
-import { Button, Node } from "cc";
+import { Button, Node, UITransform } from "cc";
 import { HistoryRecordItem } from "../history/HistoryRecordItem";
 import { app } from "../../core/App";
 import { gameplayScreens, type GameplayRoute } from "../../core/GameplayBundles";
@@ -46,49 +46,58 @@ export class RuntimeScreenFactory {
     const backgroundSlot = home.visualSlot(root, "background", 0, 0, 640, 960);
     backgroundSlot.fallbackNode.active = false;
     const safe = home.safeArea(root, "HomeSafeArea");
-    const top = home.topBar(safe, "HomeTopBar", 80);
-    const playerCard = home.card(top, "HomePlayerCard", -155, 0, 280, 70, 18);
-    home.visualSlot(playerCard, "avatar", -97, 0, 62, 62);
-    const player = home.label(playerCard, "HomePlayerName", "", 10, 0, 142, 54, 22, "homeText", 0);
-    const coinCard = home.card(top, "HomeCoinCard", 96, 0, 176, 54, 18);
-    home.label(coinCard, "HomeCoinIcon", "★", -58, 0, 36, 38, 24, "homeHistory");
-    const coins = home.label(coinCard, "HomeCoins", "", 18, 0, 104, 40, 22, "homeText");
-
+    const top = home.topBar(safe, "HomeTopBar", 86);
     let controller!: HomeScene;
+    let openPlayer = (): void => undefined;
     let openSettings = (): void => undefined;
-    home.iconButton(top, "SettingsButton", "设", 248, 0, 80, () => openSettings(), "settings");
+    home.iconButton(top, "HomeAvatarButton", "我", -252, 0, 80, () => openPlayer(), "avatar");
+    const playerCard = home.card(top, "HomePlayerCard", -126, 0, 164, 58, 18);
+    const player = home.label(playerCard, "HomePlayerName", "", 0, 0, 140, 46, 21, "homeText");
+    const coinButton = home.actionButton(
+      top, "HomeCoinButton", "", "", "币", 88, 0, 210, 80,
+      () => controller.openBankPicker(), "surface", "coin"
+    );
+    const coins = coinButton.titleLabel;
+    coins.node.name = "HomeCoins";
+    coins.node.setPosition(20, 0, 0);
+    coins.node.getComponent(UITransform)?.setContentSize(88, 44);
+    home.label(coinButton.node, "HomeCoinAdd", "+", 82, 0, 30, 42, 28, "homeText");
+    home.iconButton(top, "SettingsButton", "设", 252, 0, 80, () => openSettings(), "settings");
 
-    home.visualSlot(safe.node, "logo", 0, 315, 460, 88);
-    home.label(safe.node, "HomeSubtitle", "和好友一起比拼单词实力", 0, 265, 480, 30, 19, "homeText");
+    home.visualSlot(safe.node, "logo", 0, 298, 460, 112);
+    home.label(safe.node, "HomeSubtitle", "和好友一起比拼单词实力", 0, 228, 480, 30, 19, "homeText");
     const bank = home.actionButton(
-      safe.node, "CurrentBankBar", "", "点击更换比赛词库", "词", 0, 215, 560, 80,
+      safe.node, "CurrentBankBar", "", "", "词", 0, 174, 560, 80,
       () => controller.openBankPicker(), "surface", "wordBank"
     );
+    bank.titleLabel.node.setPosition(-28, 0, 0);
+    bank.titleLabel.node.getComponent(UITransform)?.setContentSize(350, 56);
+    home.label(bank.node, "CurrentBankChange", "更换 ›", 220, 0, 88, 42, 18, "homeText");
     home.actionButton(
-      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, 115, 560, 96,
+      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, 76, 560, 96,
       () => controller.openPkRoom(), "create", "createRoom"
     );
     home.actionButton(
-      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, 18, 560, 80,
+      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, -20, 560, 80,
       () => controller.openJoinRoom(), "join", "joinRoom"
     );
     home.actionButton(
-      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -144, -74, 272, 80,
+      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -144, -108, 272, 80,
       () => controller.openStudy(), "practice", "practice"
     );
     home.actionButton(
-      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 144, -74, 272, 80,
+      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 144, -108, 272, 80,
       () => controller.openBankPicker(), "bank", "wordBank"
     );
     home.actionButton(
-      safe.node, "HelpButton", "玩法目录", "了解玩法和比赛规则", "玩", -144, -164, 272, 80,
+      safe.node, "HelpButton", "玩法目录", "了解玩法和比赛规则", "玩", -144, -196, 272, 80,
       () => controller.openHelp(), "catalog", "catalog"
     );
     const history = home.actionButton(
-      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 144, -164, 272, 80,
+      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 144, -196, 272, 80,
       () => controller.openHistory(), "history", "history"
     );
-    home.visualSlot(safe.node, "character", 238, -282, 100, 120);
+    home.visualSlot(safe.node, "character", 232, -294, 112, 112);
 
     let privacy!: PreGameActionButtonRef;
     privacy = home.actionButton(
@@ -110,6 +119,20 @@ export class RuntimeScreenFactory {
       safe.node, "FeedbackButton", "问题反馈", "", "言", 144, -397, 272, 80,
       () => controller.openFeedback(), "bank", "feedback"
     );
+
+    const playerModal = home.modal(root, "HomePlayerModal", 500, 360);
+    home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 125, 420, 48, 30);
+    home.visualSlot(playerModal.content, "avatar", 0, 58, 96, 96);
+    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -14, 400, 42, 24);
+    home.label(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -52, 400, 32, 18, "homeTextMuted");
+    home.actionButton(
+      playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -120, 260, 80,
+      () => { playerModal.root.active = false; }, "surface"
+    );
+    openPlayer = (): void => {
+      playerDetail.string = app.playerStore.getLocalPlayer().displayName;
+      playerModal.root.active = true;
+    };
 
     const settingsModal = home.modal(root, "HomeSettingsModal", 500, 330);
     home.label(settingsModal.content, "HomeSettingsTitle", "设置", 0, 105, 420, 48, 30);

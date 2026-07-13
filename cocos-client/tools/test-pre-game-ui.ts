@@ -75,13 +75,23 @@ function main(): void {
   const visualSlots = HOME_VISUAL_SLOT_KEYS.map((key, index) =>
     preGame.visualSlot(root, key, 0, 400 - index * 8, key === "background" ? 640 : 96, key === "background" ? 960 : 96)
   );
-  assertEqual(visualSlots.length, 13);
+  assertEqual(visualSlots.length, 14);
   visualSlots.forEach((slot) => {
     assertEqual(slot.spriteNode.active, false, `${slot.key} must start with its fallback`);
     assertEqual(slot.fallbackNode.active, true);
     assertEqual(slot.node.name, `Home${slot.key.charAt(0).toUpperCase()}${slot.key.slice(1)}Slot`);
   });
+  visualSlots
+    .filter((slot) => slot.key !== "background" && slot.key !== "logo")
+    .forEach((slot) => {
+      assertOk(slot.vectorNode, `${slot.key} must have a programmatic vector icon`);
+      assertOk(slot.vectorNode.getComponent(Graphics), `${slot.key} vector icon must use Cocos Graphics`);
+      assertEqual(slot.fallbackLabel?.node.active, false, `${slot.key} text fallback must yield to its vector icon`);
+  });
   const logoSlot = visualSlots[1];
+  assertOk(logoSlot.vectorNode, "logo must have a programmatic fallback");
+  assertEqual(logoSlot.vectorNode.children.length, 4, "programmatic logo must keep four independently styled characters");
+  assertEqual(logoSlot.fallbackLabel?.node.active, false);
   const logoFrame = new SpriteFrame();
   Object.assign(logoFrame, { width: 560, height: 220 });
   preGame.setVisualAsset(logoSlot, logoFrame);

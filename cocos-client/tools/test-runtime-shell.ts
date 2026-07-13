@@ -179,8 +179,10 @@ function testShellLifecycleAndSceneAttachment(): void {
 
 function testPreGameUiFoundation(): void {
   const source = read("assets/scripts/components/ui/PreGameUi.ts");
-  ["visualSlot", "setVisualAsset", "safeArea", "topBar", "card", "actionButton", "iconButton", "modal"]
+  ["visualSlot", "setVisualAsset", "safeArea", "topBar", "card", "actionButton", "iconButton", "modal", "drawProgrammaticIcon", "drawProgrammaticLogo"]
     .forEach((method) => assert.match(source, new RegExp(`\\b${method}\\(`)));
+  ["coin", "createRoom", "joinRoom", "practice", "wordBank", "catalog", "history", "settings", "privacy", "feedback"]
+    .forEach((icon) => assert.match(source, new RegExp(`key === \\"${icon}\\"`)));
   assert.match(source, /DESIGN_WIDTH/);
   assert.match(source, /DESIGN_HEIGHT/);
   assert.match(source, /addComponent\(BlockInputEvents\)/);

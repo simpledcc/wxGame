@@ -245,7 +245,14 @@ function testSourceAssetBudget(): void {
   const payloadFiles = listFiles(path.join(root, "assets"), new Set([
     ".ts", ".json", ".scene", ".jpg", ".png", ".wav"
   ]));
-  const payloadBytes = payloadFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
+  const normalizedTextExtensions = new Set([".ts", ".json", ".scene"]);
+  const payloadBytes = payloadFiles.reduce((sum, filePath) => {
+    if (!normalizedTextExtensions.has(path.extname(filePath).toLowerCase())) {
+      return sum + fs.statSync(filePath).size;
+    }
+    const normalized = fs.readFileSync(filePath, "utf8").replace(/\r\n?/g, "\n");
+    return sum + Buffer.byteLength(normalized, "utf8");
+  }, 0);
   const metadataBytes = listFiles(path.join(root, "assets"), new Set([".meta"]))
     .reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
   const themeFiles = listFiles(path.join(root, "assets", "bundles"), new Set([
@@ -260,7 +267,7 @@ function testSourceAssetBudget(): void {
 function testHomeAssetHandoff(): void {
   const manifest = fs.readFileSync(path.resolve(root, "../COCOS_HOME_ASSET_MANIFEST.md"), "utf8");
   [
-    "background", "logo", "avatar", "character", "createRoom", "joinRoom", "practice",
+    "background", "logo", "avatar", "coin", "character", "createRoom", "joinRoom", "practice",
     "wordBank", "catalog", "history", "settings", "privacy", "feedback"
   ].forEach((key) => assert.ok(manifest.includes(`\`${key}\``), `Home asset manifest omits ${key}`));
   assert.match(manifest, /do not copy it, crop it, or place it under `cocos-client\/assets\/`/);

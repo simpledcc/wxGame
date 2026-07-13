@@ -10,9 +10,11 @@ Updated: 2026-07-13
 - G1 stage commit: `d39168b` (`feat(home): complete G1 visual foundation`)
 - G2 stage commit: `4e4472c` (`feat(home): complete G2 resource slots dev_done`)
 - Goal completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA.
+- Visual-status reference commit: `83cb214` (`docs(home): clarify visual fidelity and add reference`)
+- Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `G5 DONE`
-- Next stage: structural V0 Goal complete; high-fidelity Home art integration is a separate future Goal
+- Current stage: `POST-GOAL HOME FORM ENHANCEMENT DONE`
+- Next stage: optional bitmap replacement and Creator visual QA; no further route/Store work is required for the Home form
 
 ## Baseline facts
 
@@ -66,6 +68,7 @@ Updated: 2026-07-13
 | G3 Real Home layout | `DONE` | Portrait Home hierarchy, 13 mounted visual slots, fixed 640x960 bounds and target-device checks pass | None |
 | G4 Interaction and real data binding | `DONE` | All visible entries use existing controllers/routes and live stores; settings/privacy/loading/rapid-tap tests pass | None |
 | G5 Code verification and handoff | `DONE` | Full `npm run verify`, build dry-run, scope audit and documentation pass | None |
+| H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 
 ## G0 work completed
 
@@ -132,6 +135,19 @@ Updated: 2026-07-13
 5. Corrected the runtime payload measurement to exclude two documentation-only Markdown files while preserving the existing 1,500,000-byte gate for actual Cocos source/runtime assets.
 6. Recorded the final source, metadata and theme budgets below; Creator, WeChat DevTools and phone verification remain `NOT_REQUIRED` for this Goal.
 
+## H1 programmatic icon and Home form enhancement
+
+1. Added a dedicated `coin` resource slot, increasing the current Home contract from the original 13 G2 slots to 14 slots.
+2. Replaced the visible single-character icon fallbacks with Cocos `Graphics` drawings for avatar, coin, character, house, two players, open book, stacked books, gamepad, trophy, gear, shield/check and feedback bubble.
+3. Replaced the single-color Logo fallback with a four-character, four-color programmatic wordmark while preserving the same SpriteFrame replacement contract.
+4. Rebuilt the top row as a clickable avatar button, real player-name card, clickable real coin button with `+` affordance and settings button.
+5. Added a player-information modal backed by `PlayerStore`; no public WeChat profile, fake level or editable nickname was introduced.
+6. Bound the coin button to the existing bank route where real coins are used for bank unlocks; no new economy or payment behavior was introduced.
+7. Repositioned Logo, subtitle, bank selector, create/join buttons and the 2x2 grid to match the reference hierarchy without overlap.
+8. Added an explicit right-side “更换” affordance to the current-bank bar while keeping the whole row clickable and reserving fixed width for long bank names.
+9. Removed the decorative card behind the character fallback so the programmatic companion floats like the reference artwork slot.
+10. Kept all buttons at target-device touch height and retained existing create/join/practice/bank/help/history/settings/privacy/feedback behavior.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -183,6 +199,18 @@ No generated word/template payload changed after regeneration.
 - `cocos-client/tools/test-release-readiness.ts`
 - `COCOS_HOME_ASSET_MANIFEST.md`
 - `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+
+## H1 modified files
+
+- `cocos-client/assets/scripts/components/ui/PreGameUi.ts`
+- `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
+- `cocos-client/tools/test-pre-game-ui.ts`
+- `cocos-client/tools/test-runtime-shell.ts`
+- `cocos-client/tools/test-runtime-shell-execution.ts`
+- `cocos-client/tools/test-release-readiness.ts`
+- `COCOS_HOME_ASSET_MANIFEST.md`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+- `docs/design/home/README.md`
 
 ## Tests
 
@@ -250,6 +278,19 @@ No generated word/template payload changed after regeneration.
 - Theme source assets: `25` files / `217,846` bytes under the `250,000`-byte gate
 - Forbidden-path diff from G2: empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`
 
+### H1 final verification
+
+- `npm run test:pre-game-ui`: `PASSED` (14 slots, four-color Logo, vector Graphics and SpriteFrame fallback)
+- `npm run test:shell`: `PASSED`
+- `npm run test:shell-runtime`: `PASSED` (avatar modal, coin-to-bank navigation and every visible Home entry)
+- `npm run test:release`: `PASSED`
+- `npm run typecheck`: `PASSED`
+- `npm run typecheck:shell-runtime`: `PASSED`
+- `npm run verify`: `PASSED`
+- Normalized runtime source payload: `1,469,232` bytes under the unchanged `1,500,000`-byte gate (`30,768` bytes remaining)
+- Text payload measurement canonicalizes CRLF/CR to LF; image/audio bytes remain exact, so the gate is reproducible across both computers
+- Forbidden-path diff from `83cb214`: empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`
+
 Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
 
 ## Assets
@@ -257,7 +298,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
 - Added documentation-only reference: `docs/design/home/home-high-fidelity-reference.png` (`2,481,759` bytes); it remains outside `cocos-client/assets/` and the runtime package
 - Added visual-status handoff: `docs/design/home/README.md`
-- Mounted V0 slots: background, Logo, safe avatar, character, create/join/practice/bank/catalog/history/settings/privacy/feedback icons
+- Mounted current slots: background, Logo, safe avatar, coin, character, create/join/practice/bank/catalog/history/settings/privacy/feedback icons
 - Optional post-V0 art replacements: transparent Logo, dedicated safe avatar, dedicated Home background, character decoration and unified icon set; specifications are in `COCOS_HOME_ASSET_MANIFEST.md`
 - G0/G1 use no reference image in the Cocos runtime package
 - Future asset ownership: Home/common assets belong to the pre-game UI stream; gameplay assets remain in their mode bundles
@@ -265,7 +306,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 ## Remaining risks after Goal completion
 
 1. The reproducible staged LF payload has `38,057` bytes remaining, while this pre-normalization Windows worktree has only `456`; future bitmap work should still use a reviewed lightweight Bundle rather than consume the main-package margin.
-2. Logo, avatar, character and function icons currently use verified programmatic fallbacks. Dedicated final art was not a functional blocker for this structural V0 Goal, but remains required before the Home matches the high-fidelity reference.
+2. Logo, avatar, coin, character and function icons now use recognizable verified programmatic visuals. Dedicated final art remains required before the Home matches the high-fidelity reference, but no button or business behavior is waiting on those images.
 3. Creator import/rendering and WeChat device presentation are outside this Goal by user direction; the existing phone-start baseline remains accepted.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
@@ -284,7 +325,7 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 
 ## Next single action
 
-Review the `dev_done` structural V0 completion commit and `docs/design/home/README.md`. Start a separate high-fidelity Home art Goal when the final background, Logo, character and icon work is authorized.
+Review the latest Home-form enhancement commit and `docs/design/home/README.md`. The next Home task should only replace the stable slots with approved background, Logo, character and icon bitmaps and perform Creator screenshot QA.
 
 ## Continue prompt
 
