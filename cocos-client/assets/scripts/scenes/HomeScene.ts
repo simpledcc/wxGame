@@ -68,7 +68,11 @@ export class HomeScene extends Component {
   }
 
   openPkRoom(): void {
-    this.openRoom("create");
+    this.navigateOnce(() => {
+      app.roomSession.leave();
+      app.store.patch({ selectedMode: "pk", roomEntryIntent: "neutral" });
+      app.router.navigate("coopSelect");
+    });
   }
 
   openJoinRoom(): void {

@@ -20,6 +20,7 @@ const ROUND_REASON_LABELS: Record<SpellRoundRecord["reason"], string> = {
 };
 
 const DETAIL_PAGE_SIZE = 3;
+type HistoryMode = GameModeKey | "all";
 
 @ccclass("HistoryScene")
 export class HistoryScene extends Component {
@@ -28,6 +29,12 @@ export class HistoryScene extends Component {
 
   @property(Label)
   bestLabel: Label | null = null;
+
+  @property(Label)
+  recentSummaryLabel: Label | null = null;
+
+  @property(Label)
+  bestSummaryLabel: Label | null = null;
 
   @property(Label)
   emptyLabel: Label | null = null;
@@ -65,7 +72,7 @@ export class HistoryScene extends Component {
   @property(Button)
   detailNextButton: Button | null = null;
 
-  private selectedMode: GameModeKey = "pk";
+  private selectedMode: HistoryMode = "all";
   private page = 0;
   private records: MatchRecord[] = [];
   private detailRecord: MatchRecord | null = null;
@@ -76,7 +83,11 @@ export class HistoryScene extends Component {
   }
 
   start(): void {
-    this.showMode("pk");
+    this.showAll();
+  }
+
+  showAll(): void {
+    this.showMode("all");
   }
 
   showPk(): void {
@@ -137,10 +148,11 @@ export class HistoryScene extends Component {
     app.router.navigate("home");
   }
 
-  private showMode(mode: GameModeKey): void {
+  private showMode(mode: HistoryMode): void {
     this.selectedMode = mode;
     this.page = 0;
-    this.records = app.historyStore.getRecords(mode);
+    this.records = app.historyStore.getRecords(mode === "all" ? undefined : mode)
+      .sort((left, right) => right.finishedAt - left.finishedAt);
     this.closeDetail();
     this.renderList();
   }
@@ -149,9 +161,22 @@ export class HistoryScene extends Component {
     const pageSize = Math.max(1, this.recordItems.length);
     const start = this.page * pageSize;
     const pageRecords = this.records.slice(start, start + pageSize);
-    if (this.titleLabel) this.titleLabel.string = MODE_LABELS[this.selectedMode];
-    const best = app.historyStore.getBestScores()[this.selectedMode];
+    if (this.titleLabel) this.titleLabel.string = this.selectedMode === "all" ? "全部战绩" : MODE_LABELS[this.selectedMode];
+    const bestScores = app.historyStore.getBestScores();
+    const best = this.selectedMode === "all"
+      ? Object.values(bestScores).filter((item): item is NonNullable<typeof item> => !!item)
+        .sort((left, right) => right.score - left.score)[0]
+      : bestScores[this.selectedMode];
     if (this.bestLabel) this.bestLabel.string = `历史最佳 ${best ? `${best.score} 分` : "--"}`;
+    if (this.recentSummaryLabel) {
+      const recent = this.records[0];
+      this.recentSummaryLabel.string = recent
+        ? `${recent.modeLabel}\n${new Date(recent.finishedAt).toLocaleString()}`
+        : "暂无比赛记录";
+    }
+    if (this.bestSummaryLabel) {
+      this.bestSummaryLabel.string = best ? `${best.score} 分` : "--";
+    }
     if (this.emptyLabel) this.emptyLabel.string = this.records.length ? "" : "暂无战绩";
     this.recordItems.forEach((item, index) => {
       const record = pageRecords[index];

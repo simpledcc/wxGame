@@ -18,9 +18,15 @@ export class CoopSelectScene extends Component {
     if (this.statusLabel) {
       this.statusLabel.string = [
         `当前词库：${getWordBankLabel(bank, true)}`,
-        "两种合作玩法都需要两名真实玩家准备后开始"
+        "准备体验模式已开放，更多玩法正在筹备"
       ].join("\n");
     }
+  }
+
+  openTrialRoom(): void {
+    app.roomSession.leave();
+    app.store.patch({ selectedMode: "pk", roomEntryIntent: "create" });
+    app.router.navigate("room");
   }
 
   openSharedRoom(): void {

@@ -418,10 +418,13 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "coopSelect");
   assertOk(findDeep(canvas, "CoopSelectRuntimeScreen"));
-  findDeep(canvas, "OpenSpell")?.emit(Button.EventType.CLICK);
+  assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(Button)?.interactable, true);
+  assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(Button)?.interactable, false);
+  findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().selectedMode, "coopSpell");
+  assertEqual(app.store.getState().selectedMode, "pk");
   assertEqual(app.store.getState().route, "room");
+  assertEqual(app.store.getState().roomEntryIntent, "create");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -459,13 +462,56 @@ async function main(): Promise<void> {
 
   findDeep(canvas, "CreateRoomButton")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().route, "room", "create entry must open the existing room route");
+  assertEqual(app.store.getState().route, "coopSelect", "create entry must open mode selection first");
+  assertOk(findDeep(canvas, "ModeOption0"));
+  findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "room", "available mode must open room configuration");
   assertEqual(app.store.getState().roomEntryIntent, "create");
   assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "创建房间");
   assertOk(
-    findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("确认词库与玩法后点击“创建房间”"),
-    "create entry must guide the player to create a room"
+    findDeep(canvas, "CreateGuidance")?.getComponent(Label)?.string.includes("创建后邀请好友"),
+    "create configuration must explain the next step"
   );
+  assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, true);
+  findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
+  assertEqual(app.store.getState().roomAutoReady, false);
+  findDeep(canvas, "ChangeRoomBank")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "bank");
+  findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(app.store.getState().route, "room", "room bank picker must return to room configuration");
+  assertEqual(app.store.getState().roomAutoReady, false, "auto-ready preference must survive bank selection");
+  assertEqual(findDeep(canvas, "AutoReadyLabel")?.getComponent(Label)?.string, "房主创建后手动准备");
+  findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
+  assertEqual(app.store.getState().roomAutoReady, true);
+  const originalCreateRoom = app.roomSession.create.bind(app.roomSession);
+  const originalToggleReady = app.roomSession.toggleReady.bind(app.roomSession);
+  let autoReadyCount = 0;
+  app.playerStore.setOpenId("player-1");
+  app.roomSession.create = async () => {
+    const room = makeWaitingPkRoom();
+    app.roomStore.enter("pending-room", room.roomCode, room);
+    return room;
+  };
+  app.roomSession.toggleReady = async () => {
+    autoReadyCount += 1;
+    const current = app.roomStore.getRoom() || makeWaitingPkRoom();
+    const readyRoom = {
+      ...current,
+      players: current.players.map((player) => player.openid === "player-1" ? { ...player, ready: true } : player)
+    };
+    app.roomStore.applySnapshot(readyRoom);
+    return readyRoom;
+  };
+  findDeep(canvas, "CreateRoom")?.emit(Button.EventType.CLICK);
+  await flushMany();
+  assertEqual(autoReadyCount, 1, "enabled auto-ready must use the existing ready action once");
+  assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
+  assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "取消准备");
+  app.roomSession.create = originalCreateRoom;
+  app.roomSession.toggleReady = originalToggleReady;
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -481,8 +527,9 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "RandomWord"));
   assertOk(findDeep(canvas, "MarkWrong"));
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
-  findDeep(canvas, "HideMeaning")?.emit(Button.EventType.CLICK);
+  findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
+  assertEqual(findDeep(canvas, "MeaningToggleLabel")?.getComponent(Label)?.string, "显示后续单词中文");
   findDeep(canvas, "NextWord")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
   findDeep(canvas, "RevealWord")?.emit(Button.EventType.CLICK);
@@ -662,16 +709,16 @@ async function main(): Promise<void> {
     if (routes[index] === "bank") {
       const bankController = routeRoot.getComponent(BankScene);
       assertOk(bankController);
-      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
+      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
-      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
+      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);
-      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "2/6");
+      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "2/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, true);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
-      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/6");
+      assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
 
       const originalProgress = app.wordBankStore.getProgressSnapshot();
       const originalPersistWordBankProgress = app.persistWordBankProgress;
@@ -691,9 +738,9 @@ async function main(): Promise<void> {
       app.persistWordBankProgress = originalPersistWordBankProgress;
     }
     if (routes[index] === "coopSelect") {
-      findDeep(canvas, "OpenShared")?.emit(Button.EventType.CLICK);
+      findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
       await flushMany();
-      assertEqual(app.store.getState().selectedMode, "coopShared");
+      assertEqual(app.store.getState().selectedMode, "pk");
       assertEqual(app.store.getState().route, "room");
     }
     if (routes[index] === "room") {
@@ -703,9 +750,12 @@ async function main(): Promise<void> {
         "正在读取房间信息",
         "accepted joins without a snapshot must show a syncing state"
       );
-      assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "房间大厅");
+      assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
       assertEqual(findDeep(canvas, "CreateRoom")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
+      assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, false);
+      assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, false);
+      assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
       app.playerStore.setOpenId("player-1");
       const waitingRoom = makeWaitingPkRoom();
       app.roomStore.applySnapshot(waitingRoom);
@@ -714,13 +764,9 @@ async function main(): Promise<void> {
         "玩家1（我） · 未准备",
         "human system names must not be rendered twice"
       );
-      ["BotLow", "BotMedium", "BotHigh"].forEach((name) => {
-        assertEqual(findDeep(canvas, name)?.getComponent(Button)?.interactable, true);
-      });
-      assertEqual(findDeep(canvas, "BotMediumLabel")?.getComponent(Label)?.string, "✓ 中");
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "InviteFriend")?.getComponent(Button)?.interactable, true);
-      assertEqual(findDeep(canvas, "RefreshRoom")?.getComponent(Button)?.interactable, true);
+      assertEqual(findDeep(canvas, "RefreshRoom"), null, "room refresh stays in background polling");
 
       const roomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
       assertOk(roomCodeInput);
@@ -755,14 +801,12 @@ async function main(): Promise<void> {
         "BackButton",
         "CreateRoom",
         "JoinRoom",
+        "AutoReady",
         "Ready",
-        "BotLow",
-        "BotMedium",
-        "BotHigh",
         "StartRoom",
         "CopyCode",
         "InviteFriend",
-        "RefreshRoom"
+        "LeaveRoom"
       ].forEach((name) => {
         const node = findDeep(canvas, name);
         assertEqual(node?.getComponent(Button)?.interactable, false, `${name} must lock while a room action is pending`);
@@ -775,30 +819,10 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "JoinRoom")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "BackButton")?.getComponent(Button)?.interactable, true);
 
-      app.roomStore.applySnapshot({
-        ...waitingRoom,
-        gameOptions: { ...waitingRoom.gameOptions, botDifficulty: "high" },
-        players: [
-          waitingRoom.players[0],
-          {
-            openid: "bot_WAIT01",
-            nickName: "Emma",
-            score: 0,
-            ready: true,
-            isBot: true,
-            botDifficulty: "high"
-          }
-        ]
-      });
-      assertEqual(findDeep(canvas, "BotHighLabel")?.getComponent(Label)?.string, "✓ 高");
-      assertOk(
-        findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("机器人 Emma · 已准备"),
-        "room list must expose the selected bot"
-      );
-
       app.store.patch({ selectedMode: "coopSpell" });
       const roomController = findDeep(canvas, "RoomRuntimeScreen")?.getComponent(RoomScene);
       assertOk(roomController, "Room controller must be mounted");
+      roomController.toggleAutoReady();
       await roomController.createSelectedRoom();
       const createCall = appRuntime.cloudCalls[appRuntime.cloudCalls.length - 1] as {
         name: string;
@@ -852,6 +876,8 @@ async function main(): Promise<void> {
       assertOk(app.historyStore.getRecords("pk").some((record) => record.id === "pk:runtime-result-room"));
     }
     if (routes[index] === "history") {
+      assertOk(findDeep(canvas, "HistoryRecentSummary")?.getComponent(Label)?.string.length);
+      assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
       findDeep(canvas, "HistoryRow0")?.emit(Button.EventType.CLICK);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";

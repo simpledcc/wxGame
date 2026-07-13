@@ -2,15 +2,15 @@
 
 Active development root:
 
-`D:\demo\wexin`
+Current Git worktree root (`C:\work\wxgame_cocos_feature_home` on the latest verified machine)
 
 Active Cocos project:
 
-`D:\demo\wexin\cocos-client`
+`cocos-client/`
 
 Legacy uploadable client in this checkout:
 
-`D:\demo\wexin\miniprogram`
+`miniprogram/`
 
 The `C:\work\...` backup and archive paths below are historical records from an older machine. They are not the active checkout and have not been reverified here.
 
@@ -51,6 +51,6 @@ Archive SHA256:
 - `npm run verify` covers platform services, lifecycle, ordinary and prebuilt spell word data, rooms, all three gameplay modes, themes, UI assembly, release checks, and TypeScript.
 - `npm run build:wechat:dry-run` and `npm run test:build-pipeline` validate the fixed Creator command, output isolation, generated package contract, and package-size accounting without requiring the engine.
 - Generated-package inspection also requires both theme Bundle configs, rejects undeclared/empty subpackages, and enforces 4 MiB main plus 30 MiB aggregate subpackage limits.
-- This machine currently has neither Cocos Creator nor WeChat Developer Tools; `npm run check:cocos-env` confirms no Creator command is available.
-- No Cocos preview, real WeChat build/package-size result, or device acceptance from this checkout should be claimed until those external tools are installed and the gates in `COCOS_RELEASE_QA.md` are completed. Use `COCOS_WECHAT_BUILD_PIPELINE.md` when moving the checkout to that machine.
+- This machine has Cocos Creator 3.8.8 and WeChat Developer Tools. Actual WeChat builds and local tool launches must still be recorded per task; installation alone is not acceptance evidence.
+- The H5 source has a successful Cocos Creator 3.8.8 WeChat build and WeChat Developer Tools run. The generated package is `6,490,758` bytes total, with `4,120,918 / 4,194,304` bytes in the main package and `2,369,840` bytes in subpackages; future art must not consume the remaining main-package margin.
 - `COCOS_MIGRATION_COMPLETION_MATRIX.md` is the authoritative phase-by-phase distinction between current source evidence and missing external proof.

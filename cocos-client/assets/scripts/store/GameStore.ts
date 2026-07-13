@@ -25,6 +25,7 @@ export interface AppState {
   openid: string;
   selectedMode: GameModeKey;
   roomEntryIntent: RoomEntryIntent;
+  roomAutoReady: boolean;
   duration: GameDuration;
   bankId: string;
   wordMode: WordMode;
@@ -45,6 +46,7 @@ export class GameStore {
     openid: "",
     selectedMode: "pk",
     roomEntryIntent: "neutral",
+    roomAutoReady: true,
     duration: 60,
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",

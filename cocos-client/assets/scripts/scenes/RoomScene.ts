@@ -1,15 +1,16 @@
-import { _decorator, Button, Component, EditBox, Label } from "cc";
+import { _decorator, Button, Component, EditBox, Label, Node } from "cc";
 import { app } from "../core/App";
 import {
   buildRoomGameOptions,
   getLocalRoomPlayer,
   getRoomActionAvailability,
-  getRoomModeLabel,
   getRoomStartStatusText,
   isBotPlayer
 } from "../domain/RoomRules";
 import type { BotDifficulty } from "../domain/GameTypes";
+import type { RoomSnapshot } from "../domain/RoomTypes";
 import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
+import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
 import type { RoomSessionState } from "../store/RoomStore";
 
 const { ccclass, property } = _decorator;
@@ -51,6 +52,24 @@ export class RoomScene extends Component {
   @property(Label)
   pageTitleLabel: Label | null = null;
 
+  @property(Label)
+  selectedBankLabel: Label | null = null;
+
+  @property(Label)
+  autoReadyLabel: Label | null = null;
+
+  @property(Label)
+  readyLabel: Label | null = null;
+
+  @property(Node)
+  createPanel: Node | null = null;
+
+  @property(Node)
+  joinPanel: Node | null = null;
+
+  @property(Node)
+  lobbyPanel: Node | null = null;
+
   @property(Button)
   readyButton: Button | null = null;
 
@@ -73,6 +92,9 @@ export class RoomScene extends Component {
   backButton: Button | null = null;
 
   @property(Button)
+  leaveButton: Button | null = null;
+
+  @property(Button)
   addBotButton: Button | null = null;
 
   @property([Button])
@@ -83,6 +105,9 @@ export class RoomScene extends Component {
 
   @property(Button)
   startButton: Button | null = null;
+
+  @property(Button)
+  autoReadyButton: Button | null = null;
 
   private unsubscribe: (() => void) | null = null;
 
@@ -124,11 +149,32 @@ export class RoomScene extends Component {
       wrongWords: app.wordBankStore.getWrongWords(),
       roomSpellQuestions
     });
+    let room: RoomSnapshot;
     try {
-      await app.roomSession.create(gameOptions);
+      room = await app.roomSession.create(gameOptions);
     } catch (error) {
       this.showError(error, "创建房间失败");
+      return;
     }
+    if (!app.store.getState().roomAutoReady) return;
+    const localOpenId = app.playerStore.getLocalPlayer().openid;
+    const localPlayer = getLocalRoomPlayer(room, localOpenId);
+    if (!localPlayer || localPlayer.ready) return;
+    try {
+      await app.roomSession.toggleReady();
+    } catch {
+      app.runtime.showToast("房间已创建，请手动点击准备");
+    }
+  }
+
+  changeBank(): void {
+    app.router.openBankPicker("room");
+  }
+
+  toggleAutoReady(): void {
+    if (app.roomStore.getState().pendingAction) return;
+    app.store.patch({ roomAutoReady: !app.store.getState().roomAutoReady });
+    this.renderAutoReady();
   }
 
   async joinEnteredRoom(): Promise<void> {
@@ -218,16 +264,24 @@ export class RoomScene extends Component {
   private render(state: RoomSessionState): void {
     const room = state.room;
     const hasSession = !!state.roomId || !!room;
+    const intent = app.store.getState().roomEntryIntent;
+    if (this.createPanel) this.createPanel.active = !hasSession && intent === "create";
+    if (this.joinPanel) this.joinPanel.active = !hasSession && intent === "join";
+    if (this.lobbyPanel) this.lobbyPanel.active = hasSession;
     this.setSessionControls(state, hasSession);
+    this.renderAutoReady();
     if (this.pageTitleLabel) {
-      const intent = app.store.getState().roomEntryIntent;
       this.pageTitleLabel.string = hasSession
-        ? "房间大厅"
+        ? this.getSelectedModeLabel(room)
         : intent === "join"
           ? "加入房间"
           : intent === "create"
             ? "创建房间"
             : "双人房间";
+    }
+    if (this.selectedBankLabel) {
+      const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
+      this.selectedBankLabel.string = getWordBankLabel(selectedBank, true);
     }
     if (this.roomCodeLabel) {
       this.roomCodeLabel.string = state.roomCode || "------";
@@ -255,7 +309,7 @@ export class RoomScene extends Component {
     const availability = getRoomActionAvailability(room, localOpenId);
     const localPlayer = getLocalRoomPlayer(room, localOpenId);
     if (this.modeLabel) {
-      this.modeLabel.string = `${getRoomModeLabel(room)} · ${room.duration}秒`;
+      this.modeLabel.string = `${this.getSelectedModeLabel(room)} · ${room.duration}秒`;
     }
     if (this.playersLabel) {
       this.playersLabel.string = room.players.length
@@ -285,6 +339,9 @@ export class RoomScene extends Component {
     );
     if (this.readyButton && localPlayer) {
       this.readyButton.interactable = availability.canToggleReady && !state.pendingAction;
+    }
+    if (this.readyLabel) {
+      this.readyLabel.string = localPlayer?.ready ? "取消准备" : "我准备好了";
     }
   }
 
@@ -320,13 +377,26 @@ export class RoomScene extends Component {
       this.refreshButton.interactable = !!state.roomId && !state.syncing && !busy;
     }
     if (this.backButton) this.backButton.interactable = !busy;
+    if (this.leaveButton) this.leaveButton.interactable = !busy;
+    if (this.autoReadyButton) this.autoReadyButton.interactable = !busy;
   }
 
-  private getSelectedModeLabel(): string {
+  private getSelectedModeLabel(room: RoomSnapshot | null = null): string {
+    if (room?.gameOptions.matchMode === "coop") {
+      return room.gameOptions.coopMode === "spell" ? "同舟拼词记" : "默契捕词赛";
+    }
     const mode = app.store.getState().selectedMode;
     if (mode === "coopShared") return "默契捕词赛";
     if (mode === "coopSpell") return "同舟拼词记";
-    return "双人PK";
+    return "准备体验模式";
+  }
+
+  private renderAutoReady(): void {
+    if (this.autoReadyLabel) {
+      this.autoReadyLabel.string = app.store.getState().roomAutoReady
+        ? "✓ 房主创建后自动准备"
+        : "房主创建后手动准备";
+    }
   }
 
   private getEntryGuidance(): string {

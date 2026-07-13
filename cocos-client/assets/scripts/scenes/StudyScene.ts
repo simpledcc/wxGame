@@ -14,6 +14,9 @@ export class StudyScene extends Component {
   @property(Label)
   statusLabel: Label | null = null;
 
+  @property(Label)
+  meaningToggleLabel: Label | null = null;
+
   onLoad(): void {
     app.store.setRoute("study");
   }
@@ -33,6 +36,11 @@ export class StudyScene extends Component {
 
   showChinese(): void {
     app.studyStore.setShowMeaning(true);
+    this.renderCard();
+  }
+
+  toggleChinese(): void {
+    app.studyStore.setShowMeaning(!app.studyStore.getSession().showMeaning);
     this.renderCard();
   }
 
@@ -104,6 +112,11 @@ export class StudyScene extends Component {
     }
     if (this.statusLabel) {
       this.statusLabel.string = `${card.index + 1}/${card.total}`;
+    }
+    if (this.meaningToggleLabel) {
+      this.meaningToggleLabel.string = app.studyStore.getSession().showMeaning
+        ? "隐藏后续单词中文"
+        : "显示后续单词中文";
     }
   }
 }

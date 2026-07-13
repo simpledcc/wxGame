@@ -1,6 +1,6 @@
 # Codex Project Entry: Word Battle Park
 
-本文件是 `D:\demo\wexin` 的唯一 Codex 启动入口。
+本文件是本仓库的唯一 Codex 启动入口。当前已验证工作树为 `C:\work\wxgame_cocos_feature_home`；换电脑或换工作树时，以 `git rev-parse --show-toplevel` 返回的仓库根目录为准。
 
 用户在新电脑、新任务窗或上下文中断后，只需要要求 Codex“阅读 `AGENTS.md` 并继续当前目标”。Codex 必须自行按照本文件完成 Git 检查、文档路由、进度判断、代码检查、开发、验证、交接和推送，不要求用户重复粘贴完整工作说明。
 
@@ -8,8 +8,8 @@
 
 ## 1. 项目定位
 
-- 仓库根目录：`D:\demo\wexin`
-- Cocos 项目：`D:\demo\wexin\cocos-client`
+- 仓库根目录：当前 Git 工作树根目录
+- Cocos 项目：`cocos-client/`
 - 产品：微信小游戏《词斗乐园单词比拼》
 - Cocos Creator 目标版本：`3.8.8`
 - 当前产品方向：竖屏，逻辑设计分辨率 `640x960`
@@ -18,7 +18,7 @@
 - 云函数：`cloudfunctions/`，客户端迁移期间保持生产协议兼容
 - 当前工作区说明：`COCOS_WORKSPACE.md`
 
-历史文档中的 `D:\wx_game`、`C:\work\...` 和旧横屏说明不是当前工作路径。发现文档与当前代码冲突时，先检查当前目标、代码、测试和最新提交，再更新过时文档。
+历史文档中的 `D:\wx_game` 和旧横屏说明不是当前工作路径。发现文档与当前代码冲突时，先检查当前目标、代码、测试和最新提交，再更新过时文档。
 
 ## 2. 每次启动必须执行
 
@@ -27,7 +27,7 @@
 在修改任何文件前执行：
 
 ```powershell
-Set-Location D:\demo\wexin
+Set-Location <repo-root>
 git status --short --branch
 git branch --show-current
 git log -5 --oneline
@@ -88,17 +88,17 @@ git fetch origin
 
 当前工作流：A 线，首页和游戏准备前界面。
 
-当前目标：H4 正式美术资源接入。
+当前目标：H5 七页赛前流程与参考布局落地。
 
 当前权威文件：
 
 - 进度：`COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
-- 设计与验收：`COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
-- 资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
-- 页面结构：`COCOS_PRE_GAME_PAGES_DESIGN.md`
+- 设计与验收：`COCOS_PRE_GAME_PAGES_DESIGN.md`
+- 后续美术设计：`COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
+- 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
 
-当前快照：H4 设计已完成，实施尚未开始。下一阶段由进度文件的 `Next single action` 决定；当前设计要求从 H4.0 正式资产冻结和唯一 Creator 3.8.8 导入负责人确认开始。
+当前快照：H5 已完成。主页创建入口依次经过玩法目录、创建配置和准备房间；加入、词库、战绩与赛前练习使用同一套真实 Store/Scene/云协议。完整自动化验证、Cocos Creator 3.8.8 微信构建和微信开发者工具页面检查均已通过。正式位图美术 H4 继续延期，直到用户提供批准的独立图片资源。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -142,16 +142,18 @@ git fetch origin
 
 ## 6. 当前模块边界
 
-### 6.1 当前 H4 可以修改
+### 6.1 当前 H5 可以修改
 
 - `cocos-client/assets/scripts/components/ui/**`
 - 首页和非玩法 route 的 `RuntimeScreenFactory.ts`
-- H4 新增的共享美术加载模块和测试
+- `HomeScene`、`CoopSelectScene`、`RoomScene`、`BankScene`、`StudyScene`、`HistoryScene` 的赛前展示与路由绑定
+- 仅用于保持页面返回状态的 `GameStore` UI 状态
+- 赛前页面、路由和运行时模拟测试
 - `theme_default`、`theme_island` 中明确属于首页背景的资源和清单
 - 未来由 Creator 正式创建的 `home_common` Bundle
 - 当前目标、资源、进度和交接文档
 
-### 6.2 当前 H4 禁止修改
+### 6.2 当前 H5 禁止修改
 
 - `cocos-client/assets/bundles/mode_pk/**`
 - `cocos-client/assets/bundles/mode_spell/**`
@@ -174,12 +176,12 @@ git fetch origin
 
 ## 8. 实施与验证规则
 
-开发时遵循现有架构和测试模式。先读取相关实现，再做最小范围修改；不得为了 H4 重写 Router、Store 或业务 Controller。
+开发时遵循现有架构和测试模式。先读取相关实现，再做最小范围修改；不得为了 H5 重写 Router、房间协议或业务服务。
 
 无 Creator 的电脑至少执行：
 
 ```powershell
-Set-Location D:\demo\wexin\cocos-client
+Set-Location <repo-root>\cocos-client
 npm run verify
 npm run build:wechat:dry-run
 ```
@@ -187,7 +189,7 @@ npm run build:wechat:dry-run
 文档-only 修改至少执行：
 
 ```powershell
-Set-Location D:\demo\wexin
+Set-Location <repo-root>
 git diff --check
 ```
 

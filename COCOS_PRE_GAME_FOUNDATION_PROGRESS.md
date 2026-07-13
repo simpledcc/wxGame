@@ -15,8 +15,8 @@ Updated: 2026-07-13
 - Programmatic icon/form enhancement commit: the commit containing the latest version of this record; use `git log -1` after checkout for the exact SHA.
 - Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H4 FINAL ART INTEGRATION DESIGN READY`
-- Next stage: H4.0 formal asset freeze and Creator import ownership; no further route/Store work is required for the Home form
+- Current stage: `H5 SEVEN-PAGE PRE-GAME FLOW DONE`
+- Next stage: keep the completed pre-game route and business bindings frozen; start H4.0 only after approved standalone bitmap files are available
 
 ## Baseline facts
 
@@ -26,7 +26,7 @@ Updated: 2026-07-13
 - Design resolution: `640x960`
 - Runtime shell: persistent `Home.scene` plus route builders
 - Phone runtime: `BASELINE_ACCEPTED` (confirmed by user/current project baseline)
-- Creator/WeChat DevTools in this task: `NOT_REQUIRED`
+- Creator/WeChat DevTools in this task: `PASSED` for the current H5 source and generated WeChat package
 - Legacy upload client: `miniprogram/`, untouched by G0
 - Cloud functions: `cloudfunctions/`, untouched by G0
 - Gameplay bundles: `mode_pk` and `mode_spell`, outside this task's ownership
@@ -74,6 +74,7 @@ Updated: 2026-07-13
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
 | H4 Formal art integration | `DESIGN_READY` | `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` defines assets, Bundle/loading architecture, fallback, QA and collaboration gates | Approved image files and a Creator 3.8.8 import owner are required before implementation |
+| H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 
 ## G0 work completed
 
@@ -182,6 +183,18 @@ Updated: 2026-07-13
 5. Defined Creator import ownership, package budgets, visual checks, automated acceptance and a six-stage H4 execution line.
 6. Kept H4 implementation explicitly `NOT_STARTED`: no empty Bundle, placeholder bitmap or hand-authored importer metadata was added.
 
+## H5 seven-page pre-game flow
+
+1. Changed Home create-room navigation to open the eight-slot mode catalog before any cloud room is created.
+2. Opened only “准备体验模式”; seven future modes are visible, disabled and unable to trigger hidden actions.
+3. Split the shared Room runtime into create configuration, join entry and active lobby panels while preserving existing room services and cloud contracts.
+4. Added selected-mode/current-bank configuration, source-route bank return and a persistent owner auto-ready preference that calls the existing ready action after successful creation.
+5. Removed manual refresh and robot controls from the current two-real-player preparation UI; background polling, copy, invite, ready, start and leave remain active.
+6. Kept 6-character alphanumeric input because production room codes are not numeric-only.
+7. Reworked Bank into four large real-data cards per page, Study into a large next-word thumb flow, and History into all-mode summaries plus real records and spell detail.
+8. Added runtime execution coverage for the full create path, bank return, auto-ready, join validation, background-refresh UI, history summaries and target-device touch bounds.
+9. Built the changed source with Cocos Creator 3.8.8, opened the generated package in WeChat Developer Tools, and manually traversed Home, mode catalog, create configuration, bank return, join, history and study without business-console errors.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -281,6 +294,22 @@ No generated word/template payload changed after regeneration.
 - `CODEX_HANDOFF.md`
 
 This H4 design commit adds no runtime bitmap, Bundle, Creator metadata or application code.
+- `CODEX_HANDOFF.md`
+
+## H5 modified files
+
+- `AGENTS.md`
+- `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
+- `cocos-client/assets/scripts/scenes/CoopSelectScene.ts`
+- `cocos-client/assets/scripts/scenes/HistoryScene.ts`
+- `cocos-client/assets/scripts/scenes/HomeScene.ts`
+- `cocos-client/assets/scripts/scenes/RoomScene.ts`
+- `cocos-client/assets/scripts/scenes/StudyScene.ts`
+- `cocos-client/assets/scripts/store/GameStore.ts`
+- `cocos-client/tools/test-runtime-shell.ts`
+- `cocos-client/tools/test-runtime-shell-execution.ts`
+- `COCOS_PRE_GAME_PAGES_DESIGN.md`
+- `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
 - `CODEX_HANDOFF.md`
 
 ## Tests
@@ -386,7 +415,22 @@ This H4 design commit adds no runtime bitmap, Bundle, Creator metadata or applic
 - Runtime bitmap/Bundle changes: none
 - Creator/WeChat/phone verification: `NOT_REQUIRED` for the design-only commit; required gates for later H4 implementation are defined in `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
 
-Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_REQUIRED` for this local code stage.
+For H4 design alone, bitmap import, QR code, phone screenshots and upload were `NOT_REQUIRED`; H5 now has separate Creator build and WeChat simulator evidence below.
+
+### H5 final verification
+
+- `npm run verify`: `PASSED` in `46.6s`, including all platform, lifecycle, cloud-contract, gameplay, UI, release and TypeScript checks
+- `npm audit --omit=dev`: `PASSED`, 0 vulnerabilities
+- Structure contract: `122` required files checked
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
+- `npm run inspect:wechat-build`: `PASSED`; generated package `6,490,758` bytes, main package `4,120,918 / 4,194,304` bytes, subpackages `2,369,840` bytes
+- Generated settings: `cocos-client/build/wechatgame/src/settings.eb216.json`
+- WeChat Developer Tools CLI open and trusted auto-run: `PASSED` for AppID `wx063a1823d29bed9e`
+- Simulator inspection: Home, mode catalog, create configuration, word-bank return, alphanumeric join, history and study rendered and routed correctly; Problems reported `0`
+- Visible console warnings are platform/basic-library notices only; no application runtime error was observed
+- Runtime simulation covers the active lobby, auto-ready, copy, invite, ready, start, leave and pending-action locks without changing room/cloud contracts
+- Runtime bitmap/Bundle changes: none
+- Real two-phone create/join/ready acceptance remains part of release QA because one local simulator cannot supply two independent WeChat accounts
 
 ## Assets
 
@@ -400,9 +444,9 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 
 ## Remaining risks after Goal completion
 
-1. The release source-budget gate still passes after H3; future bitmap work should use a reviewed lightweight Bundle rather than consume main-package margin.
+1. The generated H5 main package has only `73,386` bytes of margin under the 4 MiB gate; future bitmap work must use the reviewed `home_common` Bundle/subpackage plan rather than add art to the main package.
 2. Logo, avatar, coin, character and function icons now use recognizable verified programmatic visuals. Dedicated final art remains required before the Home matches the high-fidelity reference, but no button or business behavior is waiting on those images.
-3. Creator import/rendering and WeChat device presentation are outside this Goal by user direction; the existing phone-start baseline remains accepted.
+3. Creator import/rendering and WeChat simulator presentation passed for H5. Two-real-phone room acceptance, low-end performance, preview screenshots and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
@@ -420,15 +464,16 @@ Creator import, WeChat DevTools, QR code, phone screenshots and upload are `NOT_
 - H2 added only the UI-only room entry intent and button guards; it changed no cloud or gameplay protocol.
 - H3 migrates all non-game route builders to `PreGameUi`; it changes no Store, Router, App, gameplay Bundle, theme manifest or cloud contract.
 - H3 adds one presentation-only `RoomScene.pageTitleLabel` binding and shortens the Bank status copy for the new card.
+- H5 adds only presentation/controller state for the seven preparation pages. It does not change gameplay Bundles, room documents, cloud functions, scoring, synchronization or request/response contracts.
 
 ## Next single action
 
-Review `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` and the latest `dev_done` commit. Start H4.0 by freezing the approved bitmap delivery list and naming one Creator 3.8.8 import owner; do not create an empty Bundle or change completed route/business bindings.
+Keep H5 frozen. After the user supplies approved standalone image files, review `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`, freeze the H4.0 delivery list and use this same Creator 3.8.8 computer as the single first-import owner; do not create an empty Bundle or change completed route/business bindings.
 
 ## Continue prompt
 
 ```text
-The unified pre-game page design is complete and the H4 formal-art integration design is ready on branch feature/pre-game-ui-home-goal.
+The H5 seven-page pre-game flow, Creator 3.8.8 WeChat build and WeChat Developer Tools inspection are complete on branch feature/pre-game-ui-home-goal.
 Read COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md, this progress file and the latest dev_done commit.
 Start at H4.0 only after approved image files exist, and name one computer as the Creator 3.8.8 import owner.
 Commit each image together with Creator-generated metadata; do not crop the reference composite or hand-write image importer metadata.

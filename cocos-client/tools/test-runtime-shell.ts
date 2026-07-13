@@ -66,15 +66,15 @@ function testExpectedControls(): void {
     "选择词库",
     "玩法目录",
     "加入房间",
-    "双人PK",
-    "双人合作",
+    "准备体验模式",
+    "玩法目录",
     "换词库",
     "战绩记录",
     "问题反馈",
     "玩法说明",
     "创建房间",
     "加入",
-    "准备 / 取消",
+    "我准备好了",
     "开始游戏",
     "使用道具",
     "提交",
@@ -82,8 +82,7 @@ function testExpectedControls(): void {
     "提交反馈",
     "隐私保护指引",
     "开启音效",
-    "关闭",
-    "机器人难度"
+    "关闭"
   ].forEach((label) => assert.equal(visibleBuilders.includes(label), true, `runtime control missing: ${label}`));
   [
     "randomWord",
@@ -94,10 +93,7 @@ function testExpectedControls(): void {
     "HistoryRecordItem",
     "nextDetailPage",
     "ThemedWordTargetVisual",
-    "GameplayFeedbackPool",
-    "addLowBot",
-    "addMediumBot",
-    "addHighBot"
+    "GameplayFeedbackPool"
   ].forEach((binding) => assert.match(visibleBuilders, new RegExp(`\\b${binding}\\b`)));
 
   const roomController = read("assets/scripts/scenes/RoomScene.ts");
@@ -107,6 +103,10 @@ function testExpectedControls(): void {
   ["createButton", "joinButton", "copyButton", "inviteButton", "refreshButton", "backButton"]
     .forEach((binding) => assert.match(roomController, new RegExp(`\\b${binding}\\b`)));
   assert.match(roomController, /setSessionControls/);
+  assert.match(roomController, /createPanel/);
+  assert.match(roomController, /joinPanel/);
+  assert.match(roomController, /lobbyPanel/);
+  assert.match(roomController, /toggleAutoReady/);
   assert.match(roomController, /getSpellTemplatesForBank/);
   assert.match(roomController, /app\.spellTemplateData/);
   assert.match(roomController, /roomSpellQuestions/);

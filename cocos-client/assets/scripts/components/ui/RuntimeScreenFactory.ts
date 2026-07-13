@@ -171,28 +171,33 @@ export class RuntimeScreenFactory {
     const home = new PreGameUi(app.themes.getCurrentTheme());
     const safe = home.safeArea(root, "BankSafeArea");
     let controller!: BankScene;
-    home.pageHeader(safe, "BankHeader", "选择词库", "为练习和比赛选择学习内容", () => controller.back());
-    const statusCard = home.card(safe.node, "BankStatusCard", 0, 292, 560, 94);
-    home.visualSlot(statusCard, "coin", -238, 0, 58, 58);
-    const status = home.label(statusCard, "BankStatus", "", 26, 0, 430, 76, 18, "homeText", 0);
+    home.pageHeader(safe, "BankHeader", "选择词库", "选择教材单元，练习和房间会同步使用", () => controller.back());
+    const statusCard = home.card(safe.node, "BankStatusCard", 0, 300, 560, 78);
+    home.visualSlot(statusCard, "coin", -238, 0, 54, 54);
+    const status = home.label(statusCard, "BankStatus", "", 24, 0, 430, 62, 17, "homeText", 0);
+    const filterLabels = ["教材", "年级", "册次", "单元"];
+    filterLabels.forEach((label, index) => {
+      const chip = home.card(safe.node, `BankFilter${index}`, -210 + index * 140, 232, 126, 56, 14);
+      home.label(chip, "Label", label, 0, 0, 104, 36, 16, "homeText");
+    });
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
-    const pageSize = 8;
+    const pageSize = 4;
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
     const slotIds = Array.from({ length: pageSize }, () => "");
-    const slots: RuntimeButtonRef[] = [];
+    const slots: PreGameActionButtonRef[] = [];
     let previous!: RuntimeButtonRef;
     let next!: RuntimeButtonRef;
     for (let index = 0; index < pageSize; index += 1) {
-      const column = index % 2;
-      const row = Math.floor(index / 2);
-      slots.push(home.button(
+      slots.push(home.actionButton(
         safe.node,
         `BankSlot${index}`,
         "",
-        column === 0 ? -144 : 144,
-        194 - row * 88,
-        272,
-        80,
+        "",
+        "词",
+        0,
+        160 - index * 98,
+        560,
+        90,
         () => {
           const bankId = slotIds[index];
           if (!bankId) return;
@@ -200,10 +205,10 @@ export class RuntimeScreenFactory {
           renderPage();
         },
         "surface",
-        17
+        "wordBank"
       ));
     }
-    const pageLabel = home.label(safe.node, "BankPage", "", 0, -164, 120, 44, 18, "homeTextMuted");
+    const pageLabel = home.label(safe.node, "BankPage", "", 0, -260, 120, 44, 18, "homeTextMuted");
     const renderPage = (): void => {
       const selectedId = app.store.getState().bankPickerSelectedBankId;
       const pageCount = Math.max(1, Math.ceil(entries.length / pageSize));
@@ -216,7 +221,10 @@ export class RuntimeScreenFactory {
         if (!entry) return;
         const [id, bank] = entry;
         const unlocked = app.wordBankStore.isUnlocked(app.wordBankCatalog, id);
-        slot.label.string = `${id === selectedId ? "✓ " : ""}${getWordBankLabel(bank, true)}${unlocked ? "" : " · 锁定"}`;
+        slot.titleLabel.string = `${id === selectedId ? "✓ " : ""}${getWordBankLabel(bank, true)}`;
+        if (slot.subtitleLabel) {
+          slot.subtitleLabel.string = `${bank.words.length} 个单词 · ${unlocked ? "已解锁" : "未解锁"}`;
+        }
       });
       pageLabel.string = `${page + 1}/${pageCount}`;
       previous.button.interactable = page > 0;
@@ -224,15 +232,15 @@ export class RuntimeScreenFactory {
       previous.visual.refresh();
       next.visual.refresh();
     };
-    previous = home.iconButton(safe.node, "PreviousBanks", "‹", -105, -164, 80, () => {
+    previous = home.iconButton(safe.node, "PreviousBanks", "‹", -105, -260, 80, () => {
       page -= 1;
       renderPage();
     });
-    next = home.iconButton(safe.node, "NextBanks", "›", 105, -164, 80, () => {
+    next = home.iconButton(safe.node, "NextBanks", "›", 105, -260, 80, () => {
       page += 1;
       renderPage();
     });
-    home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, -276, 272, 82, () => {
+    home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, -362, 272, 82, () => {
       controller.unlockSelectedBank();
       renderPage();
     }, "history", "coin");
@@ -243,7 +251,7 @@ export class RuntimeScreenFactory {
       "用于练习和下一场比赛",
       "词",
       144,
-      -276,
+      -362,
       272,
       82,
       () => controller.confirmSelection(),
@@ -261,7 +269,7 @@ export class RuntimeScreenFactory {
     const home = new PreGameUi(app.themes.getCurrentTheme());
     const safe = home.safeArea(root, "StudySafeArea");
     let controller!: StudyScene;
-    home.pageHeader(safe, "StudyHeader", "赛前练习", "熟悉当前词库，标记需要复习的单词", () => controller.backHome());
+    home.pageHeader(safe, "StudyHeader", "赛前练习", "背诵当前单元，随时标记需要复习的单词", () => controller.backHome());
     const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     home.actionButton(
       safe.node,
@@ -270,41 +278,40 @@ export class RuntimeScreenFactory {
       "点击更换练习词库",
       "词",
       0,
-      292,
+      294,
       560,
       82,
       () => controller.changeBank(),
       "surface",
       "wordBank"
     );
-    const card = home.card(safe.node, "StudyCard", 0, 86, 560, 300, 22);
-    home.visualSlot(card, "practice", 0, 92, 72, 72);
-    const word = home.label(card, "StudyWord", "", 0, 28, 500, 72, 48, "homeText");
-    const meaning = home.label(card, "StudyMeaning", "", 0, -45, 500, 66, 25, "homeTextMuted");
-    const status = home.label(card, "StudyStatus", "", 0, -116, 160, 36, 18, "homeTextMuted");
-    home.iconButton(safe.node, "PreviousWord", "‹", -232, -112, 80, () => controller.previousWord());
-    home.button(safe.node, "RandomWord", "随机一个", 0, -112, 264, 80, () => controller.randomWord(), "surface", 20);
-    home.iconButton(safe.node, "NextWord", "›", 232, -112, 80, () => controller.nextWord());
+    const card = home.card(safe.node, "StudyCard", 0, 66, 560, 340, 24);
+    const status = home.label(card, "StudyStatus", "", 210, 138, 90, 34, 18, "homeTextMuted");
+    const word = home.label(card, "StudyWord", "", 0, 42, 500, 86, 54, "homeText");
+    const meaning = home.label(card, "StudyMeaning", "", 0, -58, 500, 92, 28, "homeTextMuted");
+    home.button(card, "PreviousWord", "上一个", -150, -126, 220, 80, () => controller.previousWord(), "surface", 18);
+    home.button(card, "RandomWord", "随机", 150, -126, 220, 80, () => controller.randomWord(), "surface", 18);
     home.button(
       safe.node,
       "RevealWord",
-      "查看本词释义",
-      0,
-      -202,
-      560,
+      "查看当前释义",
+      -144,
+      -150,
+      272,
       80,
       () => controller.revealCurrentMeaning(),
-      "practice",
-      22
+      "join",
+      19
     );
-    home.button(safe.node, "MarkWrong", "加入错题库", -144, -292, 272, 80, () => controller.markCurrentUnfamiliar(), "history", 20);
-    home.button(safe.node, "ChangeStudyBank", "更换词库", 144, -292, 272, 80, () => controller.changeBank(), "bank", 20);
-    home.button(safe.node, "HideMeaning", "隐藏中文", -144, -382, 272, 80, () => controller.hideChinese(), "surface", 19);
-    home.button(safe.node, "ShowMeaning", "显示中文", 144, -382, 272, 80, () => controller.showChinese(), "surface", 19);
+    home.button(safe.node, "MarkWrong", "标记错词", 144, -150, 272, 80, () => controller.markCurrentUnfamiliar(), "history", 19);
+    const meaningToggle = home.button(safe.node, "MeaningToggle", "", 0, -240, 560, 80, () => controller.toggleChinese(), "surface", 19);
+    home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "›", 0, -338, 560, 96, () => controller.nextWord(), "create", "practice");
+    home.button(safe.node, "ChangeStudyBank", "更换词库", 0, -405, 260, 80, () => controller.changeBank(), "surface", 17);
     controller = root.addComponent(StudyScene);
     controller.wordLabel = word;
     controller.meaningLabel = meaning;
     controller.statusLabel = status;
+    controller.meaningToggleLabel = meaningToggle.label;
     return root;
   }
 
@@ -313,33 +320,38 @@ export class RuntimeScreenFactory {
     const home = new PreGameUi(app.themes.getCurrentTheme());
     const safe = home.safeArea(root, "CoopSelectSafeArea");
     let controller!: CoopSelectScene;
-    home.pageHeader(safe, "CoopSelectHeader", "双人合作", "选择一种和好友共同完成的玩法", () => controller.backHome());
-    const statusCard = home.card(safe.node, "CoopStatusCard", 0, 292, 560, 94);
-    const status = home.label(statusCard, "CoopStatus", "", 0, 0, 520, 76, 18, "homeTextMuted");
-    const shared = home.card(safe.node, "SharedInfo", 0, 116, 560, 210, 22);
-    home.visualSlot(shared, "joinRoom", -226, 22, 74, 74);
-    home.label(shared, "SharedTitle", "默契捕词赛", 20, 58, 420, 42, 28, "homeText", 0);
-    home.label(shared, "SharedBody", "两人共同捕获正确单词，团队成绩为双方得分之和", 20, 12, 420, 58, 17, "homeTextMuted", 0);
-    home.button(shared, "OpenShared", "进入默契房间", 20, -66, 420, 80, () => controller.openSharedRoom(), "practice", 21);
-    const spell = home.card(safe.node, "SpellInfo", 0, -118, 560, 210, 22);
-    home.visualSlot(spell, "practice", -226, 22, 74, 74);
-    home.label(spell, "SpellTitle", "同舟拼词记", 20, 58, 420, 42, 28, "homeText", 0);
-    home.label(spell, "SpellBody", "双方各填写两个空位，每个单词限时 20 秒", 20, 12, 420, 58, 17, "homeTextMuted", 0);
-    home.button(spell, "OpenSpell", "进入拼词房间", 20, -66, 420, 80, () => controller.openSpellRoom(), "catalog", 21);
-    home.actionButton(
-      safe.node,
-      "CoopBank",
-      "更换当前词库",
-      "合作玩法使用同一套真实词库",
-      "词",
-      0,
-      -345,
-      560,
-      82,
-      () => controller.changeBank(),
-      "bank",
-      "wordBank"
-    );
+    home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "先选择玩法，再配置词库并创建房间", () => controller.backHome());
+    const modes = [
+      ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
+      ["双人 PK 竞技", "快速抢答，一决高下", "practice", "surface"],
+      ["魔法对战", "答对单词积累魔法能量", "catalog", "surface"],
+      ["抢夺宝物", "一起争夺宝箱与奖励", "history", "surface"],
+      ["搭桥比赛", "答对单词建桥前进", "createRoom", "surface"],
+      ["造塔比赛", "收集材料搭建高塔", "wordBank", "surface"],
+      ["合作塔防", "合作守护词斗乐园", "joinRoom", "surface"],
+      ["合作挑战 Boss", "一起挑战强大对手", "catalog", "surface"]
+    ] as const;
+    modes.forEach(([title, subtitle, icon, kind], index) => {
+      const action = home.actionButton(
+        safe.node,
+        `ModeOption${index}`,
+        title,
+        index === 0 ? subtitle : `${subtitle} · 筹备中`,
+        index === 0 ? "2" : "…",
+        0,
+        270 - index * 84,
+        560,
+        80,
+        () => controller.openTrialRoom(),
+        kind,
+        icon
+      );
+      if (index > 0) {
+        action.button.interactable = false;
+        action.visual.refresh();
+      }
+    });
+    const status = home.label(safe.node, "CoopStatus", "", 0, -394, 540, 38, 16, "homeTextMuted");
     controller = root.addComponent(CoopSelectScene);
     controller.statusLabel = status;
     return root;
@@ -352,59 +364,75 @@ export class RuntimeScreenFactory {
     let controller!: RoomScene;
     const entryIntent = app.store.getState().roomEntryIntent;
     const headerTitle = entryIntent === "join" ? "加入房间" : entryIntent === "create" ? "创建房间" : "双人房间";
-    const header = home.pageHeader(safe, "RoomHeader", headerTitle, "邀请好友，双方准备后开始对局", () => controller.backHome());
-    const modeCard = home.card(safe.node, "RoomModeCard", 0, 306, 560, 64);
-    const mode = home.label(modeCard, "RoomMode", "", 0, 0, 520, 46, 21, "homeText");
-    const codeCard = home.card(safe.node, "RoomCodeCard", 0, 226, 560, 76);
-    home.label(codeCard, "RoomCodeCaption", "房间码", -198, 0, 100, 34, 16, "homeTextMuted");
-    const roomCode = home.label(codeCard, "RoomCode", "------", 45, 0, 330, 46, 30, "homeText");
-    const playersCard = home.card(safe.node, "RoomPlayersCard", 0, 110, 560, 136);
-    const players = home.label(playersCard, "RoomPlayers", "", 0, 0, 520, 112, 20, "homeText");
-    const status = home.label(safe.node, "RoomStatus", "", 0, 20, 560, 44, 17, "homeTextMuted");
-    const input = home.edit(
-      safe.node,
-      "RoomCodeInput",
-      `输入 ${ROOM_CODE_LENGTH} 位房间码`,
-      -95,
-      -44,
-      370,
-      80,
-      ROOM_CODE_LENGTH
-    );
-    const join = home.button(safe.node, "JoinRoom", "加入", 190, -44, 170, 80, () => {
-      void controller.joinEnteredRoom();
-    }, "join", 22);
-    const create = home.actionButton(safe.node, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0, -136, 560, 84, () => {
+    const header = home.pageHeader(safe, "RoomHeader", headerTitle, "两名真实玩家加入并准备后，由房主开始", () => controller.backHome());
+
+    const createPanel = home.group(safe.node, "RoomCreatePanel", 0, -18, safe.width, 760);
+    const selectedModeCard = home.card(createPanel, "SelectedModeCard", 0, 236, 560, 154, 22);
+    home.visualSlot(selectedModeCard, "joinRoom", -216, 0, 88, 88);
+    home.label(selectedModeCard, "SelectedModeCaption", "已选模式", -116, 45, 300, 34, 17, "homeTextMuted", 0);
+    home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, 5, 400, 52, 31, "homeText", 0);
+    home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -42, 400, 34, 18, "homeTextMuted", 0);
+    const bankCard = home.card(createPanel, "CreateBankCard", 0, 78, 560, 124, 22);
+    home.visualSlot(bankCard, "wordBank", -224, 0, 72, 72);
+    home.label(bankCard, "CreateBankCaption", "当前词库", -124, 32, 250, 30, 16, "homeTextMuted", 0);
+    const selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -10, 360, 48, 24, "homeText", 0);
+    home.button(bankCard, "ChangeRoomBank", "更换", 205, 0, 126, 80, () => controller.changeBank(), "practice", 18);
+    const guidance = home.card(createPanel, "CreateGuidanceCard", 0, -56, 560, 96, 20);
+    home.visualSlot(guidance, "practice", -225, 0, 60, 60);
+    home.label(guidance, "CreateGuidance", "创建后邀请好友，双方准备完成即可开始", 32, 0, 430, 58, 19, "homeText", 0);
+    const create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并进入准备房间", "房", 0, -178, 560, 96, () => {
       void controller.createSelectedRoom();
     }, "create", "createRoom");
-    home.label(safe.node, "BotDifficultyTitle", "机器人难度（仅双人 PK）", 0, -190, 360, 22, 15, "homeTextMuted");
-    const botLow = home.button(safe.node, "BotLow", "低", -136, -243, 120, 80, () => {
-      void controller.addLowBot();
-    }, "surface", 19);
-    const botMedium = home.button(safe.node, "BotMedium", "中", 0, -243, 120, 80, () => {
-      void controller.addMediumBot();
-    }, "surface", 19);
-    const botHigh = home.button(safe.node, "BotHigh", "高", 136, -243, 120, 80, () => {
-      void controller.addHighBot();
-    }, "surface", 19);
-    const ready = home.button(safe.node, "Ready", "准备 / 取消", -144, -323, 272, 80, () => {
-      void controller.toggleReady();
-    }, "practice", 19);
-    const start = home.button(safe.node, "StartRoom", "开始游戏", 144, -323, 272, 80, () => {
-      void controller.startGame();
-    }, "create", 21);
-    const copy = home.button(safe.node, "CopyCode", "复制房间码", -192, -403, 176, 80, () => {
+    const autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -286, 430, 80, () => {
+      controller.toggleAutoReady();
+    }, "surface", 18);
+
+    const joinPanel = home.group(safe.node, "RoomJoinPanel", 0, -18, safe.width, 760);
+    const joinCard = home.card(joinPanel, "JoinCodeCard", 0, 42, 560, 540, 24);
+    home.visualSlot(joinCard, "joinRoom", 0, 194, 100, 100);
+    home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 118, 480, 48, 28, "homeText");
+    home.label(joinCard, "JoinCodeHint", "房间码支持英文字母和数字", 0, 74, 480, 34, 17, "homeTextMuted");
+    const input = home.edit(joinCard, "RoomCodeInput", `输入 ${ROOM_CODE_LENGTH} 位房间码`, 0, 0, 500, 88, ROOM_CODE_LENGTH);
+    home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -88, 480, 54, 18, "homeTextMuted");
+    const join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -190, 500, 92, () => {
+      void controller.joinEnteredRoom();
+    }, "join", "joinRoom");
+
+    const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, -18, safe.width, 760);
+    const codeCard = home.card(lobbyPanel, "RoomCodeCard", 0, 276, 560, 92);
+    home.label(codeCard, "RoomCodeCaption", "房间码", -210, 0, 92, 34, 16, "homeTextMuted");
+    const roomCode = home.label(codeCard, "RoomCode", "------", -52, 0, 220, 48, 30, "homeText");
+    const copy = home.button(codeCard, "CopyCode", "复制", 108, 0, 120, 80, () => {
       void controller.copyRoomCode();
-    }, "surface", 16);
-    const invite = home.button(safe.node, "InviteFriend", "邀请好友", 0, -403, 176, 80, () => {
+    }, "join", 16);
+    const invite = home.button(codeCard, "InviteFriend", "邀请", 220, 0, 96, 80, () => {
       void controller.inviteFriend();
-    }, "surface", 16);
-    const refresh = home.button(safe.node, "RefreshRoom", "刷新房间", 192, -403, 176, 80, () => {
-      void controller.refreshRoom();
-    }, "surface", 16);
+    }, "practice", 16);
+    const lobbyBank = home.card(lobbyPanel, "LobbyBankCard", 0, 188, 520, 70, 18);
+    home.visualSlot(lobbyBank, "wordBank", -220, 0, 48, 48);
+    const mode = home.label(lobbyBank, "RoomMode", "", 15, 0, 430, 44, 20, "homeText");
+    const playersCard = home.card(lobbyPanel, "RoomPlayersCard", 0, 38, 560, 210, 22);
+    home.label(playersCard, "RoomPlayersTitle", "房间玩家", 0, 74, 500, 34, 19, "homeTextMuted");
+    const players = home.label(playersCard, "RoomPlayers", "", 0, -12, 500, 120, 23, "homeText");
+    const statusCard = home.card(lobbyPanel, "RoomStatusCard", 0, -102, 520, 68, 18);
+    const status = home.label(statusCard, "RoomStatus", "", 0, 0, 480, 46, 17, "homeTextMuted");
+    const ready = home.button(lobbyPanel, "Ready", "我准备好了", 0, -190, 520, 84, () => {
+      void controller.toggleReady();
+    }, "practice", 22);
+    const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0, -288, 560, 92, () => {
+      void controller.startGame();
+    }, "create", "createRoom");
+    const leave = home.button(lobbyPanel, "LeaveRoom", "离开房间", 0, -382, 360, 80, () => controller.backHome(), "join", 19);
+
     controller = root.addComponent(RoomScene);
     controller.roomCodeInput = input.editBox;
     controller.pageTitleLabel = header.titleLabel;
+    controller.selectedBankLabel = selectedBank;
+    controller.autoReadyLabel = autoReady.label;
+    controller.readyLabel = ready.label;
+    controller.createPanel = createPanel;
+    controller.joinPanel = joinPanel;
+    controller.lobbyPanel = lobbyPanel;
     controller.roomCodeLabel = roomCode;
     controller.modeLabel = mode;
     controller.playersLabel = players;
@@ -413,13 +441,11 @@ export class RuntimeScreenFactory {
     controller.joinButton = join.button;
     controller.copyButton = copy.button;
     controller.inviteButton = invite.button;
-    controller.refreshButton = refresh.button;
     controller.backButton = header.backButton.button;
+    controller.leaveButton = leave.button;
     controller.readyButton = ready.button;
-    controller.addBotButton = botMedium.button;
-    controller.botDifficultyButtons = [botLow.button, botMedium.button, botHigh.button];
-    controller.botDifficultyLabels = [botLow.label, botMedium.label, botHigh.label];
     controller.startButton = start.button;
+    controller.autoReadyButton = autoReady.button;
     return root;
   }
 
@@ -477,16 +503,35 @@ export class RuntimeScreenFactory {
     const detailRoot = home.group(safe.node, "HistoryDetail", 0, 0, safe.width, safe.height);
     detailRoot.active = false;
     let controller!: HistoryScene;
-    home.pageHeader(safe, "HistoryHeader", "战绩记录", "按玩法回顾最近比赛和历史最佳", () => controller.back());
-    home.button(listRoot, "HistoryPk", "双人PK", -190, 288, 176, 80, () => controller.showPk(), "join", 17);
-    home.button(listRoot, "HistoryShared", "默契捕词", 0, 288, 176, 80, () => controller.showCoopShared(), "practice", 17);
-    home.button(listRoot, "HistorySpell", "同舟拼词", 190, 288, 176, 80, () => controller.showCoopSpell(), "catalog", 17);
-    const title = home.label(listRoot, "HistoryTitle", "", -110, 220, 320, 42, 27, "homeText", 0);
-    const best = home.label(listRoot, "HistoryBest", "", 190, 220, 220, 38, 18, "homeTextMuted");
-    const empty = home.label(listRoot, "HistoryEmpty", "", 0, -20, 500, 42, 20, "homeTextMuted");
+    home.pageHeader(safe, "HistoryHeader", "战绩记录", "查看真实比赛成绩和历史最佳", () => controller.back());
+    const tabs = [
+      ["HistoryAll", "全部", () => controller.showAll(), "join"],
+      ["HistoryPk", "PK", () => controller.showPk(), "surface"],
+      ["HistoryShared", "合作", () => controller.showCoopShared(), "surface"],
+      ["HistorySpell", "拼词", () => controller.showCoopSpell(), "surface"],
+      ["HistoryOther", "其他", () => undefined, "surface"]
+    ] as const;
+    tabs.forEach(([name, label, action, kind], index) => {
+      const tab = home.button(listRoot, name, label, -224 + index * 112, 294, 104, 80, action, kind, 16);
+      if (name === "HistoryOther") {
+        tab.button.interactable = false;
+        tab.visual.refresh();
+      }
+    });
+    const recentCard = home.card(listRoot, "HistoryRecentCard", -144, 218, 272, 88, 18);
+    home.visualSlot(recentCard, "history", -102, 0, 56, 56);
+    home.label(recentCard, "HistoryRecentCaption", "最近记录", 24, 24, 190, 28, 16, "homeTextMuted");
+    const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 24, -16, 190, 46, 15, "homeText", 0);
+    const bestCard = home.card(listRoot, "HistoryBestCard", 144, 218, 272, 88, 18);
+    home.visualSlot(bestCard, "coin", -102, 0, 56, 56);
+    home.label(bestCard, "HistoryBestCaption", "最佳成绩", 24, 22, 190, 28, 16, "homeTextMuted");
+    const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 24, -16, 190, 40, 23, "homeText", 0);
+    const title = home.label(listRoot, "HistoryTitle", "", -120, 150, 320, 38, 24, "homeText", 0);
+    const best = home.label(listRoot, "HistoryBest", "", 190, 150, 220, 34, 16, "homeTextMuted");
+    const empty = home.label(listRoot, "HistoryEmpty", "", 0, -10, 500, 42, 20, "homeTextMuted");
     const items: HistoryRecordItem[] = [];
-    for (let index = 0; index < 5; index += 1) {
-      const row = home.card(listRoot, `HistoryRow${index}`, 0, 140 - index * 84, 560, 80, 16);
+    for (let index = 0; index < 4; index += 1) {
+      const row = home.card(listRoot, `HistoryRow${index}`, 0, 100 - index * 88, 560, 82, 16);
       const rowTitle = home.label(row, "Title", "", -90, 14, 350, 30, 17, "homeText", 0);
       const meta = home.label(row, "Meta", "", -75, -16, 380, 26, 13, "homeTextMuted", 0);
       const rowScore = home.label(row, "Score", "", 210, 0, 110, 34, 18, "homeText");
@@ -517,6 +562,8 @@ export class RuntimeScreenFactory {
     controller = root.addComponent(HistoryScene);
     controller.titleLabel = title;
     controller.bestLabel = best;
+    controller.recentSummaryLabel = recentSummary;
+    controller.bestSummaryLabel = bestSummary;
     controller.emptyLabel = empty;
     controller.pageLabel = page;
     controller.previousButton = previous.button;

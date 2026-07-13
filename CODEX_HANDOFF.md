@@ -1,14 +1,14 @@
 # Codex Handoff
 
-> Active Cocos migration workspace in this checkout: `D:\demo\wexin`.
+> Active Cocos migration workspace for this handoff: `C:\work\wxgame_cocos_feature_home`.
 >
-> Older `C:\work\...` paths below are historical machine records. Continue new development in this checkout and keep `miniprogram/` as the stable uploadable client during migration.
+> Continue H5/H4 pre-game work in this checkout and keep `miniprogram/` as the stable uploadable client during migration. Other absolute paths below are historical machine records.
 
 ## Project
 
 WeChat Mini Game project:
 
-`D:\demo\wexin`
+`C:\work\wxgame_cocos_feature_home`
 
 Game concept: two-player English vocabulary PK game. Current visual theme is grass/cockroach. Players see a Chinese prompt, tap the correct English word on moving cockroaches, score points, earn/use power-ups, and can play against a friend or a test robot.
 
@@ -16,6 +16,7 @@ Game concept: two-player English vocabulary PK game. Current visual theme is gra
 
 Resume point for the next agent:
 
+- 2026-07-13 H5 seven-page pre-game completion: Home create now enters an eight-item mode catalog, then the enabled preparation mode opens real-bank creation settings and an optional existing ready action before the active lobby. Join uses the production six-character alphanumeric contract; lobby refresh stays in background polling; Bank, History and Study use real stores without fabricated identity, coins or records. Full `npm run verify`, Cocos Creator 3.8.8 `build:wechat`, generated-package inspection and WeChat Developer Tools traversal passed. The generated package is 6,490,758 bytes total and 4,120,918 bytes in the main package, leaving only 73,386 bytes. No cloud function, gameplay Bundle, room/scoring/synchronization contract, AppID or cloud environment changed. Real two-phone room acceptance remains release QA; H4 bitmap work remains blocked until approved standalone assets are supplied.
 - 2026-07-13 repository-entry redesign: root `AGENTS.md` is now the single Codex startup entry for new computers and tasks. It performs Git safety checks, routes Codex to the current progress/design/asset files, defines document update ownership, preserves H4 scope boundaries, and requires verification plus push/remote-sync evidence. Users can now request only “read AGENTS.md and continue”; detailed progress remains in its authoritative progress file rather than being duplicated in the entry document. The redesign passed the complete `npm run verify` chain and `npm run build:wechat:dry-run`.
 - 2026-07-13 H4 formal-art handoff: `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` now defines the approved path for adding theme backgrounds plus a shared `home_common` Bundle, resource catalog/manager, slot binding, fallback/retry/lifecycle behavior, optional nine-slice skins, package budgets and Creator acceptance. H4 implementation is not started and no empty Bundle was created. Start with H4.0 only after approved image files exist; one computer must own the first Creator 3.8.8 import and push each image together with its generated `.meta` before another computer continues.
 
