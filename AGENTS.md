@@ -1,160 +1,214 @@
-# Agent Handoff: Word Fishing Battle
+# Codex Project Entry: Word Battle Park
 
-This file is the project handoff note for future coding agents. Read it before changing the project.
+本文件是 `D:\demo\wexin` 的唯一 Codex 启动入口。
 
-## Project Summary
+用户在新电脑、新任务窗或上下文中断后，只需要要求 Codex“阅读 `AGENTS.md` 并继续当前目标”。Codex 必须自行按照本文件完成 Git 检查、文档路由、进度判断、代码检查、开发、验证、交接和推送，不要求用户重复粘贴完整工作说明。
 
-- Project path: `D:\wx_game`
-- Product: WeChat Mini Game, two-player online word-fishing battle.
-- Current AppID in `project.config.json`: `wx063a1823d29bed9e`
-- Current compile type: `game`
-- Game entry: `miniprogram/game.js`
-- Game config: `miniprogram/game.json`
-- Cloud functions root: `cloudfunctions/`
-- Cloud database collection: `rooms`
+`AGENTS.md` 负责导航和规则，不复制全部项目进度。具体进度、设计和验收结果仍由下方列出的权威文件维护。
 
-The game flow is:
+## 1. 项目定位
 
-1. Player opens the mini game.
-2. Player creates a room or joins by room code.
-3. Two players prepare.
-4. Either player starts a 60-second match.
-5. Fish swim on canvas; each fish carries an English word.
-6. The bottom prompt shows a Chinese meaning.
-7. Tapping the matching fish gives +100.
-8. Tapping the wrong fish gives -100.
-9. Higher score wins when time runs out.
+- 仓库根目录：`D:\demo\wexin`
+- Cocos 项目：`D:\demo\wexin\cocos-client`
+- 产品：微信小游戏《词斗乐园单词比拼》
+- Cocos Creator 目标版本：`3.8.8`
+- 当前产品方向：竖屏，逻辑设计分辨率 `640x960`
+- 运行架构：持久化 `Home.scene` 加运行时 route 页面
+- 旧版可上传客户端：`miniprogram/`，迁移完成前必须保留
+- 云函数：`cloudfunctions/`，客户端迁移期间保持生产协议兼容
+- 当前工作区说明：`COCOS_WORKSPACE.md`
 
-## Current Verified State
+历史文档中的 `D:\wx_game`、`C:\work\...` 和旧横屏说明不是当前工作路径。发现文档与当前代码冲突时，先检查当前目标、代码、测试和最新提交，再更新过时文档。
 
-As of 2026-05-27:
+## 2. 每次启动必须执行
 
-- The project has been converted from a page-based mini program prototype to a WeChat Mini Game.
-- Local static checks passed for all JavaScript and JSON files.
-- User has created and selected a cloud environment in WeChat DevTools.
-- Creating a room has been verified successfully in the simulator.
-- The simulator showed a generated room code and waited for a second player.
-- Full two-player match flow still needs end-to-end verification with simulator + phone or two clients.
+### 2.1 Git 安全检查
 
-## Important Architecture Notes
-
-The active frontend is canvas-based:
-
-- `miniprogram/game.js` owns rendering, touch handling, scene state, room polling, and calls to cloud functions.
-- `miniprogram/game.json` configures the mini game.
-- `miniprogram/config.js` currently has `envId: ""`, which means "use the cloud environment selected in WeChat DevTools".
-
-The old page-based mini program files remain in the repo:
-
-- `miniprogram/app.js`
-- `miniprogram/app.json`
-- `miniprogram/app.wxss`
-- `miniprogram/pages/**`
-
-These are not the active entry points while `compileType` is `game`. Do not spend time modifying the old pages unless intentionally restoring a mini program version.
-
-## Cloud Database
-
-Required collection:
-
-- `rooms`
-
-Recommended database permission:
-
-```json
-{
-  "read": true,
-  "write": false
-}
-```
-
-Rationale:
-
-- Clients read room state for synchronization.
-- Writes should happen through cloud functions only.
-
-## Cloud Functions
-
-Required cloud functions:
-
-- `getOpenId`: returns the current user's OpenID.
-- `createRoom`: creates a room and adds the creator as player 1.
-- `joinRoom`: joins an existing waiting room by room code.
-- `toggleReady`: marks a player ready or not ready.
-- `startGame`: validates two ready players, creates fish, starts 60-second game.
-- `catchFish`: validates fish taps, updates score, hides correctly caught fish, refreshes target.
-- `finishGame`: finalizes the match and writes the winner.
-
-Each function has its own `package.json` and depends on `wx-server-sdk`.
-
-Deployment in WeChat DevTools:
-
-1. Expand `cloudfunctions`.
-2. Right-click each function directory.
-3. Choose "上传并部署：云端安装依赖".
-
-Do not use the top toolbar "上传" button for cloud functions; that uploads the mini game version.
-
-## Current Frontend Behavior
-
-Scenes in `miniprogram/game.js`:
-
-- `home`: player nickname, create room, join room.
-- `room`: room code, players, prepare button, start button.
-- `playing`: canvas game scene with moving fish, scores, timer, prompt.
-- `finished`: result overlay.
-
-Room synchronization currently uses polling:
-
-- `fetchRoom()` reads the `rooms` document about every 800 ms.
-- This is acceptable for prototype testing.
-- A future improvement could use database watchers if Mini Game support is stable enough in the target runtime.
-
-## Known Product / Tech Gaps
-
-High priority:
-
-- Verify the full two-player flow with simulator + phone.
-- Confirm all cloud functions are deployed to the selected cloud environment.
-- Confirm `rooms` collection exists and has the correct permission.
-- Improve error messages for common cloud deployment problems.
-
-Gameplay:
-
-- Fish art is currently drawn with canvas primitives.
-- Fish movement is simple bounce movement based on server-created velocity.
-- Word bank is hardcoded in `startGame` and `catchFish`; this duplication should be refactored later.
-- There is no difficulty selection, match lobby, reconnect handling, or anti-cheat beyond cloud function scoring.
-
-Mini Game polish:
-
-- Add generated or hand-made image assets for fish/background.
-- Add sound effects and hit feedback.
-- Add tutorial or first-time hint.
-- Add better result screen and rematch flow.
-- Add loading states while cloud calls are pending.
-
-Engineering:
-
-- Consider sharing word bank logic between `startGame` and `catchFish`.
-- Consider adding a `roomVersion` or event log if polling causes stale UI during rapid taps.
-- Consider moving repeated canvas UI helpers into modules if `game.js` grows much larger.
-
-## Local Checks Used
-
-From `D:\wx_game`:
+在修改任何文件前执行：
 
 ```powershell
-Get-ChildItem -Path D:\wx_game -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
-Get-ChildItem -Path D:\wx_game -Recurse -Include *.json | ForEach-Object { node -e "JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'));" $_.FullName }
+Set-Location D:\demo\wexin
+git status --short --branch
+git branch --show-current
+git log -5 --oneline
+git fetch origin
 ```
 
-## Handoff Advice
+规则：
 
-When resuming:
+1. 工作区干净时，检查当前分支与对应远端分支的 ahead/behind 状态。
+2. 远端存在新提交时，只允许使用 `git pull --ff-only` 更新。
+3. 工作区存在未提交修改时，不得直接拉取、重置或覆盖；先判断修改来源及是否属于当前任务。
+4. 禁止使用 `git reset --hard`、`git checkout --` 或其他会丢失他人修改的命令。
+5. 多人开发时不默认切换到别人的功能分支；根据当前目标文件和交接记录确认分支归属。
 
-1. First ask whether the user has completed cloud function deployment and `rooms` collection setup.
-2. If create room works but join/start does not, inspect cloud function deployment status first.
-3. If the simulator can create a room, the most likely next blocker is second-client preview permissions or missing function deployment.
-4. Keep the project as a WeChat Mini Game unless the user explicitly asks to go back to a page-based mini program.
+### 2.2 必读文档路由
 
+完成 Git 检查后，按顺序读取：
+
+1. `COCOS_WORKSPACE.md`：当前工作区、工具能力和稳定边界。
+2. `CODEX_HANDOFF.md`：最近一次重要提交、风险和跨电脑交接。
+3. `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`：当前首页/准备前界面的阶段、证据和下一项行动。
+4. 当前目标说明书：由本文件“当前目标指针”指定。
+5. 当前目标附属清单：由本文件“当前目标指针”指定。
+
+首次接手项目、切换大阶段或发现文档冲突时，再读取：
+
+- `COCOS_FIRST_PLAYABLE_MASTER_PLAN.md`：第一版总计划、工作流和模块所有权。
+- `COCOS_MIGRATION_COMPLETION_MATRIX.md`：阶段 0-9 的代码证据和外部验证缺口。
+- `COCOS_MIGRATION_DESIGN.md`：长期迁移架构。
+- `COCOS_RELEASE_QA.md`：Creator、微信工具、真机和上传验收。
+
+不要一开始顺序读取全部历史阶段文档。只有当前任务涉及对应模块或契约时，才读取 `COCOS_MIGRATION_PHASE*.md`、性能、生命周期、构建或玩法专项文件。
+
+### 2.3 检查代码而不是只信文档
+
+读取文档后必须：
+
+1. 检查当前目标涉及的实现文件和测试。
+2. 对照最新 5 个提交确认文档状态是否已落到代码。
+3. 搜索 TODO、未接入接口、资源路径和测试断言。
+4. 文档与代码冲突时，不猜测完成度；以当前代码、自动化测试和可复现构建证据为准，并修正文档。
+
+### 2.4 首次状态报告
+
+开始修改前，向用户简短报告：
+
+- 当前分支和最新提交
+- 是否与远端同步
+- 已完成阶段
+- 当前阶段和完成状态
+- 下一项唯一行动
+- 阻塞项
+- 本任务禁止修改范围
+
+没有真实阻塞时，报告后直接执行下一项任务，不停留在方案描述，也不等待用户再次确认。
+
+## 3. 当前目标指针
+
+当前工作流：A 线，首页和游戏准备前界面。
+
+当前目标：H4 正式美术资源接入。
+
+当前权威文件：
+
+- 进度：`COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+- 设计与验收：`COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
+- 资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
+- 页面结构：`COCOS_PRE_GAME_PAGES_DESIGN.md`
+- 首页目标参考：`docs/design/home/README.md`
+
+当前快照：H4 设计已完成，实施尚未开始。下一阶段由进度文件的 `Next single action` 决定；当前设计要求从 H4.0 正式资产冻结和唯一 Creator 3.8.8 导入负责人确认开始。
+
+当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
+
+## 4. 文档职责与更新规则
+
+| 文件 | 作用 | 何时更新 |
+| --- | --- | --- |
+| `AGENTS.md` | 唯一入口、启动协议、当前目标指针和永久边界 | 切换目标、工作流或永久规则时 |
+| `CODEX_HANDOFF.md` | 跨电脑、跨任务的重要事实和最近交接 | 每个重要提交、阻塞或外部环境状态变化时 |
+| `COCOS_FIRST_PLAYABLE_MASTER_PLAN.md` | 第一版总阶段、分工和集成路线 | 总范围、里程碑或模块所有权变化时 |
+| `COCOS_MIGRATION_COMPLETION_MATRIX.md` | 全局阶段完成度及代码/外部证据 | 阶段状态或 Creator/微信/真机证据变化时 |
+| `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` | 当前 A 线目标的执行账本 | 每个 H4 子阶段开始、完成、阻塞和交接时 |
+| `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` | H4 架构、范围和验收标准 | 设计决策或验收标准正式变化时 |
+| `COCOS_HOME_ASSET_MANIFEST.md` | 美术文件、路径、尺寸、归属和接入状态 | 资源到位、导入、替换、延期或预算变化时 |
+| `COCOS_RELEASE_QA.md` | Creator、微信构建、真机、截图和上传证据 | 实际执行外部验收时 |
+
+禁止把每天的详细进度同时复制到多个文件。状态以当前进度文件为主，`CODEX_HANDOFF.md` 只记录足以让另一台电脑继续的重要变化，`AGENTS.md` 只维护入口和目标指针。
+
+## 5. 进度记录格式
+
+每个子阶段使用以下状态：
+
+- `NOT_STARTED`：尚未开始。
+- `IN_PROGRESS`：已有实际修改，但验收未完成。
+- `BLOCKED`：缺少外部资产、权限或工具，且没有可继续的本地工作。
+- `DONE`：实现、测试、文档和提交证据全部完成。
+- `DESIGN_READY`：设计完成，但实现尚未开始。
+
+进度文件每个阶段至少记录：
+
+1. 目标和状态。
+2. 已完成内容。
+3. 修改文件。
+4. 测试、构建和截图证据。
+5. Creator、微信工具和真机验证是否适用。
+6. 阻塞项及责任人。
+7. 下一项唯一行动。
+8. 完成提交 SHA。
+
+不得把“代码实现完成”和“外部验证完成”混成一个状态。没有 Creator 或微信工具时可以完成代码阶段，但不能伪造 Creator 构建、截图、包体或真机证据。
+
+## 6. 当前模块边界
+
+### 6.1 当前 H4 可以修改
+
+- `cocos-client/assets/scripts/components/ui/**`
+- 首页和非玩法 route 的 `RuntimeScreenFactory.ts`
+- H4 新增的共享美术加载模块和测试
+- `theme_default`、`theme_island` 中明确属于首页背景的资源和清单
+- 未来由 Creator 正式创建的 `home_common` Bundle
+- 当前目标、资源、进度和交接文档
+
+### 6.2 当前 H4 禁止修改
+
+- `cocos-client/assets/bundles/mode_pk/**`
+- `cocos-client/assets/bundles/mode_spell/**`
+- `cloudfunctions/**`
+- `miniprogram/**`
+- 房间、计分、同步和云请求/响应协议
+- AppID、云环境、数据库权限和上传配置
+- 为展示效果伪造昵称、等级、金币、房间或历史数据
+
+不得从参考合成图裁图，不得手写图片 importer `.meta`。正式图片首次导入必须由唯一一台 Creator 3.8.8 电脑完成，并将图片和 Creator 生成的 `.meta` 放入同一个提交。
+
+## 7. 多人和多电脑协作
+
+1. 同事开发不同模块时使用不同功能分支，不共享一个可写分支。
+2. 同一个人使用两台电脑时，可以延续同一功能分支，但不能同时保留两份未推送修改。
+3. 电脑 A 停止前必须更新进度和交接、提交并推送；电脑 B 开始前必须执行本文件的 Git 安全检查和 fast-forward 同步。
+4. 共享文件、`.scene`、Prefab、Bundle 根 `.meta` 和生成数据同一时间只有一个负责人。
+5. H4 正式图片只有一个 Creator 首次导入负责人；其他电脑必须拉取生成的元数据，不得二次导入生成另一套 UUID。
+6. 发现他人修改时保留并理解它；不回退、不覆盖、不顺手重构无关模块。
+
+## 8. 实施与验证规则
+
+开发时遵循现有架构和测试模式。先读取相关实现，再做最小范围修改；不得为了 H4 重写 Router、Store 或业务 Controller。
+
+无 Creator 的电脑至少执行：
+
+```powershell
+Set-Location D:\demo\wexin\cocos-client
+npm run verify
+npm run build:wechat:dry-run
+```
+
+文档-only 修改至少执行：
+
+```powershell
+Set-Location D:\demo\wexin
+git diff --check
+```
+
+正式 H4 图片接入还必须在安装 Creator 的电脑执行实际导入、预览和微信构建，并按 `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`、`COCOS_RELEASE_QA.md` 留下证据。
+
+## 9. 提交、推送与交接
+
+1. 每完成一个可独立验收的子阶段，立即更新进度文件，不等 Token 或时间即将耗尽。
+2. 运行相关测试，检查 `git diff --check` 和禁止目录差异。
+3. 提交只包含当前阶段及必要文档，不混入其他人的模块。
+4. 完整阶段提交主题最后包含 `dev_done`。
+5. 未完成但必须换电脑时，也要创建明确的 checkpoint 提交并推送，但不得使用 `dev_done`。
+6. 推送当前功能分支，再 fetch 对应远端引用，确认本地与远端 ahead/behind 为 `0 0`。
+7. 最终报告提交 SHA、分支、测试结果、完成内容、未完成内容和下一项唯一行动。
+
+## 10. 用户最短启动命令
+
+以后用户可以只发送：
+
+```text
+请阅读 D:\demo\wexin\AGENTS.md，按照启动协议同步最新代码、报告当前状态，并在没有阻塞时继续当前目标的下一项任务。完成阶段后更新进度与交接，验证、提交并推送。
+```
+
+Codex 收到这句话后不得要求用户再次粘贴本文档列出的文件和流程。

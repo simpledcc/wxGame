@@ -4,6 +4,7 @@ Updated: 2026-07-13
 
 ## Handoff
 
+- Repository entry: `AGENTS.md`; it owns the startup protocol and points to this file for current A-line progress
 - Branch: `feature/pre-game-ui-home-goal`
 - Base commit: `387121a` (`docs: add first playable and pre-game UI plans`)
 - G0 stage commit: `0719691` (`chore(home): establish G0 development baseline`)
