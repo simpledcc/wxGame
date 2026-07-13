@@ -83,7 +83,7 @@ function testThemeManifestsAndBudget(): void {
     const diskManifest = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
     assert.deepEqual(diskManifest, THEME_MANIFESTS[themeId]);
     Object.values(manifest.colors).forEach((value) => {
-      assert.match(value, /^#[0-9A-F]{6}$/);
+      assert.match(value, /^#[0-9A-F]{6}([0-9A-F]{2})?$/);
       assert.equal(parseThemeColor(value).length, 4);
     });
     Object.values(manifest.assets).forEach((assetPath) => {

@@ -161,6 +161,19 @@ function testShellLifecycleAndSceneAttachment(): void {
   assert.match(ui, /this\.color\("primaryPressed"\)/);
   const buttonVisual = read("assets/scripts/components/ui/RuntimeButtonVisual.ts");
   assert.match(buttonVisual, /isShowingDisabledState/);
+  assert.match(buttonVisual, /getVisualGeometry/);
+  assert.match(ui, /backgroundNode = this\.panel/);
+}
+
+function testPreGameUiFoundation(): void {
+  const source = read("assets/scripts/components/ui/PreGameUi.ts");
+  ["safeArea", "topBar", "card", "actionButton", "iconButton", "modal"]
+    .forEach((method) => assert.match(source, new RegExp(`\\b${method}\\(`)));
+  assert.match(source, /DESIGN_WIDTH/);
+  assert.match(source, /DESIGN_HEIGHT/);
+  assert.match(source, /addComponent\(BlockInputEvents\)/);
+  assert.match(source, /RuntimeButtonVisual/);
+  assert.doesNotMatch(source, /mode_pk|mode_spell|wx\.|cloudfunctions/);
 }
 
 interface SerializedSceneItem {
@@ -232,6 +245,7 @@ function main(): void {
   testRouterStaysInRuntimeShell();
   testBootEntryRouting();
   testGameplayBundleBoundary();
+  testPreGameUiFoundation();
   console.log("Runtime Cocos shell OK: all routes, controllers, controls, lifecycle, and single-scene routing are wired.");
 }
 

@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.runtime-test.json",
   "include": [
+    "tools/test-pre-game-ui.ts",
     "tools/test-runtime-shell-execution.ts",
     "tools/mocks/**/*.ts"
   ]

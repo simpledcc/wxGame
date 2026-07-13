@@ -19,6 +19,7 @@
     "test:phase8": "tsx ./tools/test-themes.ts",
     "test:release": "tsx ./tools/test-release-readiness.ts",
     "test:shell": "tsx ./tools/test-runtime-shell.ts",
+    "test:pre-game-ui": "tsx --tsconfig ./tsconfig.runtime-test.json ./tools/test-pre-game-ui.ts",
     "test:shell-runtime": "tsx --tsconfig ./tsconfig.runtime-test.json ./tools/test-runtime-shell-execution.ts",
     "test:platform": "tsx ./tools/test-platform-services.ts",
     "test:lifecycle": "tsx ./tools/test-lifecycle.ts",
@@ -28,7 +29,7 @@
     "test:spell-data": "tsx ./tools/test-spell-template-data.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:shell-runtime": "tsc -p tsconfig.runtime-test-typecheck.json --noEmit",
-    "verify": "npm run check:structure && npm run test:platform && npm run test:lifecycle && npm run test:contracts && npm run test:build-pipeline && npm run test:performance && npm run test:spell-data && npm run test:stage3 && npm run test:room && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:phase7 && npm run test:phase8 && npm run test:shell && npm run test:shell-runtime && npm run test:release && npm run typecheck && npm run typecheck:shell-runtime"
+    "verify": "npm run check:structure && npm run test:platform && npm run test:lifecycle && npm run test:contracts && npm run test:build-pipeline && npm run test:performance && npm run test:spell-data && npm run test:stage3 && npm run test:room && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:phase7 && npm run test:phase8 && npm run test:shell && npm run test:pre-game-ui && npm run test:shell-runtime && npm run test:release && npm run typecheck && npm run typecheck:shell-runtime"
   },
   "devDependencies": {
     "tsx": "^3.12.7",

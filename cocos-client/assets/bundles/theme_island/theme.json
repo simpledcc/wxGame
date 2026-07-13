@@ -28,7 +28,19 @@
     "keyText": "#143A42",
     "success": "#17845B",
     "warning": "#C97918",
-    "error": "#C64246"
+    "error": "#C64246",
+    "homeCreate": "#FFB23C",
+    "homeJoin": "#45A9F2",
+    "homePractice": "#52C884",
+    "homeBank": "#328FE5",
+    "homeCatalog": "#8C72E8",
+    "homeHistory": "#F4A533",
+    "homeCard": "#F8FFFC",
+    "homeCardBorder": "#9BD4D1",
+    "homeText": "#23454E",
+    "homeTextMuted": "#5A7680",
+    "homeTextOnColor": "#FFFFFF",
+    "homeModalShade": "#102E38B8"
   },
   "copy": {
     "gameTitle": "单词捕鱼",

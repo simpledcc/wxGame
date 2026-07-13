@@ -41,7 +41,19 @@ export const THEME_MANIFESTS: Record<ThemeId, ThemeManifest> = {
       keyText: "#17351C",
       success: "#168548",
       warning: "#C77813",
-      error: "#C53A31"
+      error: "#C53A31",
+      homeCreate: "#FFB23C",
+      homeJoin: "#4AA7FF",
+      homePractice: "#4CC96B",
+      homeBank: "#3A8BFF",
+      homeCatalog: "#8E6BFF",
+      homeHistory: "#FFAA2B",
+      homeCard: "#FFF8EF",
+      homeCardBorder: "#E8CFA9",
+      homeText: "#30445B",
+      homeTextMuted: "#60758B",
+      homeTextOnColor: "#FFFFFF",
+      homeModalShade: "#172433B8"
     },
     copy: {
       gameTitle: "单词捕虫",
@@ -80,7 +92,19 @@ export const THEME_MANIFESTS: Record<ThemeId, ThemeManifest> = {
       keyText: "#143A42",
       success: "#17845B",
       warning: "#C97918",
-      error: "#C64246"
+      error: "#C64246",
+      homeCreate: "#FFB23C",
+      homeJoin: "#45A9F2",
+      homePractice: "#52C884",
+      homeBank: "#328FE5",
+      homeCatalog: "#8C72E8",
+      homeHistory: "#F4A533",
+      homeCard: "#F8FFFC",
+      homeCardBorder: "#9BD4D1",
+      homeText: "#23454E",
+      homeTextMuted: "#5A7680",
+      homeTextOnColor: "#FFFFFF",
+      homeModalShade: "#102E38B8"
     },
     copy: {
       gameTitle: "单词捕鱼",

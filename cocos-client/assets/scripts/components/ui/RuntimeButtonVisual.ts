@@ -11,6 +11,7 @@ export class RuntimeButtonVisual extends Component {
   private disabledColor = new Color();
   private width = 0;
   private height = 0;
+  private radius = 8;
   private lastInteractable: boolean | null = null;
   private pressed = false;
 
@@ -19,6 +20,7 @@ export class RuntimeButtonVisual extends Component {
     background: Graphics,
     width: number,
     height: number,
+    radius: number,
     normalColor: Color,
     pressedColor: Color,
     disabledColor: Color
@@ -27,6 +29,7 @@ export class RuntimeButtonVisual extends Component {
     this.background = background;
     this.width = width;
     this.height = height;
+    this.radius = Math.max(0, Math.min(radius, width / 2, height / 2));
     this.normalColor = normalColor;
     this.pressedColor = pressedColor;
     this.disabledColor = disabledColor;
@@ -47,12 +50,16 @@ export class RuntimeButtonVisual extends Component {
     this.background.fillColor = interactable
       ? (this.pressed ? this.pressedColor : this.normalColor)
       : this.disabledColor;
-    this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, 8);
+    this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, this.radius);
     this.background.fill();
   }
 
   isShowingDisabledState(): boolean {
     return this.lastInteractable === false;
+  }
+
+  getVisualGeometry(): { width: number; height: number; radius: number } {
+    return { width: this.width, height: this.height, radius: this.radius };
   }
 
   setPressed(pressed: boolean): void {

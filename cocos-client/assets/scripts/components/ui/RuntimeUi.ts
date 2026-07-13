@@ -33,6 +33,8 @@ export interface RuntimeButtonRef {
 
 export interface RuntimeEditRef {
   node: Node;
+  backgroundNode: Node;
+  background: Graphics;
   editBox: EditBox;
   textLabel: Label;
   placeholderLabel: Label;
@@ -197,8 +199,9 @@ export class RuntimeUi {
     visual.configure(
       button,
       background,
-      width,
-      height,
+      actualWidth,
+      actualHeight,
+      Math.min(this.height(8), actualHeight / 2),
       this.buttonColor(kind),
       this.buttonPressedColor(kind),
       this.color("disabled")
@@ -221,7 +224,20 @@ export class RuntimeUi {
     maxLength: number,
     multiline = false
   ): RuntimeEditRef {
-    const node = this.panel(parent, name, x, y, width, height, "panel", "panelBorder", 6);
+    const node = this.node(parent, name, x, y, width, height);
+    const backgroundNode = this.panel(
+      node,
+      `${name}Background`,
+      0,
+      0,
+      width,
+      height,
+      "panel",
+      "panelBorder",
+      6
+    );
+    const background = backgroundNode.getComponent(Graphics);
+    if (!background) throw new Error(`Edit background was not created: ${name}`);
     const textLabel = this.label(
       node,
       `${name}Text`,
@@ -253,7 +269,7 @@ export class RuntimeUi {
     editBox.textLabel = textLabel;
     editBox.placeholderLabel = placeholderLabel;
     if (multiline) editBox.inputMode = EditBox.InputMode.ANY;
-    return { node, editBox, textLabel, placeholderLabel };
+    return { node, backgroundNode, background, editBox, textLabel, placeholderLabel };
   }
 
   title(parent: Node, text: string): Label {

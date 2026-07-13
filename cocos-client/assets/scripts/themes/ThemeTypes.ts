@@ -28,7 +28,19 @@ export const THEME_COLOR_TOKENS = [
   "keyText",
   "success",
   "warning",
-  "error"
+  "error",
+  "homeCreate",
+  "homeJoin",
+  "homePractice",
+  "homeBank",
+  "homeCatalog",
+  "homeHistory",
+  "homeCard",
+  "homeCardBorder",
+  "homeText",
+  "homeTextMuted",
+  "homeTextOnColor",
+  "homeModalShade"
 ] as const;
 export type ThemeColorToken = typeof THEME_COLOR_TOKENS[number];
 

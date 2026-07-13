@@ -124,7 +124,10 @@ export class Graphics extends Component {
   fillColor = new Color();
   strokeColor = new Color();
   lineWidth = 1;
-  roundRect(_x: number, _y: number, _width: number, _height: number, _radius: number): void {}
+  lastRoundRect: { x: number; y: number; width: number; height: number; radius: number } | null = null;
+  roundRect(x: number, y: number, width: number, height: number, radius: number): void {
+    this.lastRoundRect = { x, y, width, height, radius };
+  }
   circle(_cx: number, _cy: number, _radius: number): void {}
   ellipse(_cx: number, _cy: number, _radiusX: number, _radiusY: number): void {}
   moveTo(_x: number, _y: number): void {}
@@ -132,7 +135,9 @@ export class Graphics extends Component {
   close(): void {}
   fill(): void {}
   stroke(): void {}
-  clear(): void {}
+  clear(): void {
+    this.lastRoundRect = null;
+  }
 }
 
 export class Button extends Component {
