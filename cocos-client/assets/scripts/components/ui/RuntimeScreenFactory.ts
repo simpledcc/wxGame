@@ -103,7 +103,7 @@ export class RuntimeScreenFactory {
       safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 144, logoY - 495, 272, 80,
       () => controller.openHistory(), "history", "history"
     );
-    home.visualSlot(safe.node, "character", 205, footerY + 170, 190, 240);
+    home.visualSlot(safe.node, "character", 210, footerY + 154, 166, 214);
 
     let privacy!: PreGameActionButtonRef;
     privacy = home.actionButton(
@@ -182,7 +182,7 @@ export class RuntimeScreenFactory {
     let controller!: BankScene;
     home.pageHeader(safe, "BankHeader", "选择词库", "选择教材单元，练习和房间会同步使用", () => controller.back());
     const statusCard = home.card(safe.node, "BankStatusCard", 0, safeTop - 143, 560, 78);
-    home.visualSlot(statusCard, "coin", -238, 0, 54, 54);
+    home.visualSlot(statusCard, "coin", -232, 0, 44, 44);
     const status = home.label(statusCard, "BankStatus", "", 24, 0, 430, 62, 17, "homeText", 0);
     const filterLabels = ["教材", "年级", "册次", "单元"];
     filterLabels.forEach((label, index) => {
@@ -389,17 +389,17 @@ export class RuntimeScreenFactory {
     if (!hasSession && entryIntent === "create") {
       createPanel = home.group(safe.node, "RoomCreatePanel", 0, roomContentY, safe.width, 760);
       const selectedModeCard = home.card(createPanel, "SelectedModeCard", 0, 236, 560, 154, 22);
-      home.visualSlot(selectedModeCard, "joinRoom", -216, 0, 88, 88);
+      home.visualSlot(selectedModeCard, "joinRoom", -218, 0, 72, 72);
       home.label(selectedModeCard, "SelectedModeCaption", "已选模式", -116, 45, 300, 34, 17, "homeTextMuted", 0);
       home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, 5, 400, 52, 31, "homeText", 0);
       home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -42, 400, 34, 18, "homeTextMuted", 0);
       const bankCard = home.card(createPanel, "CreateBankCard", 0, 78, 560, 124, 22);
-      home.visualSlot(bankCard, "wordBank", -224, 0, 72, 72);
+      home.visualSlot(bankCard, "wordBank", -220, 0, 58, 58);
       home.label(bankCard, "CreateBankCaption", "当前词库", -124, 32, 250, 30, 16, "homeTextMuted", 0);
       selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -10, 360, 48, 24, "homeText", 0);
       home.button(bankCard, "ChangeRoomBank", "更换", 205, 0, 126, 80, () => controller.changeBank(), "practice", 18);
       const guidance = home.card(createPanel, "CreateGuidanceCard", 0, -56, 560, 96, 20);
-      home.visualSlot(guidance, "practice", -225, 0, 60, 60);
+      home.visualSlot(guidance, "practice", -224, 0, 48, 48);
       home.label(guidance, "CreateGuidance", "创建后邀请好友，双方准备完成即可开始", 32, 0, 430, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并进入准备房间", "房", 0, -178, 560, 96, () => {
         void controller.createConfiguredRoom();
@@ -415,7 +415,7 @@ export class RuntimeScreenFactory {
     if (!hasSession && entryIntent === "join") {
       joinPanel = home.group(safe.node, "RoomJoinPanel", 0, roomContentY, safe.width, 760);
       const joinCard = home.card(joinPanel, "JoinCodeCard", 0, 42, 560, 540, 24);
-      home.visualSlot(joinCard, "joinRoom", 0, 194, 100, 100);
+      home.visualSlot(joinCard, "joinRoom", 0, 194, 84, 84);
       home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 118, 480, 48, 28, "homeText");
       home.label(joinCard, "JoinCodeHint", "房间码支持英文字母和数字", 0, 74, 480, 34, 17, "homeTextMuted");
       input = home.edit(joinCard, "RoomCodeInput", `输入 ${ROOM_CODE_LENGTH} 位房间码`, 0, 0, 500, 88, ROOM_CODE_LENGTH);
@@ -436,7 +436,7 @@ export class RuntimeScreenFactory {
       void controller.inviteFriend();
     }, "practice", 16);
     const lobbyBank = home.card(lobbyPanel, "LobbyBankCard", 0, 188, 520, 70, 18);
-    home.visualSlot(lobbyBank, "wordBank", -220, 0, 48, 48);
+    home.visualSlot(lobbyBank, "wordBank", -218, 0, 40, 40);
     const mode = home.label(lobbyBank, "RoomMode", "", 15, 0, 430, 44, 20, "homeText");
     const playersCard = home.card(lobbyPanel, "RoomPlayersCard", 0, 38, 560, 210, 22);
     home.label(playersCard, "RoomPlayersTitle", "房间玩家", 0, 74, 500, 34, 19, "homeTextMuted");
@@ -551,11 +551,11 @@ export class RuntimeScreenFactory {
       }
     });
     const recentCard = home.card(listRoot, "HistoryRecentCard", -144, safeTop - 225, 272, 88, 18);
-    home.visualSlot(recentCard, "history", -102, 0, 56, 56);
+    home.visualSlot(recentCard, "history", -98, 0, 44, 44);
     home.label(recentCard, "HistoryRecentCaption", "最近记录", 24, 24, 190, 28, 16, "homeTextMuted");
     const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 24, -16, 190, 46, 15, "homeText", 0);
     const bestCard = home.card(listRoot, "HistoryBestCard", 144, safeTop - 225, 272, 88, 18);
-    home.visualSlot(bestCard, "coin", -102, 0, 56, 56);
+    home.visualSlot(bestCard, "coin", -98, 0, 44, 44);
     home.label(bestCard, "HistoryBestCaption", "最佳成绩", 24, 22, 190, 28, 16, "homeTextMuted");
     const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 24, -16, 190, 40, 23, "homeText", 0);
     const title = home.label(listRoot, "HistoryTitle", "", -120, safeTop - 293, 320, 38, 24, "homeText", 0);
@@ -620,7 +620,7 @@ export class RuntimeScreenFactory {
     let controller!: FeedbackScene;
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议", () => controller.backHome());
     const promptCard = home.card(safe.node, "FeedbackPromptCard", 0, contentTop, 560, 82);
-    home.visualSlot(promptCard, "feedback", -238, 0, 56, 56);
+    home.visualSlot(promptCard, "feedback", -232, 0, 44, 44);
     home.label(promptCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 25, 0, 430, 52, 18, "homeTextMuted", 0);
     const content = home.edit(safe.node, "FeedbackContent", "反馈内容（4-300 字）", 0, contentTop - 166, 560, 220, 300, true);
     const contact = home.edit(safe.node, "FeedbackContact", "联系方式（选填）", 0, contentTop - 336, 560, 80, 80);

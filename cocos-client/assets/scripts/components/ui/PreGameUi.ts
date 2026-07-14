@@ -477,11 +477,20 @@ export class PreGameUi {
     const skinNode = this.node(node, `${name}Skin`, 0, 0, width, height);
     const skin = skinNode.addComponent(Sprite);
     skin.type = Sprite.Type.SLICED;
+    skin.sizeMode = Sprite.SizeMode.CUSTOM;
     skinNode.active = false;
     this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
-    const iconSize = Math.max(44, Math.min(height - 20, width * 0.25));
-    const iconSlot = this.node(node, `${name}IconSlot`, -width / 2 + 18 + iconSize / 2, 0, iconSize, iconSize);
+    const iconSize = Math.max(40, Math.min(height * 0.62, width * 0.2, 64));
+    const iconInset = Math.max(20, Math.min(28, width * 0.08));
+    const iconSlot = this.node(
+      node,
+      `${name}IconSlot`,
+      -width / 2 + iconInset + iconSize / 2,
+      0,
+      iconSize,
+      iconSize
+    );
     const iconLabel = this.label(
       iconSlot,
       `${name}IconFallback`,
@@ -498,8 +507,8 @@ export class PreGameUi {
       this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken);
     }
 
-    const textLeft = -width / 2 + 30 + iconSize;
-    const textWidth = Math.max(40, width - (textLeft + width / 2) - 20);
+    const textLeft = -width / 2 + iconInset + iconSize + 12;
+    const textWidth = Math.max(40, width - (textLeft + width / 2) - 24);
     const titleY = subtitle ? 12 : 0;
     const titleLabel = this.label(
       node,
@@ -547,6 +556,7 @@ export class PreGameUi {
         frame.insetTop = 28;
         frame.insetBottom = 28;
         skin.spriteFrame = frame;
+        skinNode.getComponent(UITransform)?.setContentSize(width, height);
         skinNode.active = true;
         background.enabled = false;
         visual.setSkin(skin);
@@ -578,21 +588,22 @@ export class PreGameUi {
       "homeCardBorder"
     );
     this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
-    const iconSlot = this.node(node, `${name}IconSlot`, 0, 0, size - 14, size - 14);
+    const iconSize = Math.max(36, Math.min(size * 0.7, size - 24));
+    const iconSlot = this.node(node, `${name}IconSlot`, 0, 0, iconSize, iconSize);
     const iconLabel = this.label(
       iconSlot,
       `${name}IconFallback`,
       fallbackIcon,
       0,
       0,
-      size - 14,
-      size - 14,
+      iconSize,
+      iconSize,
       Math.min(30, size * 0.46),
       "homeText"
     );
     if (visualKey) {
       iconLabel.node.active = false;
-      this.visualSlot(iconSlot, visualKey, 0, 0, size - 14, size - 14);
+      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize);
     }
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);

@@ -222,6 +222,7 @@ Updated: 2026-07-14
 17. `npm run verify` passed in `48.1s`; the actual Creator build passed in `60.6s`. Package inspection reports `6,849,298` total, `4,121,077 / 4,194,304` main and `355,148` bytes in the declared `home_common` subpackage.
 18. WeChat Developer Tools CLI `auto` passed for AppID `wx063a1823d29bed9e`. iPhone 12/13 simulator inspection covered Home, mode catalog, create room, Bank, Study and History with formal art visible and application errors `0`; three visible warnings are platform/basic-library notices.
 19. H4.5 completed exact `360x800` and `430x932` Home checks in WeChat Developer Tools. Background cover, contained foreground art, live Labels, button skins, bottom actions and safe-area spacing remained visible without incoherent overlap; application errors remained `0`. H4 is complete.
+20. Post-H4 icon-layout maintenance fixed formal sliced button skins shrinking back to source-image dimensions after asynchronous SpriteFrame assignment. Action skins now use `Sprite.SizeMode.CUSTOM` and reapply the full hit-area size, action icons are capped at 64 design pixels with an enforced text gap, top icon buttons use a compact 70% slot, and crowded card/character slots were reduced and repositioned. The full verification chain, actual Creator WeChat build and package inspection passed; the 360x800 Home view showed full-width skins with contained icons and no application errors.
 
 ## H5 seven-page pre-game flow
 

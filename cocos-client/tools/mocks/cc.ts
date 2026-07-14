@@ -175,9 +175,11 @@ export class SpriteFrame extends Asset {
 
 export class Sprite extends Component {
   static readonly Type = { SIMPLE: 0, SLICED: 1 };
+  static readonly SizeMode = { CUSTOM: 0 };
   spriteFrame: SpriteFrame | null = null;
   color = new Color();
   type = Sprite.Type.SIMPLE;
+  sizeMode = Sprite.SizeMode.CUSTOM;
 }
 
 export class EditBox extends Component {

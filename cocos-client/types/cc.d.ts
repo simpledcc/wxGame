@@ -76,10 +76,14 @@ declare module "cc" {
       SIMPLE: number;
       SLICED: number;
     };
+    static readonly SizeMode: {
+      CUSTOM: number;
+    };
     node: Node;
     spriteFrame: SpriteFrame | null;
     color: Color;
     type: number;
+    sizeMode: number;
   }
 
   export class Graphics {

@@ -5,6 +5,7 @@ import {
   Graphics,
   Node,
   setMockWindowSize,
+  Sprite,
   SpriteFrame,
   UITransform
 } from "cc";
@@ -52,6 +53,15 @@ function assertVisualMatchesHitArea(node: Node, visual: RuntimeButtonVisual): vo
   assertEqual(geometry.width, hitArea.width, `${node.name} visual width must match its hit area`);
   assertEqual(geometry.height, hitArea.height, `${node.name} visual height must match its hit area`);
   assertOk(geometry.radius <= Math.min(hitArea.width, hitArea.height) / 2);
+}
+
+function assertActionIconClearOfText(action: ReturnType<PreGameUi["actionButton"]>): void {
+  const iconBounds = transform(action.iconSlot);
+  const titleBounds = transform(action.titleLabel.node);
+  const iconRight = action.iconSlot.position.x + iconBounds.width / 2;
+  const titleLeft = action.titleLabel.node.position.x - titleBounds.width / 2;
+  assertOk(iconRight + 8 <= titleLeft, `${action.node.name} icon must not overlap its title area`);
+  assertOk(iconBounds.width <= 64, `${action.node.name} icon must stay within the compact visual cap`);
 }
 
 function main(): void {
@@ -139,7 +149,13 @@ function main(): void {
   assertVisualMatchesHitArea(action.node, action.visual);
   assertEqual(action.titleLabel.string, "创建房间");
   assertEqual(action.subtitleLabel?.string, "邀请好友，一起开始对战");
-  assertEqual(transform(action.iconSlot).width, 92);
+  assertEqual(transform(action.iconSlot).width, 64);
+  assertActionIconClearOfText(action);
+  const actionSkinNode = action.node.getChildByName("FoundationActionSkin");
+  assertOk(actionSkinNode, "action button must keep a dedicated skin node");
+  assertEqual(actionSkinNode.getComponent(Sprite)?.sizeMode, Sprite.SizeMode.CUSTOM);
+  assertEqual(transform(actionSkinNode).width, 560);
+  assertEqual(transform(actionSkinNode).height, 112);
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
@@ -167,10 +183,12 @@ function main(): void {
   );
   assertVisualMatchesHitArea(surfaceAction.node, surfaceAction.visual);
   assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeText"));
+  assertActionIconClearOfText(surfaceAction);
 
   let iconCount = 0;
   const icon = preGame.iconButton(topBar, "SettingsIcon", "设", 250, 0, 64, () => { iconCount += 1; });
   assertVisualMatchesHitArea(icon.node, icon.visual);
+  assertEqual(transform(icon.iconSlot).width, 40);
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
 
