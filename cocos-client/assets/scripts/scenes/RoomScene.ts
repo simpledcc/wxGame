@@ -84,6 +84,9 @@ export class RoomScene extends Component {
   @property(Button)
   startButton: Button | null = null;
 
+  @property(Label)
+  startSubtitleLabel: Label | null = null;
+
   @property(Button)
   autoReadyButton: Button | null = null;
 
@@ -242,7 +245,7 @@ export class RoomScene extends Component {
         if (this.statusLabel) {
           this.statusLabel.string = state.pendingAction
             ? ACTION_LABELS[state.pendingAction]
-            : (state.syncError ? `${state.syncError}，正在自动重试` : "正在同步房间...");
+            : (state.syncError ? `${state.syncError}，后台将自动重试` : "正在进入房间...");
         }
       }
       this.setLobbyButtons(false, false);
@@ -267,11 +270,18 @@ export class RoomScene extends Component {
     if (this.statusLabel) {
       this.statusLabel.string = state.pendingAction
         ? ACTION_LABELS[state.pendingAction]
-        : state.syncError || (state.syncing
-          ? "正在同步房间..."
+        : (state.syncError
+          ? `${state.syncError}，后台将自动重试`
           : getRoomStartStatusText(availability.startBlockReason));
     }
     this.setLobbyButtons(availability.canToggleReady, availability.canStart);
+    if (this.startSubtitleLabel) {
+      this.startSubtitleLabel.string = availability.canStart
+        ? "双方已准备，点击开始游戏"
+        : localPlayer?.ready
+          ? "你已准备，等待另一名玩家"
+          : "双方准备后可开始";
+    }
     if (this.readyLabel) {
       this.readyLabel.string = localPlayer?.ready ? "取消准备" : "我准备好了";
     }

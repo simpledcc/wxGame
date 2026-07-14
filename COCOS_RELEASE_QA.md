@@ -41,6 +41,7 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Room replacement: invalid or failed create/join attempts retain the active room, identity, and polling until a replacement succeeds or the player explicitly leaves.
 - Join recovery: a server-accepted join with an initial document-read failure retains the new identity/session, enters Room, and retries polling without a duplicate join request.
 - Preparation Room UI exposes no robot or duration selection and uses normalized Player 1/Player 2 rows. Active Cocos preparation services expose no `addBot` path, and all starts require two real humans; passive legacy/gameplay compatibility remains frozen outside this flow.
+- Room background polling does not flash routine sync activity over the preparation condition; real errors remain visible, and the start action switches from disabled styling to primary highlighting after both humans are ready.
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.

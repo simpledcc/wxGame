@@ -104,6 +104,8 @@ function testExpectedControls(): void {
     .forEach((binding) => assert.match(roomController, new RegExp(`\\b${binding}\\b`)));
   assert.match(roomController, /setSessionControls/);
   assert.match(roomController, /setLobbyButtons/);
+  assert.doesNotMatch(roomController, /state\.syncing/);
+  assert.match(roomController, /双方已准备，点击开始游戏/);
   assert.match(roomController, /releaseEntryPanels/);
   assert.doesNotMatch(roomController, /getEntryGuidance/);
   assert.match(roomController, /createPanel/);

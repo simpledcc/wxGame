@@ -472,6 +472,7 @@ export class RuntimeScreenFactory {
     controller.leaveButton = leave.button;
     controller.readyButton = ready.button;
     controller.startButton = start.button;
+    controller.startSubtitleLabel = start.subtitleLabel;
     controller.autoReadyButton = autoReady?.button ?? null;
     return root;
   }

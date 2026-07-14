@@ -781,6 +781,37 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "InviteFriend")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "RefreshRoom"), null, "room refresh stays in background polling");
+      assertEqual(
+        findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string,
+        "等待第二名玩家加入",
+        "a loaded room must show the preparation condition instead of polling activity"
+      );
+      app.roomStore.setSyncing(true);
+      assertEqual(
+        findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string,
+        "等待第二名玩家加入",
+        "background polling must not replace the visible preparation status"
+      );
+      app.roomStore.setSyncing(false);
+
+      const twoReadyPlayers: RoomSnapshot = {
+        ...waitingRoom,
+        players: [
+          { ...waitingRoom.players[0], ready: true },
+          { openid: "player-2", nickName: "玩家2", score: 0, ready: true }
+        ]
+      };
+      app.roomStore.applySnapshot(twoReadyPlayers);
+      const enabledStart = findDeep(canvas, "StartRoom")?.getComponent(Button);
+      const enabledStartVisual = findDeep(canvas, "StartRoom")?.getComponent(RuntimeButtonVisual);
+      assertEqual(enabledStart?.interactable, true, "two ready human players must enable the start action");
+      enabledStartVisual?.refresh();
+      assertEqual(enabledStartVisual?.isShowingDisabledState(), false, "enabled start must use the highlighted action color");
+      assertEqual(
+        findDeep(canvas, "StartRoomSubtitle")?.getComponent(Label)?.string,
+        "双方已准备，点击开始游戏"
+      );
+      app.roomStore.applySnapshot(waitingRoom);
 
       findDeep(canvas, "CopyCode")?.emit(Button.EventType.CLICK);
       await flushMany();

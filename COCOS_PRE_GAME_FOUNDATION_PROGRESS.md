@@ -17,8 +17,9 @@ Updated: 2026-07-14
 - H5 completion commit: `005c713` (`feat(pre-game): complete seven-page preparation flow dev_done`)
 - H6 completion commit: `bfd2870` (`refactor(pre-game): remove hidden preparation controls dev_done`)
 - H8.1 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H8.2 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.1 PRE-GAME DEAD-CODE AND TWO-HUMAN AUDIT DONE`
+- Current stage: `H8.2 QUIET ROOM SYNC AND START HIGHLIGHT DONE`
 - Next stage: two-real-phone create/join/ready/start acceptance; formal H4 bitmap integration waits for standalone approved assets
 
 ## Baseline facts
@@ -82,6 +83,7 @@ Updated: 2026-07-14
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
 | H8 Full-screen pre-game visual pass | `DONE` | Fixed-width dynamic viewport, full-screen scenery, seven-page long-screen layout, 393x852 route simulation, Creator build and DevTools visual inspection pass | Formal bitmap assets remain a separate H4 input |
 | H8.1 Pre-game dead-code and two-human audit | `DONE` | Unused page handlers and active robot service/facade paths removed; every visible start requires two real players; regression tests freeze the boundary | Real two-phone acceptance remains external QA |
+| H8.2 Quiet room sync and start highlight | `DONE` | Normal polling no longer replaces preparation copy; errors remain visible; two ready humans enable and highlight the start action | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -280,6 +282,22 @@ Updated: 2026-07-14
 - Focused room, shell, runtime-shell, service, platform and production-contract checks: `PASSED`.
 - Strict unused-symbol audit: no new preparation-layer warning; existing warnings are confined to frozen gameplay/shared compatibility files.
 - `git diff --check` and forbidden-path audit: `PASSED`; no `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram` change.
+
+## H8.2 quiet room sync and start highlight
+
+1. Kept `RoomPollingService` unchanged and active in the background, but stopped rendering routine `syncing` transitions in the loaded room status card.
+2. Kept the one-time room-entry message and real sync errors visible; retry text now explains that retry continues in the background.
+3. Made the status card stable around actual preparation conditions: waiting for the second player, waiting for ready, or ready to start.
+4. Bound the start action subtitle to live room readiness. Two ready real players enable the button, restore its primary action color and show `双方已准备，点击开始游戏`.
+5. Added runtime regression coverage that toggles polling state without changing visible preparation copy, then applies a two-human ready snapshot and verifies the highlighted enabled button.
+6. Kept room polling, room/cloud protocols, gameplay Bundles, cloud functions, legacy client and AppID unchanged.
+
+### H8.2 final verification
+
+- Focused shell source/runtime tests and TypeScript check: `PASSED`.
+- `npm run verify`: `PASSED` in `17.1s`; all structure, platform, lifecycle, cloud-contract, room, gameplay compatibility, UI, release and TypeScript checks passed.
+- `npm run build:wechat:dry-run`: `PASSED`; build inputs, output isolation and command contract remain valid without starting Creator.
+- `git diff --check` and forbidden-path audit: `PASSED`; no gameplay Bundle, cloud function, legacy client or protocol change.
 
 ## G0 modified files
 
@@ -573,13 +591,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Keep H5-H8.1 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify one player cannot start and no robot entry is present; record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
+Keep H5-H8.2 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify background polling does not flash a sync message, one player cannot start, no robot entry is present, and the start action highlights after both players are ready. Record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
 
 ## Continue prompt
 
 ```text
-The H5-H8.1 pre-game flow, visual pass and two-human audit are complete on branch feature/pre-game-ui-home-goal.
+The H5-H8.2 pre-game flow, visual pass, two-human audit and quiet room sync are complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_PRE_GAME_PAGES_DESIGN.md and the latest dev_done commit.
-Run the next external QA with two real WeChat accounts: create, verify one-player start is unavailable, invite/join, both ready and owner start; verify no robot entry exists and retain evidence from both phones.
+Run the next external QA with two real WeChat accounts: create, verify one-player start is unavailable and polling stays visually quiet, invite/join, both ready and owner start; verify the start button highlights, no robot entry exists and retain evidence from both phones.
 Do not start H4 art work, and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment during that QA.
 ```
