@@ -587,6 +587,8 @@ async function main(): Promise<void> {
     findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string.includes("英文字母和数字"),
     "the visible join form must explain the room-code format"
   );
+  assertEqual(findDeep(canvas, "JoinCodeCard")?.getComponent(UITransform)?.height, 600);
+  assertOk(findDeep(canvas, "JoinCodeCardAccent")?.getComponent(Graphics));
   const entryRoomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
   assertOk(entryRoomCodeInput);
   entryRoomCodeInput.string = "ABC";
@@ -614,6 +616,8 @@ async function main(): Promise<void> {
     findDeep(canvas, "CreateGuidance")?.getComponent(Label)?.string.includes("创建后邀请好友"),
     "create configuration must explain the next step"
   );
+  assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 164);
+  assertOk(findDeep(canvas, "SelectedModeCardAccent")?.getComponent(Graphics));
   assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, true);
   findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
   assertEqual(app.store.getState().roomAutoReady, false);
@@ -668,6 +672,13 @@ async function main(): Promise<void> {
   assertPreGameTargetDevices(studyRoot);
   assertOk(findDeep(canvas, "RandomWord"));
   assertOk(findDeep(canvas, "MarkWrong"));
+  assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 350);
+  assertOk(findDeep(canvas, "StudyCardAccent")?.getComponent(Graphics));
+  assertEqual(
+    findDeep(canvas, "StudyBankBar")?.position.y,
+    findDeep(canvas, "ChangeStudyBank")?.position.y,
+    "Study bank name and change action must share one compact row"
+  );
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
@@ -733,6 +744,7 @@ async function main(): Promise<void> {
   findDeep(canvas, "HistoryButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "history");
+  assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, true, "empty history must show a complete empty-state card");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   findDeep(canvas, "FeedbackButton")?.emit(Button.EventType.CLICK);
@@ -847,6 +859,15 @@ async function main(): Promise<void> {
     if (unifiedContract) {
       assertOk(findDeep(routeRoot, unifiedContract[0]), `${routes[index]} safe area is required`);
       assertOk(findDeep(routeRoot, unifiedContract[1]), `${routes[index]} shared page header is required`);
+      assertOk(
+        findDeep(routeRoot, `${unifiedContract[1]}Backdrop`)?.getComponent(Graphics),
+        `${routes[index]} must use the high-contrast shared header backdrop`
+      );
+      assertEqual(
+        findDeep(routeRoot, "BackButton")?.getComponent(Graphics)?.enabled,
+        false,
+        `${routes[index]} back action must not render the old white card`
+      );
       assertPreGameTargetDevices(routeRoot);
     }
     if (routes[index] === "bank") {
@@ -855,6 +876,9 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
+      assertOk(findDeep(canvas, "BankListHeader"), "Bank must separate status from the unit list");
+      assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
+      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);
@@ -881,6 +905,11 @@ async function main(): Promise<void> {
       app.persistWordBankProgress = originalPersistWordBankProgress;
     }
     if (routes[index] === "coopSelect") {
+      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.width, 560);
+      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 116);
+      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 272);
+      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 104);
+      assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 560);
       findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().selectedMode, "pk");
@@ -1027,6 +1056,7 @@ async function main(): Promise<void> {
     }
     if (routes[index] === "result") {
       assertOk(findDeep(canvas, "ResultTitle")?.getComponent(Label)?.string.length);
+      assertEqual(findDeep(canvas, "ResultCard")?.getComponent(UITransform)?.height, 450);
       findDeep(canvas, "ResultHistory")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "history");
@@ -1036,6 +1066,8 @@ async function main(): Promise<void> {
     if (routes[index] === "history") {
       assertOk(findDeep(canvas, "HistoryRecentSummary")?.getComponent(Label)?.string.length);
       assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
+      assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, false, "history records must hide the empty-state card");
+      assertOk(findDeep(canvas, "HistoryRecentCardAccent")?.getComponent(Graphics));
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
       findDeep(canvas, "HistoryRow0")?.emit(Button.EventType.CLICK);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";
@@ -1061,6 +1093,11 @@ async function main(): Promise<void> {
       assertOk(feedbackInput);
       assertOk(feedbackContact);
       assertOk(feedbackButton);
+      assertEqual(feedbackInput.node.parent?.name, "FeedbackSafeArea", "native EditBox must use safe-area coordinates");
+      assertEqual(feedbackContact.node.parent?.name, "FeedbackSafeArea", "native EditBox must use safe-area coordinates");
+      assertEqual(findDeep(canvas, "FeedbackFormCard")?.getComponent(UITransform)?.height, 500);
+      assertOk(findDeep(canvas, "FeedbackContentCaption"));
+      assertOk(findDeep(canvas, "FeedbackContactCaption"));
       feedbackInput.string = "短";
       const cloudCallCount = appRuntime.cloudCalls.length;
       findDeep(canvas, "SubmitFeedback")?.emit(Button.EventType.CLICK);
@@ -1109,6 +1146,8 @@ async function main(): Promise<void> {
     }
     if (routes[index] === "help") {
       assertOk(findDeep(canvas, "HelpBody")?.getComponent(Label)?.string);
+      assertOk(findDeep(canvas, "HelpRulesSummary"));
+      assertEqual(findDeep(canvas, "HelpBody")?.getComponent(Label)?.fontSize, 20);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "home");

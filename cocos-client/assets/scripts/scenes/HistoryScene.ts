@@ -39,6 +39,9 @@ export class HistoryScene extends Component {
   @property(Label)
   emptyLabel: Label | null = null;
 
+  @property(Node)
+  emptyStateNode: Node | null = null;
+
   @property(Label)
   pageLabel: Label | null = null;
 
@@ -177,7 +180,9 @@ export class HistoryScene extends Component {
     if (this.bestSummaryLabel) {
       this.bestSummaryLabel.string = best ? `${best.score} 分` : "--";
     }
-    if (this.emptyLabel) this.emptyLabel.string = this.records.length ? "" : "暂无战绩";
+    const isEmpty = this.records.length === 0;
+    if (this.emptyStateNode) this.emptyStateNode.active = isEmpty;
+    if (this.emptyLabel) this.emptyLabel.string = isEmpty ? "暂无战绩" : "";
     this.recordItems.forEach((item, index) => {
       const record = pageRecords[index];
       if (record) item.bind(record, start + index, (recordIndex) => this.openRecord(recordIndex));

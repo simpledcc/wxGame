@@ -299,67 +299,42 @@ export class PreGameUi {
     return this.node(parent.node, name, 0, parent.height / 2 - height / 2, parent.width, height);
   }
 
-  pageHeader(
-    parent: PreGameSafeAreaRef,
-    name: string,
-    title: string,
-    subtitle: string,
-    backHandler: () => void
-  ): PreGamePageHeaderRef {
-    const node = this.topBar(parent, name, 96);
-    const backButton = this.iconButton(node, "BackButton", "‹", -252, 0, 80, backHandler);
-    const titleLabel = this.label(node, `${name}Title`, title, 38, 14, 430, 42, 30, "homeText", 0);
-    const subtitleLabel = this.label(
-      node,
-      `${name}Subtitle`,
-      subtitle,
-      38,
-      -24,
-      430,
-      30,
-      16,
-      "homeTextMuted",
-      0
-    );
+  pageHeader(parent: PreGameSafeAreaRef, name: string, title: string, subtitle: string,
+    backHandler: () => void): PreGamePageHeaderRef {
+    const node = this.topBar(parent, name, 104);
+    this.pill(node, `${name}Backdrop`, 0, 0, 560, 92);
+    const backButton = this.iconButton(node, "BackButton", "‹", -244, 0, 80, backHandler, undefined, "transparent", 44);
+    backButton.titleLabel.color = this.color("homeTextOnColor");
+    const titleLabel = this.label(node, `${name}Title`, title, 40, 17, 420, 44, 32, "homeTextOnColor", 0);
+    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 40, -24, 420, 32, 17, "homeTextOnColor", 0);
     return { node, backButton, titleLabel, subtitleLabel };
   }
 
-  group(
-    parent: Node,
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): Node {
+  group(parent: Node, name: string, x: number, y: number, width: number, height: number): Node {
     return this.node(parent, name, x, y, width, height);
   }
 
-  card(
-    parent: Node,
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    radius = 18
-  ): Node {
+  card(parent: Node, name: string, x: number, y: number, width: number, height: number,
+    radius = 18): Node {
     const node = this.node(parent, name, x, y, width, height);
     this.addRoundedBackground(node, width, height, radius, "homeCard", "homeCardBorder");
     this.addHighlight(node, `${name}Highlight`, width - 24, height, radius);
     return node;
   }
 
-  pill(
-    parent: Node,
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillToken: ThemeColorToken = "homeModalShade",
-    borderToken: ThemeColorToken = "homeTextOnColor"
-  ): Node {
+  accentCard(parent: Node, name: string, x: number, y: number, width: number, height: number,
+    kind: PreGameActionKind, radius = 20): Node {
+    const node = this.card(parent, name, x, y, width, height, radius);
+    const accent = this.node(node, `${name}Accent`, 0, height/2-14, width-36, 10);
+    const graphics = accent.addComponent(Graphics);
+    graphics.fillColor = this.color(this.actionToken(kind));
+    graphics.roundRect(-(width-36)/2,-5,width-36,10,5);
+    graphics.fill();
+    return node;
+  }
+
+  pill(parent: Node, name: string, x: number, y: number, width: number, height: number,
+    fillToken: ThemeColorToken = "homeModalShade", borderToken: ThemeColorToken = "homeTextOnColor"): Node {
     const node = this.node(parent, name, x, y, width, height);
     const graphics = node.addComponent(Graphics);
     graphics.fillColor = this.color(fillToken);
@@ -371,18 +346,8 @@ export class PreGameUi {
     return node;
   }
 
-  button(
-    parent: Node,
-    name: string,
-    text: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    handler: () => void,
-    kind: PreGameActionKind = "surface",
-    fontSize = 20
-  ): RuntimeButtonRef {
+  button(parent: Node, name: string, text: string, x: number, y: number, width: number, height: number,
+    handler: () => void, kind: PreGameActionKind = "surface", fontSize = 20): RuntimeButtonRef {
     const node = this.node(parent, name, x, y, width, height);
     const radius = Math.min(18, height / 2);
     const token = this.actionToken(kind);
@@ -414,17 +379,8 @@ export class PreGameUi {
     return { node, button, label, background, visual };
   }
 
-  edit(
-    parent: Node,
-    name: string,
-    placeholder: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    maxLength: number,
-    multiline = false
-  ): RuntimeEditRef {
+  edit(parent: Node, name: string, _placeholder: string, x: number, y: number, width: number, height: number,
+    maxLength: number, multiline = false): RuntimeEditRef {
     const node = this.node(parent, name, x, y, width, height);
     const backgroundNode = this.node(node, `${name}Background`, 0, 0, width, height);
     const background = this.addRoundedBackground(
@@ -435,33 +391,15 @@ export class PreGameUi {
       "homeCard",
       "homeCardBorder"
     );
-    const textLabel = this.label(
-      node,
-      `${name}Text`,
-      "",
-      0,
-      0,
-      width - 32,
-      height - 18,
-      multiline ? 18 : 20,
-      "homeText",
-      0
-    );
-    const placeholderLabel = this.label(
-      node,
-      `${name}Placeholder`,
-      placeholder,
-      0,
-      0,
-      width - 32,
-      height - 18,
-      multiline ? 17 : 19,
-      "homeTextMuted",
-      0
-    );
+    const textLabel = this.label(node, `${name}Text`, "", 0, 0, width - 32, height - 18,
+      multiline ? 18 : 20, "homeText", 0);
+    const placeholderLabel = this.label(node, `${name}Placeholder`, "", 0, 0, width - 32,
+      height - 18, multiline ? 17 : 19, "homeTextMuted", 0);
+    const textTransform = textLabel.node.getComponent(UITransform);
+    if (textTransform) { textTransform.anchorX=0; textTransform.anchorY=1; }
     const editBox = node.addComponent(EditBox);
     editBox.string = "";
-    editBox.placeholder = placeholder;
+    editBox.placeholder = "";
     editBox.maxLength = maxLength;
     editBox.textLabel = textLabel;
     editBox.placeholderLabel = placeholderLabel;
@@ -469,20 +407,9 @@ export class PreGameUi {
     return { node, backgroundNode, background, editBox, textLabel, placeholderLabel };
   }
 
-  actionButton(
-    parent: Node,
-    name: string,
-    title: string,
-    subtitle: string,
-    fallbackIcon: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    handler: () => void,
-    kind: PreGameActionKind,
-    visualKey?: HomeVisualSlotKey
-  ): PreGameActionButtonRef {
+  actionButton(parent: Node, name: string, title: string, subtitle: string, fallbackIcon: string,
+    x: number, y: number, width: number, height: number, handler: () => void, kind: PreGameActionKind,
+    visualKey?: HomeVisualSlotKey): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, width, height);
     const radius = Math.min(22, height / 2);
     const baseColor = this.color(this.actionToken(kind));
@@ -598,18 +525,9 @@ export class PreGameUi {
     return { node, button, label: titleLabel, background, visual, iconSlot, iconLabel, titleLabel, subtitleLabel };
   }
 
-  iconButton(
-    parent: Node,
-    name: string,
-    fallbackIcon: string,
-    x: number,
-    y: number,
-    size: number,
-    handler: () => void,
-    visualKey?: HomeVisualSlotKey,
-    backgroundStyle: PreGameIconBackground = "card",
-    iconSizeOverride = 0
-  ): PreGameActionButtonRef {
+  iconButton(parent: Node, name: string, fallbackIcon: string, x: number, y: number, size: number,
+    handler: () => void, visualKey?: HomeVisualSlotKey, backgroundStyle: PreGameIconBackground = "card",
+    iconSizeOverride = 0): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, size, size);
     const radius = Math.min(18, size / 2);
     const baseColor = this.color("homeCard");
@@ -668,12 +586,7 @@ export class PreGameUi {
     };
   }
 
-  modal(
-    parent: Node,
-    name: string,
-    panelWidth: number,
-    panelHeight: number
-  ): PreGameModalRef {
+  modal(parent: Node, name: string, panelWidth: number, panelHeight: number): PreGameModalRef {
     const viewportHeight = parent.getComponent(UITransform)?.height || getPortraitViewportHeight();
     const root = this.node(parent, name, 0, 0, DESIGN_WIDTH, viewportHeight);
     root.active = false;

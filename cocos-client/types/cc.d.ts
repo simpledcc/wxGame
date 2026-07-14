@@ -52,6 +52,8 @@ declare module "cc" {
   export class UITransform {
     width: number;
     height: number;
+    anchorX: number;
+    anchorY: number;
     setContentSize(width: number, height: number): void;
   }
 

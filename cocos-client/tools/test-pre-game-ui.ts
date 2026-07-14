@@ -3,6 +3,7 @@ import {
   Button,
   EditBox,
   Graphics,
+  Label,
   Node,
   setMockWindowSize,
   Sprite,
@@ -132,6 +133,8 @@ function main(): void {
     height: 120,
     radius: 18
   });
+  const accentCard = preGame.accentCard(safe.node, "FoundationAccentCard", 0, 210, 560, 140, "practice");
+  assertOk(accentCard.getChildByName("FoundationAccentCardAccent")?.getComponent(Graphics));
 
   let actionCount = 0;
   const action = preGame.actionButton(
@@ -233,8 +236,14 @@ function main(): void {
     "bank"
   );
   assertVisualMatchesHitArea(directButton.node, directButton.visual);
+  assertOk(pageHeader.node.getChildByName("FoundationPageHeaderBackdrop")?.getComponent(Graphics));
+  assertEqual(pageHeader.backButton.background.enabled, false);
+  assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
   const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
   assertOk(directEdit.node.getComponent(EditBox));
+  assertEqual(directEdit.textLabel.node.getComponent(UITransform)?.anchorX, 0);
+  assertEqual(directEdit.textLabel.node.getComponent(UITransform)?.anchorY, 1);
+  assertEqual(directEdit.editBox.placeholder, "", "native placeholder must stay blank to avoid adapter ghost text");
   assertEqual(directEdit.node.getComponent(Graphics), null, "PreGame EditBox host must not carry Graphics");
   assertOk(directEdit.backgroundNode.getComponent(Graphics));
   assertEqual(directEdit.backgroundNode.parent, directEdit.node);

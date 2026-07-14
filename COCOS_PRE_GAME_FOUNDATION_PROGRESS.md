@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-14
+Updated: 2026-07-15
 
 ## Handoff
 
@@ -19,6 +19,8 @@ Updated: 2026-07-14
 - H8.1 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.2 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.3 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H8.4 completion commit: the commit containing the H8.4 record, with subject ending in `dev_done`; use `git log` after checkout for the exact SHA
+- H8.5 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H4 art staging commit: `8f8ac1c` (`feat(home-art): stage H4 assets and integration checkpoint`)
 - H4 visual refinement commit: `6987f6f` (`fix(home-art): refine H4 visual assets and composition checkpoint`)
 - H4 import automation commit: `93f397f` (`feat(home-art): automate H4 Creator import handoff`)
@@ -27,7 +29,7 @@ Updated: 2026-07-14
 - H4.1 import/build commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H4 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H4 COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
+- Current stage: `H8.5 COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
 - Next stage: retain the imported metadata and complete the two-real-phone create/join/ready/start preparation-flow record
 
 ## Baseline facts
@@ -93,6 +95,8 @@ Updated: 2026-07-14
 | H8.1 Pre-game dead-code and two-human audit | `DONE` | Unused page handlers and active robot service/facade paths removed; every visible start requires two real players; regression tests freeze the boundary | Real two-phone acceptance remains external QA |
 | H8.2 Quiet room sync and start highlight | `DONE` | Normal polling no longer replaces preparation copy; errors remain visible; two ready humans enable and highlight the start action | Real two-phone acceptance remains external QA |
 | H8.3 Mode-neutral pre-game naming | `DONE` | Mode catalog, configured room creation, selected-mode start and preparation-session entry use generic names; README explains the protocol boundary | Real two-phone acceptance remains external QA |
+| H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
+| H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -365,6 +369,23 @@ Updated: 2026-07-14
 - WeChat Developer Tools cache was cleared before the final check. The `H4-360x800` simulator showed the approved six-entry hierarchy, transparent top controls, complete bottom actions, contained icons and no application error.
 - `git diff --check` and forbidden-path audit: `PASSED`; no `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram` change.
 
+## H8.5 supporting-page visual hierarchy refinement
+
+1. Unified every non-Home preparation page under a dark translucent header with a transparent `80x80` Back control, white title hierarchy and reusable accent cards.
+2. Refined Bank, Study, mode catalog, create/join/lobby, Result, History, Feedback and Help layouts without changing their Store, route or service behavior.
+3. Removed unsupported visual filter affordances from Bank, featured the currently available mode, strengthened create/join/lobby status hierarchy and distributed controls safely on long screens.
+4. Added a complete non-interactive History empty state and bound its visibility to real filtered records.
+5. Added explicit Feedback field captions. Runtime `EditBox` placeholders stay blank and real input labels use top-left anchors so WeChat native input overlays cannot duplicate or misalign guidance text.
+6. Extended UI and route-execution tests for all new geometry, accent, empty-state and input contracts.
+
+### H8.5 final verification
+
+- Focused pre-game UI, runtime shell, release and both TypeScript checks: `PASSED`.
+- `npm run verify`: `PASSED`; all structure, platform, lifecycle, cloud-contract, gameplay compatibility, UI, release and TypeScript checks passed.
+- `npm run build:wechat` and `npm run inspect:wechat-build`: `PASSED` with Cocos Creator `3.8.8`; package budgets remain within the configured gates.
+- WeChat Developer Tools cache was cleared before visual traversal. Bank, Study, Help, History empty state, Feedback, Join, mode catalog and create configuration rendered without overlap, native-input ghost text or application errors.
+- `git diff --check` and forbidden-path audit: `PASSED`; no gameplay Bundle, cloud function, legacy client, room/cloud protocol or AppID change.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`
@@ -632,9 +653,9 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Remaining risks after Goal completion
 
-1. The generated H5 main package has only `73,386` bytes of margin under the 4 MiB gate; the build contract now requires `home_common` as a subpackage before the next real build.
-2. Formal H4 art is generated and code-bound, but it remains in the staging directory until Creator creates stable importer metadata; current runtime continues to show programmatic fallbacks.
-3. Creator import/rendering and WeChat simulator presentation passed through H8. H8.1 changes only preparation controllers/services and is covered locally; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
+1. The main package remains close to the 4 MiB gate; new shared art or source must stay in declared subpackages and every release change must rerun package inspection.
+2. Formal H4 art and Creator metadata are imported and stable; do not re-import the Bundle or regenerate its UUIDs.
+3. Creator import/rendering and WeChat simulator presentation passed through H8.5; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
@@ -663,7 +684,7 @@ Use two real phones and two WeChat accounts to execute create room, invitation/j
 ## Continue prompt
 
 ```text
-The H4 Creator import/build and multi-view visual goal is complete on branch feature/pre-game-ui-home-goal.
+The H4 Creator import/build plus H8.4/H8.5 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Complete the two-real-phone create/join/ready/start preparation-flow QA and record external evidence.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
