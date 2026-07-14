@@ -115,8 +115,12 @@ function testExpectedControls(): void {
   assert.match(roomController, /getSpellTemplatesForBank/);
   assert.match(roomController, /app\.spellTemplateData/);
   assert.match(roomController, /roomSpellQuestions/);
+  assert.doesNotMatch(roomController, /createSelectedRoom|async startGame\(/);
+  assert.match(roomController, /createConfiguredRoom|async startSelectedMode\(/);
   const roomSession = read("assets/scripts/services/RoomSessionService.ts");
   assert.doesNotMatch(roomSession, /\baddBot\b|BOT_NAMES|runAction\("bot"/);
+  assert.doesNotMatch(roomSession, /async startGame\(/);
+  assert.match(roomSession, /async startPreparedMode\(/);
   const roomService = read("assets/scripts/services/RoomService.ts");
   assert.doesNotMatch(roomService, /\baddBot\b/);
   const roomRules = read("assets/scripts/domain/RoomRules.ts");
@@ -125,8 +129,8 @@ function testExpectedControls(): void {
   const gameStore = read("assets/scripts/store/GameStore.ts");
   assert.doesNotMatch(gameStore, /GameDuration|\bduration\s*:/);
   const coopSelectController = read("assets/scripts/scenes/CoopSelectScene.ts");
-  assert.doesNotMatch(coopSelectController, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
-  assert.match(coopSelectController, /openTrialRoom/);
+  assert.doesNotMatch(coopSelectController, /openSharedRoom|openSpellRoom|openTrialRoom|changeBank|statusLabel/);
+  assert.match(coopSelectController, /openModeSetup/);
   const homeController = read("assets/scripts/scenes/HomeScene.ts");
   assert.doesNotMatch(homeController, /RoomEntryIntent|\bopenRoom\b/);
   assert.match(homeController, /openPrivacyContract/);

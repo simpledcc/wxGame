@@ -45,6 +45,7 @@ Archive SHA256:
 - Bounded per-route frame/node instrumentation and a DEV-only performance report are ready for the external low-end-device scenarios in `COCOS_RUNTIME_PERFORMANCE.md`.
 - Launch/show room invitations, lazy identity acquisition, and hide/show polling recovery are implemented behind `RuntimePort`.
 - Current preparation Room UI exposes no robot or duration selector and uses normalized Player 1/Player 2 rows. H8.1 also removes the active Cocos `addBot` session/facade path and requires two real humans before every visible start; passive legacy snapshots, raw cloud typing and gameplay compatibility remain outside the pre-game workstream.
+- The preparation call chain uses mode-neutral controller names (`openModeSetup`, `createConfiguredRoom`, `startSelectedMode`, `startPreparedMode`); production `startGame`/`catchFish` contracts and gameplay-owned `Fishing*` code remain intentionally unchanged.
 - Runtime routes preload their semantic asset before controller replacement, retain the old screen under an input-blocking loading layer, and discard stale completions; Room cloud actions lock every command with themed disabled feedback.
 - The generated data layer now includes a lossless 35 KB index for all 44 legacy spell banks/6,351 templates; spell-room creation sends the selected pool and applies the cloud-compatible 240-item cap.
 - Boot exposes contract/accept/decline controls on `UI_2D`; declining stays offline on Boot, while Home shows the fixed system player and a persistent privacy-contract entry.

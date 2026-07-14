@@ -1,8 +1,8 @@
 {
-  "name": "word-fishing-cocos-client",
+  "name": "word-battle-park-cocos-client",
   "version": "3.8.8",
   "private": true,
-  "description": "Cocos Creator migration shell for 词斗乐园单词比拼.",
+  "description": "Multi-mode Cocos Creator client for 词斗乐园.",
   "scripts": {
     "check:structure": "node ./tools/check-structure.js",
     "check:cocos-env": "node ./tools/check-cocos-env.js",

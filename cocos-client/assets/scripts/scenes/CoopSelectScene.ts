@@ -9,7 +9,7 @@ export class CoopSelectScene extends Component {
     app.store.setRoute("coopSelect");
   }
 
-  openTrialRoom(): void {
+  openModeSetup(): void {
     app.store.patch({ selectedMode: "pk", roomEntryIntent: "create" });
     app.router.navigate("room");
   }

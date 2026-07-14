@@ -127,10 +127,14 @@ function testSceneCoverage(): void {
   assert.match(room, /releaseEntryPanels/);
   assert.match(room, /getSpellTemplatesForBank/);
   assert.match(room, /roomSpellQuestions/);
+  assert.doesNotMatch(room, /createSelectedRoom|async startGame\(/);
+  assert.match(room, /createConfiguredRoom|async startSelectedMode\(/);
   assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
   const roomSession = read("assets/scripts/services/RoomSessionService.ts");
   assert.doesNotMatch(roomSession, /\baddBot\b|BOT_NAMES|runAction\("bot"/);
+  assert.doesNotMatch(roomSession, /async startGame\(/);
+  assert.match(roomSession, /async startPreparedMode\(/);
   const roomService = read("assets/scripts/services/RoomService.ts");
   assert.doesNotMatch(roomService, /\baddBot\b/);
   const roomRules = read("assets/scripts/domain/RoomRules.ts");
@@ -139,7 +143,8 @@ function testSceneCoverage(): void {
   const gameStore = read("assets/scripts/store/GameStore.ts");
   assert.doesNotMatch(gameStore, /GameDuration|\bduration\s*:/);
   const coopSelect = read("assets/scripts/scenes/CoopSelectScene.ts");
-  assert.doesNotMatch(coopSelect, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
+  assert.doesNotMatch(coopSelect, /openSharedRoom|openSpellRoom|openTrialRoom|changeBank|statusLabel/);
+  assert.match(coopSelect, /openModeSetup/);
   const shell = read("assets/scripts/components/HomePlaceholder.ts");
   assert.match(shell, /gameplayBundles\.prepare/);
   assert.match(shell, /themes\.preloadAssets/);

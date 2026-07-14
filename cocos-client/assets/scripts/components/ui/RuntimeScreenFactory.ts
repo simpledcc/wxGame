@@ -356,7 +356,7 @@ export class RuntimeScreenFactory {
         firstModeY - index * 84,
         560,
         80,
-        () => controller.openTrialRoom(),
+        () => controller.openModeSetup(),
         kind,
         icon
       );
@@ -402,7 +402,7 @@ export class RuntimeScreenFactory {
       home.visualSlot(guidance, "practice", -225, 0, 60, 60);
       home.label(guidance, "CreateGuidance", "创建后邀请好友，双方准备完成即可开始", 32, 0, 430, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并进入准备房间", "房", 0, -178, 560, 96, () => {
-        void controller.createSelectedRoom();
+        void controller.createConfiguredRoom();
       }, "create", "createRoom");
       autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -286, 430, 80, () => {
         controller.toggleAutoReady();
@@ -447,7 +447,7 @@ export class RuntimeScreenFactory {
       void controller.toggleReady();
     }, "practice", 22);
     const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0, -288, 560, 92, () => {
-      void controller.startGame();
+      void controller.startSelectedMode();
     }, "create", "createRoom");
     const leave = home.button(lobbyPanel, "LeaveRoom", "离开房间", 0, -382, 360, 80, () => controller.backHome(), "join", 19);
 

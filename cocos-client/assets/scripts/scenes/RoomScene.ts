@@ -106,7 +106,7 @@ export class RoomScene extends Component {
     this.unsubscribe = null;
   }
 
-  async createSelectedRoom(): Promise<void> {
+  async createConfiguredRoom(): Promise<void> {
     const state = app.store.getState();
     const words = app.wordBankStore.getSelectedWords(app.wordBankCatalog);
     if (!words.length) {
@@ -177,9 +177,9 @@ export class RoomScene extends Component {
     }
   }
 
-  async startGame(): Promise<void> {
+  async startSelectedMode(): Promise<void> {
     try {
-      await app.roomSession.startGame();
+      await app.roomSession.startPreparedMode();
     } catch (error) {
       this.showError(error, "无法开始游戏");
     }

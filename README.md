@@ -1,125 +1,65 @@
-# 单词捕鱼双人对战微信小游戏
+# 词斗乐园
 
-这是一个微信小游戏原型：玩家创建/加入房间，双方准备后开始 60 秒对战。画面中的鱼带英文单词，底部显示中文释义，点击对应单词的鱼加 100 分，点错扣 100 分。
+《词斗乐园》是一个面向微信小游戏的多人单词游戏项目。玩家通过统一的竖屏首页完成词库选择、赛前练习、创建或加入房间、双方准备，再进入具体玩法。
 
-后续开发交接信息请先阅读 `AGENTS.md`。
+项目不再把产品定位限定为捕鱼或捕虫。赛前系统使用通用的玩法目录和房间准备流程，后续可以接入单词对战、合作拼词以及新的单人或多人玩法；具体游戏规则和表现由独立玩法模块负责。
 
-## Cocos 迁移
+后续开发或换电脑继续工作时，先阅读 [`AGENTS.md`](AGENTS.md)。它是 Codex 的唯一启动入口，会指向当前进度、设计、边界和下一项任务。
 
-新的 Cocos Creator 客户端位于 `cocos-client/`，旧 `miniprogram/` 仍是稳定上传版本。迁移架构、逐项完成证据和外部验收门槛分别见 `COCOS_MIGRATION_DESIGN.md`、`COCOS_MIGRATION_COMPLETION_MATRIX.md` 与 `COCOS_RELEASE_QA.md`。在 `cocos-client/` 下运行 `npm run verify` 可执行全部不依赖游戏引擎的检查。
+## 当前能力
 
-## 项目类型
+- 竖屏 Cocos 首页、玩法目录和七页赛前流程。
+- 真实词库选择、赛前练习、战绩、帮助和反馈入口。
+- 创建房间、6 位房间码加入、邀请、双真人准备和开始。
+- 后台房间轮询；正常刷新不打断界面，真实错误仍会提示。
+- 双方准备后高亮开始按钮，未满足条件时保持禁用。
+- 玩法资源按 Bundle 按需加载，赛前入口不依赖捕鱼或捕虫命名。
+- 微信云函数和旧房间数据保持生产兼容。
 
-当前项目已经切换为微信小游戏：
+## 项目结构
 
-- `project.config.json` 中的 `compileType` 是 `game`
-- 小游戏入口是 `miniprogram/game.js`
-- 小游戏配置是 `miniprogram/game.json`
-- 联机后端仍然使用云函数和云数据库
+| 目录/文件 | 作用 |
+| --- | --- |
+| `cocos-client/` | 当前 Cocos Creator 3.8.8 迁移客户端 |
+| `cloudfunctions/` | 生产云函数，迁移期间保持协议兼容 |
+| `miniprogram/` | 旧版稳定微信小游戏客户端，正式切换前保留 |
+| `AGENTS.md` | 开发启动协议、当前目标和禁止修改边界 |
+| `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` | 首页与赛前流程进度 |
+| `COCOS_MIGRATION_COMPLETION_MATRIX.md` | 整体迁移完成度和外部验证缺口 |
+| `COCOS_RELEASE_QA.md` | Creator、微信工具、真机和上传验收记录 |
 
-旧的 `pages`、`app.js`、`app.json` 文件暂时保留，但小游戏运行时主要使用 `game.js` 和 `game.json`。
+## 赛前架构
 
-## 第一次导入
-
-1. 打开微信开发者工具。
-2. 选择“小程序/小游戏项目导入”。
-3. 项目目录选择：
-
-```text
-D:\wx_game
-```
-
-4. AppID 使用你自己的小游戏/小程序 AppID。
-5. 如果开发者工具提示类型，选择“小游戏”。
-
-## AppID 设置
-
-打开：
+当前赛前调用链使用面向多玩法的通用命名：
 
 ```text
-D:\wx_game\project.config.json
+玩法目录 openModeSetup
+  -> 创建配置 createConfiguredRoom
+  -> 双方准备
+  -> 启动所选玩法 startSelectedMode
+  -> 会话边界 startPreparedMode
 ```
 
-确认这一项是你的真实 AppID：
+底层 `RoomService.startGame` 及云端 `startGame`、`catchFish` 等名称属于现有生产协议和历史玩法实现。本阶段不会重命名这些协议，也不会修改游戏内 `Fishing*` 模块。未来新增玩法应接入通用赛前入口，再由玩法注册和 Bundle 路由进入自己的实现。
 
-```json
-"appid": "你的AppID"
+## 本地验证
+
+在仓库根目录进入 Cocos 项目：
+
+```powershell
+Set-Location .\cocos-client
+npm install
+npm run verify
+npm run build:wechat:dry-run
 ```
 
-我没有覆盖你当前已经填入的 AppID。
+`npm run verify` 执行不依赖游戏引擎的结构、平台、房间、玩法兼容、运行时 UI、发布静态检查和 TypeScript 检查。`build:wechat:dry-run` 只验证构建契约，不会启动 Cocos Creator。
 
-## 云开发设置
+安装 Cocos Creator 3.8.8 的电脑可以打开 `cocos-client/`，以 `assets/scenes/Boot.scene` 为初始场景进行预览和微信小游戏构建。
 
-1. 在微信开发者工具顶部点击“云开发”。
-2. 开通或选择一个云开发环境。
-3. 复制环境 ID。
-4. 打开：
+## 联机环境
 
-```text
-D:\wx_game\miniprogram\config.js
-```
-
-把：
-
-```js
-envId: ""
-```
-
-改成：
-
-```js
-envId: "你的云开发环境ID"
-```
-
-如果开发者工具里无法选择云开发环境，可以先让 `envId` 保持空字符串：
-
-```js
-envId: ""
-```
-
-这表示使用开发者工具当前选中的云环境。真正需要先解决的是开发者工具里能看到并进入“云开发”面板。
-
-常见原因：
-
-- 当前登录微信不是这个 AppID 的管理员或开发者。
-- 当前 AppID 不是正式 AppID，或者导入项目时用了测试号/游客模式。
-- 这个 AppID 还没有开通云开发。
-- 微信开发者工具登录状态异常，需要清缓存后重新扫码登录。
-
-建议检查顺序：
-
-1. 微信公众平台确认当前微信号是管理员，或已在“成员管理”中被添加为开发者。
-2. 微信开发者工具重新导入 `D:\wx_game`，AppID 填 `project.config.json` 里的真实 AppID。
-3. 顶部点击“云开发”，先创建一个环境。
-4. 如果 `cloudfunctions` 显示“未指定环境”，右键 `cloudfunctions` 目录，找到“当前环境”，选择刚创建的环境。
-5. 仍然不显示时，微信开发者工具里执行“设置 -> 通用设置 -> 清除缓存 -> 全部清除”，重启后重新扫码登录。
-
-## 数据库
-
-在云开发数据库中新建集合：
-
-```text
-rooms
-```
-
-权限设置为：
-
-```text
-所有用户可读，仅云函数可写
-```
-
-如果使用安全规则，可以参考：
-
-```json
-{
-  "read": true,
-  "write": false
-}
-```
-
-## 上传云函数
-
-在微信开发者工具左侧找到 `cloudfunctions`，分别右键下面每个目录，选择“上传并部署：云端安装依赖”：
+联机房间使用云数据库集合 `rooms`，客户端只读，写操作由云函数完成。现有生产函数包括：
 
 ```text
 getOpenId
@@ -127,24 +67,22 @@ createRoom
 joinRoom
 toggleReady
 startGame
+startCoopSpell
 catchFish
 finishGame
+addBot
+checkText
+submitFeedback
 ```
 
-## 测试方式
+其中机器人入口已从当前 Cocos 赛前流程移除；保留云函数只是为了旧客户端、旧房间和生产协议兼容。
 
-1. 第一个客户端点击“创建房间”。
-2. 复制房间码。
-3. 第二个客户端点击“输入房间码加入”。
-4. 两边都点“准备”。
-5. 点击“开始游戏”。
-6. 进入 60 秒捕鱼对战。
+## 当前验收状态
 
-可以用两个开发者工具模拟器，也可以用一个模拟器加一台真机预览。
+- Cocos 迁移阶段 0-8 已有实现和自动化证据。
+- 首页与赛前流程 H5-H8.3 已完成代码验证。
+- Creator 和微信开发者工具已有阶段性构建证据。
+- 两台真实手机的创建、加入、准备、开始及弱网恢复仍属于外部验收。
+- 正式美术位图接入等待独立资源文件和唯一 Creator 导入负责人。
 
-## 后续可增强
-
-- 加入更流畅的鱼类动画和美术资源。
-- 接入音效、连击、道具。
-- 加入难度分级词库。
-- 做匹配大厅和断线重连。
+详细状态以 [`COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`](COCOS_PRE_GAME_FOUNDATION_PROGRESS.md) 和 [`COCOS_RELEASE_QA.md`](COCOS_RELEASE_QA.md) 为准。

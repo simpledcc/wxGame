@@ -852,7 +852,7 @@ async function main(): Promise<void> {
       const roomController = findDeep(canvas, "RoomRuntimeScreen")?.getComponent(RoomScene);
       assertOk(roomController, "Room controller must be mounted");
       roomController.toggleAutoReady();
-      await roomController.createSelectedRoom();
+      await roomController.createConfiguredRoom();
       const createCall = appRuntime.cloudCalls[appRuntime.cloudCalls.length - 1] as {
         name: string;
         data: { gameOptions?: { roomSpellQuestions?: Array<{ word: string; mask: string }> } };

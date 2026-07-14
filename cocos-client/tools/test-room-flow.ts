@@ -199,7 +199,7 @@ async function testRoomSessionFlow(): Promise<void> {
   store.applySnapshot(twoReadyPlayers);
   assert.equal(getRoomActionAvailability(twoReadyPlayers, "player-1").canStart, true);
 
-  const playing = await session.startGame();
+  const playing = await session.startPreparedMode();
   assert.equal(playing.state, "playing");
   assert.equal(getRoomGameplayRoute(playing), "pkGame");
 

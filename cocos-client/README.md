@@ -1,12 +1,12 @@
-# Cocos Client Skeleton
+# Cocos Multi-mode Client
 
-This directory is the isolated Cocos Creator migration workspace for `词斗乐园单词比拼`.
+This directory is the Cocos Creator migration workspace for `词斗乐园`. The preparation shell is mode-neutral: it owns Home, mode selection, word-bank setup, room entry, two-human readiness, and routing, while each game owns its rules and presentation in a dedicated module.
 
 It intentionally does not replace the current production WeChat Mini Game under `../miniprogram/`. Cloud functions under `../cloudfunctions/` remain the source of truth during this migration.
 
 ## Current Phase
 
-The engine-independent migration now provides platform services, Home/Bank/Study core logic, room flow, all three multiplayer modes, feedback/help controllers, a data-driven theme foundation, and a single-scene runtime UI shell:
+The engine-independent migration now provides platform services, Home/Bank/Study core logic, a multi-mode preparation flow, the currently implemented multiplayer modes, feedback/help controllers, a data-driven theme foundation, and a single-scene runtime UI shell:
 
 - TypeScript project structure.
 - Boot and Home scenes with their controller scripts attached.
@@ -25,14 +25,14 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Study session rules for hidden Chinese, current-word reveal, and next/previous word.
 - Read-only room document access compatible with the production database rules.
 - Normalized room state, room action rules, and a single authoritative `RoomStore`.
-- Create, join, ready, low/medium/high PK robot selection, start, copy, invite, resume, and leave flows.
+- Create, join, two-human ready/start, copy, invite, resume, and leave flows; the current Cocos preparation UI exposes no robot entry.
 - Non-overlapping room polling at the legacy 1000 ms / 600 ms cadence.
 - Deferred launch/show invitation handling after privacy-approved boot, with no startup `getOpenId` request.
 - Cold invitations load the persistent Home scene while preserving the invited room route.
 - Background polling pause and foreground room refresh through the runtime lifecycle boundary.
-- Accepted room joins survive an initial snapshot-read failure and expose an automatic-retry state.
+- Accepted room joins survive an initial snapshot-read failure; routine polling stays visually quiet while real failures expose a background-retry state.
 - Room cloud commands and back navigation share one pending lock with theme-visible disabled states.
-- `CoopSelectScene` and `RoomScene` controller scripts ready for Cocos node binding.
+- The mode-catalog and `RoomScene` controllers use generic preparation actions and are ready for additional game registrations.
 - Optimistic PK target input with authoritative cloud correction.
 - PK score, combo, stun, power-up, bot, and timeout settlement rules.
 - Moving `PkWordTarget`, `PkGameScene`, and `ResultScene` controller foundations.
@@ -54,6 +54,16 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Bounded frame/route/node performance instrumentation with a DEV-only JSON report command.
 - Static release checks for scene coverage, compliance copy, platform isolation, upload-root safety, and source budgets.
 - A persistent `Home.scene` runtime shell that constructs all route controls and mounts the existing scene controllers without hand-authored scene JSON.
+
+## Preparation Naming Boundary
+
+The active preparation call chain is deliberately independent of fishing/insect terminology:
+
+```text
+openModeSetup -> createConfiguredRoom -> startSelectedMode -> startPreparedMode
+```
+
+`RoomService.startGame` and the cloud function names remain unchanged because they are production protocol adapters. Existing `Fishing*` stores/services, gameplay Bundle code, scoring, timers, and target presentation are owned by the gameplay workstream and are not renamed by preparation-only changes.
 
 ## Open In Cocos Creator
 

@@ -18,8 +18,9 @@ Updated: 2026-07-14
 - H6 completion commit: `bfd2870` (`refactor(pre-game): remove hidden preparation controls dev_done`)
 - H8.1 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.2 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H8.3 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.2 QUIET ROOM SYNC AND START HIGHLIGHT DONE`
+- Current stage: `H8.3 MODE-NEUTRAL PRE-GAME NAMING DONE`
 - Next stage: two-real-phone create/join/ready/start acceptance; formal H4 bitmap integration waits for standalone approved assets
 
 ## Baseline facts
@@ -84,6 +85,7 @@ Updated: 2026-07-14
 | H8 Full-screen pre-game visual pass | `DONE` | Fixed-width dynamic viewport, full-screen scenery, seven-page long-screen layout, 393x852 route simulation, Creator build and DevTools visual inspection pass | Formal bitmap assets remain a separate H4 input |
 | H8.1 Pre-game dead-code and two-human audit | `DONE` | Unused page handlers and active robot service/facade paths removed; every visible start requires two real players; regression tests freeze the boundary | Real two-phone acceptance remains external QA |
 | H8.2 Quiet room sync and start highlight | `DONE` | Normal polling no longer replaces preparation copy; errors remain visible; two ready humans enable and highlight the start action | Real two-phone acceptance remains external QA |
+| H8.3 Mode-neutral pre-game naming | `DONE` | Mode catalog, configured room creation, selected-mode start and preparation-session entry use generic names; README explains the protocol boundary | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -298,6 +300,22 @@ Updated: 2026-07-14
 - `npm run verify`: `PASSED` in `17.1s`; all structure, platform, lifecycle, cloud-contract, room, gameplay compatibility, UI, release and TypeScript checks passed.
 - `npm run build:wechat:dry-run`: `PASSED`; build inputs, output isolation and command contract remain valid without starting Creator.
 - `git diff --check` and forbidden-path audit: `PASSED`; no gameplay Bundle, cloud function, legacy client or protocol change.
+
+## H8.3 mode-neutral pre-game naming
+
+1. Renamed the mode-catalog action from `openTrialRoom` to `openModeSetup` so future game types enter the same configuration boundary.
+2. Renamed `RoomScene.createSelectedRoom` to `createConfiguredRoom` and `RoomScene.startGame` to `startSelectedMode`.
+3. Renamed the Cocos preparation-session entry from `RoomSessionService.startGame` to `startPreparedMode`.
+4. Kept `RoomService.startGame`, cloud function names, request/response contracts and gameplay `Fishing*` implementations unchanged as production/gameplay compatibility boundaries.
+5. Added static release guards that reject the obsolete preparation names while allowing the frozen protocol adapter.
+6. Rewrote the repository README around the multi-mode Word Battle Park product, current Cocos architecture, generic preparation chain, validation commands and external QA state; updated the Cocos subproject introduction and package/build-task metadata from `word-fishing-*` to `word-battle-park-*`.
+
+### H8.3 final verification
+
+- Focused Phase 4, shell source/runtime, release and TypeScript checks: `PASSED`.
+- `npm run verify`: `PASSED`; all structure, platform, lifecycle, cloud-contract, room, gameplay compatibility, UI, release and TypeScript checks passed under the new package name.
+- `npm run build:wechat:dry-run`: `PASSED`; the renamed build task keeps valid inputs, output isolation and Creator command generation.
+- `git diff --check` and forbidden-path audit: `PASSED`; no gameplay Bundle, cloud function, legacy client, protocol or AppID change.
 
 ## G0 modified files
 
@@ -588,15 +606,16 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - H3 adds one presentation-only `RoomScene.pageTitleLabel` binding and shortens the Bank status copy for the new card.
 - H5 adds only presentation/controller state for the seven preparation pages. It does not change gameplay Bundles, room documents, cloud functions, scoring, synchronization or request/response contracts.
 - H8.1 removes only the active Cocos preparation robot facade/session path and unused preparation handlers. Passive snapshot/raw-cloud/gameplay compatibility remains frozen.
+- H8.3 renames only preparation controllers/session entry; the production facade, cloud contracts and gameplay-owned `Fishing*` code keep their existing names.
 
 ## Next single action
 
-Keep H5-H8.2 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify background polling does not flash a sync message, one player cannot start, no robot entry is present, and the start action highlights after both players are ready. Record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
+Keep H5-H8.3 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify background polling does not flash a sync message, one player cannot start, no robot entry is present, and the start action highlights after both players are ready. Record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
 
 ## Continue prompt
 
 ```text
-The H5-H8.2 pre-game flow, visual pass, two-human audit and quiet room sync are complete on branch feature/pre-game-ui-home-goal.
+The H5-H8.3 pre-game flow, visual pass, two-human audit, quiet room sync and mode-neutral naming are complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_PRE_GAME_PAGES_DESIGN.md and the latest dev_done commit.
 Run the next external QA with two real WeChat accounts: create, verify one-player start is unavailable and polling stays visually quiet, invite/join, both ready and owner start; verify the start button highlights, no robot entry exists and retain evidence from both phones.
 Do not start H4 art work, and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment during that QA.

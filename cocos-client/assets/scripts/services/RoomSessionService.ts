@@ -116,7 +116,7 @@ export class RoomSessionService {
     });
   }
 
-  async startGame(): Promise<RoomSnapshot> {
+  async startPreparedMode(): Promise<RoomSnapshot> {
     return this.runAction("start", async () => {
       const room = this.requireRoom();
       const availability = getRoomActionAvailability(room, this.requireLocalOpenId());
