@@ -285,7 +285,9 @@ function testHomeAssetHandoff(): void {
     "background", "logo", "avatar", "coin", "character", "createRoom", "joinRoom", "practice",
     "wordBank", "catalog", "history", "settings", "privacy", "feedback"
   ].forEach((key) => assert.ok(manifest.includes(`\`${key}\``), `Home asset manifest omits ${key}`));
-  assert.match(manifest, /do not copy it, crop it, or place it under `cocos-client\/assets\/`/);
+  assert.match(manifest, /was not copied or cropped into the runtime package/);
+  assert.match(manifest, /Do not hand-author image importer sub-meta files/);
+  assert.match(manifest, /332,877/);
 }
 
 function main(): void {

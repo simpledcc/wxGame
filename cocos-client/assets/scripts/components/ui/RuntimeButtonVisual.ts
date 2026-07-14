@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Graphics } from "cc";
+import { _decorator, Button, Color, Component, Graphics, Sprite } from "cc";
 
 const { ccclass } = _decorator;
 
@@ -6,6 +6,7 @@ const { ccclass } = _decorator;
 export class RuntimeButtonVisual extends Component {
   private button: Button | null = null;
   private background: Graphics | null = null;
+  private skin: Sprite | null = null;
   private normalColor = new Color();
   private pressedColor = new Color();
   private disabledColor = new Color();
@@ -40,6 +41,11 @@ export class RuntimeButtonVisual extends Component {
     this.refresh();
   }
 
+  setSkin(skin: Sprite | null): void {
+    this.skin = skin;
+    this.refresh(true);
+  }
+
   refresh(force = false): void {
     if (!this.button || !this.background) return;
     const interactable = this.button.interactable;
@@ -62,6 +68,10 @@ export class RuntimeButtonVisual extends Component {
       : this.disabledColor;
     this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, this.radius);
     this.background.fill();
+    if (this.skin) {
+      const channel = interactable ? (this.pressed ? 220 : 255) : 158;
+      this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);
+    }
   }
 
   isShowingDisabledState(): boolean {

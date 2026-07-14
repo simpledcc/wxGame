@@ -4,6 +4,7 @@ import {
   Graphics,
   Label,
   Node,
+  Sprite,
   UITransform,
   deferMockAssetLoad,
   deferMockBundleLoad,
@@ -335,6 +336,13 @@ async function main(): Promise<void> {
     "Background", "Logo", "Avatar", "Coin", "Character", "CreateRoom", "JoinRoom", "Practice",
     "WordBank", "Catalog", "History", "Settings", "Privacy", "Feedback"
   ].forEach((stem) => assertOk(findDeep(canvas, `Home${stem}Slot`), `Home ${stem} visual slot is required`));
+  assertOk(findDeep(canvas, "ThemeBackground")?.getComponent(Sprite)?.spriteFrame, "shared pre-game background must load");
+  assertOk(findDeep(canvas, "HomeLogoSprite")?.getComponent(Sprite)?.spriteFrame, "formal Home logo must load");
+  assertEqual(findDeep(canvas, "HomeAvatarFallback")?.active, false, "formal avatar must replace its fallback");
+  const createSkin = findDeep(canvas, "CreateRoomButtonSkin");
+  assertEqual(createSkin?.active, true, "formal primary button skin must load");
+  assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);
+  assertEqual(findDeep(canvas, "CreateRoomButton")?.getComponent(Graphics)?.enabled, false);
   [
     "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
     "HistoryButton", "HomeAvatarButton", "HomeCoinButton", "SettingsButton", "HomePrivacy", "FeedbackButton"
@@ -676,10 +684,10 @@ async function main(): Promise<void> {
       await app.themes.select("island");
       await flushMany(2);
       const routeLoading = findDeep(canvas, "RouteLoading");
-      assertEqual(routeLoading?.active, true, "theme remount must show loading state");
+      assertEqual(routeLoading?.active, false, "shared pre-game art must not wait for gameplay backgrounds");
       assertOk(routeLoading);
       assertVisibleUiContract(routeLoading, "route loading overlay");
-      assertOk(findDeep(canvas, "RoomRuntimeScreen"), "current route must remain visible during preload");
+      assertOk(findDeep(canvas, "RoomRuntimeScreen"), "theme remount must preserve the current room route");
       deferMockBundleLoad("mode_pk");
     }
     if (deferredSpellFailure) deferMockBundleLoad("mode_spell");

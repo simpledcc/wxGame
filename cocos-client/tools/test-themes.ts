@@ -6,7 +6,13 @@ import {
   parseThemeColor,
   THEME_MANIFESTS
 } from "../assets/scripts/themes/ThemeCatalog";
-import { ThemeManager } from "../assets/scripts/themes/ThemeManager";
+import {
+  HOME_ART_ASSET_PATHS,
+  HOME_ART_BUNDLE_NAME,
+  HOME_BUTTON_SKIN_PATHS,
+  HomeArtManager,
+  ThemeManager
+} from "../assets/scripts/themes/ThemeManager";
 import { getRouteBackgroundAssetKey } from "../assets/scripts/themes/ThemeRouteRules";
 import type { ThemeBundlePort, ThemeId } from "../assets/scripts/themes/ThemeTypes";
 
@@ -111,6 +117,37 @@ function testRouteAssets(): void {
   assert.equal(getRouteBackgroundAssetKey("coopSpell"), "spellBackground");
 }
 
+function getPngDimensions(filePath: string): { width: number; height: number } {
+  const data = fs.readFileSync(filePath);
+  assert.equal(data.subarray(1, 4).toString("ascii"), "PNG");
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+}
+
+function testHomeArtManifestAndBudget(): void {
+  const bundlePath = path.join(root, "art-source", "home-v1", "optimized");
+  const entries = [
+    ...Object.entries(HOME_ART_ASSET_PATHS),
+    ...Object.entries(HOME_BUTTON_SKIN_PATHS)
+  ];
+  let totalBytes = 0;
+  entries.forEach(([key, assetPath]) => {
+    const basePath = path.join(bundlePath, assetPath.replace(/\/spriteFrame$/, ""));
+    const sourcePath = key === "background" ? `${basePath}.jpg` : `${basePath}.png`;
+    assert.equal(fs.existsSync(sourcePath), true, `${key} home art is missing`);
+    totalBytes += fs.statSync(sourcePath).size;
+    if (key === "background") {
+      assert.deepEqual(getJpegDimensions(sourcePath), { width: 750, height: 1334 });
+    } else if (key === "logo") {
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 640, height: 200 });
+    } else if (key in HOME_BUTTON_SKIN_PATHS) {
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 384, height: 164 });
+    } else {
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 192, height: 192 });
+    }
+  });
+  assert.ok(totalBytes <= 350_000, `home art payload exceeds 350 KB: ${totalBytes}`);
+}
+
 async function testThemeSelectionAndFallback(): Promise<void> {
   const port = new FakeThemeBundlePort();
   const manager = new ThemeManager(port);
@@ -198,14 +235,42 @@ async function testAssetLevelFallback(): Promise<void> {
   assert.match(defaultManager.getState().error, /默认主题资源加载失败/);
 }
 
+async function testHomeArtRequestDeduplicationAndRetry(): Promise<void> {
+  const port = new FakeThemeBundlePort();
+  const manager = new HomeArtManager<string>(port);
+  const frames = await Promise.all([
+    manager.load("avatar"),
+    manager.load("avatar"),
+    manager.loadButtonSkin("blue")
+  ]);
+  assert.deepEqual(frames, [
+    `${HOME_ART_BUNDLE_NAME}:${HOME_ART_ASSET_PATHS.avatar}`,
+    `${HOME_ART_BUNDLE_NAME}:${HOME_ART_ASSET_PATHS.avatar}`,
+    `${HOME_ART_BUNDLE_NAME}:${HOME_BUTTON_SKIN_PATHS.blue}`
+  ]);
+  assert.equal(port.loads.length, 1, "home art Bundle must load once");
+  assert.equal(port.assetLoads.length, 2, "duplicate home art requests must share one promise");
+
+  const retryPort = new FakeThemeBundlePort();
+  const retryManager = new HomeArtManager<string>(retryPort);
+  const failingPath = `${HOME_ART_BUNDLE_NAME}:${HOME_ART_ASSET_PATHS.feedback}`;
+  retryPort.assetFailures.add(failingPath);
+  await assert.rejects(() => retryManager.load("feedback"));
+  retryPort.assetFailures.delete(failingPath);
+  assert.equal(await retryManager.load("feedback"), failingPath);
+  assert.equal(retryPort.assetLoads.length, 2, "failed home art requests must be retryable");
+}
+
 async function main(): Promise<void> {
   testThemeManifestsAndBudget();
   testRouteAssets();
+  testHomeArtManifestAndBudget();
   await testThemeSelectionAndFallback();
   await testLatestSelectionWins();
   await testAssetLoadDeduplication();
   await testAssetLevelFallback();
-  console.log("Phase 8 themes OK: route preloads, compact bundles, request deduplication, switching, race safety, and bundle/asset fallback.");
+  await testHomeArtRequestDeduplicationAndRetry();
+  console.log("Phase 8 themes OK: route preloads, compact bundles, home art budgets, request deduplication, switching, race safety, and fallback.");
 }
 
 void main();

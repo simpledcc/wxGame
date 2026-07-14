@@ -6,8 +6,8 @@ const HOME_SCENE_UUID = "87946c61-a2ef-4735-9e40-9dbd2753bf88";
 const EXPECTED_ORIENTATION = "portrait";
 const MAIN_PACKAGE_LIMIT_BYTES = 4 * 1024 * 1024;
 const SUBPACKAGE_TOTAL_LIMIT_BYTES = 30 * 1024 * 1024;
-const REQUIRED_ASSET_BUNDLES = ["theme_default", "theme_island", "mode_pk", "mode_spell"];
-const REQUIRED_SUBPACKAGE_BUNDLES = ["mode_pk", "mode_spell"];
+const REQUIRED_ASSET_BUNDLES = ["theme_default", "theme_island", "home_common", "mode_pk", "mode_spell"];
+const REQUIRED_SUBPACKAGE_BUNDLES = ["home_common", "mode_pk", "mode_spell"];
 
 function readJson(filePath) {
   try {

@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const DEFAULT_BUNDLES = ["mode_pk", "mode_spell"];
+const DEFAULT_BUNDLES = ["home_common", "mode_pk", "mode_spell"];
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));

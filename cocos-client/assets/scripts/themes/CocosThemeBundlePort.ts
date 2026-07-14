@@ -1,5 +1,10 @@
 import { assetManager, SpriteFrame } from "cc";
 import type { ThemeBundlePort } from "./ThemeTypes";
+import {
+  HomeArtManager
+} from "./ThemeManager";
+
+export type { HomeButtonSkinKey } from "./ThemeManager";
 
 export function createCocosThemeBundlePort(): ThemeBundlePort<SpriteFrame> {
   return {
@@ -26,3 +31,5 @@ export function createCocosThemeBundlePort(): ThemeBundlePort<SpriteFrame> {
     })
   };
 }
+
+export const homeArt = new HomeArtManager<SpriteFrame>(createCocosThemeBundlePort());

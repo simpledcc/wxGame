@@ -21,6 +21,7 @@ declare module "cc" {
 
   export class Component {
     node: Node;
+    enabled: boolean;
     onLoad?(): void;
     start?(): void;
     onDestroy?(): void;
@@ -63,15 +64,26 @@ declare module "cc" {
 
   export class Asset {}
 
-  export class SpriteFrame extends Asset {}
+  export class SpriteFrame extends Asset {
+    insetLeft: number;
+    insetRight: number;
+    insetTop: number;
+    insetBottom: number;
+  }
 
   export class Sprite {
+    static readonly Type: {
+      SIMPLE: number;
+      SLICED: number;
+    };
     node: Node;
     spriteFrame: SpriteFrame | null;
     color: Color;
+    type: number;
   }
 
   export class Graphics {
+    enabled: boolean;
     fillColor: Color;
     strokeColor: Color;
     lineWidth: number;

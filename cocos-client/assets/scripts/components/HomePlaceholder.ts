@@ -7,6 +7,7 @@ import {
   Label,
   Node,
   Sprite,
+  SpriteFrame,
   UITransform
 } from "cc";
 import { RuntimeScreenFactory } from "./ui/RuntimeScreenFactory";
@@ -19,9 +20,22 @@ import {
 import { app } from "../core/App";
 import { parseThemeColor } from "../themes/ThemeCatalog";
 import { getRouteBackgroundAssetKey } from "../themes/ThemeRouteRules";
+import { homeArt } from "../themes/CocosThemeBundlePort";
 import type { RouteName } from "../store/GameStore";
 
 const { ccclass, property } = _decorator;
+
+const PRE_GAME_ROUTES = new Set<RouteName>([
+  "home",
+  "bank",
+  "study",
+  "coopSelect",
+  "room",
+  "result",
+  "history",
+  "feedback",
+  "help"
+]);
 
 @ccclass("HomePlaceholder")
 export class HomePlaceholder extends Component {
@@ -141,12 +155,7 @@ export class HomePlaceholder extends Component {
       app.runtime.showToast(error instanceof Error ? error.message : "玩法资源加载失败，请重试");
       return;
     }
-    let backgroundReady = true;
-    try {
-      await app.themes.preloadAssets([getRouteBackgroundAssetKey(route)]);
-    } catch {
-      backgroundReady = false;
-    }
+    const backgroundReady = await this.preloadBackground(route);
     if (sequence !== this.routeLoadSequence || !this.screenHost) return;
     this.pendingRoute = "";
     this.activeRoute = route;
@@ -181,7 +190,7 @@ export class HomePlaceholder extends Component {
       return;
     }
     try {
-      const frame = await app.themes.loadSpriteFrame(getRouteBackgroundAssetKey(route));
+      const frame = await this.loadBackground(route);
       if (sequence === this.backgroundSequence && this.backgroundSprite) {
         this.backgroundSprite.spriteFrame = frame;
         const transform = this.backgroundSprite.node.getComponent(UITransform);
@@ -204,6 +213,34 @@ export class HomePlaceholder extends Component {
         this.backgroundSprite.spriteFrame = null;
       }
     }
+  }
+
+  private async preloadBackground(route: RouteName): Promise<boolean> {
+    if (PRE_GAME_ROUTES.has(route)) {
+      try {
+        await homeArt.preload(["background"]);
+        return true;
+      } catch {
+        // The themed vector/background fallback remains available while art imports are incomplete.
+      }
+    }
+    try {
+      await app.themes.preloadAssets([getRouteBackgroundAssetKey(route)]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async loadBackground(route: RouteName): Promise<SpriteFrame> {
+    if (PRE_GAME_ROUTES.has(route)) {
+      try {
+        return await homeArt.load("background");
+      } catch {
+        // Use the existing theme image if the optional home art Bundle cannot load.
+      }
+    }
+    return app.themes.loadSpriteFrame(getRouteBackgroundAssetKey(route));
   }
 
   private countNodes(root: Node): number {

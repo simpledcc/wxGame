@@ -20,6 +20,7 @@ assert.equal(runBuild({ projectRoot, dryRun: true }), null);
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "wechat-build-inspection-"));
 const validSubpackages = [
   { name: "theme_island", root: "subpackages/theme_island" },
+  { name: "home_common", root: "subpackages/home_common" },
   { name: "mode_pk", root: "subpackages/mode_pk" },
   { name: "mode_spell", root: "subpackages/mode_spell" }
 ];
@@ -54,13 +55,14 @@ try {
   fs.writeFileSync(path.join(fixture, "src", "application.js"), "console.log('fixture');\n", "utf8");
   writeJson("assets/theme_default/config.12345.json", {});
   writeJson("subpackages/theme_island/config.67890.json", {});
+  writeJson("subpackages/home_common/config.67890.json", {});
   writeJson("subpackages/mode_pk/config.12345.json", {});
   writeJson("subpackages/mode_spell/config.12345.json", {});
 
   const report = inspect();
-  assert.equal(report.subpackages.length, 3);
+  assert.equal(report.subpackages.length, 4);
   assert.equal(report.subpackages[0].fileCount, 1);
-  assert.equal(report.fileCount, 8);
+  assert.equal(report.fileCount, 9);
   assert.ok(report.mainPackage.bytes < report.totalBytes);
   assert.deepEqual(report.assetBundles.map((bundle: { name: string; packageType: string }) => ({
     name: bundle.name,
@@ -68,6 +70,7 @@ try {
   })), [
     { name: "theme_default", packageType: "main" },
     { name: "theme_island", packageType: "subpackage" },
+    { name: "home_common", packageType: "subpackage" },
     { name: "mode_pk", packageType: "subpackage" },
     { name: "mode_spell", packageType: "subpackage" }
   ]);
@@ -86,7 +89,7 @@ try {
   writeJson("game.json", { deviceOrientation: "portrait", subpackages: [] });
   assert.throws(() => inspect(), /Asset Bundle subpackage is not declared.*theme_island/);
 
-  writeJson("game.json", { deviceOrientation: "portrait", subpackages: [validSubpackages[0]] });
+  writeJson("game.json", { deviceOrientation: "portrait", subpackages: validSubpackages.slice(0, 2) });
   fs.mkdirSync(path.join(fixture, "assets", "mode_pk"), { recursive: true });
   fs.renameSync(
     path.join(fixture, "subpackages", "mode_pk", "config.12345.json"),

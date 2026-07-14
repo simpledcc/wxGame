@@ -2,9 +2,9 @@
 
 更新日期：2026-07-13
 
-目标状态：`DESIGN_READY`
+目标状态：`IN_PROGRESS`
 
-实现状态：`NOT_STARTED`
+实现状态：`H4.0_STAGED / H4.1_CREATOR_IMPORT_PENDING`
 适用版本：V0 竖屏首页及游戏准备前界面
 
 ## 1. 文档用途
@@ -20,13 +20,14 @@
 - 设计分辨率：`640x960`，竖屏
 - 当前运行外壳：持久化 `Home.scene` 加运行时页面构建器
 - 首页和准备前页面：结构、文本、点击逻辑、路由及 Store 数据已完成
-- 当前背景：由主题 Bundle 的 `homeBackground` 提供
+- 当前背景：运行时优先请求 `home_common`，Bundle 未导入时回退到主题 `homeBackground`
 - 当前前景视觉：`PreGameUi.visualSlot()` 中的 Graphics/Label 程序化兜底
 - 当前替换接口：`PreGameUi.setVisualAsset(slot, SpriteFrame | null)`
-- 当前正式位图：尚未提交
-- 当前 `home_common` Bundle：尚未创建
+- 当前正式位图：18 个优化文件暂存于 `art-source/home-v1/optimized/`，总计 `332,877` 字节
+- 当前加载实现：`HomeArtManager`、语义路径、页面绑定、失败回退、按钮九宫格和微信分包契约已完成
+- 当前 `home_common` Bundle：尚未由 Creator 创建，图片及 `.meta` 尚未进入 `assets/`
 
-结论：现有版本不是“只差把图片路径填进去”这么简单，但也不需要改业务逻辑。正式接入需要完成 Creator 导入元数据、资源目录和清单、异步加载管理器、页面槽位绑定、失败兜底、包体检查及 Creator 视觉验收。
+结论：资源生成、代码加载、页面槽位、失败兜底和包体契约已经完成。剩余关键工作是由唯一 Creator 3.8.8 负责人完成首次导入和元数据、实际构建、包体检查及 Creator 视觉验收。
 
 ## 3. H4 目标
 

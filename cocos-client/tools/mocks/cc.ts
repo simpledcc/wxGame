@@ -34,6 +34,7 @@ export const view = {
 
 export class Component {
   node!: Node;
+  enabled = true;
   onLoad?(): void;
   start?(): void;
   onDestroy?(): void;
@@ -165,11 +166,18 @@ export class Button extends Component {
 }
 
 export class Asset {}
-export class SpriteFrame extends Asset {}
+export class SpriteFrame extends Asset {
+  insetLeft = 0;
+  insetRight = 0;
+  insetTop = 0;
+  insetBottom = 0;
+}
 
 export class Sprite extends Component {
+  static readonly Type = { SIMPLE: 0, SLICED: 1 };
   spriteFrame: SpriteFrame | null = null;
   color = new Color();
+  type = Sprite.Type.SIMPLE;
 }
 
 export class EditBox extends Component {

@@ -11,6 +11,10 @@ import {
   UITransform
 } from "cc";
 import { parseThemeColor } from "../../themes/ThemeCatalog";
+import {
+  homeArt,
+  type HomeButtonSkinKey
+} from "../../themes/CocosThemeBundlePort";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
 import {
   DESIGN_WIDTH,
@@ -252,7 +256,11 @@ export class PreGameUi {
     const spriteNode = this.node(node, `Home${stem}Sprite`, 0, 0, width, height);
     const sprite = spriteNode.addComponent(Sprite);
     spriteNode.active = false;
-    return { key, width, height, node, spriteNode, sprite, fallbackNode, fallbackLabel, vectorNode };
+    const slot = { key, width, height, node, spriteNode, sprite, fallbackNode, fallbackLabel, vectorNode };
+    void homeArt.load(key).then((frame) => {
+      if (slot.node.active) this.setVisualAsset(slot, frame);
+    }).catch(() => undefined);
+    return slot;
   }
 
   setVisualAsset(slot: HomeVisualSlotRef, frame: SpriteFrame | null): void {
@@ -463,6 +471,10 @@ export class PreGameUi {
       strokeToken
     );
     background.lineWidth = 2;
+    const skinNode = this.node(node, `${name}Skin`, 0, 0, width, height);
+    const skin = skinNode.addComponent(Sprite);
+    skin.type = Sprite.Type.SLICED;
+    skinNode.active = false;
     this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
     const iconSize = Math.max(44, Math.min(height - 20, width * 0.25));
@@ -523,6 +535,20 @@ export class PreGameUi {
       this.darken(baseColor, 0.14),
       this.color("disabled")
     );
+    const skinKey = this.buttonSkinKey(kind);
+    if (skinKey) {
+      void homeArt.loadButtonSkin(skinKey).then((frame) => {
+        if (!node.active) return;
+        frame.insetLeft = 48;
+        frame.insetRight = 48;
+        frame.insetTop = 48;
+        frame.insetBottom = 48;
+        skin.spriteFrame = frame;
+        skinNode.active = true;
+        background.enabled = false;
+        visual.setSkin(skin);
+      }).catch(() => undefined);
+    }
     this.bindButton(node, button, visual, handler);
     return { node, button, label: titleLabel, background, visual, iconSlot, iconLabel, titleLabel, subtitleLabel };
   }
@@ -867,6 +893,14 @@ export class PreGameUi {
     if (kind === "catalog") return "homeCatalog";
     if (kind === "history") return "homeHistory";
     return "homeCard";
+  }
+
+  private buttonSkinKey(kind: PreGameActionKind): HomeButtonSkinKey | null {
+    if (kind === "create" || kind === "history") return "orange";
+    if (kind === "join" || kind === "bank") return "blue";
+    if (kind === "practice") return "green";
+    if (kind === "catalog") return "purple";
+    return null;
   }
 
   private darken(color: Color, amount: number): Color {

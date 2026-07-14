@@ -86,9 +86,9 @@ git fetch origin
 
 ## 3. 当前目标指针
 
-当前工作流：A 线，首页和游戏准备前界面；H5 布局、H6 逻辑精简、H7 赛前选项清理、H8 全屏视觉适配、H8.1 双真人赛前审计、H8.2 静默房间同步与 H8.3 多玩法赛前命名均已冻结。
+当前工作流：A 线，首页和游戏准备前界面；H5-H8.3 已冻结，当前进入 H4 正式美术接入。
 
-当前目标：H8.3 已将玩法目录、房间创建配置和准备启动入口改为多玩法通用命名；生产云函数、房间协议和游戏内 `Fishing*` 实现保持兼容。下一项是两台真实手机验证创建、加入、准备和开始流程。正式 H4 位图接入只在独立背景、角色和图标文件交付后开始，游戏内部规则继续冻结。
+当前目标：H4.0 的独立背景、Logo、角色/功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `332,877` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑完成 H4.1 首次导入。
 
 当前权威文件：
 
@@ -98,7 +98,7 @@ git fetch origin
 - 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
 
-当前快照：H5-H8.3 已完成并冻结。准备页面使用固定宽度、动态可视高度，主题背景和程序化卡通场景铺满长屏；首页、玩法目录、创建/加入/准备房间、词库、练习与战绩均保持真实数据和原业务动作。赛前通用调用链为 `openModeSetup -> createConfiguredRoom -> startSelectedMode -> startPreparedMode`，不使用捕鱼或捕虫命名。赛前不保存或展示总时长，不接受机器人难度，也不再暴露 `RoomSessionService.addBot`、`RoomService.addBot`、`canAddBot` 或 `bot` pending action；所有开始操作要求两名真实玩家。正常轮询不再闪动“正在同步”，只有首次进入、用户动作和真实同步错误提供可见反馈；双方准备后开始按钮切换为高亮可点击状态。生产 `RoomService.startGame`、云函数、协议字段以及游戏内 `Fishing*` 兼容逻辑仍冻结保留。正式 H4 位图仍延期，不得从参考合成图裁切或手写图片 importer 元数据。
+当前快照：H5-H8.3 已完成并冻结。H4 已具备全新的独立美术源图和 18 个优化文件，不含动态数据，也不是从参考合成图裁切。运行时代码会从 `home_common` 去重加载背景、Logo、头像、金币、角色、12 个语义图标和四种按钮皮肤；缺少 Bundle、资源加载失败或页面销毁时继续使用程序化回退。正式显示仍等待 Creator 首次导入和自动元数据，未完成前不得把暂存图片直接复制进 `assets/` 提交。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -161,7 +161,8 @@ git fetch origin
 - 房间、计分、同步和云请求/响应协议
 - AppID、云环境、数据库权限和上传配置
 - 为展示效果伪造昵称、等级、金币、房间或历史数据
-- 任何位图、音频、字体、Bundle 或美术 importer `.meta`
+- `art-source/home-v1` 之外的位图、音频、字体或美术资源
+- 未经指定 Creator 导入负责人生成的图片 importer `.meta`
 
 不得从参考合成图裁图，不得手写图片 importer `.meta`。正式图片首次导入必须由唯一一台 Creator 3.8.8 电脑完成，并将图片和 Creator 生成的 `.meta` 放入同一个提交。
 
@@ -193,7 +194,7 @@ Set-Location <repo-root>
 git diff --check
 ```
 
-正式 H4 图片接入还必须在安装 Creator 的电脑执行实际导入、预览和微信构建，并按 `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`、`COCOS_RELEASE_QA.md` 留下证据。
+H4 暂存检查点可在无 Creator 电脑完成代码、预算和回退测试；正式完成仍必须在安装 Creator 的电脑执行首次导入、预览和微信构建，并按 `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`、`COCOS_RELEASE_QA.md` 留下证据。
 
 ## 9. 提交、推送与交接
 

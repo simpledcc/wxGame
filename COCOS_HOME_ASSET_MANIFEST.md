@@ -4,7 +4,7 @@ Updated: 2026-07-14
 
 ## Purpose
 
-This is the handoff contract for Home art that is still missing from the V0 repository. The reference composite is design input only: do not copy it, crop it, or place it under `cocos-client/assets/`.
+This is the handoff contract for generated Home art staged under `cocos-client/art-source/home-v1/`. The reference composite is design input only and was not copied or cropped into the runtime package.
 
 The formal H4 implementation sequence, loading architecture, collaboration rules and completion gates are defined in `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`. This manifest remains the authoritative per-file delivery list.
 
@@ -14,10 +14,10 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 ## Current V0 State
 
-- The portrait Home structure, data and interaction are complete in code and use the existing theme-managed `homeBackground` as the current scene background.
-- Logo, safe avatar, coin, character and function icons are mounted at stable locations and currently render verified programmatic Graphics/Label visuals.
+- Eighteen optimized formal assets total `332,877` bytes and are ready for one-time Creator import from `art-source/home-v1/optimized/`.
+- The portrait Home structure, data and interaction are complete; until import, the existing theme background and programmatic Graphics/Label visuals remain active.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
-- Replacing a fallback with a final `SpriteFrame` requires no route, controller or Store change.
+- `HomeArtManager` automatically replaces a fallback when the matching `SpriteFrame` resolves; no route, controller or Store change is required.
 - Dedicated bitmap art below did not block the completed structural V0 Goal, but is required before claiming high-fidelity visual completion against the reference.
 - H8 adds a full-viewport programmatic sky, cloud, hill, meadow, path, foliage and flower layer to every preparation page. It removes black bars and supplies a coherent scene while formal bitmap files are still pending.
 
@@ -34,29 +34,29 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 | Slot key | Art | Suggested source | Alpha | Slice | Planned ownership | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `background` | Portrait village/learning-camp scene, no embedded text | 720x1280 JPG/PNG, <=180 KB | optional | none | existing lightweight theme Bundle (`homeBackground`) | mounted; committed theme background active, dedicated replacement optional |
-| `logo` | Word Battle Park logo, no subtitle | 560x220 PNG/WebP | yes | none | `home_common` | mounted; four-color programmatic wordmark active |
-| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG/WebP | yes | none | `home_common` | mounted; clickable programmatic profile icon active |
-| `coin` | Star coin icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; clickable programmatic coin icon active |
-| `character` | Friendly learning companion decoration | 360x420 PNG/WebP | yes | none | `home_common` | mounted; floating programmatic rabbit silhouette active |
-| `createRoom` | House icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic house icon active |
-| `joinRoom` | Two-player/friend icon | 160x160 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic two-player icon active |
-| `practice` | Open book/practice icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic open-book icon active |
-| `wordBank` | Stacked books/word-bank icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted twice; programmatic stacked-book icon active |
-| `catalog` | Gamepad/mode catalog icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic gamepad icon active |
-| `history` | Trophy/history icon | 128x128 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic trophy icon active |
-| `settings` | Gear icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic gear icon active |
-| `privacy` | Shield/check icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic shield/check icon active |
-| `feedback` | Message bubble icon | 96x96 PNG/WebP | yes | none | `home_common/icons` | mounted; programmatic message icon active |
+| `background` | Portrait village/learning-camp scene, no embedded text | 750x1334 JPG, 170,868 B | no | none | `home_common/backgrounds` | optimized and code-bound; Creator import pending |
+| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,115 B | yes | none | `home_common` | optimized and code-bound; Creator import pending |
+| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `coin` | Star coin icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `character` | Friendly rabbit learning companion | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `createRoom` | House icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `joinRoom` | Two-player/friend icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `practice` | Open book/practice icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `wordBank` | Stacked books/word-bank icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `catalog` | Gamepad/mode catalog icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `history` | Trophy/history icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `settings` | Gear icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `privacy` | Shield/check icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 
-Button panels remain programmatic for V0. If later replaced by bitmap panels, deliver clean nine-slice sources without text: primary 600x160 and secondary 280x150, with at least 28 px protected corners.
+Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 48 px slice insets and preserves live Labels and button handlers; surface cards remain programmatic.
 
 ## Bundle Rules
 
 - Theme-specific backgrounds remain in `theme_default` / `theme_island`; use the existing `homeBackground` semantic key.
-- Shared logo, avatar, character and icons belong in a future lightweight `home_common` Bundle. Create it only when Creator-generated metadata and at least one final asset are available.
+- Shared background, logo, avatar, character, icons and button skins belong in `home_common`. The designated Creator owner creates this Bundle while importing the staged files.
 - Do not place Home art in `mode_pk` or `mode_spell`; those Bundles are owned by gameplay streams.
-- Keep source Home art below 350 KB total for V0 and each decoded texture at or below 2048x2048.
+- Keep optimized Home art below 350 KB total for V0 and each decoded texture at or below 2048x2048. Current optimized total is `332,877` bytes.
 - No text may be baked into buttons. Labels remain runtime text for data binding, accessibility and later copy changes.
 
 ## Acceptance Checklist

@@ -20,8 +20,8 @@ Updated: 2026-07-14
 - H8.2 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.3 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.3 MODE-NEUTRAL PRE-GAME NAMING DONE`
-- Next stage: two-real-phone create/join/ready/start acceptance; formal H4 bitmap integration waits for standalone approved assets
+- Current stage: `H4.0 ART STAGED / H4.1 CREATOR IMPORT PENDING`
+- Next stage: import `art-source/home-v1/optimized` once through Cocos Creator 3.8.8 and commit generated metadata with the images
 
 ## Baseline facts
 
@@ -78,7 +78,7 @@ Updated: 2026-07-14
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
-| H4 Formal art integration | `DESIGN_READY` | `COCOS_FINAL_ART_INTEGRATION_DESIGN.md` defines assets, Bundle/loading architecture, fallback, QA and collaboration gates | Approved image files and a Creator 3.8.8 import owner are required before implementation |
+| H4 Formal art integration | `IN_PROGRESS` | 18 optimized assets (`332,877` bytes), source masters, processing tool, cached loader, semantic bindings, fallback and subpackage contract are ready | This computer has no Creator; H4.1 first import, generated `.meta`, actual build and visual QA remain |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
@@ -193,6 +193,18 @@ Updated: 2026-07-14
 4. Defined priority loading, failed-key retry and route-destruction protection so art never blocks or changes business actions.
 5. Defined Creator import ownership, package budgets, visual checks, automated acceptance and a six-stage H4 execution line.
 6. Kept H4 implementation explicitly `NOT_STARTED`: no empty Bundle, placeholder bitmap or hand-authored importer metadata was added.
+
+## H4 implementation checkpoint
+
+1. Generated a new text-free portrait learning-garden background, exact fixed `词斗乐园` Logo, 16-icon source atlas and four text-free button skins from the approved visual direction.
+2. Added `tools/process-home-art.py`; the optimized import payload contains one JPG and 17 transparent PNG files totaling `332,877` bytes, below the 350 KB H4 target.
+3. Added `HomeArtManager` request deduplication, cache, retry-after-failure behavior and semantic asset/button-skin paths without changing gameplay code or room/cloud contracts.
+4. Bound every existing `PreGameUi.visualSlot()` automatically and applied orange/blue/green/purple sliced button skins while retaining Graphics/Label fallbacks.
+5. Made all non-game routes prefer the shared learning-garden background; gameplay routes continue using their existing theme backgrounds.
+6. Added `home_common` to the WeChat Asset Bundle/subpackage build contract so the 333 KB art payload cannot consume the remaining main-package margin.
+7. Kept the optimized files outside `assets/` because this computer cannot run Creator. This checkpoint intentionally contains no hand-authored image or Bundle `.meta`.
+8. H4 remains `IN_PROGRESS`; the next Creator computer must perform H4.1 import before actual rendering or completion can be claimed.
+9. Local checkpoint verification passed `npm run verify` and `npm run build:wechat:dry-run`; actual Creator import/build, package-byte evidence and screenshots are intentionally still pending.
 
 ## H5 seven-page pre-game flow
 
@@ -584,8 +596,8 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Remaining risks after Goal completion
 
-1. The generated H5 main package has only `73,386` bytes of margin under the 4 MiB gate; future bitmap work must use the reviewed `home_common` Bundle/subpackage plan rather than add art to the main package.
-2. Logo, avatar, coin, character and function icons now use recognizable verified programmatic visuals. Dedicated final art remains required before the Home matches the high-fidelity reference, but no button or business behavior is waiting on those images.
+1. The generated H5 main package has only `73,386` bytes of margin under the 4 MiB gate; the build contract now requires `home_common` as a subpackage before the next real build.
+2. Formal H4 art is generated and code-bound, but it remains in the staging directory until Creator creates stable importer metadata; current runtime continues to show programmatic fallbacks.
 3. Creator import/rendering and WeChat simulator presentation passed through H8. H8.1 changes only preparation controllers/services and is covered locally; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
@@ -610,13 +622,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Keep H5-H8.3 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify background polling does not flash a sync message, one player cannot start, no robot entry is present, and the start action highlights after both players are ready. Record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
+On the designated Creator 3.8.8 computer, create Bundle `home_common`, import the complete `cocos-client/art-source/home-v1/optimized/` tree once, and commit every imported image together with Creator-generated directory/image `.meta`. Then run full verification and the actual WeChat build before visual QA.
 
 ## Continue prompt
 
 ```text
-The H5-H8.3 pre-game flow, visual pass, two-human audit, quiet room sync and mode-neutral naming are complete on branch feature/pre-game-ui-home-goal.
-Read AGENTS.md, this progress file, COCOS_PRE_GAME_PAGES_DESIGN.md and the latest dev_done commit.
-Run the next external QA with two real WeChat accounts: create, verify one-player start is unavailable and polling stays visually quiet, invite/join, both ready and owner start; verify the start button highlights, no robot entry exists and retain evidence from both phones.
-Do not start H4 art work, and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment during that QA.
+The H4 art-generation and code-binding checkpoint is pushed on branch feature/pre-game-ui-home-goal.
+Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
+Use Cocos Creator 3.8.8 as the sole first-import owner: create Bundle home_common and import the complete cocos-client/art-source/home-v1/optimized tree without renaming files. Commit the images and all Creator-generated .meta together, then run npm run verify, npm run build:wechat and npm run inspect:wechat-build.
+Do not hand-write importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
 ```
