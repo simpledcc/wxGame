@@ -139,32 +139,6 @@ async function main(): Promise<void> {
           winnerOpenid: "player-1"
         };
       },
-      addBot: (data) => {
-        assert.deepEqual(data, {
-          roomId: room._id,
-          difficulty: "medium"
-        });
-        const players = [
-          ...room.players,
-          {
-            openid: "bot_medium",
-            nickName: "练习机器人",
-            score: 0,
-            ready: true,
-            isBot: true,
-            botDifficulty: "medium"
-          }
-        ];
-        return {
-          ok: true,
-          players,
-          gameOptions: room.gameOptions,
-          room: {
-            ...room,
-            players
-          }
-        };
-      }
     }
   });
   const storage = new StorageService(runtime);
@@ -191,9 +165,6 @@ async function main(): Promise<void> {
   const ready = await rooms.toggleReady("room-1", true);
   assert.equal(ready.players[0].ready, true);
 
-  const bot = await rooms.addBot({ roomId: "room-1", difficulty: "medium" });
-  assert.equal(bot.players[1].isBot, true);
-
   const started = await rooms.startGame({
     roomId: "room-1",
     roomWords: [{ word: "exchange", meaning: "交换" }]
@@ -218,7 +189,6 @@ async function main(): Promise<void> {
     "createRoom",
     "joinRoom",
     "toggleReady",
-    "addBot",
     "startGame",
     "startCoopSpell",
     "catchFish",

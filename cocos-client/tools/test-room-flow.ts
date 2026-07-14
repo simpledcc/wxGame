@@ -127,22 +127,6 @@ async function testRoomSessionFlow(): Promise<void> {
           : player);
         return { ok: true, players: room.players, room };
       },
-      addBot: (data) => {
-        const request = data as { roomId: string; difficulty: "low" | "medium" | "high" };
-        const room = documents[request.roomId];
-        room.players = [
-          room.players[0],
-          {
-            openid: `bot_${room.roomCode}`,
-            nickName: "Emma",
-            score: 0,
-            ready: true,
-            isBot: true,
-            botDifficulty: request.difficulty
-          }
-        ];
-        return { ok: true, players: room.players, gameOptions: room.gameOptions, room };
-      },
       startGame: (data) => {
         const request = data as { roomId: string };
         const room = documents[request.roomId];
@@ -204,10 +188,16 @@ async function testRoomSessionFlow(): Promise<void> {
   const ready = await session.toggleReady();
   assert.equal(ready.players[0].ready, true);
 
-  const withBot = await session.addBot("high");
-  assert.equal(withBot.players[1].isBot, true);
-  assert.equal(withBot.players[1].botDifficulty, "high");
-  assert.equal(getRoomActionAvailability(withBot, "player-1").canStart, true);
+  const twoReadyPlayers: RoomSnapshot = {
+    ...ready,
+    players: [
+      ready.players[0],
+      { openid: "player-2", nickName: "玩家2", score: 0, ready: true }
+    ]
+  };
+  documents["room-1"] = twoReadyPlayers;
+  store.applySnapshot(twoReadyPlayers);
+  assert.equal(getRoomActionAvailability(twoReadyPlayers, "player-1").canStart, true);
 
   const playing = await session.startGame();
   assert.equal(playing.state, "playing");
@@ -305,7 +295,6 @@ function testRoomRules(): void {
     createdAt: new Date("2026-01-01T00:00:00Z") as unknown as number
   }));
   const availability = getRoomActionAvailability(coopRoom, "player-1");
-  assert.equal(availability.canAddBot, false);
   assert.equal(availability.canStart, false);
   assert.equal(availability.startBlockReason, "humanPlayersRequired");
   assert.equal(coopRoom.createdAt, Date.parse("2026-01-01T00:00:00Z"));
@@ -319,6 +308,9 @@ function testRoomRules(): void {
   }));
   assert.equal(sanitized.players[0].nickName, "玩家1");
   assert.equal(sanitized.players[1].nickName, "Emma");
+  const pkBotAvailability = getRoomActionAvailability(sanitized, "player-1");
+  assert.equal(pkBotAvailability.canStart, false);
+  assert.equal(pkBotAvailability.startBlockReason, "humanPlayersRequired");
 }
 
 async function main(): Promise<void> {

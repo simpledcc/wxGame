@@ -129,6 +129,13 @@ function testSceneCoverage(): void {
   assert.match(room, /roomSpellQuestions/);
   assert.match(room, /backButton\.interactable = !busy/);
   assert.doesNotMatch(room, /playerNameInput|nickNameInput/);
+  const roomSession = read("assets/scripts/services/RoomSessionService.ts");
+  assert.doesNotMatch(roomSession, /\baddBot\b|BOT_NAMES|runAction\("bot"/);
+  const roomService = read("assets/scripts/services/RoomService.ts");
+  assert.doesNotMatch(roomService, /\baddBot\b/);
+  const roomRules = read("assets/scripts/domain/RoomRules.ts");
+  assert.doesNotMatch(roomRules, /\bcanAddBot\b/);
+  assert.match(roomRules, /humanCount < 2/);
   const gameStore = read("assets/scripts/store/GameStore.ts");
   assert.doesNotMatch(gameStore, /GameDuration|\bduration\s*:/);
   const coopSelect = read("assets/scripts/scenes/CoopSelectScene.ts");

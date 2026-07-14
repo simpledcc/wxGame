@@ -112,7 +112,7 @@ async function testCloudCallsAndFailures(): Promise<void> {
       joinRoom: () => {
         throw { errMsg: "cloud.callFunction:fail Error: 房间不存在 request=private-openid" };
       },
-      addBot: () => {
+      startGame: () => {
         throw new Error("cloud.callFunction:fail errCode: -501000 FunctionName parameter could not be found");
       },
       toggleReady: () => {
@@ -161,7 +161,7 @@ async function testCloudCallsAndFailures(): Promise<void> {
   );
 
   await assert.rejects(
-    () => cloud.call("addBot", { roomId: "room-safe", difficulty: "low" }),
+    () => cloud.call("startGame", { roomId: "room-safe" }),
     (error: unknown) => {
       assert.ok(error instanceof CloudCallError);
       assert.equal(error.code, "FUNCTION_NOT_FOUND");

@@ -1,6 +1,6 @@
 # Cocos Migration Completion Matrix
 
-Date: 2026-07-13
+Date: 2026-07-14
 
 Purpose: track the design document requirement-by-requirement and distinguish implemented source code from evidence that requires Cocos Creator, WeChat Developer Tools, cloud access, or real devices.
 
@@ -18,8 +18,8 @@ Status meanings:
 | 1 - Cocos skeleton | Isolated project, Boot/Home scenes, TypeScript structure, WeChat build | Structure/type checks, Creator 3.8.8 build and generated-package inspection pass | Passed for skeleton/build |
 | 2 - platform services | Cloud, storage, privacy, share, logger | Platform/lifecycle tests execute privacy gates, redaction, storage migration, cloud failure and invitation handling | Passed for engine-independent scope |
 | 3 - Home/Bank/Study | Functional routes, unlocks, study behavior, default UI | Stage 3/runtime tests plus H5 WeChat simulator traversal cover Home, Bank and Study | Passed for current pre-game scope; phone visual proof pending |
-| 4 - room flow | Create/join/copy/invite/ready/start, normalized player rows, unified pending UI and authoritative snapshots | Room service/flow/lifecycle/runtime tests cover success, replacement failure, accepted-join recovery, non-duplicated names and all visible-command busy locking; H6 removes hidden robot/manual-refresh page controls | Implemented / two-device proof pending |
-| 5 - PK | Moving targets, immediate feedback, cloud correction, dormant robot compatibility, power-ups, result/history | Phase 5 and runtime tests cover optimistic timing order, reconciliation and remote settlement; current H6 preparation UI does not expose robot entry | Implemented / gameplay device proof pending |
+| 4 - room flow | Create/join/copy/invite/ready/start, normalized player rows, unified pending UI and authoritative snapshots | Room service/flow/lifecycle/runtime tests cover success, replacement failure, accepted-join recovery, non-duplicated names and all visible-command busy locking; H8.1 removes the active preparation robot facade/session path and requires two real humans to start | Implemented / two-device proof pending |
+| 5 - PK | Moving targets, immediate feedback, cloud correction, dormant robot compatibility, power-ups, result/history | Phase 5 and runtime tests cover optimistic timing order, reconciliation and remote settlement; H8.1 makes frozen gameplay robot compatibility unreachable from the active preparation flow | Implemented / gameplay device proof pending |
 | 6 - shared co-op | Team scoring, two-human restrictions, result/history | Phase 6 and production contract tests | Implemented / two-device proof pending |
 | 7 - spell co-op | 44 prebuilt template banks, QWERTY input, question isolation, dual timers, timeout, detail history | Exact 6,351-template source comparison plus Phase 7/runtime history tests; Room creation carries the selected 240-item pool | Implemented / two-device proof pending |
 | 8 - themes and gameplay bundles | Two theme bundles, preloaded route assets, target skins, fallback, themed controls, plus load-on-demand `mode_pk`/`mode_spell` gameplay bundles | Phase 8 tests pass and the real generated package places both gameplay modes in declared subpackages | Development/build proof passed; gameplay visual/device proof pending |
@@ -30,7 +30,7 @@ Status meanings:
 | Requirement | Authoritative evidence | Status |
 | --- | --- | --- |
 | Preserve legacy uploadable client | Root `project.config.json` still points to `miniprogram/`; release test freezes that value | Passed |
-| Preserve cloud contracts | `test-production-contracts.ts` reads production handler sources and checks typed Cocos facades | Passed |
+| Preserve cloud contracts | `test-production-contracts.ts` reads production handler sources and checks typed client coverage | Passed |
 | No direct client database writes | Database rules plus adapter/service tests | Passed |
 | Privacy before cloud/personal storage | Runtime Boot test declines with zero cloud init, then accepts and enters Home after one init; platform/lifecycle tests cover storage and invitation gates | Passed in source/runtime mock; visual platform proof pending |
 | Privacy controls remain reachable | Boot has contract/accept/decline controls on `UI_2D`; Home exposes the native contract and fixed system identity | Passed in source/runtime mock |
@@ -44,8 +44,8 @@ Status meanings:
 | Source metadata integrity | Release QA parses the current 113 committed metas, rejects UUID duplication/missing directory metadata and validates every Boot/Home internal object reference; future H4 imports must commit Creator-generated metadata with each image | Passed for current committed source |
 | No public nickname/chat/payment surface | Release source scan and runtime control inventory | Passed |
 | Local gameplay feedback before cloud response | Deferred-response Phase 5 test | Passed |
-| Dormant PK robot compatibility remains isolated | Lower-level room/gameplay tests retain difficulty behavior, while H6 static/runtime tests reject robot controls from the visible preparation page | Passed; not part of the current visible flow |
-| Cloud-backed Room controls prevent duplicate taps | Runtime controller test applies a pending action and verifies create/join/ready/bot/start/copy/invite/refresh/back plus themed disabled visuals | Passed in source/runtime mock |
+| Dormant PK robot compatibility remains isolated | Passive snapshot fields, raw cloud typing and gameplay tests retain compatibility, while H8.1 removes Cocos preparation `addBot` services/actions and rejects start with fewer than two humans | Passed; not part of the current visible flow |
+| Cloud-backed Room controls prevent duplicate taps | Runtime controller test applies pending actions and verifies create/join/ready/start/copy/invite/back plus themed disabled visuals | Passed in source/runtime mock |
 | Non-overlapping polling and hide/show recovery | Room/lifecycle tests | Passed; real weak-network proof pending |
 | Finished-room polling release | Runtime test starts a real polling timer, applies a finished snapshot, requires immediate stop, then clicks Result-to-History and proves the room is released while its record remains | Passed |
 | Session replacement isolation | Monotonic RoomStore versions gate fishing/spell actions; Phase 5/7 defer cloud responses, leave the room, and prove no snapshot, refresh, draft or stale result returns; Result hide/show cannot restart finished polling | Passed |

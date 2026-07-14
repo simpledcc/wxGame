@@ -1,4 +1,3 @@
-import type { BotDifficulty } from "../domain/GameTypes";
 import {
   getLocalRoomPlayer,
   getRoomActionAvailability,
@@ -36,12 +35,6 @@ export class RoomSessionError extends Error {
     this.name = "RoomSessionError";
   }
 }
-
-const BOT_NAMES: Record<BotDifficulty, string> = {
-  high: "Emma",
-  medium: "Jack",
-  low: "Lily"
-};
 
 export class RoomSessionService {
   constructor(
@@ -120,26 +113,6 @@ export class RoomSessionService {
         await this.polling.refresh().catch(() => undefined);
         throw error;
       }
-    });
-  }
-
-  async addBot(difficulty: BotDifficulty = "medium"): Promise<RoomSnapshot> {
-    return this.runAction("bot", async () => {
-      const room = this.requireRoom();
-      const availability = getRoomActionAvailability(room, this.requireLocalOpenId());
-      if (!availability.canAddBot) {
-        throw new RoomSessionError("ACTION_NOT_ALLOWED",
-          room.gameOptions.matchMode === "coop"
-            ? "双人合作需要两名真实玩家，不能加入机器人"
-            : undefined);
-      }
-      const response = await this.rooms.addBot({
-        roomId: this.requireRoomId(),
-        difficulty,
-        botName: BOT_NAMES[difficulty]
-      });
-      this.roomStore.applySnapshot(response.room);
-      return this.requireRoom();
     });
   }
 

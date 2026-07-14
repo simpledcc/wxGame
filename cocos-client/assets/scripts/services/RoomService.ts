@@ -1,6 +1,4 @@
 import type {
-  AddBotRequest,
-  AddBotResponse,
   CatchFishRequest,
   CatchFishResponse,
   CreateRoomRequest,
@@ -38,10 +36,6 @@ export class RoomService {
 
   toggleReady(roomId: string, ready: boolean): Promise<ToggleReadyResponse> {
     return this.cloud.call("toggleReady", { roomId, ready });
-  }
-
-  addBot(request: AddBotRequest): Promise<AddBotResponse> {
-    return this.cloud.call("addBot", request);
   }
 
   startGame(request: StartGameRequest): Promise<StartGameResponse> {

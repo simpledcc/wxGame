@@ -41,7 +41,6 @@ export type RoomStartBlockReason =
 
 export interface RoomActionAvailability {
   canToggleReady: boolean;
-  canAddBot: boolean;
   canStart: boolean;
   startBlockReason: RoomStartBlockReason | null;
 }
@@ -303,20 +302,15 @@ export function getRoomActionAvailability(
   const localPlayer = getLocalRoomPlayer(room, localOpenId);
   const waiting = room.state === "waiting";
   const humanCount = room.players.filter((player) => !isBotPlayer(player)).length;
-  const hasBot = room.players.some(isBotPlayer);
   let startBlockReason: RoomStartBlockReason | null = null;
   if (!waiting) startBlockReason = "notWaiting";
   else if (!localPlayer) startBlockReason = "notInRoom";
   else if (room.players.length < 2) startBlockReason = "waitingForPlayer";
-  else if (room.gameOptions.matchMode === "coop" && humanCount < 2) startBlockReason = "humanPlayersRequired";
+  else if (humanCount < 2) startBlockReason = "humanPlayersRequired";
   else if (!room.players.every((player) => player.ready === true)) startBlockReason = "waitingForReady";
 
   return {
     canToggleReady: waiting && !!localPlayer && !isBotPlayer(localPlayer),
-    canAddBot: waiting
-      && !!localPlayer
-      && room.gameOptions.matchMode === "pk"
-      && (room.players.length < 2 || hasBot),
     canStart: startBlockReason == null,
     startBlockReason
   };
@@ -327,6 +321,6 @@ export function getRoomStartStatusText(reason: RoomStartBlockReason | null): str
   if (reason === "notInRoom") return "你不在这个房间中";
   if (reason === "waitingForPlayer") return "等待第二名玩家加入";
   if (reason === "waitingForReady") return "双方准备后即可开始";
-  if (reason === "humanPlayersRequired") return "双人合作需要两名真实玩家";
+  if (reason === "humanPlayersRequired") return "需要两名真实玩家才能开始";
   return "双方已准备，可以开始";
 }

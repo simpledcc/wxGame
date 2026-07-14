@@ -2,20 +2,20 @@
 
 Date: 2026-07-14
 
-Status: Phase 8 source development and H7 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup have passed for the current source. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+Status: Phase 8 source development and H8.1 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup passed for the H8 visual baseline; H8.1 has local source/runtime verification and still needs the same two-device acceptance. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
 
 ## Latest Real Build Evidence
 
-- Source baseline: H6 commit `bfd2870`; H7 completion is the commit containing this updated record
-- `npm run verify`: `PASSED` after H7 on 2026-07-14 in `50.2s`
+- Source baseline for the latest real build: H8 commit `cb926e2`; H8.1 completion is the commit containing this updated record
+- `npm run verify`: `PASSED` after H8.1 on 2026-07-14; H8.1 did not run a new Creator build
 - `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
-- Generated package: `89` files, `6,487,834` bytes total
+- Generated package at H8: `6,491,368` bytes total
 - Main package: `4,120,918 / 4,194,304` bytes; only `73,386` bytes remain
-- Subpackages: `2,366,916` bytes total; `mode_pk` `40,748` bytes and `mode_spell` `25,615` bytes
+- Subpackages at H8: `2,370,450` bytes total
 - `npm run inspect:wechat-build`: `PASSED`; report retained at ignored local path `cocos-client/build/wechatgame-report.json`
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
 - H5 simulator traversal previously covered Home, mode catalog, create configuration, bank return, join, history and study with `0` reported Problems
-- H7 runtime tests additionally reject pre-game robot identity, duration state/display and duration/bot fields in newly built room options
+- H8.1 runtime/static tests additionally reject active preparation `addBot` actions/services, require two real humans to start and preserve only passive legacy/gameplay compatibility
 
 Known non-blocking Creator notices: legacy components still use primitive decorator types (`Boolean`, `String`, `Number`) instead of the Cocos-specific annotation types, and Babel reports styling de-optimization for the generated word-bank file over 500 KB. The build and package inspector pass, but these notices should be cleaned in the owning UI/gameplay streams before final release QA.
 
@@ -29,7 +29,7 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Feedback: content is locally length-checked, submitted through the protected cloud function, displays the privacy-contract entry, locks duplicate submission, and ignores success/failure after its route is destroyed.
 - Local economy: a word-bank unlock writes the unlocked-bank list before the coin deduction and uses compensating rollback; storage or controller failure cannot leave deducted coins without the matching unlock.
 - Cloud writes: client database rules remain read-only; writes stay in cloud functions.
-- Production contracts: all 11 cloud handler sources retain the request/response markers and typed Cocos service coverage frozen by the migration baseline.
+- Production contracts: all 11 cloud handler sources retain the request/response markers and typed client coverage frozen by the migration baseline.
 - Cloud diagnostics: missing functions, invalid environments, permission failures, network failures, and timeouts map to bounded public messages; Boot never displays a raw initialization error.
 - Compliance copy: visible Cocos sources contain no commercial/payment, membership, chat, signature, message-board, or red-packet copy.
 - Placeholder copy: visible Home sources no longer contain migration/placeholder text.
@@ -40,7 +40,7 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Remote settlement: real App subscriptions convert remotely finished PK/spell snapshots into result/history state before routing, without another finish cloud call.
 - Room replacement: invalid or failed create/join attempts retain the active room, identity, and polling until a replacement succeeds or the player explicitly leaves.
 - Join recovery: a server-accepted join with an initial document-read failure retains the new identity/session, enters Room, and retries polling without a duplicate join request.
-- Preparation Room UI exposes no robot or duration selection and uses normalized Player 1/Player 2 rows; dormant gameplay robot compatibility remains covered only by the frozen lower-level tests.
+- Preparation Room UI exposes no robot or duration selection and uses normalized Player 1/Player 2 rows. Active Cocos preparation services expose no `addBot` path, and all starts require two real humans; passive legacy/gameplay compatibility remains frozen outside this flow.
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.

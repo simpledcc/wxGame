@@ -105,6 +105,7 @@ function testExpectedControls(): void {
   assert.match(roomController, /setSessionControls/);
   assert.match(roomController, /setLobbyButtons/);
   assert.match(roomController, /releaseEntryPanels/);
+  assert.doesNotMatch(roomController, /getEntryGuidance/);
   assert.match(roomController, /createPanel/);
   assert.match(roomController, /joinPanel/);
   assert.match(roomController, /lobbyPanel/);
@@ -112,17 +113,27 @@ function testExpectedControls(): void {
   assert.match(roomController, /getSpellTemplatesForBank/);
   assert.match(roomController, /app\.spellTemplateData/);
   assert.match(roomController, /roomSpellQuestions/);
+  const roomSession = read("assets/scripts/services/RoomSessionService.ts");
+  assert.doesNotMatch(roomSession, /\baddBot\b|BOT_NAMES|runAction\("bot"/);
+  const roomService = read("assets/scripts/services/RoomService.ts");
+  assert.doesNotMatch(roomService, /\baddBot\b/);
+  const roomRules = read("assets/scripts/domain/RoomRules.ts");
+  assert.doesNotMatch(roomRules, /\bcanAddBot\b/);
+  assert.match(roomRules, /humanCount < 2/);
   const gameStore = read("assets/scripts/store/GameStore.ts");
   assert.doesNotMatch(gameStore, /GameDuration|\bduration\s*:/);
   const coopSelectController = read("assets/scripts/scenes/CoopSelectScene.ts");
   assert.doesNotMatch(coopSelectController, /openSharedRoom|openSpellRoom|changeBank|statusLabel/);
   assert.match(coopSelectController, /openTrialRoom/);
   const homeController = read("assets/scripts/scenes/HomeScene.ts");
+  assert.doesNotMatch(homeController, /RoomEntryIntent|\bopenRoom\b/);
   assert.match(homeController, /openPrivacyContract/);
   assert.match(homeController, /refreshDisplay/);
   assert.match(homeController, /navigateOnce/);
   assert.match(homeController, /toggleMuted/);
   assert.match(homeController, /audio\.setMuted/);
+  const studyController = read("assets/scripts/scenes/StudyScene.ts");
+  assert.doesNotMatch(studyController, /\bhideChinese\b|\bshowChinese\b/);
   [
     "HomeTopBar", "HomePlayerName", "HomeCoins", "SettingsButton", "CurrentBankBar",
     "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
@@ -190,7 +201,8 @@ function testPreGameUiFoundation(): void {
   ["coin", "createRoom", "joinRoom", "practice", "wordBank", "catalog", "history", "settings", "privacy", "feedback"]
     .forEach((icon) => assert.match(source, new RegExp(`key === \\"${icon}\\"`)));
   assert.match(source, /DESIGN_WIDTH/);
-  assert.match(source, /DESIGN_HEIGHT/);
+  assert.match(source, /getPortraitViewportHeight/);
+  assert.doesNotMatch(source, /DESIGN_HEIGHT/);
   assert.match(source, /addComponent\(BlockInputEvents\)/);
   assert.match(source, /RuntimeButtonVisual/);
   assert.doesNotMatch(source, /mode_pk|mode_spell|wx\.|cloudfunctions/);

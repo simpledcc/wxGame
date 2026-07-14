@@ -16,8 +16,9 @@ Updated: 2026-07-14
 - Button-logic audit commit: the commit containing the H2 record below; use `git log -1` after checkout for the exact SHA.
 - H5 completion commit: `005c713` (`feat(pre-game): complete seven-page preparation flow dev_done`)
 - H6 completion commit: `bfd2870` (`refactor(pre-game): remove hidden preparation controls dev_done`)
+- H8.1 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8 FULL-SCREEN PRE-GAME VISUAL PASS DONE`
+- Current stage: `H8.1 PRE-GAME DEAD-CODE AND TWO-HUMAN AUDIT DONE`
 - Next stage: two-real-phone create/join/ready/start acceptance; formal H4 bitmap integration waits for standalone approved assets
 
 ## Baseline facts
@@ -80,6 +81,7 @@ Updated: 2026-07-14
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
 | H8 Full-screen pre-game visual pass | `DONE` | Fixed-width dynamic viewport, full-screen scenery, seven-page long-screen layout, 393x852 route simulation, Creator build and DevTools visual inspection pass | Formal bitmap assets remain a separate H4 input |
+| H8.1 Pre-game dead-code and two-human audit | `DONE` | Unused page handlers and active robot service/facade paths removed; every visible start requires two real players; regression tests freeze the boundary | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -259,6 +261,25 @@ Updated: 2026-07-14
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`.
 - iPhone 12/13 simulator inspection: full-height Home rendered without black bars or overlapping controls; application errors `0`. The three visible warnings are WeChat platform/basic-library notices.
 - `git diff --check`: `PASSED`; forbidden-path diff remains empty for `mode_pk`, `mode_spell`, `cloudfunctions` and `miniprogram`.
+
+## H8.1 pre-game dead-code and two-human audit
+
+1. Removed Home's obsolete generic room opener and the unused `RoomEntryIntent` import while preserving the visible join route.
+2. Removed Study's unreferenced hide/show handlers; the visible session-wide Chinese toggle and one-word reveal remain unchanged.
+3. Removed duplicate no-session guidance writes to hidden lobby labels and deleted the unused Room guidance helper.
+4. Removed the unused fixed-height import from `PreGameUi`; all preparation geometry continues to use the dynamic portrait viewport.
+5. Removed the active Cocos pre-game robot path from `RoomPendingAction`, `RoomSessionService`, `RoomService` and `RoomActionAvailability`.
+6. Unified room start validation so every visible mode requires at least two real human players; a legacy snapshot containing a bot cannot satisfy the preparation start condition.
+7. Retained passive `RoomTypes` bot/duration snapshot fields, raw cloud-function type coverage and frozen gameplay compatibility. They support old room data and game internals but have no Cocos preparation UI or session-service entry.
+8. Kept `mode_pk`, `mode_spell`, `cloudfunctions`, `miniprogram`, room/scoring protocols and AppID untouched.
+
+### H8.1 final verification
+
+- `npm run verify`: `PASSED` in `18s`; all 122-file structure, platform, lifecycle, 11 cloud-contract, room, gameplay compatibility, UI, release and TypeScript checks passed.
+- `npm run build:wechat:dry-run`: `PASSED`; build inputs, output isolation and command contract are valid without starting Creator.
+- Focused room, shell, runtime-shell, service, platform and production-contract checks: `PASSED`.
+- Strict unused-symbol audit: no new preparation-layer warning; existing warnings are confined to frozen gameplay/shared compatibility files.
+- `git diff --check` and forbidden-path audit: `PASSED`; no `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram` change.
 
 ## G0 modified files
 
@@ -529,7 +550,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 1. The generated H5 main package has only `73,386` bytes of margin under the 4 MiB gate; future bitmap work must use the reviewed `home_common` Bundle/subpackage plan rather than add art to the main package.
 2. Logo, avatar, coin, character and function icons now use recognizable verified programmatic visuals. Dedicated final art remains required before the Home matches the high-fidelity reference, but no button or business behavior is waiting on those images.
-3. Creator import/rendering and WeChat simulator presentation passed for H5. Two-real-phone room acceptance, low-end performance, preview screenshots and upload remain release QA.
+3. Creator import/rendering and WeChat simulator presentation passed through H8. H8.1 changes only preparation controllers/services and is covered locally; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
@@ -548,16 +569,17 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - H3 migrates all non-game route builders to `PreGameUi`; it changes no Store, Router, App, gameplay Bundle, theme manifest or cloud contract.
 - H3 adds one presentation-only `RoomScene.pageTitleLabel` binding and shortens the Bank status copy for the new card.
 - H5 adds only presentation/controller state for the seven preparation pages. It does not change gameplay Bundles, room documents, cloud functions, scoring, synchronization or request/response contracts.
+- H8.1 removes only the active Cocos preparation robot facade/session path and unused preparation handlers. Passive snapshot/raw-cloud/gameplay compatibility remains frozen.
 
 ## Next single action
 
-Keep H5/H6 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Record both phones' room code, player/ready state and start transition; do not begin H4 art work in that QA task.
+Keep H5-H8.1 frozen and use two real WeChat accounts to execute create -> invite/join -> both ready -> owner start. Verify one player cannot start and no robot entry is present; record both phones' room code, player/ready state and start transition. Do not begin H4 art work in that QA task.
 
 ## Continue prompt
 
 ```text
-The H5 seven-page pre-game flow and H6 logic simplification are complete on branch feature/pre-game-ui-home-goal.
+The H5-H8.1 pre-game flow, visual pass and two-human audit are complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_PRE_GAME_PAGES_DESIGN.md and the latest dev_done commit.
-Run the next external QA with two real WeChat accounts: create, invite/join, both ready and owner start; retain evidence from both phones.
+Run the next external QA with two real WeChat accounts: create, verify one-player start is unavailable, invite/join, both ready and owner start; verify no robot entry exists and retain evidence from both phones.
 Do not start H4 art work, and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment during that QA.
 ```

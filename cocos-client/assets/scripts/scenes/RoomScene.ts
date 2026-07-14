@@ -236,19 +236,14 @@ export class RoomScene extends Component {
       this.roomCodeLabel.string = state.roomCode || "------";
     }
     if (!room) {
-      if (this.modeLabel) this.modeLabel.string = this.getSelectedModeLabel();
-      const joiningAccepted = !!state.roomId;
-      if (this.playersLabel) {
-        this.playersLabel.string = joiningAccepted
-          ? "正在读取房间信息"
-          : this.getEntryGuidance();
-      }
-      if (this.statusLabel) {
-        this.statusLabel.string = state.pendingAction
-          ? ACTION_LABELS[state.pendingAction]
-          : (joiningAccepted
-            ? (state.syncError ? `${state.syncError}，正在自动重试` : "正在同步房间...")
-            : "创建新房间，或输入 6 位房间码加入");
+      if (hasSession) {
+        if (this.modeLabel) this.modeLabel.string = this.getSelectedModeLabel();
+        if (this.playersLabel) this.playersLabel.string = "正在读取房间信息";
+        if (this.statusLabel) {
+          this.statusLabel.string = state.pendingAction
+            ? ACTION_LABELS[state.pendingAction]
+            : (state.syncError ? `${state.syncError}，正在自动重试` : "正在同步房间...");
+        }
       }
       this.setLobbyButtons(false, false);
       return;
@@ -328,13 +323,6 @@ export class RoomScene extends Component {
         ? "✓ 房主创建后自动准备"
         : "房主创建后手动准备";
     }
-  }
-
-  private getEntryGuidance(): string {
-    const intent = app.store.getState().roomEntryIntent;
-    if (intent === "create") return "已选择创建房间\n确认词库与玩法后点击“创建房间”";
-    if (intent === "join") return "已选择加入房间\n输入好友的 6 位房间码";
-    return "尚未进入房间";
   }
 
   private showError(error: unknown, fallback: string): void {

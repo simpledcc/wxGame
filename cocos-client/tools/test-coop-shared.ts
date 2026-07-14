@@ -166,7 +166,6 @@ async function testSharedFlow(): Promise<void> {
   const initial = roomStore.getRoom()!;
   const waiting = normalizeRoomSnapshot({ ...initial, state: "waiting" });
   assert.equal(getRoomActionAvailability(waiting, "player-1").canStart, true);
-  assert.equal(getRoomActionAvailability(waiting, "player-1").canAddBot, false);
   assert.equal(getFishingTeamScore(initial), 300);
   assert.equal(scheduler.hasActiveDelay(1000), false, "shared mode must not schedule a high bot");
 

@@ -1,7 +1,6 @@
 import { _decorator, Component, Label } from "cc";
 import { app } from "../core/App";
 import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
-import type { RoomEntryIntent } from "../store/GameStore";
 
 const { ccclass, property } = _decorator;
 
@@ -75,7 +74,11 @@ export class HomeScene extends Component {
   }
 
   openJoinRoom(): void {
-    this.openRoom("join");
+    this.navigateOnce(() => {
+      app.roomSession.leave();
+      app.store.patch({ selectedMode: "pk", roomEntryIntent: "join" });
+      app.router.navigate("room");
+    });
   }
 
   openHistory(): void {
@@ -110,14 +113,6 @@ export class HomeScene extends Component {
     } catch {
       if (this.active) app.runtime.showToast("隐私保护指引暂时无法打开，请稍后重试");
     }
-  }
-
-  private openRoom(intent: Exclude<RoomEntryIntent, "neutral">): void {
-    this.navigateOnce(() => {
-      app.roomSession.leave();
-      app.store.patch({ selectedMode: "pk", roomEntryIntent: intent });
-      app.router.navigate("room");
-    });
   }
 
   private navigateOnce(action: () => void): void {

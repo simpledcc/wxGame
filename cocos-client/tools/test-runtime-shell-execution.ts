@@ -456,8 +456,8 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
   assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
   assertOk(
-    findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string.includes("输入好友的 6 位房间码"),
-    "join entry must guide the player to enter a room code"
+    findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string.includes("英文字母和数字"),
+    "the visible join form must explain the room-code format"
   );
   const entryRoomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
   assertOk(entryRoomCodeInput);

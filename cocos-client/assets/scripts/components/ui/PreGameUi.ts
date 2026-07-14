@@ -13,7 +13,6 @@ import {
 import { parseThemeColor } from "../../themes/ThemeCatalog";
 import type { ThemeColorToken, ThemeManifest } from "../../themes/ThemeTypes";
 import {
-  DESIGN_HEIGHT,
   DESIGN_WIDTH,
   getPortraitViewportHeight,
   type RuntimeButtonRef,

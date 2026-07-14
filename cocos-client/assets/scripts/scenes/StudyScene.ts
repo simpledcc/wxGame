@@ -29,16 +29,6 @@ export class StudyScene extends Component {
     this.renderCard();
   }
 
-  hideChinese(): void {
-    app.studyStore.setShowMeaning(false);
-    this.renderCard();
-  }
-
-  showChinese(): void {
-    app.studyStore.setShowMeaning(true);
-    this.renderCard();
-  }
-
   toggleChinese(): void {
     app.studyStore.setShowMeaning(!app.studyStore.getSession().showMeaning);
     this.renderCard();

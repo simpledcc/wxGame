@@ -6,7 +6,6 @@ export type RoomPendingAction =
   | "create"
   | "join"
   | "ready"
-  | "bot"
   | "start"
   | "copy"
   | "invite";

@@ -42,7 +42,7 @@ const contracts: Record<string, SourceContract> = {
   addBot: {
     requestFields: ["roomId", "difficulty", "botName"],
     responseFields: ["ok", "players", "gameOptions", "room"],
-    clientFacade: "RoomService"
+    clientFacade: "CloudService"
   },
   startGame: {
     requestFields: ["roomId", "roomWords"],
@@ -127,7 +127,7 @@ function testCocosContractCoverage(): void {
 function main(): void {
   testProductionSources();
   testCocosContractCoverage();
-  console.log("Production contracts OK: 11 cloud handlers, request/response markers, and Cocos facades agree.");
+  console.log("Production contracts OK: 11 cloud handlers, request/response markers, and typed client coverage agree.");
 }
 
 main();

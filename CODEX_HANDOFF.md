@@ -2,7 +2,7 @@
 
 > Active Cocos migration workspace for this handoff: `C:\work\wxgame_cocos_feature_home`.
 >
-> Continue the frozen H5/H6 pre-game flow and its two-phone release QA in this checkout. Keep `miniprogram/` as the stable uploadable client during migration; H4 art remains deferred. Other absolute paths below are historical machine records.
+> Continue the frozen H5-H8.1 pre-game flow and its two-phone release QA in this checkout. Keep `miniprogram/` as the stable uploadable client during migration; H4 art remains deferred. Other absolute paths below are historical machine records.
 
 ## Project
 
@@ -10,12 +10,13 @@ WeChat Mini Game project:
 
 `C:\work\wxgame_cocos_feature_home`
 
-Game concept: two-player English vocabulary PK game. Current visual theme is grass/cockroach. Players see a Chinese prompt, tap the correct English word on moving cockroaches, score points, earn/use power-ups, and can play against a friend or a test robot.
+Game concept: two-player English vocabulary PK game. Current visual theme is grass/cockroach. Players see a Chinese prompt, tap the correct English word on moving cockroaches, score points and earn/use power-ups. The active preparation flow is real-player-only; legacy gameplay robot compatibility is frozen outside this workstream.
 
 ## Current State
 
 Resume point for the next agent:
 
+- 2026-07-14 H8.1 pre-game dead-code/two-human audit: removed unused Home, Room and Study handlers plus the active Cocos preparation `addBot` chain from pending actions, `RoomSessionService`, `RoomService` and room action availability. Every visible room start now requires two real human players, including PK snapshots that happen to contain a legacy bot. Passive `RoomTypes` bot/duration fields, raw cloud contract types and gameplay compatibility remain intentionally frozen because they support old snapshots and game internals but are no longer reachable from preparation UI/services. Full local verification and dry-run passed; no gameplay Bundle, cloud function, legacy client, room/scoring protocol or AppID changed. Next action is two-real-phone create/join/ready/start QA, including proving one-player start is unavailable and no robot entry exists.
 - 2026-07-14 H7 pre-game option cleanup: pre-game state no longer stores a selected duration, room creation settings no longer accept or send duration/bot difficulty, and the preparation lobby no longer displays seconds or robot identity. Help/feedback pre-game copy was reduced to necessary context. Existing gameplay timers, robot match compatibility, cloud functions, gameplay Bundles and the legacy mini-program remain intentionally untouched after the user narrowed the request to preparation-only behavior. `npm run verify` passed in 50.2s, dependency audit found 0 vulnerabilities, Creator 3.8.8 built successfully, package inspection passed at 6,487,834 total / 4,120,918 main bytes, and Developer Tools CLI `auto` passed. Next action remains two-real-phone create/join/ready/start QA.
 - 2026-07-13 H6 pre-game logic simplification: the visible seven-page layout is unchanged and no art was added. Mode selection no longer carries hidden shared/spell/bank handlers or duplicate bank status; Home uses `openModeCatalog`; Room no longer owns invisible bot-difficulty/manual-refresh controls. Create and join now construct mutually exclusive entry trees, and accepted sessions destroy those trees before showing the lobby. Lower-level room/gameplay compatibility, automatic polling, copy/invite, ready/start and cloud contracts are untouched. `npm run verify` passed in 47.4s, Creator 3.8.8 built in 48.5s, the inspector passed at 6,488,045 total / 4,120,918 main bytes (2,713 bytes below H5), and Developer Tools CLI `auto` passed. Next action is two-real-phone create/join/ready/start QA; H4 art remains deferred.
 - 2026-07-13 documentation and QA revalidation checkpoint before H6: `AGENTS.md` temporarily pointed to H4 as `DESIGN_READY` and removed the old fixed startup path; `COCOS_WORKSPACE.md`, the completion matrix, release QA and pre-game design were aligned with the H5 build evidence. `npm run verify` passed in 42.7s, Creator 3.8.8 rebuilt WeChat in 49.7s, the package inspector reported 6,490,758 total / 4,120,918 main bytes, and Developer Tools CLI `auto` passed. The newer H6 entry above supersedes this checkpoint.
