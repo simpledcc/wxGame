@@ -134,6 +134,8 @@ cocos-client/assets/bundles/
 - 所有图片及 Creator 生成的 `.meta` 必须在同一个提交中进入 Git。
 - 禁止手写图片 importer 的子资源 UUID 和 `.meta`。
 - `home_common` 只在至少一张正式图片已经就绪、并由 Creator 创建 Bundle 元数据后建立；当前不提交空 Bundle。
+- `npm run home-art:prepare` 负责把批准的 18 个优化文件复制到待导入工作树；它不会生成或提交 `.meta`，并会拒绝覆盖不同图片或已导入目录。
+- Creator 首次导入后必须把全部图片设为 `sprite-frame`，再由 `npm run home-art:verify-import` 检查源文件哈希、Bundle 配置、目录/图片元数据、UUID 和 SpriteFrame 子资源。
 
 ## 8. 运行时清单
 
@@ -370,11 +372,12 @@ npm run inspect:wechat-build -- <实际构建目录>
 ## 16. 多人和多电脑协作规则
 
 1. 美术导出、Creator 首次导入、代码绑定可以分工，但同一批图片只能有一个 Creator 导入负责人。
-2. 导入负责人把图片和 Creator 生成的 `.meta` 原子提交并推送；其他电脑先拉取，不要重新生成同一资源的元数据。
-3. 代码负责人只通过资源键和清单引用图片，不复制 UUID 到业务页面。
-4. 玩法开发者继续维护 `mode_pk`、`mode_spell`；H4 不跨入玩法 Bundle。
-5. 合并前比较 `manifest.json`、图片文件和 `.meta` 是否成套，禁止只合并其中一部分。
-6. 每一阶段使用独立、可识别提交；H4 完成提交主题必须以 `dev_done` 结尾。
+2. 导入负责人先执行 `npm run home-art:prepare`，Creator 导入完成后执行 `npm run home-art:verify-import`；不得用资源管理器手工挑选或改名复制。
+3. 导入负责人把图片和 Creator 生成的 `.meta` 原子提交并推送；其他电脑先拉取，不要重新生成同一资源的元数据。
+4. 代码负责人只通过资源键和清单引用图片，不复制 UUID 到业务页面。
+5. 玩法开发者继续维护 `mode_pk`、`mode_spell`；H4 不跨入玩法 Bundle。
+6. 合并前必须通过导入验证，禁止只合并图片或 `.meta` 中的一部分。
+7. 每一阶段使用独立、可识别提交；H4 完成提交主题必须以 `dev_done` 结尾。
 
 ## 17. 风险与处理
 

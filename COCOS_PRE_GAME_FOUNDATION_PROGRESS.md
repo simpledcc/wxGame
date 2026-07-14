@@ -624,13 +624,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-On the designated Creator 3.8.8 computer, create Bundle `home_common`, import the complete `cocos-client/art-source/home-v1/optimized/` tree once, and commit every imported image together with Creator-generated directory/image `.meta`. Then run full verification and the actual WeChat build before visual QA.
+On the designated Creator 3.8.8 computer, run `npm run home-art:prepare`, let Creator import all 18 images, configure Bundle `home_common` and set every image to `sprite-frame`. Run `npm run home-art:verify-import` before full verification and the actual WeChat build, then commit the imported images together with all Creator-generated `.meta`.
 
 ## Continue prompt
 
 ```text
 The H4 art-generation and code-binding checkpoint is pushed on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
-Use Cocos Creator 3.8.8 as the sole first-import owner: create Bundle home_common and import the complete cocos-client/art-source/home-v1/optimized tree without renaming files. Commit the images and all Creator-generated .meta together, then run npm run verify, npm run build:wechat and npm run inspect:wechat-build.
+Use Cocos Creator 3.8.8 as the sole first-import owner. From cocos-client run npm run home-art:prepare, open Creator, configure Bundle home_common and set all imported images to sprite-frame. Run npm run home-art:verify-import, then npm run verify, npm run build:wechat and npm run inspect:wechat-build. Commit assets/bundles/home_common, assets/bundles/home_common.meta and all generated .meta together.
 Do not hand-write importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
 ```

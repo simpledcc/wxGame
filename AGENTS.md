@@ -88,7 +88,7 @@ git fetch origin
 
 当前工作流：A 线，首页和游戏准备前界面；H5-H8.3 已冻结，当前进入 H4 正式美术接入。
 
-当前目标：H4.0 的独立背景、Logo、全身角色、功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `335,229` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑完成 H4.1 首次导入。
+当前目标：H4.0 的独立背景、Logo、全身角色、功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `335,229` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑执行 `npm run home-art:prepare`，完成 H4.1 首次导入后执行 `npm run home-art:verify-import`。
 
 当前权威文件：
 
@@ -98,7 +98,7 @@ git fetch origin
 - 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
 
-当前快照：H5-H8.3 已完成并冻结。H4 已具备全新的独立美术源图和 18 个优化文件，不含动态数据，也不是从参考合成图裁切。运行时代码会从 `home_common` 去重加载背景、Logo、头像、金币、角色、12 个语义图标和四种按钮皮肤；缺少 Bundle、资源加载失败或页面销毁时继续使用程序化回退。正式显示仍等待 Creator 首次导入和自动元数据，未完成前不得把暂存图片直接复制进 `assets/` 提交。
+当前快照：H5-H8.3 已完成并冻结。H4 已具备全新的独立美术源图和 18 个优化文件，不含动态数据，也不是从参考合成图裁切。运行时代码会从 `home_common` 去重加载背景、Logo、头像、金币、角色、12 个语义图标和四种按钮皮肤；缺少 Bundle、资源加载失败或页面销毁时继续使用程序化回退。正式显示仍等待 Creator 首次导入和自动元数据；只能用仓库命令准备导入工作树，未通过 `home-art:verify-import` 前不得提交 `assets/bundles/home_common`。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -165,6 +165,14 @@ git fetch origin
 - 未经指定 Creator 导入负责人生成的图片 importer `.meta`
 
 不得从参考合成图裁图，不得手写图片 importer `.meta`。正式图片首次导入必须由唯一一台 Creator 3.8.8 电脑完成，并将图片和 Creator 生成的 `.meta` 放入同一个提交。
+
+H4.1 导入电脑执行顺序：
+
+1. 在干净工作树执行 `cd cocos-client` 和 `npm run home-art:prepare`；命令只复制经过哈希确认的 18 个优化文件，遇到不同文件或已有元数据会拒绝覆盖。
+2. 用 Cocos Creator 3.8.8 打开项目，等待导入结束；把 `assets/bundles/home_common` 设置为名称严格为 `home_common` 的 Bundle，并把全部 18 张图片的 importer 类型设置为 `sprite-frame`。
+3. 执行 `npm run home-art:verify-import`；该命令必须验证图片与批准源文件一致、23 个 Bundle/目录/图片元数据齐全、Bundle 设置正确、UUID 不重复且 SpriteFrame 子资源存在。
+4. 再执行 `npm run verify`、`npm run build:wechat` 和 `npm run inspect:wechat-build`，完成 Creator 画面检查。
+5. 只有上述检查通过后，才把 `assets/bundles/home_common`、`assets/bundles/home_common.meta`、进度和交接文件放入同一个 `dev_done` 提交。
 
 ## 7. 多人和多电脑协作
 
