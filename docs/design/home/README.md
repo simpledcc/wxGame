@@ -19,6 +19,8 @@
 
 ## 2. 高保真参考图
 
+本目标使用的 9 张原始参考界面图已完整归档到 [`references/`](./references/README.md)，并记录文件大小和 SHA-256。归档只用于设计追溯，不进入 Cocos Bundle；运行时只使用 `cocos-client/art-source/home-v1/` 中独立生成并压缩的资源。
+
 ![首页高保真设计参考](./home-high-fidelity-reference.png)
 
 文件：`docs/design/home/home-high-fidelity-reference.png`
