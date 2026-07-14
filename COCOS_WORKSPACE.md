@@ -2,7 +2,7 @@
 
 Active development root:
 
-Current Git worktree root (`C:\work\wxgame_cocos_feature_home` on the latest verified machine)
+Current Git worktree root (`D:\demo\wexin` for the 2026-07-14 tracking sync; always re-detect with `git rev-parse --show-toplevel`)
 
 Active Cocos project:
 
@@ -52,7 +52,8 @@ Archive SHA256:
 - `npm run verify` covers platform services, lifecycle, ordinary and prebuilt spell word data, rooms, all three gameplay modes, themes, UI assembly, release checks, and TypeScript.
 - `npm run build:wechat:dry-run` and `npm run test:build-pipeline` validate the fixed Creator command, output isolation, generated package contract, and package-size accounting without requiring the engine.
 - Generated-package inspection also requires both theme Bundle configs, rejects undeclared/empty subpackages, and enforces 4 MiB main plus 30 MiB aggregate subpackage limits.
-- This machine has Cocos Creator 3.8.8 and WeChat Developer Tools. Actual WeChat builds and local tool launches must still be recorded per task; installation alone is not acceptance evidence.
+- Tool availability is machine-specific. The historical `C:\work\wxgame_cocos_feature_home` machine had Cocos Creator 3.8.8 and WeChat Developer Tools; the current `D:\demo\wexin` machine has neither and cannot supply new Creator evidence.
+- H4 formal Home art is `source-ready`: five generated masters, 18 optimized runtime files (`335,229` bytes), nine archived reference images, a composition preview, runtime semantic bindings and cross-computer import/status/verifier tools are pushed. `home_common` and Creator-generated image metadata remain pending.
 - Commit `cb926e2` established the H8 visual baseline with a successful Creator 3.8.8 build and Developer Tools run. H8.1 is a source-only preparation cleanup with full local verification; it does not supersede the H8 real-build evidence. The H8 package is `6,491,368` bytes total, with `4,120,918 / 4,194,304` bytes in the main package and `2,370,450` bytes in subpackages; future art must not consume the remaining main-package margin.
 - The 2026-07-13 H6 validation passed `npm run verify` in `47.4s`, rebuilt WeChat in `48.5s`, and reopened the package through the Developer Tools CLI. Known non-blocking Creator notices are recorded in `COCOS_RELEASE_QA.md` rather than being treated as runtime failures.
 - `COCOS_MIGRATION_COMPLETION_MATRIX.md` is the authoritative phase-by-phase distinction between current source evidence and missing external proof.

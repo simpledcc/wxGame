@@ -1,6 +1,6 @@
 # Codex Project Entry: Word Battle Park
 
-本文件是本仓库的唯一 Codex 启动入口。当前已验证工作树为 `C:\work\wxgame_cocos_feature_home`；换电脑或换工作树时，以 `git rev-parse --show-toplevel` 返回的仓库根目录为准。
+本文件是本仓库的唯一 Codex 启动入口。2026-07-14 最新文档同步工作树为 `D:\demo\wexin`；换电脑或换工作树时，始终以 `git rev-parse --show-toplevel` 返回的仓库根目录为准，不把该绝对路径当成固定要求。
 
 用户在新电脑、新任务窗或上下文中断后，只需要要求 Codex“阅读 `AGENTS.md` 并继续当前目标”。Codex 必须自行按照本文件完成 Git 检查、文档路由、进度判断、代码检查、开发、验证、交接和推送，不要求用户重复粘贴完整工作说明。
 
@@ -88,7 +88,7 @@ git fetch origin
 
 当前工作流：A 线，首页和游戏准备前界面；H5-H8.3 已冻结，当前进入 H4 正式美术接入。
 
-当前目标：H4.0 的独立背景、Logo、全身角色、功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `335,229` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑执行 `npm run home-art:prepare`，完成 H4.1 首次导入后执行 `npm run home-art:verify-import`。
+当前目标：H4.0 的 5 张独立美术源图和 18 个优化资源已生成并上传，优化负载位于 `cocos-client/art-source/home-v1/optimized/`，总计 `335,229` 字节；9 张 Goal 参考图及哈希清单也已归档到 `docs/design/home/references/`。`HomeArtManager`、语义路径、失败回退、按钮九宫格、`home_common` 微信分包契约，以及 `home-art:prepare/status/verify-import` 跨电脑工具均已实现。当前工作树状态为 `source-ready`，本机没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑完成 H4.1 首次导入和实际构建。
 
 当前权威文件：
 
@@ -98,7 +98,7 @@ git fetch origin
 - 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
 
-当前快照：H5-H8.3 已完成并冻结。H4 已具备全新的独立美术源图和 18 个优化文件，不含动态数据，也不是从参考合成图裁切。运行时代码会从 `home_common` 去重加载背景、Logo、头像、金币、角色、12 个语义图标和四种按钮皮肤；缺少 Bundle、资源加载失败或页面销毁时继续使用程序化回退。正式显示仍等待 Creator 首次导入和自动元数据；只能用仓库命令准备导入工作树，未通过 `home-art:verify-import` 前不得提交 `assets/bundles/home_common`。
+当前快照：H5-H8.3 已完成并冻结。H4 已具备全新的独立美术源图、18 个优化文件、9 张完整参考归档和 `640x1387` 合成预览，不含动态数据，运行时资源也不是从参考合成图裁切。运行时代码会从 `home_common` 去重加载背景、Logo、头像、金币、角色、12 个语义图标和四种按钮皮肤；缺少 Bundle、资源加载失败或页面销毁时继续使用程序化回退。正式显示仍等待 Creator 首次导入和自动元数据；只能用仓库命令准备导入工作树，未通过 `home-art:verify-import` 前不得提交 `assets/bundles/home_common`。H4 最近检查点依次为 `8f8ac1c`、`6987f6f`、`93f397f`、`613ef0c` 和资源归档 `54b3964`，均已推送到当前分支但未标记 `dev_done`。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -161,7 +161,7 @@ git fetch origin
 - 房间、计分、同步和云请求/响应协议
 - AppID、云环境、数据库权限和上传配置
 - 为展示效果伪造昵称、等级、金币、房间或历史数据
-- `art-source/home-v1` 之外的位图、音频、字体或美术资源
+- `art-source/home-v1` 之外的运行时位图、音频、字体或美术资源；`docs/design/home/` 中已批准且明确不进 Bundle 的设计参考归档除外
 - 未经指定 Creator 导入负责人生成的图片 importer `.meta`
 
 不得从参考合成图裁图，不得手写图片 importer `.meta`。正式图片首次导入必须由唯一一台 Creator 3.8.8 电脑完成，并将图片和 Creator 生成的 `.meta` 放入同一个提交。

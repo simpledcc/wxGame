@@ -1,6 +1,6 @@
 # Cocos 正式美术资源接入设计说明书（H4）
 
-更新日期：2026-07-13
+更新日期：2026-07-14
 
 目标状态：`IN_PROGRESS`
 
@@ -25,6 +25,8 @@
 - 当前替换接口：`PreGameUi.setVisualAsset(slot, SpriteFrame | null)`
 - 当前正式位图：18 个优化文件暂存于 `art-source/home-v1/optimized/`，总计 `335,229` 字节
 - 当前加载实现：`HomeArtManager`、语义路径、页面绑定、失败回退、按钮九宫格和微信分包契约已完成
+- 当前导入工具：`home-art:prepare/status/verify-import` 及无 Creator 回归测试已完成，当前状态为 `source-ready`
+- 当前设计证据：5 张生成源图、9 张原始 Goal 参考归档及 `640x1387` 合成预览均已推送；参考归档不进入运行包
 - 当前 `home_common` Bundle：尚未由 Creator 创建，图片及 `.meta` 尚未进入 `assets/`
 
 结论：资源生成、代码加载、页面槽位、失败兜底和包体契约已经完成。剩余关键工作是由唯一 Creator 3.8.8 负责人完成首次导入和元数据、实际构建、包体检查及 Creator 视觉验收。

@@ -8,13 +8,14 @@ This is the handoff contract for generated Home art staged under `cocos-client/a
 
 The formal H4 implementation sequence, loading architecture, collaboration rules and completion gates are defined in `COCOS_FINAL_ART_INTEGRATION_DESIGN.md`. This manifest remains the authoritative per-file delivery list.
 
-The checked-in reference and the explicit comparison between current code and the target are in `docs/design/home/README.md`. The reference is documentation, not a current runtime screenshot.
+The checked-in reference and the explicit comparison between current code and the target are in `docs/design/home/README.md`. All nine original Goal references are archived with hashes under `docs/design/home/references/`; they are documentation, not current runtime screenshots or runtime assets.
 
 G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot()`. G3/G4 now mount every slot in the real Home; route and Store code do not depend on whether final art has arrived.
 
 ## Current V0 State
 
 - Eighteen optimized formal assets total `335,229` bytes and are ready for one-time Creator import from `art-source/home-v1/optimized/`.
+- Five generated masters, all 18 optimized files, the composition preview and all nine hashed Goal references are tracked on GitHub; `npm run home-art:status` currently reports `source-ready`.
 - The portrait Home structure, data and interaction are complete; until import, the existing theme background and programmatic Graphics/Label visuals remain active.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - `HomeArtManager` automatically replaces a fallback when the matching `SpriteFrame` resolves; no route, controller or Store change is required.

@@ -2,7 +2,7 @@
 
 Date: 2026-07-14
 
-Status: Phase 8 source development and H8.1 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup passed for the H8 visual baseline; H8.1 has local source/runtime verification and still needs the same two-device acceptance. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+Status: Phase 8 source development and H8.1 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup passed for the historical H8 visual baseline. H4 formal Home art is now `source-ready`, but `home_common` has not been imported or built, so the older H8 evidence must not be used as H4 visual acceptance. Phase 9 also remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
 
 ## Latest Real Build Evidence
 
@@ -79,14 +79,14 @@ These are historical source measurements. The current final generated-package me
 
 | Gate | Status | Required action |
 | --- | --- | --- |
-| Cocos 3.8.8 import | Passed for current source/build | Creator 3.8.8 imported and built the project; static release QA still guards committed UUID/reference integrity |
+| Cocos 3.8.8 import | H8 baseline passed; H4 pending | On the designated Creator machine run `home-art:prepare`, import/configure `home_common`, pass `home-art:verify-import`, then perform a fresh actual build |
 | Runtime screen assembly | Implemented | Single `Home.scene` shell mounts every route/controller and its controls |
 | Runtime layout inspection | Partial | H5 pre-game routes passed portrait simulator traversal; inspect gameplay, privacy, result and loading states at all target portrait ratios |
 | Theme visual QA | Pending | Switch both themes; verify route backgrounds, insect/fish targets, feedback motion, fallback, contrast, and narrow-screen framing |
 | Two-device room QA | Pending | Create/join/ready/start on two real phones for the current preparation flow; later gameplay milestones must separately verify each enabled multiplayer mode |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
 | Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
-| WeChat package size | Passed for current build | Keep the current byte record; H4 art must use Bundle/subpackage budget because main-package margin is only `73,386` bytes |
+| WeChat package size | H8 baseline passed; H4 remeasure pending | Keep the H8 byte record as historical evidence; after H4 import verify `home_common` is a subpackage and record fresh main/subpackage totals |
 | Review screenshots | Partial | V0 screenshots and H5 simulator inspection exist; capture final current Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow before upload |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 
