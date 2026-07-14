@@ -61,9 +61,9 @@ Four clean text-free `384x164` PNG button skins are staged for orange/create-his
 
 ## Creator Import Handoff
 
-1. From `cocos-client`, run `npm run home-art:prepare`; this creates the exact runtime hierarchy under `assets/bundles/home_common/textures` without generating metadata.
+1. From `cocos-client`, run `npm run home-art:status` and require `source-ready`, then run `npm run home-art:prepare`; this creates the exact runtime hierarchy under `assets/bundles/home_common/textures` without generating metadata and changes status to `prepared`.
 2. Open the project with Cocos Creator 3.8.8, configure the root as Bundle `home_common`, and set all 18 images to importer type `sprite-frame`.
-3. Run `npm run home-art:verify-import`. It rejects missing/wrong files, changed bytes, incomplete metadata, duplicate top-level UUIDs, a wrong Bundle name, or missing SpriteFrame sub-resources.
+3. Run `npm run home-art:verify-import`, then require `npm run home-art:status` to report `imported`. The verifier rejects missing/wrong files, changed bytes, incomplete metadata, duplicate top-level UUIDs, a wrong Bundle name, or missing SpriteFrame sub-resources.
 4. Commit the imported image tree and every Creator-generated `.meta` together only after the verifier and actual WeChat build pass.
 
 ## Acceptance Checklist

@@ -10,6 +10,7 @@
     "build:wechat:dry-run": "node ./tools/run-wechat-build.js --dry-run",
     "inspect:wechat-build": "node ./tools/inspect-wechat-build.js",
     "home-art:prepare": "node ./tools/home-art-import.js",
+    "home-art:status": "node ./tools/home-art-import.js --status",
     "home-art:verify-import": "node ./tools/home-art-import.js --verify",
     "generate:word-banks": "node ./tools/generate-word-bank-data.js",
     "test:home-art-import": "node ./tools/test-home-art-import.js",

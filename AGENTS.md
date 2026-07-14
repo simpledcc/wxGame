@@ -168,9 +168,9 @@ git fetch origin
 
 H4.1 导入电脑执行顺序：
 
-1. 在干净工作树执行 `cd cocos-client` 和 `npm run home-art:prepare`；命令只复制经过哈希确认的 18 个优化文件，遇到不同文件或已有元数据会拒绝覆盖。
+1. 在干净工作树执行 `cd cocos-client` 和 `npm run home-art:status`，正常状态应为 `source-ready`；再执行 `npm run home-art:prepare`。准备命令只复制经过哈希确认的 18 个优化文件，遇到不同文件或已有元数据会拒绝覆盖，完成后状态必须为 `prepared`。
 2. 用 Cocos Creator 3.8.8 打开项目，等待导入结束；把 `assets/bundles/home_common` 设置为名称严格为 `home_common` 的 Bundle，并把全部 18 张图片的 importer 类型设置为 `sprite-frame`。
-3. 执行 `npm run home-art:verify-import`；该命令必须验证图片与批准源文件一致、23 个 Bundle/目录/图片元数据齐全、Bundle 设置正确、UUID 不重复且 SpriteFrame 子资源存在。
+3. 执行 `npm run home-art:verify-import`；该命令必须验证图片与批准源文件一致、23 个 Bundle/目录/图片元数据齐全、Bundle 设置正确、UUID 不重复且 SpriteFrame 子资源存在。随后 `npm run home-art:status` 必须显示 `imported`。
 4. 再执行 `npm run verify`、`npm run build:wechat` 和 `npm run inspect:wechat-build`，完成 Creator 画面检查。
 5. 只有上述检查通过后，才把 `assets/bundles/home_common`、`assets/bundles/home_common.meta`、进度和交接文件放入同一个 `dev_done` 提交。
 

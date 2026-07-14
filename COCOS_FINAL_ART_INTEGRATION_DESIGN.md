@@ -136,6 +136,9 @@ cocos-client/assets/bundles/
 - `home_common` 只在至少一张正式图片已经就绪、并由 Creator 创建 Bundle 元数据后建立；当前不提交空 Bundle。
 - `npm run home-art:prepare` 负责把批准的 18 个优化文件复制到待导入工作树；它不会生成或提交 `.meta`，并会拒绝覆盖不同图片或已导入目录。
 - Creator 首次导入后必须把全部图片设为 `sprite-frame`，再由 `npm run home-art:verify-import` 检查源文件哈希、Bundle 配置、目录/图片元数据、UUID 和 SpriteFrame 子资源。
+- `npm run home-art:status` 是跨电脑只读状态检查：`source-ready`、`prepared`、`imported` 为可继续状态，`invalid-source` 或 `invalid` 必须先修复，不能构建或提交。
+
+限制手写 importer `.meta` 的依据是 Creator 3.8 的官方资源流程：Creator 会在打开项目或刷新资源时为缺少元数据的文件自动生成 `.meta`，UUID 冲突或删除重建已被引用资源的元数据会造成资源引用丢失；图片默认按 Texture 导入，只有在 Inspector 中设为 `sprite-frame` 并应用后才会生成 SpriteFrame 子资源。参见 [Meta Files](https://docs.cocos.com/creator/3.8/manual/en/asset/meta.html)、[Texture Assets](https://docs.cocos.com/creator/3.8/manual/en/asset/texture.html) 和 [Sprite Frame Assets](https://docs.cocos.com/creator/3.8/manual/en/asset/sprite-frame.html)。
 
 ## 8. 运行时清单
 

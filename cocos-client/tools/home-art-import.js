@@ -148,8 +148,41 @@ function verifyHomeArtImport(options = {}) {
   return { bundleRoot, files: EXPECTED_FILES.length, metadataFiles: EXPECTED_FILES.length + EXPECTED_DIRECTORIES.length + 1, targetRoot };
 }
 
+function getHomeArtImportStatus(options = {}) {
+  const sourceRoot = path.resolve(options.sourceRoot || SOURCE_ROOT);
+  const bundleRoot = path.resolve(options.bundleRoot || BUNDLE_ROOT);
+  const targetRoot = path.join(bundleRoot, "textures");
+  try {
+    assertSourceComplete(sourceRoot);
+  } catch (error) {
+    return { state: "invalid-source", reason: error.message };
+  }
+  if (!fs.existsSync(bundleRoot)) return { state: "source-ready", files: EXPECTED_FILES.length };
+  try {
+    assertCopiesMatch(sourceRoot, targetRoot);
+  } catch (error) {
+    return { state: "invalid", reason: error.message };
+  }
+  const hasMetadata = fs.existsSync(`${bundleRoot}.meta`)
+    || fs.existsSync(`${targetRoot}.meta`)
+    || listFiles(targetRoot).some((file) => file.endsWith(".meta"));
+  if (!hasMetadata) return { state: "prepared", files: EXPECTED_FILES.length };
+  try {
+    const result = verifyHomeArtImport({ bundleRoot, sourceRoot });
+    return { state: "imported", files: result.files, metadataFiles: result.metadataFiles };
+  } catch (error) {
+    return { state: "invalid", reason: error.message };
+  }
+}
+
 function runCli() {
   try {
+    if (process.argv.includes("--status")) {
+      const status = getHomeArtImportStatus();
+      console.log(JSON.stringify(status, null, 2));
+      if (status.state === "invalid" || status.state === "invalid-source") process.exitCode = 1;
+      return;
+    }
     if (process.argv.includes("--verify")) {
       const result = verifyHomeArtImport();
       console.log(`home_common import verified: ${result.files} images and ${result.metadataFiles} metadata files.`);
@@ -170,6 +203,7 @@ module.exports = {
   EXPECTED_DIRECTORIES,
   EXPECTED_FILES,
   assertSourceComplete,
+  getHomeArtImportStatus,
   prepareHomeArt,
   verifyHomeArtImport
 };
