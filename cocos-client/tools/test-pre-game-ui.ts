@@ -61,7 +61,7 @@ function assertActionIconClearOfText(action: ReturnType<PreGameUi["actionButton"
   const iconRight = action.iconSlot.position.x + iconBounds.width / 2;
   const titleLeft = action.titleLabel.node.position.x - titleBounds.width / 2;
   assertOk(iconRight + 8 <= titleLeft, `${action.node.name} icon must not overlap its title area`);
-  assertOk(iconBounds.width <= 64, `${action.node.name} icon must stay within the compact visual cap`);
+  assertOk(iconBounds.width <= 56, `${action.node.name} icon must stay within the compact visual cap`);
 }
 
 function main(): void {
@@ -83,6 +83,7 @@ function main(): void {
   const topBar = preGame.topBar(safe);
   assertEqual(transform(topBar).width, safe.width);
   assertEqual(transform(topBar).height, 84);
+  assertOk(PRE_GAME_SAFE_INSETS.top >= 96, "top controls must stay below the WeChat capsule safe zone");
 
   const visualSlots = HOME_VISUAL_SLOT_KEYS.map((key, index) =>
     preGame.visualSlot(root, key, 0, 400 - index * 8, key === "background" ? 640 : 96, key === "background" ? 960 : 96)
@@ -149,13 +150,18 @@ function main(): void {
   assertVisualMatchesHitArea(action.node, action.visual);
   assertEqual(action.titleLabel.string, "创建房间");
   assertEqual(action.subtitleLabel?.string, "邀请好友，一起开始对战");
-  assertEqual(transform(action.iconSlot).width, 64);
+  assertEqual(transform(action.iconSlot).width, 56);
   assertActionIconClearOfText(action);
   const actionSkinNode = action.node.getChildByName("FoundationActionSkin");
   assertOk(actionSkinNode, "action button must keep a dedicated skin node");
   assertEqual(actionSkinNode.getComponent(Sprite)?.sizeMode, Sprite.SizeMode.CUSTOM);
   assertEqual(transform(actionSkinNode).width, 560);
   assertEqual(transform(actionSkinNode).height, 112);
+  action.visual.setSkin(actionSkinNode.getComponent(Sprite));
+  transform(actionSkinNode).setContentSize(384, 164);
+  action.visual.update();
+  assertEqual(transform(actionSkinNode).width, 560, "runtime visual must repair a late sprite-size reset");
+  assertEqual(transform(actionSkinNode).height, 112, "runtime visual must repair a late sprite-size reset");
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
@@ -188,7 +194,7 @@ function main(): void {
   let iconCount = 0;
   const icon = preGame.iconButton(topBar, "SettingsIcon", "设", 250, 0, 64, () => { iconCount += 1; });
   assertVisualMatchesHitArea(icon.node, icon.visual);
-  assertEqual(transform(icon.iconSlot).width, 40);
+  assertEqual(transform(icon.iconSlot).width, 36);
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
 
@@ -250,8 +256,8 @@ function main(): void {
   const tallSafe = preGame.safeArea(tallRoot, "TallPhoneSafeArea");
   assertEqual(transform(tallRoot).height, 1387);
   assertEqual(transform(tallScenery).height, 1387);
-  assertEqual(tallSafe.height, 1313);
-  assertEqual(tallSafe.node.position.y, -3);
+  assertEqual(tallSafe.height, 1249);
+  assertEqual(tallSafe.node.position.y, -35);
   setMockWindowSize(640, 960);
 
   console.log("Pre-game UI foundation OK: long-screen scenery, page headers, controls, hit geometry, and EditBox layering passed.");

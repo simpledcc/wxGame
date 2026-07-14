@@ -27,7 +27,7 @@ import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 const UI_LAYER = 1 << 25;
 
 export const PRE_GAME_SAFE_INSETS = Object.freeze({
-  top: 40,
+  top: 104,
   right: 24,
   bottom: 34,
   left: 24
@@ -481,8 +481,8 @@ export class PreGameUi {
     skinNode.active = false;
     this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
-    const iconSize = Math.max(40, Math.min(height * 0.62, width * 0.2, 64));
-    const iconInset = Math.max(20, Math.min(28, width * 0.08));
+    const iconSize = Math.max(36, Math.min(height * 0.56, width * 0.18, 56));
+    const iconInset = Math.max(18, Math.min(24, width * 0.07));
     const iconSlot = this.node(
       node,
       `${name}IconSlot`,
@@ -556,9 +556,9 @@ export class PreGameUi {
         frame.insetTop = 28;
         frame.insetBottom = 28;
         skin.spriteFrame = frame;
+        skin.sizeMode = Sprite.SizeMode.CUSTOM;
         skinNode.getComponent(UITransform)?.setContentSize(width, height);
         skinNode.active = true;
-        background.enabled = false;
         visual.setSkin(skin);
       }).catch(() => undefined);
     }
@@ -588,7 +588,7 @@ export class PreGameUi {
       "homeCardBorder"
     );
     this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
-    const iconSize = Math.max(36, Math.min(size * 0.7, size - 24));
+    const iconSize = Math.max(32, Math.min(size * 0.6, size - 28, 48));
     const iconSlot = this.node(node, `${name}IconSlot`, 0, 0, iconSize, iconSize);
     const iconLabel = this.label(
       iconSlot,

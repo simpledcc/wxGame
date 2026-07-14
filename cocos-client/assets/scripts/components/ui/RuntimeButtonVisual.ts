@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Graphics, Sprite } from "cc";
+import { _decorator, Button, Color, Component, Graphics, Sprite, UITransform } from "cc";
 
 const { ccclass } = _decorator;
 
@@ -43,11 +43,13 @@ export class RuntimeButtonVisual extends Component {
 
   setSkin(skin: Sprite | null): void {
     this.skin = skin;
+    this.ensureSkinSize();
     this.refresh(true);
   }
 
   refresh(force = false): void {
     if (!this.button || !this.background) return;
+    this.ensureSkinSize();
     const interactable = this.button.interactable;
     if (!force && interactable === this.lastInteractable) return;
     this.lastInteractable = interactable;
@@ -87,5 +89,13 @@ export class RuntimeButtonVisual extends Component {
     if (next === this.pressed) return;
     this.pressed = next;
     this.refresh(true);
+  }
+
+  private ensureSkinSize(): void {
+    if (!this.skin) return;
+    this.skin.sizeMode = Sprite.SizeMode.CUSTOM;
+    const transform = this.skin.node.getComponent(UITransform);
+    if (!transform || (transform.width === this.width && transform.height === this.height)) return;
+    transform.setContentSize(this.width, this.height);
   }
 }

@@ -106,6 +106,58 @@ function assertPreGameTargetDevices(root: Node): void {
   });
 }
 
+function assertPreGameIconLayout(root: Node, context: string): void {
+  const violations: string[] = [];
+  const visit = (node: Node, visible: boolean): void => {
+    const active = visible && node.active;
+    if (!active) return;
+    const transform = node.getComponent(UITransform);
+    const parent = node.parent;
+    const parentTransform = parent?.getComponent(UITransform);
+    if (transform && parent && parentTransform && node.name.endsWith("IconSlot")) {
+      const left = node.position.x - transform.width / 2;
+      const right = node.position.x + transform.width / 2;
+      const bottom = node.position.y - transform.height / 2;
+      const top = node.position.y + transform.height / 2;
+      if (
+        left < -parentTransform.width / 2 || right > parentTransform.width / 2
+        || bottom < -parentTransform.height / 2 || top > parentTransform.height / 2
+      ) {
+        violations.push(`${node.name} leaves ${parent.name}`);
+      }
+      if (transform.width > 56 || transform.height > 56) {
+        violations.push(`${node.name} is oversized at ${transform.width}x${transform.height}`);
+      }
+    }
+    if (transform && parent && parentTransform && node.name.endsWith("Skin") && parent.getComponent(Button)) {
+      if (transform.width !== parentTransform.width || transform.height !== parentTransform.height) {
+        violations.push(
+          `${node.name} ${transform.width}x${transform.height} does not cover ${parent.name} `
+          + `${parentTransform.width}x${parentTransform.height}`
+        );
+      }
+    }
+    if (
+      transform && parent && parentTransform && /^Home.+Slot$/.test(node.name)
+      && /Card$/.test(parent.name)
+    ) {
+      const left = node.position.x - transform.width / 2;
+      const right = node.position.x + transform.width / 2;
+      const bottom = node.position.y - transform.height / 2;
+      const top = node.position.y + transform.height / 2;
+      if (
+        left < -parentTransform.width / 2 || right > parentTransform.width / 2
+        || bottom < -parentTransform.height / 2 || top > parentTransform.height / 2
+      ) {
+        violations.push(`${node.name} leaves ${parent.name}`);
+      }
+    }
+    node.children.forEach((child) => visit(child, active));
+  };
+  visit(root, true);
+  assertEqual(violations.length, 0, `${context} icon layout violations: ${violations.join("; ")}`);
+}
+
 async function flush(): Promise<void> {
   flushStartQueue();
   await Promise.resolve();
@@ -351,7 +403,11 @@ async function main(): Promise<void> {
   const createSkin = findDeep(canvas, "CreateRoomButtonSkin");
   assertEqual(createSkin?.active, true, "formal primary button skin must load");
   assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);
-  assertEqual(findDeep(canvas, "CreateRoomButton")?.getComponent(Graphics)?.enabled, false);
+  assertEqual(
+    findDeep(canvas, "CreateRoomButton")?.getComponent(Graphics)?.enabled,
+    true,
+    "programmatic base must remain visible behind a formal skin"
+  );
   ["CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
     const action = findDeep(canvas, name);
     const subtitle = findDeep(canvas, `${name}Subtitle`);
@@ -380,6 +436,7 @@ async function main(): Promise<void> {
   assertOk(initialHomeRoot);
   assertVisibleUiContract(initialHomeRoot, "home route");
   assertPreGameTargetDevices(initialHomeRoot);
+  assertPreGameIconLayout(initialHomeRoot, "home route");
 
   const playerModal = findDeep(canvas, "HomePlayerModal");
   assertEqual(playerModal?.active, false);
@@ -740,6 +797,7 @@ async function main(): Promise<void> {
     const routeRoot = findDeep(canvas, expectedRoots[index]);
     assertOk(routeRoot, `${routes[index]} did not mount`);
     assertVisibleUiContract(routeRoot, `${routes[index]} route`);
+    assertPreGameIconLayout(routeRoot, `${routes[index]} route`);
     const unifiedContract = unifiedPageContracts[routes[index]];
     if (unifiedContract) {
       assertOk(findDeep(routeRoot, unifiedContract[0]), `${routes[index]} safe area is required`);
