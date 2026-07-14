@@ -138,6 +138,9 @@ export class Label extends Component {
   verticalAlign = 1;
   enableWrapText = true;
   overflow = Label.Overflow.NONE;
+  enableOutline = false;
+  outlineColor = new Color();
+  outlineWidth = 0;
 }
 
 export class Graphics extends Component {

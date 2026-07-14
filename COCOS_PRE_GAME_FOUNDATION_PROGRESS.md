@@ -348,6 +348,23 @@ Updated: 2026-07-14
 - `npm run build:wechat:dry-run`: `PASSED`; the renamed build task keeps valid inputs, output isolation and Creator command generation.
 - `git diff --check` and forbidden-path audit: `PASSED`; no gameplay Bundle, cloud function, legacy client, protocol or AppID change.
 
+## H8.4 Home hierarchy and clarity refinement
+
+1. Restored the approved Home hierarchy from the final reference: full-width Create Room, full-width Join Room, then two rows for pre-match study / word bank and mode catalog / history.
+2. Removed the white card backgrounds from the avatar, coin and settings controls. The avatar and settings remain direct transparent icon targets; player and coin copy use compact dark translucent pills.
+3. Increased the safe avatar presentation while keeping strict icon-containment checks for every other action. All formal button skins still cover their complete hit areas.
+4. Strengthened action-label legibility with responsive title sizes and a restrained dark outline on colored buttons; subtitles retain independent spacing and minimum border clearance.
+5. Kept the formal Logo, character, background, semantic icons and live Labels/actions. No gameplay, room, cloud or word-bank behavior changed.
+6. Exported the current runtime images and larger source masters to `C:\work\游戏图片\游戏主界面图片`, together with `资源增强说明.md`, so enhanced replacements can preserve names, transparency and target dimensions.
+
+### H8.4 final verification
+
+- `npm run verify`: `PASSED` in `63.2s`, including structure, platform, lifecycle, contracts, all gameplay compatibility suites, pre-game UI, runtime route interaction, release and both TypeScript checks.
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`.
+- `npm run inspect:wechat-build`: `PASSED`; generated package `6,850,587` bytes, main package `4,121,077 / 4,194,304` bytes and `home_common` subpackage `355,148` bytes.
+- WeChat Developer Tools cache was cleared before the final check. The `H4-360x800` simulator showed the approved six-entry hierarchy, transparent top controls, complete bottom actions, contained icons and no application error.
+- `git diff --check` and forbidden-path audit: `PASSED`; no `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram` change.
+
 ## G0 modified files
 
 - `cocos-client/tools/generate-word-bank-data.js`

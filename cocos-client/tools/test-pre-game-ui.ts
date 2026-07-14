@@ -150,6 +150,8 @@ function main(): void {
   assertVisualMatchesHitArea(action.node, action.visual);
   assertEqual(action.titleLabel.string, "创建房间");
   assertEqual(action.subtitleLabel?.string, "邀请好友，一起开始对战");
+  assertEqual(action.titleLabel.enableOutline, true);
+  assertEqual(action.titleLabel.outlineWidth, 3);
   assertEqual(transform(action.iconSlot).width, 56);
   assertActionIconClearOfText(action);
   const actionSkinNode = action.node.getChildByName("FoundationActionSkin");
@@ -189,6 +191,7 @@ function main(): void {
   );
   assertVisualMatchesHitArea(surfaceAction.node, surfaceAction.visual);
   assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeText"));
+  assertEqual(surfaceAction.titleLabel.enableOutline, false);
   assertActionIconClearOfText(surfaceAction);
 
   let iconCount = 0;
@@ -197,6 +200,14 @@ function main(): void {
   assertEqual(transform(icon.iconSlot).width, 36);
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
+  const transparentIcon = preGame.iconButton(
+    topBar, "TransparentSettings", "设", -250, 0, 64, () => undefined, "settings", "transparent"
+  );
+  assertEqual(transparentIcon.background.enabled, false);
+  const utilityPill = preGame.pill(topBar, "FoundationUtilityPill", 0, 0, 180, 56);
+  assertOk(utilityPill.getComponent(Graphics));
+  assertEqual(transform(utilityPill).width, 180);
+  assertEqual(transform(utilityPill).height, 56);
 
   const pageGroup = preGame.group(root, "FoundationPageGroup", 0, 0, DESIGN_WIDTH, DESIGN_HEIGHT);
   const pageSafe = preGame.safeArea(pageGroup, "FoundationPageSafeArea");

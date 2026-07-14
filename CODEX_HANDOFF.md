@@ -14,6 +14,7 @@ Product concept: a multi-mode vocabulary game platform with one portrait Home an
 
 Resume point for the next agent:
 
+- 2026-07-15 Home hierarchy/clarity refinement: restored the final approved Home layout with full-width Create and Join actions followed by Study/Bank and Catalog/History rows. Avatar, coin and settings no longer have white background cards; colored action titles use responsive sizing and restrained outlines, and the avatar is larger without violating safe-area/icon containment. Current runtime assets plus larger source masters were exported to `C:\work\游戏图片\游戏主界面图片` with replacement guidance. Full `npm run verify`, the actual Creator 3.8.8 WeChat build and package inspection passed (`6,850,587` total, `4,121,077 / 4,194,304` main, `355,148` `home_common`). After clearing stale Developer Tools compile/file cache, the H4-360x800 simulator displayed the correct hierarchy with complete top and bottom controls and no application error. No gameplay Bundle, cloud function, legacy client or protocol changed.
 - 2026-07-14 final icon/capsule repair: a real screenshot proved the previous custom-size assignment could still be overwritten after asynchronous art loading, leaving raw-width skins and detached icons. `RuntimeButtonVisual` now repairs late skin resets, the programmatic full-size base remains visible under formal art, shared action/top icons are capped at 56/48 design pixels, and the common top safe inset is 104 so Home Settings and every page Back control clear the WeChat capsule. Cross-route runtime QA checks Home, Bank, Study, mode selection, Room, Result, History, Feedback and Help for icon containment and exact skin/hit-area coverage. Full verify, Creator build, package inspection and a fresh 360x800 Developer Tools Home check passed with 0 application errors. No gameplay Bundle, cloud function, legacy client or protocol changed.
 - 2026-07-14 post-H4 icon-layout maintenance: formal sliced action skins no longer collapse to their source-image width after SpriteFrame assignment; they are fixed to custom size and restored to the full clickable bounds. Action icons are capped at 64 design pixels with a tested title gap, top icon controls use a smaller slot, and crowded card/character art was reduced and repositioned. `npm run verify`, the actual Creator WeChat build and generated-package inspection passed; the 360x800 Home view showed full-width button skins, contained icons and 0 application errors. No gameplay Bundle, cloud function, legacy client or protocol changed.
 - 2026-07-14 H4 completion: exact 360x800 and 430x932 Home checks passed in WeChat Developer Tools after the imported H4.1 package. Formal background cover, contained foreground art, live Labels, button skins, bottom actions and safe-area spacing remained visible without incoherent overlap; application errors were 0. H4 is now `COMPLETE`. The next single action is two-real-phone create/join/ready/start preparation-flow QA; gameplay implementation remains frozen.
@@ -294,6 +295,13 @@ $env:PYTHONIOENCODING='utf-8'
 - The project directory is now a git repository connected to `git@github.com:simpledcc/wxGame.git`; still use file-level care because user testing may leave local changes.
 
 ## Suggested Next Steps
+
+### 2026-07-15 Home hierarchy and clarity refinement
+
+- The authoritative Home hierarchy is Create Room, Join Room, Study/Bank, Catalog/History, followed by Privacy/Feedback. Do not restore the superseded Start Study-first layout.
+- Keep avatar, coin and settings free of white card backgrounds. Any replacement art must preserve the current transparent icon slots and WeChat capsule clearance.
+- Enhancement source packages are available outside Git at `C:\work\游戏图片\游戏主界面图片`; replace runtime images only through the existing controlled Home-art import workflow.
+- The only external release action remains two-real-phone create/join/ready/start acceptance; gameplay implementation is still outside this Home-only refinement.
 
 ### 2026-07-14 full-screen pre-game visual update
 

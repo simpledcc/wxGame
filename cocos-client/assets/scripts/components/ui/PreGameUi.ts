@@ -42,6 +42,8 @@ export type PreGameActionKind =
   | "history"
   | "surface";
 
+export type PreGameIconBackground = "card" | "transparent";
+
 export const HOME_VISUAL_SLOT_KEYS = [
   "background",
   "logo",
@@ -348,6 +350,27 @@ export class PreGameUi {
     return node;
   }
 
+  pill(
+    parent: Node,
+    name: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    fillToken: ThemeColorToken = "homeModalShade",
+    borderToken: ThemeColorToken = "homeTextOnColor"
+  ): Node {
+    const node = this.node(parent, name, x, y, width, height);
+    const graphics = node.addComponent(Graphics);
+    graphics.fillColor = this.color(fillToken);
+    graphics.strokeColor = this.color(borderToken);
+    graphics.lineWidth = 2;
+    graphics.roundRect(-width / 2, -height / 2, width, height, height / 2);
+    graphics.fill();
+    graphics.stroke();
+    return node;
+  }
+
   button(
     parent: Node,
     name: string,
@@ -509,7 +532,8 @@ export class PreGameUi {
 
     const textLeft = -width / 2 + iconInset + iconSize + 12;
     const textWidth = Math.max(40, width - (textLeft + width / 2) - 24);
-    const titleY = subtitle ? 12 : 0;
+    const titleY = subtitle ? (height >= 100 ? 17 : 12) : 0;
+    const titleFontSize = height >= 120 ? 38 : height >= 96 ? 31 : height >= 80 ? 27 : 24;
     const titleLabel = this.label(
       node,
       `${name}Title`,
@@ -518,19 +542,24 @@ export class PreGameUi {
       titleY,
       textWidth,
       subtitle ? height * 0.46 : height * 0.7,
-      height >= 100 ? 30 : 24,
+      titleFontSize,
       textToken
     );
+    if (kind !== "surface") {
+      titleLabel.enableOutline = true;
+      titleLabel.outlineColor = this.darken(baseColor, 0.42);
+      titleLabel.outlineWidth = height >= 100 ? 3 : 2;
+    }
     const subtitleLabel = subtitle
       ? this.label(
           node,
           `${name}Subtitle`,
           subtitle,
           textLeft + textWidth / 2,
-          -15,
+          height >= 100 ? -22 : -16,
           textWidth,
           height * 0.3,
-          15,
+          height >= 100 ? 17 : 15,
           textToken
         )
       : null;
@@ -551,10 +580,13 @@ export class PreGameUi {
     if (skinKey) {
       void homeArt.loadButtonSkin(skinKey).then((frame) => {
         if (!node.active) return;
-        frame.insetLeft = 28;
-        frame.insetRight = 28;
-        frame.insetTop = 28;
-        frame.insetBottom = 28;
+        const source = frame as unknown as { width?: number; height?: number };
+        const sourceWidth = Math.max(1, Number(source.width) || 384);
+        const sourceHeight = Math.max(1, Number(source.height) || 164);
+        frame.insetLeft = Math.max(1, Math.round(sourceWidth * (28 / 384)));
+        frame.insetRight = frame.insetLeft;
+        frame.insetTop = Math.max(1, Math.round(sourceHeight * (28 / 164)));
+        frame.insetBottom = frame.insetTop;
         skin.spriteFrame = frame;
         skin.sizeMode = Sprite.SizeMode.CUSTOM;
         skinNode.getComponent(UITransform)?.setContentSize(width, height);
@@ -574,7 +606,9 @@ export class PreGameUi {
     y: number,
     size: number,
     handler: () => void,
-    visualKey?: HomeVisualSlotKey
+    visualKey?: HomeVisualSlotKey,
+    backgroundStyle: PreGameIconBackground = "card",
+    iconSizeOverride = 0
   ): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, size, size);
     const radius = Math.min(18, size / 2);
@@ -587,8 +621,11 @@ export class PreGameUi {
       "homeCard",
       "homeCardBorder"
     );
+    background.enabled = backgroundStyle === "card";
     this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
-    const iconSize = Math.max(32, Math.min(size * 0.6, size - 28, 48));
+    const iconSize = iconSizeOverride > 0
+      ? Math.max(32, Math.min(iconSizeOverride, size - 8))
+      : Math.max(32, Math.min(size * 0.6, size - 28, 48));
     const iconSlot = this.node(node, `${name}IconSlot`, 0, 0, iconSize, iconSize);
     const iconLabel = this.label(
       iconSlot,

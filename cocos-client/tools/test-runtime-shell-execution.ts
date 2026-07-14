@@ -125,7 +125,8 @@ function assertPreGameIconLayout(root: Node, context: string): void {
       ) {
         violations.push(`${node.name} leaves ${parent.name}`);
       }
-      if (transform.width > 56 || transform.height > 56) {
+      const maxIconSize = node.name === "HomeAvatarButtonIconSlot" ? 72 : 56;
+      if (transform.width > maxIconSize || transform.height > maxIconSize) {
         violations.push(`${node.name} is oversized at ${transform.width}x${transform.height}`);
       }
     }
@@ -400,6 +401,50 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "HomeScenery")?.active, false, "formal background must replace programmatic scenery");
   assertOk(findDeep(canvas, "HomeLogoSprite")?.getComponent(Sprite)?.spriteFrame, "formal Home logo must load");
   assertEqual(findDeep(canvas, "HomeAvatarFallback")?.active, false, "formal avatar must replace its fallback");
+  assertEqual(
+    findDeep(canvas, "HomeAvatarButton")?.getComponent(Graphics)?.enabled,
+    false,
+    "Home avatar must not keep a white card background"
+  );
+  assertEqual(
+    findDeep(canvas, "SettingsButton")?.getComponent(Graphics)?.enabled,
+    false,
+    "Home settings must not keep a white card background"
+  );
+  assertEqual(
+    findDeep(canvas, "HomeCoinButton")?.getComponent(Graphics)?.enabled,
+    false,
+    "Home coin action must not keep a white card background"
+  );
+  assertOk(findDeep(canvas, "HomePlayerCard")?.getComponent(Graphics), "player name must use a dark utility pill");
+  assertOk(findDeep(canvas, "HomeCoinPill")?.getComponent(Graphics), "coin count must use a dark utility pill");
+  const homeLogoTransform = findDeep(canvas, "HomeLogoSlot")?.getComponent(UITransform);
+  assertEqual(homeLogoTransform?.width, 520);
+  assertEqual(homeLogoTransform?.height, 156);
+  const createAction = findDeep(canvas, "CreateRoomButton");
+  const createTransform = createAction?.getComponent(UITransform);
+  const createTitle = findDeep(canvas, "CreateRoomButtonTitle")?.getComponent(Label);
+  assertEqual(createTransform?.width, 560);
+  assertEqual(createTransform?.height, 132);
+  assertEqual(createTitle?.string, "创建房间");
+  assertEqual(createTitle?.fontSize, 38);
+  assertEqual(createTitle?.enableOutline, true);
+  assertEqual(createTitle?.outlineWidth, 3);
+  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.width, 560);
+  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.height, 116);
+  ["StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
+    const transform = findDeep(canvas, name)?.getComponent(UITransform);
+    assertEqual(transform?.width, 272, `${name} must use the wide two-column layout`);
+    assertEqual(transform?.height, 104, `${name} must use the wide two-column layout`);
+    assertEqual(findDeep(canvas, `${name}Title`)?.getComponent(Label)?.fontSize, 31);
+    assertEqual(findDeep(canvas, `${name}Subtitle`)?.active, true, `${name} subtitle must remain visible`);
+  });
+  assertOk(
+    (createAction?.position.y || 0) > (findDeep(canvas, "JoinRoomButton")?.position.y || 0)
+    && (findDeep(canvas, "JoinRoomButton")?.position.y || 0) > (findDeep(canvas, "StudyButton")?.position.y || 0)
+    && (findDeep(canvas, "StudyButton")?.position.y || 0) > (findDeep(canvas, "HelpButton")?.position.y || 0),
+    "Home actions must follow create, join, learning, then extension hierarchy"
+  );
   const createSkin = findDeep(canvas, "CreateRoomButtonSkin");
   assertEqual(createSkin?.active, true, "formal primary button skin must load");
   assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);

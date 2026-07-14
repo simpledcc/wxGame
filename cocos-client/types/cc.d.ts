@@ -44,6 +44,9 @@ declare module "cc" {
     verticalAlign: number;
     enableWrapText: boolean;
     overflow: number;
+    enableOutline: boolean;
+    outlineColor: Color;
+    outlineWidth: number;
   }
 
   export class UITransform {
