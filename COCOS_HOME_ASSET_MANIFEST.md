@@ -14,7 +14,7 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 ## Current V0 State
 
-- Eighteen optimized formal assets total `332,877` bytes and are ready for one-time Creator import from `art-source/home-v1/optimized/`.
+- Eighteen optimized formal assets total `335,229` bytes and are ready for one-time Creator import from `art-source/home-v1/optimized/`.
 - The portrait Home structure, data and interaction are complete; until import, the existing theme background and programmatic Graphics/Label visuals remain active.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - `HomeArtManager` automatically replaces a fallback when the matching `SpriteFrame` resolves; no route, controller or Store change is required.
@@ -35,10 +35,10 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 | Slot key | Art | Suggested source | Alpha | Slice | Planned ownership | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | `background` | Portrait village/learning-camp scene, no embedded text | 750x1334 JPG, 170,868 B | no | none | `home_common/backgrounds` | optimized and code-bound; Creator import pending |
-| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,115 B | yes | none | `home_common` | optimized and code-bound; Creator import pending |
+| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,211 B | yes | none | `home_common` | optimized and code-bound; Creator import pending |
 | `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 | `coin` | Star coin icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `character` | Friendly rabbit learning companion | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `character` | Full-body rabbit learning companion holding a book | 192x256 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 | `createRoom` | House icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 | `joinRoom` | Two-player/friend icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 | `practice` | Open book/practice icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
@@ -49,14 +49,14 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 | `privacy` | Shield/check icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 | `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
 
-Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 48 px slice insets and preserves live Labels and button handlers; surface cards remain programmatic.
+Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 28 px slice insets so every 80/96 px target retains a valid center region, while preserving live Labels and button handlers; surface cards remain programmatic.
 
 ## Bundle Rules
 
 - Theme-specific backgrounds remain in `theme_default` / `theme_island`; use the existing `homeBackground` semantic key.
 - Shared background, logo, avatar, character, icons and button skins belong in `home_common`. The designated Creator owner creates this Bundle while importing the staged files.
 - Do not place Home art in `mode_pk` or `mode_spell`; those Bundles are owned by gameplay streams.
-- Keep optimized Home art below 350 KB total for V0 and each decoded texture at or below 2048x2048. Current optimized total is `332,877` bytes.
+- Keep optimized Home art below 350 KB total for V0 and each decoded texture at or below 2048x2048. Current optimized total is `335,229` bytes.
 - No text may be baked into buttons. Labels remain runtime text for data binding, accessibility and later copy changes.
 
 ## Acceptance Checklist

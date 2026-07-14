@@ -139,6 +139,8 @@ function testHomeArtManifestAndBudget(): void {
       assert.deepEqual(getJpegDimensions(sourcePath), { width: 750, height: 1334 });
     } else if (key === "logo") {
       assert.deepEqual(getPngDimensions(sourcePath), { width: 640, height: 200 });
+    } else if (key === "character") {
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 192, height: 256 });
     } else if (key in HOME_BUTTON_SKIN_PATHS) {
       assert.deepEqual(getPngDimensions(sourcePath), { width: 384, height: 164 });
     } else {

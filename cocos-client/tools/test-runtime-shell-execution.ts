@@ -328,6 +328,14 @@ async function main(): Promise<void> {
     "Home coins must come from WordBankStore"
   );
   assertOk(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："));
+  const homeSubtitle = findDeep(canvas, "HomeSubtitle");
+  const currentBankBar = findDeep(canvas, "CurrentBankBar");
+  const subtitleTransform = homeSubtitle?.getComponent(UITransform);
+  const bankTransform = currentBankBar?.getComponent(UITransform);
+  assertOk(homeSubtitle && currentBankBar && subtitleTransform && bankTransform);
+  const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
+    - (currentBankBar.position.y + bankTransform.height / 2);
+  assertOk(subtitleBankGap >= 2, "Home subtitle and bank bar must not overlap");
   assertEqual(
     findDeep(canvas, "HistoryButtonSubtitle")?.getComponent(Label)?.string,
     "暂无战绩，完成比赛后查看"
@@ -337,12 +345,22 @@ async function main(): Promise<void> {
     "WordBank", "Catalog", "History", "Settings", "Privacy", "Feedback"
   ].forEach((stem) => assertOk(findDeep(canvas, `Home${stem}Slot`), `Home ${stem} visual slot is required`));
   assertOk(findDeep(canvas, "ThemeBackground")?.getComponent(Sprite)?.spriteFrame, "shared pre-game background must load");
+  assertEqual(findDeep(canvas, "HomeScenery")?.active, false, "formal background must replace programmatic scenery");
   assertOk(findDeep(canvas, "HomeLogoSprite")?.getComponent(Sprite)?.spriteFrame, "formal Home logo must load");
   assertEqual(findDeep(canvas, "HomeAvatarFallback")?.active, false, "formal avatar must replace its fallback");
   const createSkin = findDeep(canvas, "CreateRoomButtonSkin");
   assertEqual(createSkin?.active, true, "formal primary button skin must load");
   assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);
   assertEqual(findDeep(canvas, "CreateRoomButton")?.getComponent(Graphics)?.enabled, false);
+  ["CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
+    const action = findDeep(canvas, name);
+    const subtitle = findDeep(canvas, `${name}Subtitle`);
+    const actionTransform = action?.getComponent(UITransform);
+    const subtitleTransform = subtitle?.getComponent(UITransform);
+    assertOk(action && subtitle && actionTransform && subtitleTransform);
+    const bottomInset = subtitle.position.y - subtitleTransform.height / 2 + actionTransform.height / 2;
+    assertOk(bottomInset >= 10, `${name} subtitle must clear the sliced-skin border`);
+  });
   [
     "CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton",
     "HistoryButton", "HomeAvatarButton", "HomeCoinButton", "SettingsButton", "HomePrivacy", "FeedbackButton"

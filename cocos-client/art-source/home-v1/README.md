@@ -8,12 +8,13 @@ reference composite was cropped or copied into the runtime package.
 
 - `home-background-master.png`: text-free portrait learning-garden scene.
 - `home-logo-master.png`: fixed `词斗乐园` brand mark with no dynamic subtitle.
+- `home-character-master.png`: dedicated full-body rabbit learning companion.
 - `home-icons-atlas.png`: 4x4 chroma-key source sheet; the first 12 icons are used by V1.
 - `home-buttons-atlas.png`: orange, blue, green and purple text-free button skins.
-- `optimized/`: 18 final import files, `332,877` bytes total.
+- `optimized/`: 18 final import files, `335,229` bytes total.
 
 Final dimensions are `750x1334` for the JPG background, `640x200` for the logo,
-`192x192` for icons and `384x164` for button skins. Dynamic player, coin, bank, room and
+`192x192` for icons (`character` is `192x256`) and `384x164` for button skins. Dynamic player, coin, bank, room and
 history text remains in Cocos Labels.
 
 ## Processing

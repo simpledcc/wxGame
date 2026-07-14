@@ -78,7 +78,7 @@ Updated: 2026-07-14
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
-| H4 Formal art integration | `IN_PROGRESS` | 18 optimized assets (`332,877` bytes), source masters, processing tool, cached loader, semantic bindings, fallback and subpackage contract are ready | This computer has no Creator; H4.1 first import, generated `.meta`, actual build and visual QA remain |
+| H4 Formal art integration | `IN_PROGRESS` | 18 optimized assets (`335,229` bytes), source masters, processing tool, cached loader, semantic bindings, fallback and subpackage contract are ready | This computer has no Creator; H4.1 first import, generated `.meta`, actual build and visual QA remain |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
@@ -197,7 +197,7 @@ Updated: 2026-07-14
 ## H4 implementation checkpoint
 
 1. Generated a new text-free portrait learning-garden background, exact fixed `词斗乐园` Logo, 16-icon source atlas and four text-free button skins from the approved visual direction.
-2. Added `tools/process-home-art.py`; the optimized import payload contains one JPG and 17 transparent PNG files totaling `332,877` bytes, below the 350 KB H4 target.
+2. Added `tools/process-home-art.py`; the optimized import payload contains one JPG and 17 transparent PNG files totaling `335,229` bytes, below the 350 KB H4 target. Connected chroma spill is removed without damaging the purple skin.
 3. Added `HomeArtManager` request deduplication, cache, retry-after-failure behavior and semantic asset/button-skin paths without changing gameplay code or room/cloud contracts.
 4. Bound every existing `PreGameUi.visualSlot()` automatically and applied orange/blue/green/purple sliced button skins while retaining Graphics/Label fallbacks.
 5. Made all non-game routes prefer the shared learning-garden background; gameplay routes continue using their existing theme backgrounds.
@@ -205,6 +205,8 @@ Updated: 2026-07-14
 7. Kept the optimized files outside `assets/` because this computer cannot run Creator. This checkpoint intentionally contains no hand-authored image or Bundle `.meta`.
 8. H4 remains `IN_PROGRESS`; the next Creator computer must perform H4.1 import before actual rendering or completion can be claimed.
 9. Local checkpoint verification passed `npm run verify` and `npm run build:wechat:dry-run`; actual Creator import/build, package-byte evidence and screenshots are intentionally still pending.
+10. Added a dedicated full-body reading rabbit, disabled programmatic scenery after formal background success, corrected Home subtitle/bank spacing and reduced button slice insets to a valid 28 px for 80 px controls.
+11. Added `docs/design/home/h4-art-composition-preview.png`, rendered from the optimized assets at the actual `640x1387` long-phone coordinate system. It is composition evidence only, not a Creator screenshot.
 
 ## H5 seven-page pre-game flow
 

@@ -23,7 +23,7 @@
 - 当前背景：运行时优先请求 `home_common`，Bundle 未导入时回退到主题 `homeBackground`
 - 当前前景视觉：`PreGameUi.visualSlot()` 中的 Graphics/Label 程序化兜底
 - 当前替换接口：`PreGameUi.setVisualAsset(slot, SpriteFrame | null)`
-- 当前正式位图：18 个优化文件暂存于 `art-source/home-v1/optimized/`，总计 `332,877` 字节
+- 当前正式位图：18 个优化文件暂存于 `art-source/home-v1/optimized/`，总计 `335,229` 字节
 - 当前加载实现：`HomeArtManager`、语义路径、页面绑定、失败回退、按钮九宫格和微信分包契约已完成
 - 当前 `home_common` Bundle：尚未由 Creator 创建，图片及 `.meta` 尚未进入 `assets/`
 

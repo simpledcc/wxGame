@@ -88,7 +88,7 @@ git fetch origin
 
 当前工作流：A 线，首页和游戏准备前界面；H5-H8.3 已冻结，当前进入 H4 正式美术接入。
 
-当前目标：H4.0 的独立背景、Logo、角色/功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `332,877` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑完成 H4.1 首次导入。
+当前目标：H4.0 的独立背景、Logo、全身角色、功能图标和四种无文字按钮皮肤已生成并压缩到 `cocos-client/art-source/home-v1/optimized/`，总计 `335,229` 字节。`HomeArtManager`、语义路径、失败回退、按钮九宫格运行时配置及 `home_common` 微信分包契约已实现。当前电脑没有 Cocos Creator，资源尚未进入 `assets/`，也没有图片 `.meta`；下一项唯一行动是在指定的 Creator 3.8.8 电脑完成 H4.1 首次导入。
 
 当前权威文件：
 

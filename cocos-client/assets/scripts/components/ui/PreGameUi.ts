@@ -203,6 +203,9 @@ export class PreGameUi {
         sparkleGraphics.circle(x, y, 7);
         sparkleGraphics.fill();
       });
+    void homeArt.load("background").then(() => {
+      if (root.active) root.active = false;
+    }).catch(() => undefined);
     return root;
   }
 
@@ -497,7 +500,7 @@ export class PreGameUi {
 
     const textLeft = -width / 2 + 30 + iconSize;
     const textWidth = Math.max(40, width - (textLeft + width / 2) - 20);
-    const titleY = subtitle ? 13 : 0;
+    const titleY = subtitle ? 12 : 0;
     const titleLabel = this.label(
       node,
       `${name}Title`,
@@ -515,7 +518,7 @@ export class PreGameUi {
           `${name}Subtitle`,
           subtitle,
           textLeft + textWidth / 2,
-          -height * 0.24,
+          -15,
           textWidth,
           height * 0.3,
           15,
@@ -539,10 +542,10 @@ export class PreGameUi {
     if (skinKey) {
       void homeArt.loadButtonSkin(skinKey).then((frame) => {
         if (!node.active) return;
-        frame.insetLeft = 48;
-        frame.insetRight = 48;
-        frame.insetTop = 48;
-        frame.insetBottom = 48;
+        frame.insetLeft = 28;
+        frame.insetRight = 28;
+        frame.insetTop = 28;
+        frame.insetBottom = 28;
         skin.spriteFrame = frame;
         skinNode.active = true;
         background.enabled = false;

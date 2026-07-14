@@ -73,7 +73,7 @@ export class RuntimeScreenFactory {
     home.visualSlot(safe.node, "logo", 0, logoY, 460, 112);
     home.label(safe.node, "HomeSubtitle", "和好友一起比拼单词实力", 0, logoY - 70, 480, 30, 19, "homeText");
     const bank = home.actionButton(
-      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - 124, 560, 80,
+      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - 128, 560, 80,
       () => controller.openBankPicker(), "surface", "wordBank"
     );
     bank.titleLabel.node.setPosition(-28, 0, 0);
@@ -103,7 +103,7 @@ export class RuntimeScreenFactory {
       safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 144, logoY - 495, 272, 80,
       () => controller.openHistory(), "history", "history"
     );
-    home.visualSlot(safe.node, "character", 218, footerY + 140, 150, 170);
+    home.visualSlot(safe.node, "character", 205, footerY + 170, 190, 240);
 
     let privacy!: PreGameActionButtonRef;
     privacy = home.actionButton(
