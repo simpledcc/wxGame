@@ -257,25 +257,38 @@ function testAssetMetadataAndSceneReferences(): void {
 }
 
 function testSourceAssetBudget(): void {
+  const homeArtRoot = path.join(root, "assets", "bundles", "home_common");
+  const homeArtMetaPath = `${homeArtRoot}.meta`;
+  const isHomeArtFile = (filePath: string): boolean =>
+    filePath === homeArtMetaPath || filePath.startsWith(`${homeArtRoot}${path.sep}`);
   const payloadFiles = listFiles(path.join(root, "assets"), new Set([
     ".ts", ".json", ".scene", ".jpg", ".png", ".wav"
   ]));
   const normalizedTextExtensions = new Set([".ts", ".json", ".scene"]);
-  const payloadBytes = payloadFiles.reduce((sum, filePath) => {
+  const measurePayload = (files: string[]): number => files.reduce((sum, filePath) => {
     if (!normalizedTextExtensions.has(path.extname(filePath).toLowerCase())) {
       return sum + fs.statSync(filePath).size;
     }
     const normalized = fs.readFileSync(filePath, "utf8").replace(/\r\n?/g, "\n");
     return sum + Buffer.byteLength(normalized, "utf8");
   }, 0);
-  const metadataBytes = listFiles(path.join(root, "assets"), new Set([".meta"]))
+  const corePayloadBytes = measurePayload(payloadFiles.filter((filePath) => !isHomeArtFile(filePath)));
+  const homeArtBytes = measurePayload(payloadFiles.filter(isHomeArtFile));
+  const metadataFiles = listFiles(path.join(root, "assets"), new Set([".meta"]));
+  const metadataBytes = metadataFiles
+    .filter((filePath) => !isHomeArtFile(filePath))
+    .reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
+  const homeArtMetadataBytes = metadataFiles
+    .filter(isHomeArtFile)
     .reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
   const themeFiles = listFiles(path.join(root, "assets", "bundles"), new Set([
     ".json", ".meta", ".jpg", ".png"
-  ]));
+  ])).filter((filePath) => !isHomeArtFile(filePath));
   const themeBytes = themeFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
-  assert.ok(payloadBytes < 1_500_000, `Cocos source payload exceeds 1.5 MB: ${payloadBytes}`);
+  assert.ok(corePayloadBytes < 1_500_000, `Cocos core source payload exceeds 1.5 MB: ${corePayloadBytes}`);
+  assert.ok(homeArtBytes <= 350_000, `home_common source art exceeds 350 KB: ${homeArtBytes}`);
   assert.ok(metadataBytes < 50_000, `Cocos source metadata exceeds 50 KB: ${metadataBytes}`);
+  assert.ok(homeArtMetadataBytes < 60_000, `home_common metadata exceeds 60 KB: ${homeArtMetadataBytes}`);
   assert.ok(themeBytes < 250_000, `theme source assets exceed 250 KB: ${themeBytes}`);
 }
 

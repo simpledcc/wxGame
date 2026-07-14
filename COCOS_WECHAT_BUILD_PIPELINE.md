@@ -60,7 +60,7 @@ The inspector fails the build when any of these conditions is found:
 - Subpackage roots are invalid or duplicated.
 - Generated output contains symbolic links.
 
-The JSON report records total bytes, main-package bytes/file count, aggregate and per-subpackage bytes, and each of the four required bundles' generated root, package type, bytes, and file count. It is generated outside the upload root at `cocos-client/build/wechatgame-report.json`.
+The JSON report records total bytes, main-package bytes/file count, aggregate and per-subpackage bytes, and each of the five required bundles' generated root, package type, bytes, and file count. It is generated outside the upload root at `cocos-client/build/wechatgame-report.json`.
 
 ## Execution On A Creator Machine
 
@@ -68,7 +68,7 @@ The JSON report records total bytes, main-package bytes/file count, aggregate an
 2. Run `npm run verify`.
 3. Run `npm run build:wechat:dry-run` and confirm the project, config, and output paths.
 4. Run `npm run build:wechat`.
-5. Review `build/wechatgame-report.json` and Creator's `build/wechat-build.log`; confirm all four required bundles are listed, both gameplay bundles are subpackages, and every package limit is green.
+5. Review `build/wechatgame-report.json` and Creator's `build/wechat-build.log`; confirm all five required bundles are listed, `home_common` and both gameplay bundles are subpackages, and every package limit is green.
 6. Import `cocos-client/build/wechatgame/` into WeChat Developer Tools as a Mini Game.
 7. Complete the route, privacy, invitation, background recovery, two-device, performance, screenshot, and development-upload gates in `COCOS_RELEASE_QA.md`.
 8. Keep a known-good legacy upload and the accepted Cocos development build before changing any production upload-root configuration.

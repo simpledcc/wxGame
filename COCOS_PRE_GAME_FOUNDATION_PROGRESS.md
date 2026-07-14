@@ -24,10 +24,11 @@ Updated: 2026-07-14
 - H4 import automation commit: `93f397f` (`feat(home-art): automate H4 Creator import handoff`)
 - H4 status command commit: `613ef0c` (`feat(home-art): expose H4 import readiness status`)
 - H4 complete reference archive commit: `54b3964` (`docs(home-art): archive all H4 visual references`)
-- H4 completion commit: `PENDING`; only the Creator import/build commit may end in `dev_done`
+- H4.1 import/build commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H4 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H4.0 ART STAGED / H4.1 CREATOR IMPORT PENDING`
-- Next stage: on the designated Creator 3.8.8 computer, require `home-art:status=source-ready`, run `home-art:prepare`, import/configure `home_common`, require `home-art:verify-import` and `home-art:status=imported`, then run the actual WeChat build
+- Current stage: `H4 COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
+- Next stage: retain the imported metadata and complete the two-real-phone create/join/ready/start preparation-flow record
 
 ## Baseline facts
 
@@ -37,7 +38,7 @@ Updated: 2026-07-14
 - Design resolution: `640x960`
 - Runtime shell: persistent `Home.scene` plus route builders
 - Phone runtime: `BASELINE_ACCEPTED` (confirmed by user/current project baseline)
-- Creator/WeChat DevTools evidence: `PASSED` for the historical H5-H8 baseline only; `NOT RUN` for H4 formal art because the current machine has neither tool
+- Creator/WeChat DevTools evidence: `PASSED` for H4 import/build plus iPhone 12/13, 360x800 and 430x932 formal-art traversal; application errors remained `0`
 - Legacy upload client: `miniprogram/`, untouched by G0
 - Cloud functions: `cloudfunctions/`, untouched by G0
 - Gameplay bundles: `mode_pk` and `mode_spell`, outside this task's ownership
@@ -84,7 +85,7 @@ Updated: 2026-07-14
 | H1 Programmatic icon and Home form enhancement | `DONE` | 14 slots, vector icons, clickable avatar/coin controls, modal and route tests pass | None |
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
-| H4 Formal art integration | `IN_PROGRESS` | 5 source masters, 18 optimized assets (`335,229` bytes), 9 hashed reference archives, composition preview, processing/import/status/verifier tools, cached loader, semantic bindings, fallback and subpackage contract are pushed | This computer has no Creator; H4.1 first import, generated `.meta`, actual build and visual QA remain |
+| H4 Formal art integration | `COMPLETE` | Imported 18 SpriteFrames with 23 Creator metadata files; full verify, actual build, package inspection and iPhone 12/13, 360x800 and 430x932 Home/pre-game traversal pass | None; preserve metadata and package boundary |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
@@ -208,15 +209,19 @@ Updated: 2026-07-14
 4. Bound every existing `PreGameUi.visualSlot()` automatically and applied orange/blue/green/purple sliced button skins while retaining Graphics/Label fallbacks.
 5. Made all non-game routes prefer the shared learning-garden background; gameplay routes continue using their existing theme backgrounds.
 6. Added `home_common` to the WeChat Asset Bundle/subpackage build contract so the 333 KB art payload cannot consume the remaining main-package margin.
-7. Kept the optimized files outside `assets/` because this computer cannot run Creator. This checkpoint intentionally contains no hand-authored image or Bundle `.meta`.
-8. H4 remains `IN_PROGRESS`; the next Creator computer must perform H4.1 import before actual rendering or completion can be claimed.
-9. Local checkpoint verification passed `npm run verify` and `npm run build:wechat:dry-run`; actual Creator import/build, package-byte evidence and screenshots are intentionally still pending.
+7. At the initial source checkpoint, kept optimized files outside `assets/` and intentionally avoided hand-authored image or Bundle `.meta` files.
+8. At that checkpoint H4 remained `IN_PROGRESS` pending H4.1 import; item 15 below records the completed designated-machine import.
+9. The initial checkpoint passed `npm run verify` and `npm run build:wechat:dry-run`; items 15-18 below supersede its then-pending Creator/build evidence.
 10. Added a dedicated full-body reading rabbit, disabled programmatic scenery after formal background success, corrected Home subtitle/bank spacing and reduced button slice insets to a valid 28 px for 80 px controls.
 11. Added `docs/design/home/h4-art-composition-preview.png`, rendered from the optimized assets at the actual `640x1387` long-phone coordinate system. It is composition evidence only, not a Creator screenshot.
 12. Added `home-art:prepare`, `home-art:verify-import` and `home-art:status`; the workflow hash-protects the exact 18-file copy, recognizes `source-ready/prepared/imported/invalid`, and verifies Bundle name, 23 generated metadata files, unique UUIDs and SpriteFrame sub-resources.
 13. Added `test:home-art-import` to cover idempotent preparation, metadata gating, all status transitions and tamper rejection without requiring Creator; it is included in `npm run verify`.
 14. Archived all nine original Goal references under `docs/design/home/references/` with byte counts and SHA-256 values matching the supplied attachments. They are documentation only and never enter a runtime Bundle.
-15. Latest H4 resource checkpoint is `54b3964`; current import status is `source-ready`. H4 remains incomplete until Creator changes it to `imported` and an actual build/visual inspection passes. The documentation-sync commit follows this record and does not change H4 implementation status.
+15. Resource checkpoint `54b3964` was imported by the designated Creator 3.8.8 owner. Current status is `imported`: 18 byte-identical images, 23 Creator-generated metadata files, Bundle name `home_common`, unique UUIDs and SpriteFrame sub-resources all pass verification.
+16. Fixed the release budget audit to keep the existing 1.5 MB core-source gate separate from the approved 350 KB `home_common` art gate. Current normalized core payload is `1,495,481` bytes and formal Home art is `335,229` bytes.
+17. `npm run verify` passed in `48.1s`; the actual Creator build passed in `60.6s`. Package inspection reports `6,849,298` total, `4,121,077 / 4,194,304` main and `355,148` bytes in the declared `home_common` subpackage.
+18. WeChat Developer Tools CLI `auto` passed for AppID `wx063a1823d29bed9e`. iPhone 12/13 simulator inspection covered Home, mode catalog, create room, Bank, Study and History with formal art visible and application errors `0`; three visible warnings are platform/basic-library notices.
+19. H4.5 completed exact `360x800` and `430x932` Home checks in WeChat Developer Tools. Background cover, contained foreground art, live Labels, button skins, bottom actions and safe-area spacing remained visible without incoherent overlap; application errors remained `0`. H4 is complete.
 
 ## H5 seven-page pre-game flow
 
@@ -634,13 +639,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-On the designated Creator 3.8.8 computer, run `npm run home-art:status` and require `source-ready`; run `npm run home-art:prepare` and require `prepared`; let Creator import all 18 images, configure Bundle `home_common` and set every image to `sprite-frame`; run `npm run home-art:verify-import` and require final status `imported`. Then run full verification and the actual WeChat build before committing the imported images together with all Creator-generated `.meta`.
+Use two real phones and two WeChat accounts to execute create room, invitation/join, both-ready and start from the current preparation flow. Record room code consistency, pending-state locking, background/foreground recovery, any user-facing error and whether both devices enter the same next route. Do not change gameplay implementation during this external gate.
 
 ## Continue prompt
 
 ```text
-The H4 source-ready checkpoint through resource archive 54b3964 is pushed on branch feature/pre-game-ui-home-goal.
+The H4 Creator import/build and multi-view visual goal is complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
-Use Cocos Creator 3.8.8 as the sole first-import owner. From cocos-client require npm run home-art:status to show source-ready, run npm run home-art:prepare, open Creator, configure Bundle home_common and set all imported images to sprite-frame. Run npm run home-art:verify-import and require status imported, then npm run verify, npm run build:wechat and npm run inspect:wechat-build. Commit assets/bundles/home_common, assets/bundles/home_common.meta and all generated .meta together in the H4 dev_done commit.
-Do not hand-write importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
+Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Complete the two-real-phone create/join/ready/start preparation-flow QA and record external evidence.
+Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
 ```

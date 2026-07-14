@@ -2,19 +2,20 @@
 
 Date: 2026-07-14
 
-Status: Phase 8 source development and H8.1 pre-game cleanup are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and WeChat Developer Tools startup passed for the historical H8 visual baseline. H4 formal Home art is now `source-ready`, but `home_common` has not been imported or built, so the older H8 evidence must not be used as H4 visual acceptance. Phase 9 also remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+Status: Phase 8 source development, H8.1 pre-game cleanup and H4 formal Home art integration are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and iPhone 12/13, 360x800 and 430x932 WeChat simulator traversal pass. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
 
 ## Latest Real Build Evidence
 
-- Source baseline for the latest real build: H8 commit `cb926e2`; H8.1 completion is the commit containing this updated record
-- `npm run verify`: `PASSED` after H8.1 on 2026-07-14; H8.1 did not run a new Creator build
+- Source baseline for the latest real build: H4.1 import/build commit containing this updated record
+- `npm run verify`: `PASSED` in `48.1s` after importing formal Home art
 - `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
-- Generated package at H8: `6,491,368` bytes total
-- Main package: `4,120,918 / 4,194,304` bytes; only `73,386` bytes remain
-- Subpackages at H8: `2,370,450` bytes total
+- Generated H4.1 package: `6,849,298` bytes total
+- Main package: `4,121,077 / 4,194,304` bytes; `73,227` bytes remain
+- Subpackages: `2,728,221` bytes total; `home_common` is a declared `355,148`-byte subpackage
 - `npm run inspect:wechat-build`: `PASSED`; report retained at ignored local path `cocos-client/build/wechatgame-report.json`
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
-- H5 simulator traversal previously covered Home, mode catalog, create configuration, bank return, join, history and study with `0` reported Problems
+- H4.1 iPhone 12/13 simulator traversal covered Home, mode catalog, create configuration, Bank, Study and History with formal art visible and application errors `0`
+- H4.5 exact 360x800 and 430x932 Home traversal kept formal art, dynamic text, button skins and bottom actions visible without incoherent overlap; application errors remained `0`
 - H8.1 runtime/static tests additionally reject active preparation `addBot` actions/services, require two real humans to start and preserve only passive legacy/gameplay compatibility
 
 Known non-blocking Creator notices: legacy components still use primitive decorator types (`Boolean`, `String`, `Number`) instead of the Cocos-specific annotation types, and Babel reports styling de-optimization for the generated word-bank file over 500 KB. The build and package inspector pass, but these notices should be cleaned in the owning UI/gameplay streams before final release QA.
@@ -46,7 +47,7 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Room pending UI: all cloud-backed Room commands and back navigation lock together during an action, with theme-visible disabled states that prevent covered duplicate submission paths.
 - Runtime bounds: Boot, every mounted route and the loading overlay use shrinking labels; mock traversal proves every active transform remains inside the `960x640` design area. Serialized Boot/Home Canvas and Label contracts are parsed separately.
 - Room codes: UI input, join, share/copy and invitation lifecycle share one exact six-character rule; malformed and overlong external values cannot be silently redirected by truncation.
-- Source metadata: release QA parses the current 113 committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and reserves the documented H4 importer path for Creator-generated metadata.
+- Source metadata: release QA parses committed Cocos metas, rejects missing/duplicate UUIDs, requires every resource directory meta, validates every Boot/Home `__id__`, and H4 verification additionally requires 23 Creator-generated `home_common` metadata files and SpriteFrame sub-resources.
 - Interaction wiring: runtime execution clicks controls across every functional route, including room validation/copy/invite and Result-to-History; platform calls and destination state are asserted rather than inferred from source text.
 - Settlement lifecycle: the first finished snapshot cancels room polling, and entering History releases the finished room without deleting its persisted result.
 - Async session isolation: delayed catch/spell responses are keyed to a monotonic room-session version; leave/replacement makes them inert, canceled failures do not toast on the next screen, and old mode results reset when a different mode enters.
@@ -54,19 +55,19 @@ Known non-blocking Creator notices: legacy components still use primitive decora
 - Spell source data: all 44 legacy banks and 6,351 prebuilt templates decode field-for-field from a 35 KB compact index; spell Room creation sends the selected pool with the production 240-item cap and no runtime random blank generation.
 - Theme presentation: pre-mount route loading, input blocking, stale-route rejection, bundle/asset fallback, cached sprite requests, pressed/disabled button states, insect/fish target geometry switching, and a three-slot gameplay feedback pool execute in the runtime Cocos mock.
 - Performance instrumentation: bounded frame sampling, full-session/per-route timing, 60-frame node-peak sampling, invalid-input handling, and DEV JSON export execute in pure and runtime-shell tests.
-- Build pipeline: fixed Creator/plugin inputs, upload-root isolation, all four required Bundle/config checks, mandatory `mode_pk`/`mode_spell` subpackages, 4 MiB main and 30 MiB aggregate subpackage gates, empty/undeclared subpackage rejection, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
+- Build pipeline: fixed Creator/plugin inputs, upload-root isolation, all five required Bundle/config checks, mandatory `home_common`/`mode_pk`/`mode_spell` subpackages, 4 MiB main and 30 MiB aggregate subpackage gates, empty/undeclared subpackage rejection, source-map rejection, and forbidden-path checks pass through `npm run test:build-pipeline`.
 - Dependencies: production dependency audit reports zero vulnerabilities.
 - Patch hygiene: `git diff --check` passes; `miniprogram/` and `cloudfunctions/` remain unchanged by the Cocos migration.
 
 ## Source Size Record
 
-Measured before Cocos import/build:
+Measured after H4.1 Cocos import/build:
 
 | Item | Size |
 | --- | ---: |
-| `cocos-client/assets/` normalized runtime payload excluding `.meta` | 1,484,332 bytes; static gate caps it at 1,500,000 bytes |
-| Committed Cocos metadata | 113 files / 21,672 bytes; separate 50,000-byte gate leaves room for Creator importer metadata |
-| Total current `assets/` checkout | 1,507,062 bytes |
+| Core normalized runtime payload excluding `home_common` and `.meta` | 1,495,481 bytes; static gate caps it at 1,500,000 bytes |
+| Formal `home_common` source art | 335,229 bytes; separate H4 gate caps it at 350,000 bytes |
+| Core / `home_common` metadata | 21,672 / 53,313 bytes; separate gates cap them at 50,000 / 60,000 bytes |
 | Generated word-bank TypeScript | 852,771 bytes in the current Windows checkout |
 | Compact generated spell-template index | 35,326 bytes for 44 banks / 6,351 templates |
 | Theme bundle sources | 214,537 bytes including manifests/metadata |
@@ -79,15 +80,15 @@ These are historical source measurements. The current final generated-package me
 
 | Gate | Status | Required action |
 | --- | --- | --- |
-| Cocos 3.8.8 import | H8 baseline passed; H4 pending | On the designated Creator machine run `home-art:prepare`, import/configure `home_common`, pass `home-art:verify-import`, then perform a fresh actual build |
+| Cocos 3.8.8 import | H4.1 passed | Preserve the committed Creator-generated metadata; do not re-import or regenerate UUIDs |
 | Runtime screen assembly | Implemented | Single `Home.scene` shell mounts every route/controller and its controls |
 | Runtime layout inspection | Partial | H5 pre-game routes passed portrait simulator traversal; inspect gameplay, privacy, result and loading states at all target portrait ratios |
 | Theme visual QA | Pending | Switch both themes; verify route backgrounds, insect/fish targets, feedback motion, fallback, contrast, and narrow-screen framing |
 | Two-device room QA | Pending | Create/join/ready/start on two real phones for the current preparation flow; later gameplay milestones must separately verify each enabled multiplayer mode |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
 | Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
-| WeChat package size | H8 baseline passed; H4 remeasure pending | Keep the H8 byte record as historical evidence; after H4 import verify `home_common` is a subpackage and record fresh main/subpackage totals |
-| Review screenshots | Partial | V0 screenshots and H5 simulator inspection exist; capture final current Home, Room, three gameplay modes, Result, History, Feedback, and privacy flow before upload |
+| WeChat package size | H4.1 passed | Main package is 4,121,077 bytes and `home_common` is a 355,148-byte declared subpackage |
+| Review screenshots | Partial | H4 preparation traversal passed on iPhone 12/13, 360x800 and 430x932; add final gameplay/privacy screenshots before upload |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 
 ## Creator Verification Checklist

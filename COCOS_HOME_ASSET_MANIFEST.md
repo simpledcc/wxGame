@@ -14,13 +14,13 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 ## Current V0 State
 
-- Eighteen optimized formal assets total `335,229` bytes and are ready for one-time Creator import from `art-source/home-v1/optimized/`.
-- Five generated masters, all 18 optimized files, the composition preview and all nine hashed Goal references are tracked on GitHub; `npm run home-art:status` currently reports `source-ready`.
-- The portrait Home structure, data and interaction are complete; until import, the existing theme background and programmatic Graphics/Label visuals remain active.
+- Eighteen optimized formal assets total `335,229` bytes and have been imported once by Cocos Creator 3.8.8 from `art-source/home-v1/optimized/`.
+- Five generated masters, all 18 optimized files, the composition preview and all nine hashed Goal references are tracked on GitHub; `npm run home-art:status` reports `imported` with 23 metadata files.
+- The portrait Home structure, data and interaction are complete; formal art is active while the existing Graphics/Label visuals remain as load-failure fallbacks.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - `HomeArtManager` automatically replaces a fallback when the matching `SpriteFrame` resolves; no route, controller or Store change is required.
-- Dedicated bitmap art below did not block the completed structural V0 Goal, but is required before claiming high-fidelity visual completion against the reference.
-- H8 adds a full-viewport programmatic sky, cloud, hill, meadow, path, foliage and flower layer to every preparation page. It removes black bars and supplies a coherent scene while formal bitmap files are still pending.
+- Dedicated bitmap art below is imported and passed the H4 iPhone 12/13, 360x800 and 430x932 visual completion gate.
+- H8's programmatic scenery remains the fallback, but successful `home_common` background loading now suppresses it in the formal presentation.
 
 ## Runtime Contract
 
@@ -35,20 +35,20 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 | Slot key | Art | Suggested source | Alpha | Slice | Planned ownership | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `background` | Portrait village/learning-camp scene, no embedded text | 750x1334 JPG, 170,868 B | no | none | `home_common/backgrounds` | optimized and code-bound; Creator import pending |
-| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,211 B | yes | none | `home_common` | optimized and code-bound; Creator import pending |
-| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `coin` | Star coin icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `character` | Full-body rabbit learning companion holding a book | 192x256 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `createRoom` | House icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `joinRoom` | Two-player/friend icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `practice` | Open book/practice icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `wordBank` | Stacked books/word-bank icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `catalog` | Gamepad/mode catalog icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `history` | Trophy/history icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `settings` | Gear icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `privacy` | Shield/check icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
-| `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | optimized and code-bound; Creator import pending |
+| `background` | Portrait village/learning-camp scene, no embedded text | 750x1334 JPG, 170,868 B | no | none | `home_common/backgrounds` | imported and simulator-verified |
+| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,211 B | yes | none | `home_common` | imported and simulator-verified |
+| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `coin` | Star coin icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `character` | Full-body rabbit learning companion holding a book | 192x256 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `createRoom` | House icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `joinRoom` | Two-player/friend icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `practice` | Open book/practice icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `wordBank` | Stacked books/word-bank icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `catalog` | Gamepad/mode catalog icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `history` | Trophy/history icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `settings` | Gear icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `privacy` | Shield/check icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
 
 Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 28 px slice insets so every 80/96 px target retains a valid center region, while preserving live Labels and button handlers; surface cards remain programmatic.
 

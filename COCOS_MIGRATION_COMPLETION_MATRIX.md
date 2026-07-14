@@ -23,7 +23,7 @@ Status meanings:
 | 6 - shared co-op | Team scoring, two-human restrictions, result/history | Phase 6 and production contract tests | Implemented / two-device proof pending |
 | 7 - spell co-op | 44 prebuilt template banks, QWERTY input, question isolation, dual timers, timeout, detail history | Exact 6,351-template source comparison plus Phase 7/runtime history tests; Room creation carries the selected 240-item pool | Implemented / two-device proof pending |
 | 8 - themes and gameplay bundles | Two theme bundles, preloaded route assets, target skins, fallback, themed controls, plus load-on-demand `mode_pk`/`mode_spell` gameplay bundles | Phase 8 tests pass and the real generated package places both gameplay modes in declared subpackages | Development/build proof passed; gameplay visual/device proof pending |
-| 9 - release QA | Creator import, real generated package, device record, screenshots, compliance record, development upload | Creator build, package report, H5 simulator traversal and static compliance pass; two-device/performance/final screenshots/upload remain | External validation in progress |
+| 9 - release QA | Creator import, real generated package, device record, screenshots, compliance record, development upload | H4 Creator import/build, package report, formal-art iPhone 12/13 plus 360x800/430x932 simulator traversal and static compliance pass; two-device, performance, final screenshots and upload remain | External validation in progress |
 
 ## Cross-Cutting Requirements
 
@@ -41,7 +41,7 @@ Status meanings:
 | Serialized scene viewport contract | Static shell test parses Boot/Home scenes and requires centered `960x640` Canvases, identical viewport Widget flags and zero edge offsets | Passed in serialized source; Creator aspect-ratio proof pending |
 | Stable runtime text/layout bounds | Boot, all routes and the loading overlay use shrinking Labels; runtime traversal rejects any active `UITransform` outside the `960x640` design area | Passed in source/runtime mock; real font/aspect-ratio proof pending |
 | One room-code contract | Input length, join validation, invitation lifecycle, sharing and clipboard use the same six-character domain normalization; overlong external codes are rejected | Passed |
-| Source metadata integrity | Release QA parses the current 113 committed metas, rejects UUID duplication/missing directory metadata and validates every Boot/Home internal object reference; future H4 imports must commit Creator-generated metadata with each image | Passed for current committed source |
+| Source metadata integrity | Release QA parses all committed metas, rejects UUID duplication/missing directory metadata and validates every Boot/Home internal object reference; H4.1 additionally verifies 18 SpriteFrames and all 23 Creator-generated `home_common` metadata files | Passed for current committed source |
 | No public nickname/chat/payment surface | Release source scan and runtime control inventory | Passed |
 | Local gameplay feedback before cloud response | Deferred-response Phase 5 test | Passed |
 | Dormant PK robot compatibility remains isolated | Passive snapshot fields, raw cloud typing and gameplay tests retain compatibility, while H8.1 removes Cocos preparation `addBot` services/actions and rejects start with fewer than two humans | Passed; not part of the current visible flow |
@@ -51,13 +51,13 @@ Status meanings:
 | Session replacement isolation | Monotonic RoomStore versions gate fishing/spell actions; Phase 5/7 defer cloud responses, leave the room, and prove no snapshot, refresh, draft or stale result returns; Result hide/show cannot restart finished polling | Passed |
 | Feedback request lifecycle isolation | Runtime controller test covers local rejection, active cloud success/failure, pending-button locking, and a delayed success after route destruction; the stale response cannot clear the old form or affect the new route | Passed |
 | Visible control wiring | Runtime shell clicks representative controls across Home, Bank, Study, co-op selection, Room, all gameplay exits, Result, History, Feedback and Help and verifies resulting state/routes/platform calls | Passed in runtime mock; device touch proof pending |
-| Asset Bundle loading and fallback | Theme manager tests plus gameplay Bundle registry/manager; runtime tests delay `mode_pk`, reject/retry `mode_spell`, and retain the active screen | Passed in source/runtime mock; Creator import proof pending |
+| Asset Bundle loading and fallback | Theme manager tests plus gameplay/Home Bundle registries and managers; runtime tests delay `mode_pk`, reject/retry `mode_spell`, retain the active screen, and H4.1 verifies/imports `home_common` | Passed in source/runtime mock and Creator import; target-device timing proof pending |
 | Route assets load before destination mount | Deferred runtime Bundle/asset test retains the old screen under `BlockInputEvents`, rejects stale work and mounts only after the complete preload chain resolves | Passed in runtime mock; real bundle timing proof pending |
 | Route-specific theme presentation | Route asset rules plus runtime target-style switch test | Passed in source; visual proof pending |
 | Reused gameplay effect nodes | Fixed three-label `GameplayFeedbackPool` runtime test | Passed in source; frame-time proof pending |
 | Runtime performance evidence collection | Bounded `PerformanceService`, 60-frame shell execution, node sampling and DEV clipboard report test | Passed for instrumentation; target-device reports pending |
-| WeChat package boundaries | Dry-run and real inspector require four Bundle configs, place `mode_pk`/`mode_spell` in declared subpackages, and enforce forbidden-path, 4 MiB main and 30 MiB aggregate limits | Passed for current real package |
-| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H7 package at `6,487,834` total bytes, `4,120,918` main bytes and all four required Bundle roots/package types | Passed for current real package |
+| WeChat package boundaries | Dry-run and real inspector require five Bundle configs, place `home_common`/`mode_pk`/`mode_spell` in declared subpackages, and enforce forbidden-path, 4 MiB main and 30 MiB aggregate limits | Passed for current real package |
+| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H4.1 package at `6,849,298` total bytes, `4,121,077` main bytes and `355,148` bytes in the declared `home_common` subpackage | Passed for current real package |
 
 ## Phase 9 External Evidence
 
