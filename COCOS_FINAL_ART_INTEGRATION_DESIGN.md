@@ -1,8 +1,8 @@
 # Cocos 正式美术资源接入设计说明书（H4）
 
-更新日期：2026-07-15
+更新日期：2026-07-16
 
-目标状态：`H4_BASELINE_COMPLETE / H4_QUALITY_UPGRADE_IN_PROGRESS`
+目标状态：`H4_BASELINE_COMPLETE / H4_QUALITY_UPGRADE_COMPLETE`
 
 实现状态：`H4_COMPLETE`
 适用版本：V0 竖屏首页及游戏准备前界面
@@ -23,13 +23,13 @@
 - 当前背景：运行时优先请求 `home_common`，Bundle 未导入时回退到主题 `homeBackground`
 - 当前前景视觉：`PreGameUi.visualSlot()` 中的 Graphics/Label 程序化兜底
 - 当前替换接口：`PreGameUi.setVisualAsset(slot, SpriteFrame | null)`
-- 当前正式位图：18 个高清文件暂存于 `art-source/home-v1/optimized/`，总计 `3,453,135` 字节；透明 PNG 为真彩 RGBA
+- 当前正式位图：18 个高清文件已导入 `assets/bundles/home_common/`，并与 `art-source/home-v1/optimized/` 逐项同哈希，总计 `3,453,135` 字节；透明 PNG 为真彩 RGBA
 - 当前加载实现：`HomeArtManager`、语义路径、页面绑定、失败回退、按钮九宫格和微信分包契约已完成
-- 当前导入工具：`home-art:prepare/sync-upgrade/status/verify-import` 及无 Creator 回归测试已完成；高清源图相对旧 Bundle 的当前状态为 `upgrade-ready`
+- 当前导入工具：`home-art:prepare/sync-upgrade/status/verify-import` 及回归测试已完成；Creator 3.8.8 已重导，当前状态为 `imported`
 - 当前设计证据：5 张生成源图、9 张原始 Goal 参考归档及 `640x1387` 合成预览均已推送；参考归档不进入运行包
 - 当前 `home_common` Bundle：Creator 3.8.8 已生成 18 张 SpriteFrame、23 份元数据并完成微信分包构建
 
-结论：H4 首次资源接入、代码加载、页面槽位、失败兜底、实际构建和包体检查已经完成。2026-07-15 根据第二台电脑的清晰度反馈重新打开 H4 画质维护：旧版低尺寸、索引色资源已替换为高清真彩源文件，但必须由 Creator 3.8.8 电脑完成保留 UUID 的重导、构建和视觉检查后，才能结束本次画质升级。
+结论：H4 首次资源接入、代码加载、页面槽位、失败兜底和高清画质升级均已完成。2026-07-16，Creator 3.8.8 保留原 UUID 重导 18 张高清真彩资源，`verify-import`、实际微信构建、包体检查及微信开发者工具视觉检查均通过；本次画质升级结束。
 
 ## 3. H4 目标
 

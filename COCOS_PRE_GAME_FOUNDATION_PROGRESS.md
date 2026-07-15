@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-15
+Updated: 2026-07-16
 
 ## Handoff
 
@@ -28,10 +28,11 @@ Updated: 2026-07-15
 - H4 complete reference archive commit: `54b3964` (`docs(home-art): archive all H4 visual references`)
 - H4.1 import/build commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H4 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
-- H4 high-fidelity source checkpoint: the commit containing this record; it must not use `dev_done` until Creator reimport and build pass
+- H4 high-fidelity source checkpoint: `5b73bdf` (`fix(home-art): stage high-fidelity resource upgrade`)
+- H4 high-fidelity completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H4 HIGH-FIDELITY UPGRADE IN_PROGRESS / SOURCE READY`
-- Next stage: on the designated Creator 3.8.8 computer, sync the 18 high-fidelity images while preserving UUIDs, reimport, build and inspect visual clarity
+- Current stage: `H4 HIGH-FIDELITY UPGRADE COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
+- Next stage: use two real phones to complete create/join/ready/start preparation-flow acceptance; gameplay implementation remains frozen
 
 ## Baseline facts
 
@@ -89,7 +90,7 @@ Updated: 2026-07-15
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
 | H4 Formal art integration | `COMPLETE` | Imported 18 SpriteFrames with 23 Creator metadata files; full verify, actual build, package inspection and iPhone 12/13, 360x800 and 430x932 Home/pre-game traversal pass | None; preserve metadata and package boundary |
-| H4 high-fidelity resource upgrade | `IN_PROGRESS` | 18 sources regenerated at high-DPI dimensions as truecolor RGBA/high-quality JPG; upgrade/status/reimport-dimension tests pass and composition preview is refreshed | Creator 3.8.8 reimport, actual WeChat build, package inspection and visual comparison pending |
+| H4 high-fidelity resource upgrade | `DONE` | 18 high-DPI assets imported with preserved UUIDs; source/runtime hashes, SpriteFrame dimensions, full verify, actual build, package inspection and Developer Tools visual check pass | None; preserve imported metadata and `home_common` package boundary |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
@@ -238,8 +239,9 @@ Updated: 2026-07-15
 3. The 18-file high-fidelity source payload is `3,453,135` bytes and remains assigned to the `home_common` WeChat subpackage. The explicit source budget is now 4 MB; each decoded texture remains at or below 2048x2048.
 4. Added `home-art:sync-upgrade` to replace only approved images while preserving existing Creator metadata and UUIDs. Status now distinguishes `upgrade-ready` from `reimport-required`, and verification rejects SpriteFrame metadata whose raw dimensions do not match the image.
 5. Regenerated `docs/design/home/h4-art-composition-preview.png` from the new files and passed processor validation plus the import-workflow regression test on this no-Creator computer.
-6. Current repository state before Creator sync is intentionally `upgrade-ready`: `art-source/home-v1/optimized/` contains the new files while `assets/bundles/home_common` still contains the last validated low-resolution import. Do not commit manually edited importer metadata.
-7. Next unique action: on the designated Creator 3.8.8 computer run `npm run home-art:sync-upgrade`, wait for automatic reimport, require `home-art:verify-import` and `home-art:status=imported`, then run full verification, actual WeChat build, package inspection and target-viewport clarity checks. Only that final import/build submission may end with `dev_done`.
+6. On 2026-07-16 the designated Creator 3.8.8 computer ran `home-art:sync-upgrade`, preserved all existing UUIDs and allowed Creator to reimport all changed textures. The resulting 18 runtime image hashes match the approved optimized sources exactly; SpriteFrame metadata records the new dimensions and status is `imported`.
+7. `home-art:verify-import` and the complete verification chain passed. The actual WeChat build produced 147 files / `9,970,161` bytes, with main package `4,121,077 / 4,194,304` bytes and `home_common` `3,472,932` bytes.
+8. WeChat Developer Tools cache was cleared and the generated `cocos-client/build/wechatgame` project was reopened. The simulator displayed the upgraded background, Logo, character, icons and button skins with intact layout and no application errors. H4 high-fidelity maintenance is complete.
 
 ## H5 seven-page pre-game flow
 

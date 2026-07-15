@@ -1,10 +1,10 @@
 # Cocos WeChat Build Pipeline
 
-Date: 2026-07-15
+Date: 2026-07-16
 
 ## Status
 
-The repository has a deterministic Cocos Creator command-line build contract and an independent WeChat build inspector. Creator 3.8.8 and WeChat Developer Tools are available on the current build computer. The 2026-07-15 export and package inspection passed at 147 files / 6,852,377 bytes, with a 4,121,077-byte main package and a 355,148-byte `home_common` subpackage.
+The repository has a deterministic Cocos Creator command-line build contract and an independent WeChat build inspector. Creator 3.8.8 and WeChat Developer Tools are available on the current build computer. The 2026-07-16 high-fidelity export and package inspection passed at 147 files / 9,970,161 bytes, with a 4,121,077-byte main package and a 3,472,932-byte `home_common` subpackage.
 
 The stable legacy client remains `miniprogram/`. The pipeline only writes below `cocos-client/build/` and rejects output paths that overlap the legacy upload root.
 
