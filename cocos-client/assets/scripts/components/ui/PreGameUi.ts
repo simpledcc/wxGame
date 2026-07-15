@@ -429,7 +429,7 @@ export class PreGameUi {
     skin.type = Sprite.Type.SLICED;
     skin.sizeMode = Sprite.SizeMode.CUSTOM;
     skinNode.active = false;
-    this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
+    const highlightNode = this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
     const iconSize = Math.max(36, Math.min(height * 0.56, width * 0.18, 56));
     const iconInset = Math.max(18, Math.min(24, width * 0.07));
@@ -507,18 +507,17 @@ export class PreGameUi {
     if (skinKey) {
       void homeArt.loadButtonSkin(skinKey).then((frame) => {
         if (!node.active) return;
-        const source = frame as unknown as { width?: number; height?: number };
-        const sourceWidth = Math.max(1, Number(source.width) || 384);
-        const sourceHeight = Math.max(1, Number(source.height) || 164);
-        frame.insetLeft = Math.max(1, Math.round(sourceWidth * (28 / 384)));
+        const skinDensity = 2;
+        frame.insetLeft = 28 * skinDensity;
         frame.insetRight = frame.insetLeft;
-        frame.insetTop = Math.max(1, Math.round(sourceHeight * (28 / 164)));
+        frame.insetTop = 28 * skinDensity;
         frame.insetBottom = frame.insetTop;
         skin.spriteFrame = frame;
         skin.sizeMode = Sprite.SizeMode.CUSTOM;
-        skinNode.getComponent(UITransform)?.setContentSize(width, height);
         skinNode.active = true;
-        visual.setSkin(skin);
+        background.enabled = false;
+        highlightNode.active = false;
+        visual.setSkin(skin, skinDensity);
       }).catch(() => undefined);
     }
     this.bindButton(node, button, visual, handler);
@@ -668,12 +667,13 @@ export class PreGameUi {
     return graphics;
   }
 
-  private addHighlight(parent: Node, name: string, width: number, height: number, radius: number): void {
+  private addHighlight(parent: Node, name: string, width: number, height: number, radius: number): Node {
     const highlight = this.node(parent, name, 0, height / 2 - 7, width, 4);
     const graphics = highlight.addComponent(Graphics);
     graphics.fillColor = new Color(255, 255, 255, 88);
     graphics.roundRect(-width / 2, -2, width, 4, Math.min(2, radius));
     graphics.fill();
+    return highlight;
   }
 
   private bindButton(

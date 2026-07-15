@@ -10,11 +10,13 @@ declare module "cc" {
     active: boolean;
     layer: number;
     position: Vec3;
+    scale: Vec3;
     readonly children: Node[];
     addChild(child: Node): void;
     addComponent<T>(type: new (...args: any[]) => T): T;
     getComponent<T>(type: new (...args: any[]) => T): T | null;
     setPosition(x: number, y: number, z?: number): void;
+    setScale(x: number, y: number, z?: number): void;
     on(type: string, callback: (...args: any[]) => void, target?: unknown): void;
     destroy(): boolean;
   }

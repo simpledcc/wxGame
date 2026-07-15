@@ -53,6 +53,7 @@ export class Node {
   private destroyed = false;
   layer = 0;
   position = new Vec3();
+  scale = new Vec3(1, 1, 1);
   parent: Node | null = null;
   readonly children: Node[] = [];
   private readonly components: Component[] = [];
@@ -84,6 +85,10 @@ export class Node {
 
   setPosition(x: number, y: number, z = 0): void {
     this.position = new Vec3(x, y, z);
+  }
+
+  setScale(x: number, y: number, z = 1): void {
+    this.scale = new Vec3(x, y, z);
   }
 
   on(type: string, callback: (...args: any[]) => void, target?: unknown): void {

@@ -29,6 +29,7 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 - Stable node names use `Home{Key}Slot`, `Home{Key}Sprite`, and `Home{Key}Fallback`.
 - A missing or failed asset leaves the fallback visible and the screen usable.
 - Preserve aspect ratio. Backgrounds use cover cropping; transparent foreground art uses contain fitting.
+- The `768x328` button skins are 2x nine-slice resources: 56 source pixels map to 28 design units. The skin node renders at 2x content size with 0.5 scale, and successful loading disables the programmatic fill, shadow and highlight fallback.
 - Import final bitmap files with Cocos Creator 3.8.8. Do not hand-author image importer sub-meta files.
 
 ## Delivery List

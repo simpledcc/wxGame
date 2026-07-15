@@ -7,6 +7,7 @@ export class RuntimeButtonVisual extends Component {
   private button: Button | null = null;
   private background: Graphics | null = null;
   private skin: Sprite | null = null;
+  private skinDensity = 1;
   private normalColor = new Color();
   private pressedColor = new Color();
   private disabledColor = new Color();
@@ -41,8 +42,9 @@ export class RuntimeButtonVisual extends Component {
     this.refresh();
   }
 
-  setSkin(skin: Sprite | null): void {
+  setSkin(skin: Sprite | null, density = 1): void {
     this.skin = skin;
+    this.skinDensity = skin ? Math.max(1, density) : 1;
     this.ensureSkinSize();
     this.refresh(true);
   }
@@ -95,7 +97,14 @@ export class RuntimeButtonVisual extends Component {
     if (!this.skin) return;
     this.skin.sizeMode = Sprite.SizeMode.CUSTOM;
     const transform = this.skin.node.getComponent(UITransform);
-    if (!transform || (transform.width === this.width && transform.height === this.height)) return;
-    transform.setContentSize(this.width, this.height);
+    const targetW = this.width * this.skinDensity;
+    const targetH = this.height * this.skinDensity;
+    if (transform && (transform.width !== targetW || transform.height !== targetH)) {
+      transform.setContentSize(targetW, targetH);
+    }
+    const scale = 1 / this.skinDensity;
+    if (this.skin.node.scale.x !== scale || this.skin.node.scale.y !== scale) {
+      this.skin.node.setScale(scale, scale, 1);
+    }
   }
 }

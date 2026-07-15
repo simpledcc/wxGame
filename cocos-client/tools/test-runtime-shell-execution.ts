@@ -62,17 +62,20 @@ function assertEqual(actual: unknown, expected: unknown, message = "values are n
 function assertVisibleUiContract(root: Node, context: string): void {
   const violations: string[] = [];
   const viewportHeight = getPortraitViewportHeight();
-  const visit = (node: Node, parentX: number, parentY: number, path: string): void => {
+  const visit = (node: Node, parentX: number, parentY: number, parentScaleX: number,
+    parentScaleY: number, path: string): void => {
     if (!node.active) return;
-    const x = parentX + node.position.x;
-    const y = parentY + node.position.y;
+    const x = parentX + node.position.x * parentScaleX;
+    const y = parentY + node.position.y * parentScaleY;
+    const scaleX = parentScaleX * node.scale.x;
+    const scaleY = parentScaleY * node.scale.y;
     const nodePath = `${path}/${node.name}`;
     const transform = node.getComponent(UITransform);
     if (transform && transform.width > 0 && transform.height > 0) {
-      const left = x - transform.width / 2;
-      const right = x + transform.width / 2;
-      const bottom = y - transform.height / 2;
-      const top = y + transform.height / 2;
+      const left = x - transform.width * scaleX / 2;
+      const right = x + transform.width * scaleX / 2;
+      const bottom = y - transform.height * scaleY / 2;
+      const top = y + transform.height * scaleY / 2;
       if (left < -320 || right > 320 || bottom < -viewportHeight / 2 || top > viewportHeight / 2) {
         violations.push(`${nodePath}=[${left},${bottom}]..[${right},${top}]`);
       }
@@ -81,9 +84,9 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (label && label.overflow !== Label.Overflow.SHRINK) {
       violations.push(`${nodePath} uses non-shrinking Label overflow ${label.overflow}`);
     }
-    node.children.forEach((child) => visit(child, x, y, nodePath));
+    node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
   };
-  visit(root, 0, 0, "");
+  visit(root, 0, 0, 1, 1, "");
   assertEqual(violations.length, 0, `${context} violates the fixed runtime UI contract: ${violations.join("; ")}`);
 }
 
@@ -131,9 +134,11 @@ function assertPreGameIconLayout(root: Node, context: string): void {
       }
     }
     if (transform && parent && parentTransform && node.name.endsWith("Skin") && parent.getComponent(Button)) {
-      if (transform.width !== parentTransform.width || transform.height !== parentTransform.height) {
+      const visibleWidth = transform.width * node.scale.x;
+      const visibleHeight = transform.height * node.scale.y;
+      if (visibleWidth !== parentTransform.width || visibleHeight !== parentTransform.height) {
         violations.push(
-          `${node.name} ${transform.width}x${transform.height} does not cover ${parent.name} `
+          `${node.name} ${visibleWidth}x${visibleHeight} does not cover ${parent.name} `
           + `${parentTransform.width}x${parentTransform.height}`
         );
       }
@@ -450,9 +455,19 @@ async function main(): Promise<void> {
   assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);
   assertEqual(
     findDeep(canvas, "CreateRoomButton")?.getComponent(Graphics)?.enabled,
-    true,
-    "programmatic base must remain visible behind a formal skin"
+    false,
+    "formal skin must hide the duplicate programmatic base and shadow"
   );
+  assertEqual(findDeep(canvas, "CreateRoomButtonHighlight")?.active, false,
+    "formal skin must hide the duplicate programmatic highlight");
+  assertEqual(createSkin?.getComponent(UITransform)?.width, 1120,
+    "2x formal skin must retain high-density nine-slice geometry");
+  assertEqual(createSkin?.getComponent(UITransform)?.height, 264,
+    "2x formal skin must retain high-density nine-slice geometry");
+  assertEqual(createSkin?.scale.x, 0.5, "2x formal skin must map back to design units");
+  assertEqual(createSkin?.scale.y, 0.5, "2x formal skin must map back to design units");
+  assertEqual(createSkin?.getComponent(Sprite)?.spriteFrame?.insetTop, 56,
+    "2x formal skin must preserve the full source border without consuming 56 design units");
   ["CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
     const action = findDeep(canvas, name);
     const subtitle = findDeep(canvas, `${name}Subtitle`);

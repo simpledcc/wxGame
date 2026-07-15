@@ -242,6 +242,7 @@ Updated: 2026-07-16
 6. On 2026-07-16 the designated Creator 3.8.8 computer ran `home-art:sync-upgrade`, preserved all existing UUIDs and allowed Creator to reimport all changed textures. The resulting 18 runtime image hashes match the approved optimized sources exactly; SpriteFrame metadata records the new dimensions and status is `imported`.
 7. `home-art:verify-import` and the complete verification chain passed. The actual WeChat build produced 147 files / `9,970,161` bytes, with main package `4,121,077 / 4,194,304` bytes and `home_common` `3,472,932` bytes.
 8. WeChat Developer Tools cache was cleared and the generated `cocos-client/build/wechatgame` project was reopened. The simulator displayed the upgraded background, Logo, character, icons and button skins with intact layout and no application errors. H4 high-fidelity maintenance is complete.
+9. Post-upgrade button rendering maintenance fixed the phone screenshot's layered color blocks and shadows. Formal skins now disable the programmatic fill/shadow/highlight, and 2x skin geometry maps 56 source pixels to 28 design units instead of consuming 56 units from short buttons. Focused geometry tests, full `npm run verify`, Creator 3.8.8 build, package inspection and WeChat Developer Tools CLI auto compile passed; the latest package is 147 files / `9,970,209` bytes with the main package unchanged at `4,121,077` bytes.
 
 ## H5 seven-page pre-game flow
 
