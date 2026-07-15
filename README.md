@@ -57,6 +57,8 @@ npm run build:wechat:dry-run
 
 安装 Cocos Creator 3.8.8 的电脑可以打开 `cocos-client/`，以 `assets/scenes/Boot.scene` 为初始场景进行预览和微信小游戏构建。
 
+执行 `npm run build:wechat` 后，微信开发者工具必须导入 `cocos-client/build/wechatgame/`。仓库根目录的 `project.config.json` 仍指向旧版 `miniprogram/`；从根目录编译看到的不是 Cocos 新界面。若新构建仍显示旧画面，清理开发者工具的编译/文件缓存，并确认资源树中存在 `subpackages/home_common`。图片加载与清晰度排查见 [`result.md`](result.md)。
+
 ## 联机环境
 
 联机房间使用云数据库集合 `rooms`，客户端只读，写操作由云函数完成。现有生产函数包括：

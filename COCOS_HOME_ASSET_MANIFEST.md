@@ -1,6 +1,6 @@
 # Cocos Home Asset Manifest
 
-Updated: 2026-07-14
+Updated: 2026-07-15
 
 ## Purpose
 
@@ -51,6 +51,16 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 | `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
 
 Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 28 px slice insets so every 80/96 px target retains a valid center region, while preserving live Labels and button handlers; surface cards remain programmatic.
+
+## Known V0 Fidelity Limits
+
+- The `750x1334` background, `640x200` Logo, `192x256` character and `384x164` button skins were aggressively reduced to keep the complete V0 set below the original 350 KB source-art gate.
+- Modern 1080/1242-wide phones can render those textures above their source pixel dimensions. Linear magnification avoids hard pixel edges but can look soft.
+- The remaining preparation pages do not yet have dedicated bitmap backgrounds, characters or decorative illustrations. They intentionally use programmatic cards plus shared icons, so their visual richness is lower than Home even when every asset loads correctly.
+- The theme `homeBackground` currently points to a `960x640` landscape image. It is a functional fallback, not a final high-fidelity portrait background for every preparation page.
+- Any high-resolution replacement must remain in `home_common` or a new declared subpackage. Raise the source-art test gate deliberately and rerun package inspection; do not consume the roughly 73 KB remaining main-package margin.
+
+See `result.md` for the build-path, loading-fallback and image-quality investigation.
 
 ## Bundle Rules
 

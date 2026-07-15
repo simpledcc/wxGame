@@ -97,6 +97,7 @@ git fetch origin
 - 后续美术设计：`COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
 - 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
+- 图片加载与清晰度诊断：`result.md`
 
 当前快照：H4-H8.5 已完成并冻结。H4 的独立美术、运行时加载/回退、页面绑定、按钮皮肤、Creator 元数据和微信 `home_common` 分包均已落地；H8.4 保持批准的首页纵向布局，H8.5 完成其余准备页视觉与输入适配。2026-07-15 已在微信开发者工具检查首页、词库、背词、玩法目录、创建/加入房间、战绩、反馈和玩法说明，未发现应用运行错误。当前未完成项属于 Phase 9 双真机外部验证，不再属于界面实现。
 

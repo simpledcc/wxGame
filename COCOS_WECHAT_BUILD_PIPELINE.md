@@ -1,10 +1,10 @@
 # Cocos WeChat Build Pipeline
 
-Date: 2026-07-10
+Date: 2026-07-15
 
 ## Status
 
-The repository now has a deterministic Cocos Creator command-line build contract and an independent WeChat build inspector. The contract and inspector pass without the engine by using a synthetic build fixture. A real Creator export is still pending because this machine does not have Cocos Creator or WeChat Developer Tools.
+The repository has a deterministic Cocos Creator command-line build contract and an independent WeChat build inspector. Creator 3.8.8 and WeChat Developer Tools are available on the current build computer. The 2026-07-15 export and package inspection passed at 147 files / 6,852,377 bytes, with a 4,121,077-byte main package and a 355,148-byte `home_common` subpackage.
 
 The stable legacy client remains `miniprogram/`. The pipeline only writes below `cocos-client/build/` and rejects output paths that overlap the legacy upload root.
 
@@ -36,7 +36,7 @@ Set `COCOS_CREATOR_PATH` or `COCOS_CREATOR` when Creator is not in a standard Da
 - Initial scene: `Boot.scene`.
 - Included runtime scenes: Boot and Home.
 - AppID: inherited and checked against the stable root `project.config.json`.
-- Orientation: landscape, matching the 960x640 runtime shell.
+- Orientation: portrait, using the fixed-width `640x960` minimum design baseline and dynamic long-screen height.
 - Release flags: `debug=false`, `md5Cache=true`.
 - Open-data template, separate engine, and start-scene asset-bundle experiments remain disabled until real-device validation.
 
@@ -51,7 +51,7 @@ The inspector fails the build when any of these conditions is found:
 - Generated AppID or orientation differs from the fixed contract.
 - Main package exceeds 4 MiB.
 - Declared subpackages contain no generated files or exceed 30 MiB in total.
-- Any of `theme_default`, `theme_island`, `mode_pk`, or `mode_spell` is missing from both `assets/` and `subpackages/`.
+- Any of `theme_default`, `theme_island`, `home_common`, `mode_pk`, or `mode_spell` is missing from both `assets/` and `subpackages/`.
 - A required bundle lacks its generated `config.json`/`config.<hash>.json`.
 - `mode_pk` or `mode_spell` is not emitted as a declared WeChat subpackage.
 - Any bundle emitted below `subpackages/` is not declared by `game.json`.
@@ -72,6 +72,17 @@ The JSON report records total bytes, main-package bytes/file count, aggregate an
 6. Import `cocos-client/build/wechatgame/` into WeChat Developer Tools as a Mini Game.
 7. Complete the route, privacy, invitation, background recovery, two-device, performance, screenshot, and development-upload gates in `COCOS_RELEASE_QA.md`.
 8. Keep a known-good legacy upload and the accepted Cocos development build before changing any production upload-root configuration.
+
+## Import-Root Warning
+
+The repository contains two different WeChat Developer Tools entry points:
+
+- Repository root `project.config.json`: legacy client, with `miniprogramRoot` set to `miniprogram/`.
+- `cocos-client/build/wechatgame/project.config.json`: generated Cocos client, project name `word-battle-park-wechatgame`.
+
+To inspect or upload the Cocos build, import the directory `cocos-client/build/wechatgame/` itself. Importing the repository root compiles the legacy client and cannot prove that Cocos scenes or `home_common` art are working.
+
+After a new Creator build, clear WeChat Developer Tools compile/file caches when the UI still shows an older layout or programmatic fallback. Confirm `subpackages/home_common` exists in the resource tree before treating missing art as a runtime defect. The detailed 2026-07-15 investigation is recorded in `result.md`.
 
 ## References
 
