@@ -1,8 +1,8 @@
 # Cocos 正式美术资源接入设计说明书（H4）
 
-更新日期：2026-07-14
+更新日期：2026-07-15
 
-目标状态：`COMPLETE`
+目标状态：`H4_BASELINE_COMPLETE / H4_QUALITY_UPGRADE_IN_PROGRESS`
 
 实现状态：`H4_COMPLETE`
 适用版本：V0 竖屏首页及游戏准备前界面
@@ -23,13 +23,13 @@
 - 当前背景：运行时优先请求 `home_common`，Bundle 未导入时回退到主题 `homeBackground`
 - 当前前景视觉：`PreGameUi.visualSlot()` 中的 Graphics/Label 程序化兜底
 - 当前替换接口：`PreGameUi.setVisualAsset(slot, SpriteFrame | null)`
-- 当前正式位图：18 个优化文件暂存于 `art-source/home-v1/optimized/`，总计 `335,229` 字节
+- 当前正式位图：18 个高清文件暂存于 `art-source/home-v1/optimized/`，总计 `3,453,135` 字节；透明 PNG 为真彩 RGBA
 - 当前加载实现：`HomeArtManager`、语义路径、页面绑定、失败回退、按钮九宫格和微信分包契约已完成
-- 当前导入工具：`home-art:prepare/status/verify-import` 及无 Creator 回归测试已完成，当前状态为 `imported`
+- 当前导入工具：`home-art:prepare/sync-upgrade/status/verify-import` 及无 Creator 回归测试已完成；高清源图相对旧 Bundle 的当前状态为 `upgrade-ready`
 - 当前设计证据：5 张生成源图、9 张原始 Goal 参考归档及 `640x1387` 合成预览均已推送；参考归档不进入运行包
 - 当前 `home_common` Bundle：Creator 3.8.8 已生成 18 张 SpriteFrame、23 份元数据并完成微信分包构建
 
-结论：资源生成、代码加载、页面槽位、失败兜底、首次导入、实际构建和包体检查已经完成。iPhone 12/13、360x800 与 430x932 微信模拟器检查均通过，正式背景、前景、九宫格按钮、动态文本和底部入口完整显示且应用错误为 0。H4 已完成，后续真机房间验收属于 Phase 9。
+结论：H4 首次资源接入、代码加载、页面槽位、失败兜底、实际构建和包体检查已经完成。2026-07-15 根据第二台电脑的清晰度反馈重新打开 H4 画质维护：旧版低尺寸、索引色资源已替换为高清真彩源文件，但必须由 Creator 3.8.8 电脑完成保留 UUID 的重导、构建和视觉检查后，才能结束本次画质升级。
 
 ## 3. H4 目标
 
@@ -68,22 +68,22 @@
 
 | 资源键 | 用途 | 建议源尺寸 | 格式/透明 | Bundle | 优先级 |
 | --- | --- | --- | --- | --- | --- |
-| `background` | 首页和准备前页面主题背景 | 720x1280，单张不超过 180 KB | JPG/WebP；需要透明时 PNG | `theme_default` / `theme_island` | P0 |
-| `logo` | 首页品牌 Logo，不含副标题 | 560x220 | PNG/WebP，透明 | `home_common` | P0 |
-| `avatar` | 默认安全头像 | 192x192 | PNG/WebP，透明 | `home_common` | P1 |
-| `coin` | 金币图标 | 96x96 | PNG/WebP，透明 | `home_common/icons` | P0 |
-| `character` | 首页陪伴角色 | 360x420 | PNG/WebP，透明 | `home_common` | P1 |
-| `createRoom` | 创建房间图标 | 160x160 | PNG/WebP，透明 | `home_common/icons` | P0 |
-| `joinRoom` | 加入房间图标 | 160x160 | PNG/WebP，透明 | `home_common/icons` | P0 |
-| `practice` | 赛前练习图标 | 128x128 | PNG/WebP，透明 | `home_common/icons` | P1 |
-| `wordBank` | 选择词库图标，可多处复用 | 128x128 | PNG/WebP，透明 | `home_common/icons` | P1 |
-| `catalog` | 玩法目录图标 | 128x128 | PNG/WebP，透明 | `home_common/icons` | P1 |
-| `history` | 战绩/结果图标 | 128x128 | PNG/WebP，透明 | `home_common/icons` | P1 |
-| `settings` | 设置图标 | 96x96 | PNG/WebP，透明 | `home_common/icons` | P2 |
-| `privacy` | 隐私保护图标 | 96x96 | PNG/WebP，透明 | `home_common/icons` | P2 |
-| `feedback` | 问题反馈图标 | 96x96 | PNG/WebP，透明 | `home_common/icons` | P2 |
+| `background` | 首页和准备前页面主题背景 | 1080x1920，单张不超过 1.5 MB | 高质量 JPG | `home_common/backgrounds` | P0 |
+| `logo` | 首页品牌 Logo，不含副标题 | 1280x400 | 真彩 RGBA PNG，透明 | `home_common` | P0 |
+| `avatar` | 默认安全头像 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P1 |
+| `coin` | 金币图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P0 |
+| `character` | 首页陪伴角色 | 512x768 | 真彩 RGBA PNG，透明 | `home_common` | P1 |
+| `createRoom` | 创建房间图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P0 |
+| `joinRoom` | 加入房间图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P0 |
+| `practice` | 赛前练习图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P1 |
+| `wordBank` | 选择词库图标，可多处复用 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P1 |
+| `catalog` | 玩法目录图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P1 |
+| `history` | 战绩/结果图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P1 |
+| `settings` | 设置图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P2 |
+| `privacy` | 隐私保护图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P2 |
+| `feedback` | 问题反馈图标 | 320x320 | 真彩 RGBA PNG，透明 | `home_common/icons` | P2 |
 
-按钮底图是条件交付项：主按钮建议 600x160，双列辅助按钮建议 280x150，四角保护区至少 28 px，不含文字和动态图标。是否使用 PNG 或 WebP，以 Creator 3.8.8 对目标平台的实际导入和构建结果为准。
+按钮底图使用 `768x328` 真彩 RGBA PNG，四角保护区至少 28 px，不含文字和动态图标。Creator 使用九宫格缩放到主按钮和双列辅助按钮的实际点击区域。
 
 ## 6. 美术制作规则
 
@@ -136,9 +136,9 @@ cocos-client/assets/bundles/
 - 所有图片及 Creator 生成的 `.meta` 必须在同一个提交中进入 Git。
 - 禁止手写图片 importer 的子资源 UUID 和 `.meta`。
 - `home_common` 只在至少一张正式图片已经就绪、并由 Creator 创建 Bundle 元数据后建立；当前不提交空 Bundle。
-- `npm run home-art:prepare` 负责把批准的 18 个优化文件复制到待导入工作树；它不会生成或提交 `.meta`，并会拒绝覆盖不同图片或已导入目录。
+- `npm run home-art:prepare` 只用于首次导入；已有 Creator 元数据时，使用 `npm run home-art:sync-upgrade` 覆盖批准的 18 张图片并保留现有 `.meta` 和 UUID。
 - Creator 首次导入后必须把全部图片设为 `sprite-frame`，再由 `npm run home-art:verify-import` 检查源文件哈希、Bundle 配置、目录/图片元数据、UUID 和 SpriteFrame 子资源。
-- `npm run home-art:status` 是跨电脑只读状态检查：`source-ready`、`prepared`、`imported` 为可继续状态，`invalid-source` 或 `invalid` 必须先修复，不能构建或提交。
+- `npm run home-art:status` 是跨电脑只读状态检查：`source-ready`、`prepared`、`upgrade-ready`、`reimport-required`、`imported` 为明确流程状态，`invalid-source` 或 `invalid` 必须先修复。`verify-import` 还会校验图片实际尺寸与 SpriteFrame 元数据尺寸一致，防止提交未重导的旧 `.meta`。
 
 限制手写 importer `.meta` 的依据是 Creator 3.8 的官方资源流程：Creator 会在打开项目或刷新资源时为缺少元数据的文件自动生成 `.meta`，UUID 冲突或删除重建已被引用资源的元数据会造成资源引用丢失；图片默认按 Texture 导入，只有在 Inspector 中设为 `sprite-frame` 并应用后才会生成 SpriteFrame 子资源。参见 [Meta Files](https://docs.cocos.com/creator/3.8/manual/en/asset/meta.html)、[Texture Assets](https://docs.cocos.com/creator/3.8/manual/en/asset/texture.html) 和 [Sprite Frame Assets](https://docs.cocos.com/creator/3.8/manual/en/asset/sprite-frame.html)。
 
@@ -264,8 +264,8 @@ export interface HomeArtManager {
 
 ## 12. 包体与性能预算
 
-- 每个主题首页背景源文件不超过 180 KB。
-- `home_common` 的 V0 源图片总量目标不超过 350 KB。
+- 高清首页背景允许不超过 1.5 MB，当前 `1080x1920` 高质量 JPG 为 `674,436` 字节。
+- `home_common` 的高清源图片总量不超过 4 MB，当前为 `3,453,135` 字节；该 Bundle 必须保持微信分包。
 - 任一解码纹理尺寸不超过 2048x2048。
 - 图标图集建议控制在 1024x1024 内；是否合图以 Creator 构建结果和透明边缘质量为准。
 - P0 资源在首页首次打开时加载；P1/P2 分批预加载，不在同一帧创建大量 Sprite。

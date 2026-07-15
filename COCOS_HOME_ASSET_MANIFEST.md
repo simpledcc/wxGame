@@ -14,8 +14,8 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 ## Current V0 State
 
-- Eighteen optimized formal assets total `335,229` bytes and have been imported once by Cocos Creator 3.8.8 from `art-source/home-v1/optimized/`.
-- Five generated masters, all 18 optimized files, the composition preview and all nine hashed Goal references are tracked on GitHub; `npm run home-art:status` reports `imported` with 23 metadata files.
+- Eighteen high-fidelity formal assets total `3,453,135` bytes in `art-source/home-v1/optimized/`. They replace the former 335,229-byte indexed-color set that looked soft on high-DPI phones.
+- Five generated masters, all 18 high-fidelity files, the composition preview and all nine hashed Goal references are tracked on GitHub. Until the designated Creator computer performs the upgrade, `npm run home-art:status` reports `upgrade-ready` because the imported Bundle still contains the previous images.
 - The portrait Home structure, data and interaction are complete; formal art is active while the existing Graphics/Label visuals remain as load-failure fallbacks.
 - Player, coins, bank and history text remain runtime labels bound to real stores; no dynamic data is baked into art.
 - `HomeArtManager` automatically replaces a fallback when the matching `SpriteFrame` resolves; no route, controller or Store change is required.
@@ -35,27 +35,28 @@ G2 supplies a programmatic fallback for every slot through `PreGameUi.visualSlot
 
 | Slot key | Art | Suggested source | Alpha | Slice | Planned ownership | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `background` | Portrait village/learning-camp scene, no embedded text | 750x1334 JPG, 170,868 B | no | none | `home_common/backgrounds` | imported and simulator-verified |
-| `logo` | `词斗乐园` logo, no subtitle | 640x200 PNG, 28,211 B | yes | none | `home_common` | imported and simulator-verified |
-| `avatar` | Neutral system avatar, not a public WeChat avatar | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `coin` | Star coin icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `character` | Full-body rabbit learning companion holding a book | 192x256 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `createRoom` | House icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `joinRoom` | Two-player/friend icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `practice` | Open book/practice icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `wordBank` | Stacked books/word-bank icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `catalog` | Gamepad/mode catalog icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `history` | Trophy/history icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `settings` | Gear icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `privacy` | Shield/check icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
-| `feedback` | Message bubble icon | 192x192 PNG | yes | none | `home_common/icons` | imported and simulator-verified |
+| `background` | Portrait village/learning-camp scene, no embedded text | 1080x1920 JPG, 674,436 B | no | none | `home_common/backgrounds` | high-fidelity source ready; Creator reimport pending |
+| `logo` | `词斗乐园` logo, no subtitle | 1280x400 truecolor RGBA PNG | yes | none | `home_common` | high-fidelity source ready; Creator reimport pending |
+| `avatar` | Neutral system avatar, not a public WeChat avatar | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `coin` | Star coin icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `character` | Full-body rabbit learning companion holding a book | 512x768 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `createRoom` | House icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `joinRoom` | Two-player/friend icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `practice` | Open book/practice icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `wordBank` | Stacked books/word-bank icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `catalog` | Gamepad/mode catalog icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `history` | Trophy/history icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `settings` | Gear icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `privacy` | Shield/check icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
+| `feedback` | Message bubble icon | 320x320 truecolor RGBA PNG | yes | none | `home_common/icons` | high-fidelity source ready; Creator reimport pending |
 
-Four clean text-free `384x164` PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 28 px slice insets so every 80/96 px target retains a valid center region, while preserving live Labels and button handlers; surface cards remain programmatic.
+Four clean text-free `768x328` truecolor RGBA PNG button skins are staged for orange/create-history, blue/join-bank, green/practice and purple/catalog actions. Runtime applies 28 px slice insets so every 80/96 px target retains a valid center region, while preserving live Labels and button handlers; surface cards remain programmatic.
 
-## Known V0 Fidelity Limits
+## High-Fidelity Upgrade
 
-- The `750x1334` background, `640x200` Logo, `192x256` character and `384x164` button skins were aggressively reduced to keep the complete V0 set below the original 350 KB source-art gate.
-- Modern 1080/1242-wide phones can render those textures above their source pixel dimensions. Linear magnification avoids hard pixel edges but can look soft.
+- The former `750x1334` background, `640x200` Logo, `192x256` character, `192x192` icons and `384x164` skins were too small for modern high-DPI phones and were palette-quantized. They are retained only in Git history.
+- The replacement PNG files are truecolor RGBA without indexed-color quantization. The background uses high-quality JPEG compression instead of an aggressive 180 KB target.
+- The source master limits the amount of real detail available. This upgrade avoids destructive downscaling and palette banding; a later art redraw would be required to add detail that is absent from the masters.
 - The remaining preparation pages do not yet have dedicated bitmap backgrounds, characters or decorative illustrations. They intentionally use programmatic cards plus shared icons, so their visual richness is lower than Home even when every asset loads correctly.
 - The theme `homeBackground` currently points to a `960x640` landscape image. It is a functional fallback, not a final high-fidelity portrait background for every preparation page.
 - Any high-resolution replacement must remain in `home_common` or a new declared subpackage. Raise the source-art test gate deliberately and rerun package inspection; do not consume the roughly 73 KB remaining main-package margin.
@@ -67,15 +68,16 @@ See `result.md` for the build-path, loading-fallback and image-quality investiga
 - Theme-specific backgrounds remain in `theme_default` / `theme_island`; use the existing `homeBackground` semantic key.
 - Shared background, logo, avatar, character, icons and button skins belong in `home_common`. The designated Creator owner creates this Bundle while importing the staged files.
 - Do not place Home art in `mode_pk` or `mode_spell`; those Bundles are owned by gameplay streams.
-- Keep optimized Home art below 350 KB total for V0 and each decoded texture at or below 2048x2048. Current optimized total is `335,229` bytes.
+- Keep high-fidelity Home art below 4 MB total and each decoded texture at or below 2048x2048. Current optimized total is `3,453,135` bytes.
 - No text may be baked into buttons. Labels remain runtime text for data binding, accessibility and later copy changes.
 
 ## Creator Import Handoff
 
-1. From `cocos-client`, run `npm run home-art:status` and require `source-ready`, then run `npm run home-art:prepare`; this creates the exact runtime hierarchy under `assets/bundles/home_common/textures` without generating metadata and changes status to `prepared`.
-2. Open the project with Cocos Creator 3.8.8, configure the root as Bundle `home_common`, and set all 18 images to importer type `sprite-frame`.
-3. Run `npm run home-art:verify-import`, then require `npm run home-art:status` to report `imported`. The verifier rejects missing/wrong files, changed bytes, incomplete metadata, duplicate top-level UUIDs, a wrong Bundle name, or missing SpriteFrame sub-resources.
-4. Commit the imported image tree and every Creator-generated `.meta` together only after the verifier and actual WeChat build pass.
+1. On the designated Creator computer, pull this checkpoint and run `npm run home-art:status`; for this replacement set it must report `upgrade-ready`.
+2. Run `npm run home-art:sync-upgrade`. It replaces only the 18 approved images and preserves the existing Creator `.meta` files and UUIDs. Status then reports `reimport-required` until Creator updates the recorded dimensions.
+3. Open the project with Cocos Creator 3.8.8 and wait for all 18 changed images to reimport. Keep the root Bundle name `home_common` and every image importer type `sprite-frame`.
+4. Run `npm run home-art:verify-import`, then require `npm run home-art:status` to report `imported`. The verifier rejects stale image dimensions as well as missing/wrong files, changed bytes, incomplete metadata, duplicate top-level UUIDs, a wrong Bundle name or missing SpriteFrame sub-resources.
+5. Run full verification, the actual WeChat build and package inspection. Commit the upgraded imported image tree and Creator-updated `.meta` files together only after visual clarity and package checks pass.
 
 ## Acceptance Checklist
 

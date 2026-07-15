@@ -286,7 +286,7 @@ function testSourceAssetBudget(): void {
   ])).filter((filePath) => !isHomeArtFile(filePath));
   const themeBytes = themeFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
   assert.ok(corePayloadBytes < 1_500_000, `Cocos core source payload exceeds 1.5 MB: ${corePayloadBytes}`);
-  assert.ok(homeArtBytes <= 350_000, `home_common source art exceeds 350 KB: ${homeArtBytes}`);
+  assert.ok(homeArtBytes <= 4_000_000, `home_common source art exceeds 4 MB: ${homeArtBytes}`);
   assert.ok(metadataBytes < 50_000, `Cocos source metadata exceeds 50 KB: ${metadataBytes}`);
   assert.ok(homeArtMetadataBytes < 60_000, `home_common metadata exceeds 60 KB: ${homeArtMetadataBytes}`);
   assert.ok(themeBytes < 250_000, `theme source assets exceed 250 KB: ${themeBytes}`);
@@ -300,7 +300,7 @@ function testHomeAssetHandoff(): void {
   ].forEach((key) => assert.ok(manifest.includes(`\`${key}\``), `Home asset manifest omits ${key}`));
   assert.match(manifest, /was not copied or cropped into the runtime package/);
   assert.match(manifest, /Do not hand-author image importer sub-meta files/);
-  assert.match(manifest, /335,229/);
+  assert.match(manifest, /3,453,135/);
 }
 
 function main(): void {

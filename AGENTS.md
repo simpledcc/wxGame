@@ -86,9 +86,9 @@ git fetch origin
 
 ## 3. 当前目标指针
 
-当前工作流：A 线，首页和游戏准备前界面；H4-H8.5 已完成并冻结，当前进入 Phase 9 外部真机验收。
+当前工作流：A 线，首页和游戏准备前界面；H4 基线及 H8.4-H8.5 已完成，当前因高分屏画质反馈进入 H4 高清资源升级维护。
 
-当前目标：H4 正式美术接入以及 H8.4 首页、H8.5 其他准备页视觉优化均已完成。词库、背词、玩法目录、创建/加入/准备房间、结算、战绩、反馈和玩法说明已统一页头、强调卡片、操作层级、长屏间距和完整空状态；微信原生输入框使用空占位，说明文字由 Cocos 标签显示，避免真机重影。完整验证、Creator 3.8.8 微信构建、包体检查和微信开发者工具逐页检查通过。下一项唯一行动是在两台真实手机上完成创建房间、加入房间、双方准备和开始游戏的准备链路验收，并记录失败提示与后台恢复结果。
+当前目标：解决第二台电脑发现的正式图片清晰度低、画质差问题。18 张高清源文件已在无 Creator 电脑生成：背景 `1080x1920`，Logo `1280x400`，角色 `512x768`，按钮 `768x328`，通用图标 `320x320`；透明 PNG 已由索引色改为真彩 RGBA，总计 `3,453,135` 字节并继续归属 `home_common` 分包。当前状态为 `upgrade-ready`。下一项唯一行动是在指定 Creator 3.8.8 电脑保留现有 UUID 同步高清图、自动重导元数据、完成实际微信构建和清晰度检查。
 
 当前权威文件：
 
@@ -99,7 +99,7 @@ git fetch origin
 - 首页目标参考：`docs/design/home/README.md`
 - 图片加载与清晰度诊断：`result.md`
 
-当前快照：H4-H8.5 已完成并冻结。H4 的独立美术、运行时加载/回退、页面绑定、按钮皮肤、Creator 元数据和微信 `home_common` 分包均已落地；H8.4 保持批准的首页纵向布局，H8.5 完成其余准备页视觉与输入适配。2026-07-15 已在微信开发者工具检查首页、词库、背词、玩法目录、创建/加入房间、战绩、反馈和玩法说明，未发现应用运行错误。当前未完成项属于 Phase 9 双真机外部验证，不再属于界面实现。
+当前快照：H4 基线的加载/回退、页面绑定、按钮皮肤、Creator 元数据和微信 `home_common` 分包仍有效；H8.4-H8.5 页面功能与布局不改。本次只替换像素资源并提高资源预算，不修改房间、玩法或页面交互。仓库中的 `assets/bundles/home_common` 仍是旧低清导入结果，不能在无 Creator 电脑直接覆盖后提交，因为其 SpriteFrame 元数据尺寸会失效。指定电脑完成 `sync-upgrade -> Creator 重导 -> verify-import -> build` 后再提交高清运行时图片和更新后的 `.meta`。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -167,13 +167,14 @@ git fetch origin
 
 不得从参考合成图裁图，不得手写图片 importer `.meta`。正式图片首次导入必须由唯一一台 Creator 3.8.8 电脑完成，并将图片和 Creator 生成的 `.meta` 放入同一个提交。
 
-H4.1 导入电脑执行顺序：
+H4 高清升级导入电脑执行顺序：
 
-1. 在干净工作树执行 `cd cocos-client` 和 `npm run home-art:status`，正常状态应为 `source-ready`；再执行 `npm run home-art:prepare`。准备命令只复制经过哈希确认的 18 个优化文件，遇到不同文件或已有元数据会拒绝覆盖，完成后状态必须为 `prepared`。
-2. 用 Cocos Creator 3.8.8 打开项目，等待导入结束；把 `assets/bundles/home_common` 设置为名称严格为 `home_common` 的 Bundle，并把全部 18 张图片的 importer 类型设置为 `sprite-frame`。
-3. 执行 `npm run home-art:verify-import`；该命令必须验证图片与批准源文件一致、23 个 Bundle/目录/图片元数据齐全、Bundle 设置正确、UUID 不重复且 SpriteFrame 子资源存在。随后 `npm run home-art:status` 必须显示 `imported`。
-4. 再执行 `npm run verify`、`npm run build:wechat` 和 `npm run inspect:wechat-build`，完成 Creator 画面检查。
-5. 只有上述检查通过后，才把 `assets/bundles/home_common`、`assets/bundles/home_common.meta`、进度和交接文件放入同一个 `dev_done` 提交。
+1. 在干净工作树拉取本次高清资源提交，进入 `cocos-client` 后执行 `npm run home-art:status`，必须显示 `upgrade-ready`。
+2. 执行 `npm run home-art:sync-upgrade`。该命令只覆盖经过哈希确认的 18 张图片，保留现有 Creator `.meta` 和 UUID；完成后状态必须显示 `reimport-required`。
+3. 用 Cocos Creator 3.8.8 打开项目并等待全部图片自动重导完成；保持 Bundle 名称严格为 `home_common`，全部图片 importer 类型保持 `sprite-frame`。不要删除或重新生成已有 `.meta`。
+4. 执行 `npm run home-art:verify-import`；该命令验证图片哈希、23 份元数据、Bundle 设置、UUID、SpriteFrame 子资源及图片/元数据尺寸一致。随后 `npm run home-art:status` 必须显示 `imported`。
+5. 执行 `npm run verify`、`npm run build:wechat` 和 `npm run inspect:wechat-build`，在 360x800、393x852、430x932 至少检查首页背景、Logo、角色、按钮和小图标清晰度，并确认 `home_common` 仍为微信分包。
+6. 只有上述检查通过后，才把高清 `assets/bundles/home_common`、Creator 更新的 `.meta`、进度和交接文件放入同一个主题以 `dev_done` 结尾的提交。
 
 ## 7. 多人和多电脑协作
 

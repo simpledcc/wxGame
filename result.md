@@ -4,6 +4,12 @@
 排查基线：`afad54a`，分支 `feature/pre-game-ui-home-goal`  
 Cocos Creator：`3.8.8`
 
+## 0. 画质修复进展
+
+2026-07-15 已按本报告的清晰度结论完成无 Creator 侧资源升级：18 张运行源图由旧版低尺寸、索引色输出升级为 `1080x1920` 背景、`1280x400` Logo、`512x768` 角色、`768x328` 按钮皮肤和 `320x320` 图标，透明 PNG 全部改为真彩 RGBA，总计 `3,453,135` 字节并继续放在 `home_common` 分包。仓库状态应显示 `upgrade-ready`。
+
+本机没有 Cocos Creator，因此没有直接覆盖已导入图片或手写 `.meta`。指定 Creator 3.8.8 电脑需执行 `npm run home-art:sync-upgrade`，等待 Creator 自动重导后执行 `home-art:verify-import`、完整微信构建和目标视口清晰度检查。完成前，下文构建体积仍是旧低清基线的历史证据。
+
 ## 1. 结论
 
 1. 当前 Cocos 微信构建**没有漏打包图片**。`home_common` 已作为微信分包进入 `cocos-client/build/wechatgame/subpackages/home_common/`，包含 18 张正式图片对应的 SpriteFrame 和原始纹理。

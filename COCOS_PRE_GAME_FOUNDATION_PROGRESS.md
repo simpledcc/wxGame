@@ -28,9 +28,10 @@ Updated: 2026-07-15
 - H4 complete reference archive commit: `54b3964` (`docs(home-art): archive all H4 visual references`)
 - H4.1 import/build commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H4 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H4 high-fidelity source checkpoint: the commit containing this record; it must not use `dev_done` until Creator reimport and build pass
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.5 COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
-- Next stage: retain the imported metadata and complete the two-real-phone create/join/ready/start preparation-flow record
+- Current stage: `H4 HIGH-FIDELITY UPGRADE IN_PROGRESS / SOURCE READY`
+- Next stage: on the designated Creator 3.8.8 computer, sync the 18 high-fidelity images while preserving UUIDs, reimport, build and inspect visual clarity
 
 ## Baseline facts
 
@@ -88,6 +89,7 @@ Updated: 2026-07-15
 | H2 Button and room-entry logic audit | `DONE` | Distinct create/join intent, disabled-action guard, active-session lock, paging boundary and retry tests pass | None |
 | H3 Unified pre-game and auxiliary pages | `DONE` | Bank, study, co-op select, room, result, history, feedback and help use the shared portrait page system | None |
 | H4 Formal art integration | `COMPLETE` | Imported 18 SpriteFrames with 23 Creator metadata files; full verify, actual build, package inspection and iPhone 12/13, 360x800 and 430x932 Home/pre-game traversal pass | None; preserve metadata and package boundary |
+| H4 high-fidelity resource upgrade | `IN_PROGRESS` | 18 sources regenerated at high-DPI dimensions as truecolor RGBA/high-quality JPG; upgrade/status/reimport-dimension tests pass and composition preview is refreshed | Creator 3.8.8 reimport, actual WeChat build, package inspection and visual comparison pending |
 | H5 Seven-page pre-game flow | `DONE` | Reference mappings, route transitions, real-data layouts, runtime click simulation, full verify, actual Creator build and WeChat DevTools inspection pass | Real two-phone room acceptance remains release QA, not an H5 code blocker |
 | H6 Pre-game logic simplification | `DONE` | Hidden legacy actions removed; state-specific room trees, release cleanup, full verify, Creator build and WeChat tool startup pass | Real two-phone acceptance remains external QA |
 | H7 Pre-game robot/duration cleanup | `DONE` | Pre-game state, room creation settings, lobby copy and regression tests contain no robot option or user-selectable duration | Real two-phone acceptance remains external QA |
@@ -228,6 +230,16 @@ Updated: 2026-07-15
 19. H4.5 completed exact `360x800` and `430x932` Home checks in WeChat Developer Tools. Background cover, contained foreground art, live Labels, button skins, bottom actions and safe-area spacing remained visible without incoherent overlap; application errors remained `0`. H4 is complete.
 20. Post-H4 icon-layout maintenance fixed formal sliced button skins shrinking back to source-image dimensions after asynchronous SpriteFrame assignment. Action skins now use `Sprite.SizeMode.CUSTOM` and reapply the full hit-area size, action icons are capped at 64 design pixels with an enforced text gap, top icon buttons use a compact 70% slot, and crowded card/character slots were reduced and repositioned. The full verification chain, actual Creator WeChat build and package inspection passed; the 360x800 Home view showed full-width skins with contained icons and no application errors.
 21. A user-device screenshot exposed that the first maintenance pass was insufficient: Cocos could still restore the formal skin to its raw `384x164` size after the asynchronous load, and the 40-pixel top inset allowed Settings to collide with the WeChat capsule. The final repair keeps the full-size programmatic background under every skin, has `RuntimeButtonVisual` enforce custom skin dimensions after late resets, raises the shared top safe inset to 104, and reduces action/top icon caps to 56/48 design pixels. Cross-route runtime QA now rejects every icon that leaves its button/card and every skin that does not cover its hit area. Full verification, actual Creator WeChat build, package inspection and a fresh 360x800 Developer Tools Home check passed with application errors at `0`.
+
+## H4 high-fidelity resource upgrade checkpoint
+
+1. Reopened H4 visual maintenance after the second Creator computer showed visibly soft background, Logo, character, icon and button art on a high-DPI display. The business UI, routes, stores and gameplay remain unchanged.
+2. Replaced the old `750x1334`/indexed-color output contract with a `1080x1920` high-quality background, `1280x400` Logo, `512x768` character, `768x328` skins and `320x320` icons. All 17 transparent PNG files are truecolor RGBA with no palette quantization.
+3. The 18-file high-fidelity source payload is `3,453,135` bytes and remains assigned to the `home_common` WeChat subpackage. The explicit source budget is now 4 MB; each decoded texture remains at or below 2048x2048.
+4. Added `home-art:sync-upgrade` to replace only approved images while preserving existing Creator metadata and UUIDs. Status now distinguishes `upgrade-ready` from `reimport-required`, and verification rejects SpriteFrame metadata whose raw dimensions do not match the image.
+5. Regenerated `docs/design/home/h4-art-composition-preview.png` from the new files and passed processor validation plus the import-workflow regression test on this no-Creator computer.
+6. Current repository state before Creator sync is intentionally `upgrade-ready`: `art-source/home-v1/optimized/` contains the new files while `assets/bundles/home_common` still contains the last validated low-resolution import. Do not commit manually edited importer metadata.
+7. Next unique action: on the designated Creator 3.8.8 computer run `npm run home-art:sync-upgrade`, wait for automatic reimport, require `home-art:verify-import` and `home-art:status=imported`, then run full verification, actual WeChat build, package inspection and target-viewport clarity checks. Only that final import/build submission may end with `dev_done`.
 
 ## H5 seven-page pre-game flow
 

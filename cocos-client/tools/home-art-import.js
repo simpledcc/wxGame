@@ -49,6 +49,34 @@ function sha256(filePath) {
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
+function getImageDimensions(filePath) {
+  const data = fs.readFileSync(filePath);
+  if (data.length >= 24 && data.toString("ascii", 1, 4) === "PNG") {
+    return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+  }
+  if (data.length >= 4 && data[0] === 0xff && data[1] === 0xd8) {
+    let offset = 2;
+    while (offset + 8 < data.length) {
+      if (data[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+      const marker = data[offset + 1];
+      if (marker === 0xd8 || marker === 0xd9) {
+        offset += 2;
+        continue;
+      }
+      const length = data.readUInt16BE(offset + 2);
+      if (length < 2 || offset + 2 + length > data.length) break;
+      if ([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf].includes(marker)) {
+        return { height: data.readUInt16BE(offset + 5), width: data.readUInt16BE(offset + 7) };
+      }
+      offset += 2 + length;
+    }
+  }
+  throw new Error(`Unsupported or invalid Home art image: ${filePath}`);
+}
+
 function assertSourceComplete(sourceRoot = SOURCE_ROOT) {
   const actual = listFiles(sourceRoot);
   const expected = [...EXPECTED_FILES].sort();
@@ -99,6 +127,37 @@ function prepareHomeArt(options = {}) {
   return { bundleRoot, files: EXPECTED_FILES.length, sourceRoot, targetRoot };
 }
 
+function syncHomeArtUpgrade(options = {}) {
+  const sourceRoot = path.resolve(options.sourceRoot || SOURCE_ROOT);
+  const bundleRoot = path.resolve(options.bundleRoot || BUNDLE_ROOT);
+  const targetRoot = path.join(bundleRoot, "textures");
+  assertSourceComplete(sourceRoot);
+
+  const requiredMetadata = [
+    `${bundleRoot}.meta`,
+    ...EXPECTED_DIRECTORIES.map((directory) => `${path.join(bundleRoot, directory)}.meta`),
+    ...EXPECTED_FILES.map((file) => `${path.join(targetRoot, file)}.meta`)
+  ];
+  const missingMetadata = requiredMetadata.filter((file) => !fs.existsSync(file));
+  if (missingMetadata.length) {
+    throw new Error("home_common must have a complete existing Creator import before a quality upgrade can preserve its UUIDs.");
+  }
+
+  const unexpected = listFiles(targetRoot).filter((file) => !file.endsWith(".meta") && !EXPECTED_FILES.includes(file));
+  if (unexpected.length) {
+    throw new Error(`Refusing to overwrite unexpected home_common files: ${unexpected.join(", ")}`);
+  }
+
+  EXPECTED_FILES.forEach((relativePath) => {
+    const sourcePath = path.join(sourceRoot, relativePath);
+    const targetPath = path.join(targetRoot, relativePath);
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+    fs.copyFileSync(sourcePath, targetPath);
+  });
+  assertCopiesMatch(sourceRoot, targetRoot);
+  return { bundleRoot, files: EXPECTED_FILES.length, sourceRoot, targetRoot };
+}
+
 function readMeta(metaPath) {
   if (!fs.existsSync(metaPath)) throw new Error(`Creator metadata is missing: ${normalize(path.relative(PROJECT_ROOT, metaPath))}`);
   let parsed;
@@ -140,8 +199,16 @@ function verifyHomeArtImport(options = {}) {
       throw new Error(`${relativePath} must use the sprite-frame image importer type.`);
     }
     const subMetas = Object.values(meta.subMetas || {});
-    if (!subMetas.some((entry) => entry && entry.importer === "sprite-frame")) {
+    const spriteFrameMeta = subMetas.find((entry) => entry && entry.importer === "sprite-frame");
+    if (!spriteFrameMeta) {
       throw new Error(`${relativePath}.meta does not contain a generated SpriteFrame sub-resource.`);
+    }
+    const dimensions = getImageDimensions(path.join(targetRoot, relativePath));
+    if (spriteFrameMeta.userData?.rawWidth !== dimensions.width || spriteFrameMeta.userData?.rawHeight !== dimensions.height) {
+      throw new Error(
+        `Creator metadata dimensions are stale for ${relativePath}: image is ${dimensions.width}x${dimensions.height}, `
+        + `meta is ${spriteFrameMeta.userData?.rawWidth || "missing"}x${spriteFrameMeta.userData?.rawHeight || "missing"}.`
+      );
     }
   });
 
@@ -158,19 +225,27 @@ function getHomeArtImportStatus(options = {}) {
     return { state: "invalid-source", reason: error.message };
   }
   if (!fs.existsSync(bundleRoot)) return { state: "source-ready", files: EXPECTED_FILES.length };
-  try {
-    assertCopiesMatch(sourceRoot, targetRoot);
-  } catch (error) {
-    return { state: "invalid", reason: error.message };
-  }
   const hasMetadata = fs.existsSync(`${bundleRoot}.meta`)
     || fs.existsSync(`${targetRoot}.meta`)
     || listFiles(targetRoot).some((file) => file.endsWith(".meta"));
+  try {
+    assertCopiesMatch(sourceRoot, targetRoot);
+  } catch (error) {
+    const metadataComplete = fs.existsSync(`${bundleRoot}.meta`)
+      && EXPECTED_DIRECTORIES.every((directory) => fs.existsSync(`${path.join(bundleRoot, directory)}.meta`))
+      && EXPECTED_FILES.every((file) => fs.existsSync(`${path.join(targetRoot, file)}.meta`));
+    return metadataComplete
+      ? { state: "upgrade-ready", files: EXPECTED_FILES.length, reason: error.message }
+      : { state: "invalid", reason: error.message };
+  }
   if (!hasMetadata) return { state: "prepared", files: EXPECTED_FILES.length };
   try {
     const result = verifyHomeArtImport({ bundleRoot, sourceRoot });
     return { state: "imported", files: result.files, metadataFiles: result.metadataFiles };
   } catch (error) {
+    if (error.message.startsWith("Creator metadata dimensions are stale")) {
+      return { state: "reimport-required", files: EXPECTED_FILES.length, reason: error.message };
+    }
     return { state: "invalid", reason: error.message };
   }
 }
@@ -186,6 +261,12 @@ function runCli() {
     if (process.argv.includes("--verify")) {
       const result = verifyHomeArtImport();
       console.log(`home_common import verified: ${result.files} images and ${result.metadataFiles} metadata files.`);
+      return;
+    }
+    if (process.argv.includes("--sync-upgrade")) {
+      const result = syncHomeArtUpgrade();
+      console.log(`Updated ${result.files} Home art images in ${result.targetRoot} while preserving Creator metadata and UUIDs.`);
+      console.log("Open this project in Cocos Creator 3.8.8 and wait for all images to reimport, then run npm run home-art:verify-import.");
       return;
     }
     const result = prepareHomeArt();
@@ -204,6 +285,8 @@ module.exports = {
   EXPECTED_FILES,
   assertSourceComplete,
   getHomeArtImportStatus,
+  getImageDimensions,
   prepareHomeArt,
+  syncHomeArtUpgrade,
   verifyHomeArtImport
 };

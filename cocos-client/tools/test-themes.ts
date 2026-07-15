@@ -123,6 +123,10 @@ function getPngDimensions(filePath: string): { width: number; height: number } {
   return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
 }
 
+function getPngColorType(filePath: string): number {
+  return fs.readFileSync(filePath)[25];
+}
+
 function testHomeArtManifestAndBudget(): void {
   const bundlePath = path.join(root, "art-source", "home-v1", "optimized");
   const entries = [
@@ -136,18 +140,21 @@ function testHomeArtManifestAndBudget(): void {
     assert.equal(fs.existsSync(sourcePath), true, `${key} home art is missing`);
     totalBytes += fs.statSync(sourcePath).size;
     if (key === "background") {
-      assert.deepEqual(getJpegDimensions(sourcePath), { width: 750, height: 1334 });
+      assert.deepEqual(getJpegDimensions(sourcePath), { width: 1080, height: 1920 });
     } else if (key === "logo") {
-      assert.deepEqual(getPngDimensions(sourcePath), { width: 640, height: 200 });
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 1280, height: 400 });
     } else if (key === "character") {
-      assert.deepEqual(getPngDimensions(sourcePath), { width: 192, height: 256 });
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 512, height: 768 });
     } else if (key in HOME_BUTTON_SKIN_PATHS) {
-      assert.deepEqual(getPngDimensions(sourcePath), { width: 384, height: 164 });
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 768, height: 328 });
     } else {
-      assert.deepEqual(getPngDimensions(sourcePath), { width: 192, height: 192 });
+      assert.deepEqual(getPngDimensions(sourcePath), { width: 320, height: 320 });
+    }
+    if (key !== "background") {
+      assert.equal(getPngColorType(sourcePath), 6, `${key} must remain truecolor RGBA instead of indexed color`);
     }
   });
-  assert.ok(totalBytes <= 350_000, `home art payload exceeds 350 KB: ${totalBytes}`);
+  assert.ok(totalBytes <= 4_000_000, `high-fidelity home art payload exceeds 4 MB: ${totalBytes}`);
 }
 
 async function testThemeSelectionAndFallback(): Promise<void> {

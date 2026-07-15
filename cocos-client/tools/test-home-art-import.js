@@ -5,8 +5,10 @@ const path = require("path");
 const {
   EXPECTED_DIRECTORIES,
   EXPECTED_FILES,
+  getImageDimensions,
   getHomeArtImportStatus,
   prepareHomeArt,
+  syncHomeArtUpgrade,
   verifyHomeArtImport
 } = require("./home-art-import");
 
@@ -20,6 +22,26 @@ function writeMeta(metaPath, importer, uuid, userData = {}, subMetas = {}) {
     subMetas,
     userData
   }, null, 2)}\n`);
+}
+
+function writeImageMeta(metaPath, uuid, dimensions) {
+  writeMeta(metaPath, "image", uuid, { type: "sprite-frame" }, {
+    texture: { importer: "texture", uuid: `${uuid}@texture` },
+    spriteFrame: {
+      importer: "sprite-frame",
+      uuid: `${uuid}@spriteFrame`,
+      userData: { rawWidth: dimensions.width, rawHeight: dimensions.height }
+    }
+  });
+}
+
+function writePngHeader(filePath, width, height) {
+  const data = Buffer.alloc(24);
+  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(data, 0);
+  data.write("IHDR", 12, "ascii");
+  data.writeUInt32BE(width, 16);
+  data.writeUInt32BE(height, 20);
+  fs.writeFileSync(filePath, data);
 }
 
 function main() {
@@ -40,10 +62,11 @@ function main() {
       writeMeta(`${path.join(bundleRoot, directory)}.meta`, "directory", `directory-${index}`);
     });
     EXPECTED_FILES.forEach((file, index) => {
-      writeMeta(`${path.join(targetRoot, file)}.meta`, "image", `image-${index}`, { type: "sprite-frame" }, {
-        texture: { importer: "texture", uuid: `image-${index}@texture` },
-        spriteFrame: { importer: "sprite-frame", uuid: `image-${index}@spriteFrame` }
-      });
+      writeImageMeta(
+        `${path.join(targetRoot, file)}.meta`,
+        `image-${index}`,
+        getImageDimensions(path.join(targetRoot, file))
+      );
     });
     const verified = verifyHomeArtImport({ bundleRoot });
     assert.equal(verified.files, 18);
@@ -51,10 +74,19 @@ function main() {
     assert.equal(getHomeArtImportStatus({ bundleRoot }).state, "imported");
     assert.throws(() => prepareHomeArt({ bundleRoot }), /already contains Creator metadata/);
 
-    fs.writeFileSync(path.join(targetRoot, EXPECTED_FILES[0]), "changed");
-    assert.throws(() => verifyHomeArtImport({ bundleRoot }), /differs from the approved optimized source/);
-    assert.equal(getHomeArtImportStatus({ bundleRoot }).state, "invalid");
-    console.log("Home art import workflow OK: controlled preparation, metadata gate, hashes, Bundle and SpriteFrame checks passed.");
+    const upgradedSourceRoot = path.join(temporaryRoot, "upgraded-source");
+    fs.cpSync(path.resolve(__dirname, "../art-source/home-v1/optimized/textures"), upgradedSourceRoot, { recursive: true });
+    writePngHeader(path.join(upgradedSourceRoot, "logo.png"), 1279, 399);
+    assert.equal(getHomeArtImportStatus({ bundleRoot, sourceRoot: upgradedSourceRoot }).state, "upgrade-ready");
+    assert.equal(syncHomeArtUpgrade({ bundleRoot, sourceRoot: upgradedSourceRoot }).files, 18);
+    assert.throws(
+      () => verifyHomeArtImport({ bundleRoot, sourceRoot: upgradedSourceRoot }),
+      /metadata dimensions are stale/
+    );
+    assert.equal(getHomeArtImportStatus({ bundleRoot, sourceRoot: upgradedSourceRoot }).state, "reimport-required");
+    writeImageMeta(`${path.join(targetRoot, "logo.png")}.meta`, "image-0", { width: 1279, height: 399 });
+    assert.equal(getHomeArtImportStatus({ bundleRoot, sourceRoot: upgradedSourceRoot }).state, "imported");
+    console.log("Home art import workflow OK: preparation, UUID-preserving quality upgrade, reimport gate, hashes, Bundle and SpriteFrame checks passed.");
   } finally {
     fs.rmSync(temporaryRoot, { recursive: true, force: true });
   }

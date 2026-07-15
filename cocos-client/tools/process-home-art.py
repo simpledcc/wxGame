@@ -30,6 +30,14 @@ ICON_NAMES = (
 )
 BUTTON_NAMES = ("primary-orange", "primary-blue", "primary-green", "primary-purple")
 
+BACKGROUND_SIZE = (1080, 1920)
+BACKGROUND_MAX_BYTES = 1_500_000
+ICON_SIZE = (320, 320)
+CHARACTER_SIZE = (512, 768)
+BUTTON_SIZE = (768, 328)
+LOGO_SIZE = (1280, 400)
+MAX_TOTAL_BYTES = 4_000_000
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -60,10 +68,15 @@ def copy_sources(args: argparse.Namespace) -> None:
             shutil.copy2(source, destination)
 
 
-def save_background(source: Path, destination: Path, max_bytes: int = 180_000) -> None:
+def save_background(
+    source: Path,
+    destination: Path,
+    size: tuple[int, int] = BACKGROUND_SIZE,
+    max_bytes: int = BACKGROUND_MAX_BYTES,
+) -> None:
     with Image.open(source) as image:
         image = image.convert("RGB")
-        target_ratio = 750 / 1334
+        target_ratio = size[0] / size[1]
         source_ratio = image.width / image.height
         if source_ratio > target_ratio:
             width = round(image.height * target_ratio)
@@ -73,9 +86,9 @@ def save_background(source: Path, destination: Path, max_bytes: int = 180_000) -
             height = round(image.width / target_ratio)
             top = (image.height - height) // 2
             image = image.crop((0, top, image.width, top + height))
-        image = image.resize((750, 1334), Image.Resampling.LANCZOS)
+        image = image.resize(size, Image.Resampling.LANCZOS)
         destination.parent.mkdir(parents=True, exist_ok=True)
-        for quality in range(82, 49, -2):
+        for quality in range(95, 87, -1):
             image.save(destination, "JPEG", quality=quality, optimize=True, progressive=True)
             if destination.stat().st_size <= max_bytes:
                 return
@@ -161,7 +174,6 @@ def fit_transparent(
     destination: Path,
     size: tuple[int, int],
     padding: int,
-    colors: int,
 ) -> None:
     with Image.open(source) as image:
         image = remove_connected_key_spill(image)
@@ -175,12 +187,7 @@ def fit_transparent(
         canvas = Image.new("RGBA", size, (0, 0, 0, 0))
         canvas.alpha_composite(resized, ((size[0] - resized.width) // 2, (size[1] - resized.height) // 2))
         destination.parent.mkdir(parents=True, exist_ok=True)
-        quantized = canvas.quantize(
-            colors=colors,
-            method=Image.Quantize.FASTOCTREE,
-            dither=Image.Dither.NONE,
-        )
-        quantized.save(destination, "PNG", optimize=True)
+        canvas.save(destination, "PNG", optimize=True, compress_level=9)
 
 
 def split_sheet(
@@ -191,7 +198,6 @@ def split_sheet(
     destination: Path,
     output_size: tuple[int, int],
     padding: int,
-    colors: int,
     helper: Path,
 ) -> None:
     with Image.open(source) as sheet, tempfile.TemporaryDirectory() as temporary:
@@ -209,7 +215,7 @@ def split_sheet(
             keyed = temp / f"{name}-keyed.png"
             sheet.crop(box).save(raw, "PNG")
             remove_chroma(raw, keyed, helper)
-            fit_transparent(keyed, destination / f"{name}.png", output_size, padding, colors)
+            fit_transparent(keyed, destination / f"{name}.png", output_size, padding)
 
 
 def validate_output(output: Path) -> None:
@@ -217,8 +223,8 @@ def validate_output(output: Path) -> None:
     if len(files) != 18:
         raise RuntimeError(f"Expected 18 optimized files, found {len(files)}")
     total_bytes = sum(path.stat().st_size for path in files)
-    if total_bytes > 350_000:
-        raise RuntimeError(f"Optimized payload exceeds 350 KB: {total_bytes}")
+    if total_bytes > MAX_TOTAL_BYTES:
+        raise RuntimeError(f"High-fidelity payload exceeds {MAX_TOTAL_BYTES} bytes: {total_bytes}")
     for path in files:
         if path.suffix.lower() != ".png":
             continue
@@ -245,17 +251,17 @@ def main() -> None:
     args = parse_args()
     copy_sources(args)
     save_background(args.background, args.output / "backgrounds" / "learning-garden.jpg")
-    split_sheet(args.icons, ICON_NAMES, 4, 4, args.output / "icons", (192, 192), 6, 128, args.chromakey_script)
+    split_sheet(args.icons, ICON_NAMES, 4, 4, args.output / "icons", ICON_SIZE, 10, args.chromakey_script)
     if args.character:
         with tempfile.TemporaryDirectory() as temporary:
             keyed_character = Path(temporary) / "character-keyed.png"
             remove_chroma(args.character, keyed_character, args.chromakey_script)
-            fit_transparent(keyed_character, args.output / "icons" / "character.png", (192, 256), 5, 128)
-    split_sheet(args.buttons, BUTTON_NAMES, 2, 2, args.output / "buttons", (384, 164), 5, 128, args.chromakey_script)
+            fit_transparent(keyed_character, args.output / "icons" / "character.png", CHARACTER_SIZE, 12)
+    split_sheet(args.buttons, BUTTON_NAMES, 2, 2, args.output / "buttons", BUTTON_SIZE, 10, args.chromakey_script)
     with tempfile.TemporaryDirectory() as temporary:
         keyed_logo = Path(temporary) / "logo-keyed.png"
         remove_chroma(args.logo, keyed_logo, args.chromakey_script)
-        fit_transparent(keyed_logo, args.output / "logo.png", (640, 200), 4, 256)
+        fit_transparent(keyed_logo, args.output / "logo.png", LOGO_SIZE, 8)
     validate_output(args.output)
 
 
