@@ -386,7 +386,7 @@ async function main(): Promise<void> {
     "Home coins must come from WordBankStore"
   );
   assertOk(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："));
-  const homeSubtitle = findDeep(canvas, "HomeSubtitle");
+  const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const subtitleTransform = homeSubtitle?.getComponent(UITransform);
   const bankTransform = currentBankBar?.getComponent(UITransform);
@@ -429,18 +429,18 @@ async function main(): Promise<void> {
   const createAction = findDeep(canvas, "CreateRoomButton");
   const createTransform = createAction?.getComponent(UITransform);
   const createTitle = findDeep(canvas, "CreateRoomButtonTitle")?.getComponent(Label);
-  assertEqual(createTransform?.width, 560);
-  assertEqual(createTransform?.height, 132);
+  assertEqual(createTransform?.width, 520);
+  assertEqual(createTransform?.height, 146);
   assertEqual(createTitle?.string, "创建房间");
   assertEqual(createTitle?.fontSize, 38);
   assertEqual(createTitle?.enableOutline, true);
   assertEqual(createTitle?.outlineWidth, 3);
-  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.width, 560);
-  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.height, 116);
+  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.width, 520);
+  assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.height, 136);
   ["StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
     const transform = findDeep(canvas, name)?.getComponent(UITransform);
-    assertEqual(transform?.width, 272, `${name} must use the wide two-column layout`);
-    assertEqual(transform?.height, 104, `${name} must use the wide two-column layout`);
+    assertEqual(transform?.width, 252, `${name} must use the shorter two-column layout`);
+    assertEqual(transform?.height, 118, `${name} must use the taller two-column layout`);
     assertEqual(findDeep(canvas, `${name}Title`)?.getComponent(Label)?.fontSize, 31);
     assertEqual(findDeep(canvas, `${name}Subtitle`)?.active, true, `${name} subtitle must remain visible`);
   });
@@ -460,9 +460,9 @@ async function main(): Promise<void> {
   );
   assertEqual(findDeep(canvas, "CreateRoomButtonHighlight")?.active, false,
     "formal skin must hide the duplicate programmatic highlight");
-  assertEqual(createSkin?.getComponent(UITransform)?.width, 1120,
+  assertEqual(createSkin?.getComponent(UITransform)?.width, 1040,
     "2x formal skin must retain high-density nine-slice geometry");
-  assertEqual(createSkin?.getComponent(UITransform)?.height, 264,
+  assertEqual(createSkin?.getComponent(UITransform)?.height, 292,
     "2x formal skin must retain high-density nine-slice geometry");
   assertEqual(createSkin?.scale.x, 0.5, "2x formal skin must map back to design units");
   assertEqual(createSkin?.scale.y, 0.5, "2x formal skin must map back to design units");
@@ -559,7 +559,7 @@ async function main(): Promise<void> {
   assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "页面暂时无法打开，请重试");
   findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().route, "help", "failed Home navigation must allow a retry");
+  assertEqual(app.store.getState().route, "coopSelect", "failed Home navigation must allow a retry");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   app.router.navigate = originalNavigate;
@@ -569,9 +569,9 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "coopSelect");
   assertOk(findDeep(canvas, "CoopSelectRuntimeScreen"));
-  assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(Button)?.interactable, true);
-  assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(Button)?.interactable, false);
-  findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
+  assertEqual(findDeep(canvas, "ModeOption0Action")?.getComponent(Button)?.interactable, true);
+  assertEqual(findDeep(canvas, "ModeOption1Action")?.getComponent(Button)?.interactable, false);
+  findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().selectedMode, "pk");
   assertEqual(app.store.getState().route, "room");
@@ -620,7 +620,7 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "coopSelect", "create entry must open mode selection first");
   assertOk(findDeep(canvas, "ModeOption0"));
-  findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
+  findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "room", "available mode must open room configuration");
   assertEqual(app.store.getState().roomEntryIntent, "create");
@@ -631,8 +631,8 @@ async function main(): Promise<void> {
     findDeep(canvas, "CreateGuidance")?.getComponent(Label)?.string.includes("创建后邀请好友"),
     "create configuration must explain the next step"
   );
-  assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 164);
-  assertOk(findDeep(canvas, "SelectedModeCardAccent")?.getComponent(Graphics));
+  assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 184);
+  assertOk(findDeep(canvas, "SelectedModeCardTab")?.getComponent(Graphics));
   assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, true);
   findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
   assertEqual(app.store.getState().roomAutoReady, false);
@@ -669,7 +669,7 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(autoReadyCount, 1, "enabled auto-ready must use the existing ready action once");
   assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
-  assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "取消准备");
+  assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "✓ 已准备，点击取消");
   assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
   app.roomSession.create = originalCreateRoom;
   app.roomSession.toggleReady = originalToggleReady;
@@ -687,8 +687,8 @@ async function main(): Promise<void> {
   assertPreGameTargetDevices(studyRoot);
   assertOk(findDeep(canvas, "RandomWord"));
   assertOk(findDeep(canvas, "MarkWrong"));
-  assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 350);
-  assertOk(findDeep(canvas, "StudyCardAccent")?.getComponent(Graphics));
+  assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 366);
+  assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
   assertEqual(
     findDeep(canvas, "StudyBankBar")?.position.y,
     findDeep(canvas, "ChangeStudyBank")?.position.y,
@@ -749,7 +749,7 @@ async function main(): Promise<void> {
   });
   findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().route, "help");
+  assertEqual(app.store.getState().route, "coopSelect");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.string, "123456789");
@@ -880,8 +880,8 @@ async function main(): Promise<void> {
       );
       assertEqual(
         findDeep(routeRoot, "BackButton")?.getComponent(Graphics)?.enabled,
-        false,
-        `${routes[index]} back action must not render the old white card`
+        true,
+        `${routes[index]} back action must render as a visible blue button`
       );
       assertPreGameTargetDevices(routeRoot);
     }
@@ -891,9 +891,9 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
-      assertOk(findDeep(canvas, "BankListHeader"), "Bank must separate status from the unit list");
+      assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
-      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
+      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 110);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);
@@ -920,12 +920,12 @@ async function main(): Promise<void> {
       app.persistWordBankProgress = originalPersistWordBankProgress;
     }
     if (routes[index] === "coopSelect") {
-      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.width, 560);
-      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 116);
-      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 272);
-      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 104);
-      assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 560);
-      findDeep(canvas, "ModeOption0")?.emit(Button.EventType.CLICK);
+      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.width, 548);
+      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 86);
+      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 548);
+      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 86);
+      assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
+      findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().selectedMode, "pk");
       assertEqual(app.store.getState().route, "room");
@@ -933,8 +933,8 @@ async function main(): Promise<void> {
     if (routes[index] === "room") {
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
-        findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string,
-        "正在读取房间信息",
+        findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,
+        "玩家1（你）\n正在读取...",
         "accepted joins without a snapshot must show a syncing state"
       );
       assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
@@ -947,8 +947,8 @@ async function main(): Promise<void> {
       const waitingRoom = makeWaitingPkRoom();
       app.roomStore.applySnapshot(waitingRoom);
       assertEqual(
-        findDeep(canvas, "RoomPlayers")?.getComponent(Label)?.string,
-        "玩家1（我） · 未准备",
+        findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,
+        "玩家1（你）\n○ 未准备",
         "human system names must not be rendered twice"
       );
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
@@ -1082,9 +1082,9 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "HistoryRecentSummary")?.getComponent(Label)?.string.length);
       assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
       assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, false, "history records must hide the empty-state card");
-      assertOk(findDeep(canvas, "HistoryRecentCardAccent")?.getComponent(Graphics));
+      assertOk(findDeep(canvas, "HistoryRecentCardTab")?.getComponent(Graphics));
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
-      findDeep(canvas, "HistoryRow0")?.emit(Button.EventType.CLICK);
+      findDeep(canvas, "HistoryRow0Detail")?.emit(Button.EventType.CLICK);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";
       assertOk(firstBody.includes("1. WORD1"), "spell detail first page must start at round 1");
       assertEqual(firstBody.includes("4. WORD4"), false, "spell detail page must be bounded");

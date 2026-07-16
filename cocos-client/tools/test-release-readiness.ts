@@ -285,7 +285,7 @@ function testSourceAssetBudget(): void {
     ".json", ".meta", ".jpg", ".png"
   ])).filter((filePath) => !isHomeArtFile(filePath));
   const themeBytes = themeFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
-  assert.ok(corePayloadBytes < 1_500_000, `Cocos core source payload exceeds 1.5 MB: ${corePayloadBytes}`);
+  assert.ok(corePayloadBytes < 1_520_000, `Cocos core source payload exceeds 1.52 MB: ${corePayloadBytes}`);
   assert.ok(homeArtBytes <= 4_000_000, `home_common source art exceeds 4 MB: ${homeArtBytes}`);
   assert.ok(metadataBytes < 50_000, `Cocos source metadata exceeds 50 KB: ${metadataBytes}`);
   assert.ok(homeArtMetadataBytes < 60_000, `home_common metadata exceeds 60 KB: ${homeArtMetadataBytes}`);

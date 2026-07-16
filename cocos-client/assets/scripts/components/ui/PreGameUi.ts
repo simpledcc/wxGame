@@ -42,7 +42,7 @@ export type PreGameActionKind =
   | "history"
   | "surface";
 
-export type PreGameIconBackground = "card" | "transparent";
+export type PreGameIconBackground = "card" | "transparent" | "join";
 
 export const HOME_VISUAL_SLOT_KEYS = [
   "background",
@@ -300,13 +300,14 @@ export class PreGameUi {
   }
 
   pageHeader(parent: PreGameSafeAreaRef, name: string, title: string, subtitle: string,
-    backHandler: () => void): PreGamePageHeaderRef {
-    const node = this.topBar(parent, name, 104);
-    this.pill(node, `${name}Backdrop`, 0, 0, 560, 92);
-    const backButton = this.iconButton(node, "BackButton", "‹", -244, 0, 80, backHandler, undefined, "transparent", 44);
+    backHandler: () => void, icon = "★"): PreGamePageHeaderRef {
+    const node = this.topBar(parent, name, 116);
+    this.pill(node, `${name}Backdrop`, 42, 0, 454, 96, "homeJoin", "homeTextOnColor");
+    const backButton = this.iconButton(node, "BackButton", "←", -250, 0, 86, backHandler, undefined, "join", 48);
     backButton.titleLabel.color = this.color("homeTextOnColor");
-    const titleLabel = this.label(node, `${name}Title`, title, 40, 17, 420, 44, 32, "homeTextOnColor", 0);
-    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 40, -24, 420, 32, 17, "homeTextOnColor", 0);
+    this.label(node, `${name}Icon`, icon, -126, 16, 48, 48, 31, "homeTextOnColor");
+    const titleLabel = this.label(node, `${name}Title`, title, 62, 18, 310, 44, 31, "homeTextOnColor");
+    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -25, 382, 30, 15, "homeTextOnColor");
     return { node, backButton, titleLabel, subtitleLabel };
   }
 
@@ -331,6 +332,26 @@ export class PreGameUi {
     graphics.roundRect(-(width-36)/2,-5,width-36,10,5);
     graphics.fill();
     return node;
+  }
+
+  sectionCard(parent: Node, name: string, title: string, x: number, y: number, width: number,
+    height: number, kind: PreGameActionKind, visualKey?: HomeVisualSlotKey): Node {
+    const card = this.card(parent, name, x, y, width, height, 22);
+    const tabWidth = Math.min(width - 36, Math.max(170, title.length * 26 + (visualKey ? 76 : 42)));
+    const tab = this.node(card, `${name}Tab`, -width / 2 + tabWidth / 2 + 14, height / 2 - 30,
+      tabWidth, 58);
+    const tabBackground = tab.addComponent(Graphics);
+    tabBackground.fillColor = this.color(this.actionToken(kind));
+    tabBackground.strokeColor = kind === "surface" ? this.color("homeCardBorder") : this.color("homeTextOnColor");
+    tabBackground.lineWidth = 2;
+    tabBackground.roundRect(-tabWidth / 2, -29, tabWidth, 58, 18);
+    tabBackground.fill();
+    tabBackground.stroke();
+    const textToken: ThemeColorToken = kind === "surface" ? "homeText" : "homeTextOnColor";
+    if (visualKey) this.visualSlot(tab, visualKey, -tabWidth / 2 + 32, 0, 38, 38, textToken);
+    this.label(tab, `${name}TabTitle`, title, visualKey ? 18 : 0, 0,
+      tabWidth - (visualKey ? 68 : 24), 42, 22, textToken);
+    return card;
   }
 
   pill(parent: Node, name: string, x: number, y: number, width: number, height: number,
@@ -529,16 +550,19 @@ export class PreGameUi {
     iconSizeOverride = 0): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, size, size);
     const radius = Math.min(18, size / 2);
-    const baseColor = this.color("homeCard");
+    const fillToken: ThemeColorToken = backgroundStyle === "join" ? "homeJoin" : "homeCard";
+    const textToken: ThemeColorToken = backgroundStyle === "join" ? "homeTextOnColor" : "homeText";
+    const baseColor = this.color(fillToken);
     const background = this.addRoundedBackground(
       node,
       size,
       size,
       radius,
-      "homeCard",
-      "homeCardBorder"
+      fillToken,
+      backgroundStyle === "join" ? "homeTextOnColor" : "homeCardBorder"
     );
     background.enabled = backgroundStyle === "card";
+    if (backgroundStyle === "join") background.enabled = true;
     this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
     const iconSize = iconSizeOverride > 0
       ? Math.max(32, Math.min(iconSizeOverride, size - 8))
@@ -553,11 +577,11 @@ export class PreGameUi {
       iconSize,
       iconSize,
       Math.min(30, size * 0.46),
-      "homeText"
+      textToken
     );
     if (visualKey) {
       iconLabel.node.active = false;
-      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize);
+      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken);
     }
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);

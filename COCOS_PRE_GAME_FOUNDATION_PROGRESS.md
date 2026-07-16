@@ -21,6 +21,7 @@ Updated: 2026-07-16
 - H8.3 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.4 completion commit: the commit containing the H8.4 record, with subject ending in `dev_done`; use `git log` after checkout for the exact SHA
 - H8.5 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H8.6 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H4 art staging commit: `8f8ac1c` (`feat(home-art): stage H4 assets and integration checkpoint`)
 - H4 visual refinement commit: `6987f6f` (`fix(home-art): refine H4 visual assets and composition checkpoint`)
 - H4 import automation commit: `93f397f` (`feat(home-art): automate H4 Creator import handoff`)
@@ -100,6 +101,7 @@ Updated: 2026-07-16
 | H8.3 Mode-neutral pre-game naming | `DONE` | Mode catalog, configured room creation, selected-mode start and preparation-session entry use generic names; README explains the protocol boundary | Real two-phone acceptance remains external QA |
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
+| H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
 
 ## G0 work completed
 
@@ -656,6 +658,21 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Real two-phone create/join/ready acceptance remains part of release QA because one local simulator cannot supply two independent WeChat accounts
 - 2026-07-13 documentation revalidation: `npm run verify` passed again in `42.7s`; a fresh Creator build passed in `49.7s`, produced the same package byte totals, and WeChat Developer Tools CLI `auto` succeeded with the configured AppID
 
+## H8.6 final reference-aligned verification
+
+- Home uses `520x146` Create and `520x136` Join primary actions plus `252x118` auxiliary actions; player, coin, subtitle and current-bank areas now match the approved hierarchy.
+- “更换” is a real `80`-high button, and every visible pre-game button remains at least `44px` high after the `360px` target-width scale.
+- Mode catalog is one uninterrupted eight-row list with separate action buttons; disabled future modes cannot execute callbacks.
+- Create configuration, preparation lobby, Bank, Study and History use icon-labeled framed sections while retaining real Store/session data and existing routes.
+- Room lobby displays two dedicated player cards with system player names and readiness; normal polling remains silent and automatic.
+- Home character decoration now sizes itself to the real gap between auxiliary actions and the footer, and hides on short screens when the gap cannot safely contain it.
+- Normalized core source payload: `1,504,561` bytes under the new `1,520,000`-byte warning gate. The real WeChat main-package hard gate remains unchanged.
+- `npm run verify`: `PASSED`.
+- `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`.
+- `npm run inspect:wechat-build`: `PASSED`; `147` files, `9,973,107` total bytes, `4,121,077 / 4,194,304` main-package bytes and `3,472,932` `home_common` bytes.
+- WeChat Developer Tools CLI authenticated with AppID `wx063a1823d29bed9e`; the generated package visibly loaded the formal Home background, Logo, icons and button skins. Final multi-page behavior is additionally covered by runtime click simulation.
+- Frozen-path audit: no changes under `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -670,7 +687,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 1. The main package remains close to the 4 MiB gate; new shared art or source must stay in declared subpackages and every release change must rerun package inspection.
 2. Formal H4 art and Creator metadata are imported and stable; do not re-import the Bundle or regenerate its UUIDs.
-3. Creator import/rendering and WeChat simulator presentation passed through H8.5; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
+3. Creator import/rendering and WeChat simulator presentation passed through H8.6; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
@@ -699,7 +716,7 @@ Use two real phones and two WeChat accounts to execute create room, invitation/j
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4/H8.5 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Complete the two-real-phone create/join/ready/start preparation-flow QA and record external evidence.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

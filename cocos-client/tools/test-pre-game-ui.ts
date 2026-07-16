@@ -232,7 +232,7 @@ function main(): void {
   );
   assertEqual(pageHeader.titleLabel.string, "选择词库");
   assertEqual(pageHeader.subtitleLabel.string, "为练习和比赛选择学习内容");
-  assertEqual(transform(pageHeader.backButton.node).height, 80);
+  assertEqual(transform(pageHeader.backButton.node).height, 86);
   const directButton = preGame.button(
     pageSafe.node,
     "FoundationTextButton",
@@ -246,7 +246,8 @@ function main(): void {
   );
   assertVisualMatchesHitArea(directButton.node, directButton.visual);
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderBackdrop")?.getComponent(Graphics));
-  assertEqual(pageHeader.backButton.background.enabled, false);
+  assertEqual(pageHeader.backButton.background.enabled, true);
+  assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon"));
   assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
   const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
   assertOk(directEdit.node.getComponent(EditBox));

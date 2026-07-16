@@ -37,6 +37,12 @@ export class RoomScene extends Component {
   playersLabel: Label | null = null;
 
   @property(Label)
+  playerOneLabel: Label | null = null;
+
+  @property(Label)
+  playerTwoLabel: Label | null = null;
+
+  @property(Label)
   statusLabel: Label | null = null;
 
   @property(Label)
@@ -240,8 +246,10 @@ export class RoomScene extends Component {
     }
     if (!room) {
       if (hasSession) {
-        if (this.modeLabel) this.modeLabel.string = this.getSelectedModeLabel();
+        if (this.modeLabel) this.modeLabel.string = this.getSelectedBankLabel();
         if (this.playersLabel) this.playersLabel.string = "正在读取房间信息";
+        if (this.playerOneLabel) this.playerOneLabel.string = "玩家1（你）\n正在读取...";
+        if (this.playerTwoLabel) this.playerTwoLabel.string = "等待玩家加入\n○ 未准备";
         if (this.statusLabel) {
           this.statusLabel.string = state.pendingAction
             ? ACTION_LABELS[state.pendingAction]
@@ -256,7 +264,7 @@ export class RoomScene extends Component {
     const availability = getRoomActionAvailability(room, localOpenId);
     const localPlayer = getLocalRoomPlayer(room, localOpenId);
     if (this.modeLabel) {
-      this.modeLabel.string = this.getSelectedModeLabel(room);
+      this.modeLabel.string = this.getSelectedBankLabel(room);
     }
     if (this.playersLabel) {
       this.playersLabel.string = room.players.length
@@ -266,6 +274,12 @@ export class RoomScene extends Component {
             return `${displayName} · ${player.ready ? "已准备" : "未准备"}`;
           }).join("\n")
         : "等待玩家加入";
+    }
+    if (this.playerOneLabel) {
+      this.playerOneLabel.string = this.formatPlayer(room.players[0], 0, localOpenId);
+    }
+    if (this.playerTwoLabel) {
+      this.playerTwoLabel.string = this.formatPlayer(room.players[1], 1, localOpenId);
     }
     if (this.statusLabel) {
       this.statusLabel.string = state.pendingAction
@@ -283,7 +297,7 @@ export class RoomScene extends Component {
           : "双方准备后可开始";
     }
     if (this.readyLabel) {
-      this.readyLabel.string = localPlayer?.ready ? "取消准备" : "我准备好了";
+      this.readyLabel.string = localPlayer?.ready ? "✓ 已准备，点击取消" : "✓ 我准备好了";
     }
   }
 
@@ -325,6 +339,18 @@ export class RoomScene extends Component {
     if (mode === "coopShared") return "默契捕词赛";
     if (mode === "coopSpell") return "同舟拼词记";
     return "准备体验模式";
+  }
+
+  private getSelectedBankLabel(room: RoomSnapshot | null = null): string {
+    const bankId = room?.gameOptions.bankId || app.wordBankStore.getSelectedBankId();
+    return getWordBankLabel(getWordBank(app.wordBankCatalog, bankId), true);
+  }
+
+  private formatPlayer(player: RoomSnapshot["players"][number] | undefined, index: number,
+    localOpenId: string): string {
+    if (!player) return `玩家${index + 1}\n○ 等待加入`;
+    const identity = player.openid === localOpenId ? "（你）" : "";
+    return `玩家${index + 1}${identity}\n${player.ready ? "✓ 已准备" : "○ 未准备"}`;
   }
 
   private renderAutoReady(): void {
