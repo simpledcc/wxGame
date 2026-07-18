@@ -611,9 +611,22 @@ async function main(): Promise<void> {
   assertOk(settingsModal);
   assertVisibleUiContract(settingsModal, "Home settings modal");
   assertPreGameTargetDevices(settingsModal);
-  assertOk(findDeep(settingsModal, "HomeSettingsSlot"), "settings modal must retain its semantic icon");
-  assertOk(verticalGap(findDeep(settingsModal, "HomeSoundStatus")!, findDeep(settingsModal, "HomeSoundToggle")!) >= 8);
-  assertOk(verticalGap(findDeep(settingsModal, "HomeSoundToggle")!, findDeep(settingsModal, "HomeSettingsClose")!) >= 8);
+  const settingsContent = findDeep(settingsModal, "HomeSettingsModalContent")!;
+  const settingsIcon = findDeep(settingsContent, "HomeSettingsSlot")!;
+  const settingsTitle = findDeep(settingsContent, "HomeSettingsTitle")!;
+  const settingsStatus = findDeep(settingsContent, "HomeSoundStatus")!;
+  const settingsToggle = findDeep(settingsContent, "HomeSoundToggle")!;
+  const settingsClose = findDeep(settingsContent, "HomeSettingsClose")!;
+  assertEqual(findDeep(settingsModal, "HomeSettingsModalPanel")?.getComponent(UITransform)?.height, 350);
+  assertEqual(settingsContent.getComponent(UITransform)?.height, 314);
+  assertOk(verticalGap(settingsIcon, settingsStatus) >= 8);
+  assertOk(verticalGap(settingsTitle, settingsStatus) >= 8);
+  assertOk(verticalGap(settingsStatus, settingsToggle) >= 8);
+  assertOk(verticalGap(settingsToggle, settingsClose) >= 8);
+  assertOk(settingsContent.getComponent(UITransform)!.height / 2
+    - settingsIcon.position.y - settingsIcon.getComponent(UITransform)!.height / 2 >= 8);
+  assertOk(settingsClose.position.y - settingsClose.getComponent(UITransform)!.height / 2
+    >= -settingsContent.getComponent(UITransform)!.height / 2 + 8);
   const mutedBefore = app.settingsStore.isMuted();
   const soundVisual = findDeep(settingsModal, "HomeSoundToggle")?.getComponent(RuntimeButtonVisual);
   assertEqual(soundVisual?.isShowingSelectedState(), !mutedBefore);

@@ -168,11 +168,11 @@ export class RuntimeScreenFactory {
       playerModal.root.active = true;
     };
 
-    const settingsModal = home.modal(root, "HomeSettingsModal", 500, 330);
-    home.visualSlot(settingsModal.content, "settings", -150, 105, 52, 52);
-    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 28, 105, 330, 48, 30);
+    const settingsModal = home.modal(root, "HomeSettingsModal", 500, 350);
+    home.visualSlot(settingsModal.content, "settings", -150, 112, 52, 52);
+    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 28, 112, 330, 48, 30);
     const soundStatus = home.label(
-      settingsModal.content, "HomeSoundStatus", "", 0, 50, 420, 36, 20, "homeTextMuted"
+      settingsModal.content, "HomeSoundStatus", "", 0, 57, 420, 36, 20, "homeTextMuted"
     );
     let soundToggle!: PreGameActionButtonRef;
     const renderSound = (): void => {
@@ -182,12 +182,12 @@ export class RuntimeScreenFactory {
       soundToggle.visual.setSelected(!muted);
     };
     soundToggle = home.actionButton(
-      settingsModal.content, "HomeSoundToggle", "", "", "声", 0, -18, 360, 80,
+      settingsModal.content, "HomeSoundToggle", "", "", "声", 0, -11, 360, 80,
       () => { controller.toggleMuted(); renderSound(); }, "surface"
     );
     home.selectionStyle(soundToggle.visual, "join");
     home.actionButton(
-      settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -106, 260, 80,
+      settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -99, 260, 80,
       () => { settingsModal.root.active = false; }, "surface"
     );
     openSettings = (): void => {
