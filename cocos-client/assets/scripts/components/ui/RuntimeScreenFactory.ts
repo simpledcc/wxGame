@@ -609,11 +609,11 @@ export class RuntimeScreenFactory {
     const detailCard = home.accentCard(detailRoot, "HistoryDetailCard", 0, -5, 560, 680, "catalog", 22);
     home.iconButton(detailRoot, "CloseDetail", "←", -242, 300, 80,
       () => controller.closeDetail(), undefined, "join", 44);
-    const detailTitle = home.label(detailCard, "DetailTitle", "", 40, 278, 400, 54, 27, "homeText");
+    const detailTitle = home.label(detailCard, "DetailTitle", "", 40, 286, 400, 54, 27, "homeText");
     const detailBody = home.label(detailCard, "DetailBody", "", 0, 5, 500, 490, 17, "homeText", 0);
-    const detailPage = home.label(detailCard, "DetailPage", "", 0, -282, 120, 44, 17, "homeTextMuted");
-    const detailPrevious = home.iconButton(detailCard, "DetailPrevious", "‹", -105, -282, 80, () => controller.previousDetailPage());
-    const detailNext = home.iconButton(detailCard, "DetailNext", "›", 105, -282, 80, () => controller.nextDetailPage());
+    const detailPage = home.label(detailCard, "DetailPage", "", 0, -288, 120, 44, 17, "homeTextMuted");
+    const detailPrevious = home.iconButton(detailCard, "DetailPrevious", "‹", -105, -288, 80, () => controller.previousDetailPage());
+    const detailNext = home.iconButton(detailCard, "DetailNext", "›", 105, -288, 80, () => controller.nextDetailPage());
 
     controller = root.addComponent(HistoryScene);
     controller.titleLabel = title;

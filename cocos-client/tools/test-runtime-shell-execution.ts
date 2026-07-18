@@ -1706,6 +1706,16 @@ async function main(): Promise<void> {
       assertHistoryDetail(historyDetail);
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
       findDeep(canvas, "HistoryRow0Detail")?.emit(Button.EventType.CLICK);
+      const historyDetailCard = findDeep(canvas, "HistoryDetailCard")!;
+      const historyDetailTitle = findDeep(historyDetailCard, "DetailTitle")!;
+      const historyDetailBody = findDeep(historyDetailCard, "DetailBody")!;
+      const historyDetailPrevious = findDeep(historyDetailCard, "DetailPrevious")!;
+      assertOk(verticalGap(historyDetailTitle, historyDetailBody) >= 8);
+      assertOk(verticalGap(historyDetailBody, historyDetailPrevious) >= 8);
+      assertOk(historyDetailCard.getComponent(UITransform)!.height / 2
+        - historyDetailTitle.position.y - historyDetailTitle.getComponent(UITransform)!.height / 2 >= 8);
+      assertOk(historyDetailPrevious.position.y - historyDetailPrevious.getComponent(UITransform)!.height / 2
+        >= -historyDetailCard.getComponent(UITransform)!.height / 2 + 8);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";
       assertOk(firstBody.includes("1. WORD1"), "spell detail first page must start at round 1");
       assertEqual(firstBody.includes("4. WORD4"), false, "spell detail page must be bounded");
