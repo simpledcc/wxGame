@@ -680,7 +680,7 @@ export class PreGameUi {
       backgroundStyle === "join" ? "homeTextOnColor" : "homeCardBorder"
     );
     background.enabled=backgroundStyle!=="transparent";
-    this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
+    this.addHighlight(node, `${name}Highlight`, size/2-4, size, radius);
     const iconSize = iconSizeOverride > 0
       ? Math.max(32, Math.min(iconSizeOverride, size - 8))
       : Math.max(32, Math.min(size * 0.6, size - 28, 48));

@@ -108,6 +108,11 @@ function assertVisibleUiContract(root: Node, context: string): void {
       violations.push(`${nodePath} square icon control is not circular`);
     }
     const squareFallback = squareIcon?.children.find((child) => child.name === `${node.name}IconFallback`);
+    const squareHighlight = node.children.find((child) => child.name === `${node.name}Highlight`);
+    if (transform && squareVisual && transform.width === transform.height && squareIcon && squareHighlight
+      && squareHighlight.getComponent(UITransform)?.width !== transform.width / 2 - 4) {
+      violations.push(`${nodePath} circular highlight exceeds its safe chord`);
+    }
     if (transform && transform.width === transform.height && transform.width >= 80 && squareFallback?.active
       && squareFallback.getComponent(Label)?.fontSize !== 34) {
       violations.push(`${nodePath} large icon fallback is undersized`);

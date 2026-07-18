@@ -306,6 +306,7 @@ function main(): void {
   assertEqual(transform(icon.iconSlot).width, 36);
   assertEqual(icon.visual.getVisualGeometry().radius, 32);
   const iconHighlight = icon.node.getChildByName("SettingsIconHighlight")!;
+  assertEqual(transform(iconHighlight).width, 28);
   assertEqual(iconHighlight.active, true);
   icon.node.emit(Node.EventType.TOUCH_START);
   assertEqual(iconHighlight.active, false, "pressed round control must suppress its static highlight");
@@ -353,6 +354,7 @@ function main(): void {
   assertEqual(transform(pageHeader.backButton.node).height, 86);
   assertEqual(pageHeader.backButton.visual.getVisualGeometry().radius, 43);
   assertEqual(pageHeader.backButton.iconLabel.fontSize, 34);
+  assertEqual(transform(pageHeader.backButton.node.getChildByName("BackButtonHighlight")!).width, 39);
   const directButton = preGame.button(
     pageSafe.node,
     "FoundationTextButton",
