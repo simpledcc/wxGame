@@ -427,12 +427,12 @@ async function main(): Promise<void> {
   assertOk(currentBankBar.getComponent(Button), "the whole Bank strip must remain clickable");
   assertEqual(bankChangeBadge.getComponent(Button), null, "the change badge must not nest another Button");
   assertOk(bankChangeBadge.getComponent(Graphics));
-  assertOk(verticalGap(currentBankCaption, currentBankTitle) >= 4,
+  assertOk(verticalGap(currentBankCaption, currentBankTitle) >= 8,
     "Home Bank caption and real Bank name must form separate rows");
-  assertOk(currentBankIcon.position.x + currentBankIcon.getComponent(UITransform)!.width / 2 + 4
+  assertOk(currentBankIcon.position.x + currentBankIcon.getComponent(UITransform)!.width / 2 + 8
     <= currentBankTitle.position.x - currentBankTitle.getComponent(UITransform)!.width / 2,
   "Home Bank icon must not enter the dynamic Bank-name column");
-  assertOk(currentBankTitle.position.x + currentBankTitle.getComponent(UITransform)!.width / 2 + 4
+  assertOk(currentBankTitle.position.x + currentBankTitle.getComponent(UITransform)!.width / 2 + 8
     <= bankChangeBadge.position.x - bankChangeBadge.getComponent(UITransform)!.width / 2,
   "Home Bank name must not enter the change badge");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
@@ -675,10 +675,10 @@ async function main(): Promise<void> {
     "JoinRoomButton", "StudyButton", "HelpButton", "HomePrivacy"
   ].map((name) => findDeep(minimumHomeRoot, name)!);
   assertOk(verticalGap(minimumHomeChain[0], minimumHomeChain[1]) >= 4);
-  assertOk(verticalGap(minimumBankCaption, minimumBankTitle) >= 4);
-  assertOk(minimumBankIcon.position.x + minimumBankIcon.getComponent(UITransform)!.width / 2 + 4
+  assertOk(verticalGap(minimumBankCaption, minimumBankTitle) >= 8);
+  assertOk(minimumBankIcon.position.x + minimumBankIcon.getComponent(UITransform)!.width / 2 + 8
     <= minimumBankTitle.position.x - minimumBankTitle.getComponent(UITransform)!.width / 2);
-  assertOk(minimumBankTitle.position.x + minimumBankTitle.getComponent(UITransform)!.width / 2 + 4
+  assertOk(minimumBankTitle.position.x + minimumBankTitle.getComponent(UITransform)!.width / 2 + 8
     <= minimumBankBadge.position.x - minimumBankBadge.getComponent(UITransform)!.width / 2);
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
@@ -1183,7 +1183,7 @@ async function main(): Promise<void> {
   assertOk(bankTitleTransform);
   bankTitle!.getComponent(Label)!.string = "超长词库名称".repeat(12);
   assertEqual(bankTitle!.getComponent(Label)!.overflow, Label.Overflow.SHRINK);
-  assertEqual(bankTitleTransform.width, 326, "long bank text must retain space for the icon and change affordance");
+  assertEqual(bankTitleTransform.width, 320, "long bank text must retain space for the icon and change affordance");
   app.wordBankStore.setSelectedBankId(selectedBankBeforeHomePicker);
   app.store.patch({ bankId: selectedBankBeforeHomePicker });
 

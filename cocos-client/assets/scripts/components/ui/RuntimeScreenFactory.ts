@@ -88,8 +88,8 @@ export class RuntimeScreenFactory {
       safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(131, 170), 520, fit(80, 92),
       () => controller.openBankPicker(), "surface", "wordBank"
     );
-    bank.titleLabel.node.setPosition(-10, -14, 0);
-    bank.titleLabel.node.getComponent(UITransform)?.setContentSize(326, 34);
+    bank.titleLabel.node.setPosition(-10, -15, 0);
+    bank.titleLabel.node.getComponent(UITransform)?.setContentSize(320, 34);
     home.label(bank.node, "CurrentBankCaption", "当前词库", -103, 20, 140, 20, 15, "homeTextMuted");
     const bankChange = home.pill(bank.node, "CurrentBankChangeBadge", 204, 0, 92, 54,
       "homeHistory", "homeTextOnColor");
