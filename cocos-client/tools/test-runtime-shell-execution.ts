@@ -85,6 +85,17 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (label && label.overflow !== Label.Overflow.SHRINK) {
       violations.push(`${nodePath} uses non-shrinking Label overflow ${label.overflow}`);
     }
+    const title = node.children.find((child) => child.name === `${node.name}Title`);
+    const subtitle = node.children.find((child) => child.name === `${node.name}Subtitle`);
+    if (title?.active && subtitle?.active) {
+      const titleTransform = title.getComponent(UITransform);
+      const subtitleTransform = subtitle.getComponent(UITransform);
+      if (titleTransform && subtitleTransform) {
+        const gap = title.position.y - titleTransform.height / 2
+          - subtitle.position.y - subtitleTransform.height / 2;
+        if (gap < 2) violations.push(`${nodePath} title/subtitle gap is ${gap}`);
+      }
+    }
     node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
   };
   visit(root, 0, 0, 1, 1, "");
