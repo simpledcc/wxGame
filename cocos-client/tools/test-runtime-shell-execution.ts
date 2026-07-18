@@ -465,6 +465,22 @@ async function main(): Promise<void> {
   );
   assertOk(findDeep(canvas, "HomePlayerCard")?.getComponent(Graphics), "player name must use a dark utility pill");
   assertOk(findDeep(canvas, "HomeCoinPill")?.getComponent(Graphics), "coin count must use a dark utility pill");
+  const assertHomePlayerLayout = (root: Node, context: string): void => {
+    const avatar = findDeep(root, "HomeAvatarButton")!;
+    const card = findDeep(root, "HomePlayerCard")!;
+    const name = findDeep(card, "HomePlayerName")!;
+    const identity = findDeep(card, "HomePlayerIdentityLabel")!;
+    const coin = findDeep(root, "HomeCoinPill")!;
+    const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
+    const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+    assertOk(right(avatar) + 8 <= left(card), `${context} avatar/player gap must remain visible`);
+    assertOk(right(card) + 8 <= left(coin), `${context} player/coin gap must remain visible`);
+    assertOk(verticalGap(name, identity) >= 4, `${context} player name/identity gap must remain visible`);
+    assertEqual(identity.getComponent(Label)?.string, "系统安全身份");
+    assertEqual(name.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
+    assertEqual(card.getComponent(Button), null, `${context} player pill must not split the avatar click target`);
+  };
+  assertHomePlayerLayout(canvas, "long Home");
   const assertHomeCoinLayout = (root: Node, context: string): void => {
     const button = findDeep(root, "HomeCoinButton")!;
     const icon = findDeep(button, "HomeCoinButtonIconSlot")!;
@@ -658,6 +674,7 @@ async function main(): Promise<void> {
   assertVisibleUiContract(minimumHomeRoot, "minimum Home route");
   assertPreGameTargetDevices(minimumHomeRoot);
   assertPreGameIconLayout(minimumHomeRoot, "minimum Home route");
+  assertHomePlayerLayout(minimumHomeRoot, "minimum Home");
   assertHomeCoinLayout(minimumHomeRoot, "minimum Home");
   setMockWindowSize(393, 852);
   app.store.setRoute("bank");

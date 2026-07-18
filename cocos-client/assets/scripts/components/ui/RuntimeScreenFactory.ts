@@ -45,8 +45,7 @@ export class RuntimeScreenFactory {
     const root = ui.root(parent, "HomeRuntimeScreen");
     const home = new PreGameUi(app.themes.getCurrentTheme());
     const viewportHeight = root.getComponent(UITransform)?.height || 960;
-    const backgroundSlot = home.visualSlot(root, "background", 0, 0, 640, viewportHeight);
-    backgroundSlot.fallbackNode.active = false;
+    home.visualSlot(root, "background", 0, 0, 640, viewportHeight).fallbackNode.active = false;
     home.scenicBackdrop(root, "HomeScenery");
     const safe = home.safeArea(root, "HomeSafeArea");
     const safeTop = safe.height / 2;
@@ -57,13 +56,14 @@ export class RuntimeScreenFactory {
     const footerY = safeBottom + 46;
     const top = home.topBar(safe, "HomeTopBar", 92);
     let controller!: HomeScene;
-    let openPlayer = (): void => undefined;
-    let openSettings = (): void => undefined;
+    let openPlayer!: () => void;
+    let openSettings!: () => void;
     home.iconButton(
       top, "HomeAvatarButton", "我", -252, 0, 80, () => openPlayer(), "avatar", "transparent", 68
     );
-    const playerCard = home.pill(top, "HomePlayerCard", -120, 0, 178, 62);
-    const player = home.label(playerCard, "HomePlayerName", "", 0, 0, 152, 48, 22, "homeTextOnColor");
+    const playerCard = home.pill(top, "HomePlayerCard", -114, 0, 178, 62);
+    const player = home.label(playerCard, "HomePlayerName", "", 0, 12, 152, 30, 21, "homeTextOnColor");
+    home.label(playerCard, "HomePlayerIdentityLabel", "系统安全身份", 0, -17, 152, 18, 13, "homeTextOnColor");
     home.pill(top, "HomeCoinPill", 90, 0, 206, 64);
     const coinButton = home.actionButton(
       top, "HomeCoinButton", "", "", "币", 90, 0, 206, 80,
