@@ -1536,6 +1536,19 @@ async function main(): Promise<void> {
     if (routes[index] === "bank") {
       const bankController = routeRoot.getComponent(BankScene);
       assertOk(bankController);
+      const assertBankStatusRow = (root: Node, context: string): void => {
+        const card = findDeep(root, "BankStatusCard")!;
+        const coin = card.children.find((child) => child.name === "HomeCoinSlot")!;
+        const copy = findDeep(card, "BankStatus")!;
+        assertEqual(copy.position.x - copy.getComponent(UITransform)!.width / 2
+          - coin.position.x - coin.getComponent(UITransform)!.width / 2, 8,
+        `${context} Bank status icon and copy need an eight-pixel boundary`);
+        assertEqual(coin.position.x - coin.getComponent(UITransform)!.width / 2
+          + card.getComponent(UITransform)!.width / 2,
+        card.getComponent(UITransform)!.width / 2
+          - copy.position.x - copy.getComponent(UITransform)!.width / 2,
+        `${context} Bank status row needs balanced horizontal card insets`);
+      };
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
@@ -1559,6 +1572,7 @@ async function main(): Promise<void> {
       assertOk(verticalGap(bankStatusTab, bankStatusCopy) >= 4);
       assertEqual(bankStatusCoin.position.y, bankStatusCopy.position.y,
         "Bank status icon and copy must share one baseline");
+      assertBankStatusRow(routeRoot, "long");
       [bankStatusCoin, bankStatusCopy].forEach((content) => {
         assertOk(verticalGap(bankStatusTab, content) >= 8,
           "Bank status content must clear its compact title tab");
@@ -1566,9 +1580,6 @@ async function main(): Promise<void> {
           >= -bankStatusCard.getComponent(UITransform)!.height / 2 + 8,
         "Bank status content must clear the card bottom frame");
       });
-      assertOk(bankStatusCoin.position.x + bankStatusCoin.getComponent(UITransform)!.width / 2 + 4
-        <= bankStatusCopy.position.x - bankStatusCopy.getComponent(UITransform)!.width / 2,
-      "Bank status icon must not enter its copy column");
       const assertBankSlotText = (root: Node, context: string): void => {
         for (let slotIndex = 0; slotIndex < 4; slotIndex += 1) {
           const slot = findDeep(root, `BankSlot${slotIndex}`)!;
@@ -1640,6 +1651,7 @@ async function main(): Promise<void> {
         >= -minimumBankSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumBankRoot, "minimum Bank route");
       assertPreGameTargetDevices(minimumBankRoot);
+      assertBankStatusRow(minimumBankRoot, "minimum");
       assertBankSlotText(minimumBankRoot, "minimum");
       setMockWindowSize(393, 852);
     }
@@ -2141,6 +2153,9 @@ async function main(): Promise<void> {
     if (routes[index] === "feedback") {
       const assertFeedbackPageSpacing = (root: Node, context: string): void => {
         const safe = findDeep(root, "FeedbackSafeArea")!;
+        const card = findDeep(root, "FeedbackFormCard")!;
+        const promptIcon = findDeep(card, "HomeFeedbackSlot")!;
+        const promptCopy = findDeep(card, "FeedbackPrompt")!;
         const chain = ["FeedbackHeader", "FeedbackFormCard", "SubmitFeedback", "OpenPrivacy"]
           .map((name) => findDeep(root, name)!);
         for (let gap = 0; gap < chain.length - 1; gap += 1) {
@@ -2150,6 +2165,14 @@ async function main(): Promise<void> {
         assertOk(chain[3].position.y - chain[3].getComponent(UITransform)!.height / 2
           >= -safe.getComponent(UITransform)!.height / 2 + 8,
         `${context} privacy action must retain its safe-area clearance`);
+        assertEqual(promptCopy.position.x - promptCopy.getComponent(UITransform)!.width / 2
+          - promptIcon.position.x - promptIcon.getComponent(UITransform)!.width / 2, 8,
+        `${context} prompt icon and copy need an eight-pixel boundary`);
+        assertEqual(promptIcon.position.x - promptIcon.getComponent(UITransform)!.width / 2
+          + card.getComponent(UITransform)!.width / 2,
+        card.getComponent(UITransform)!.width / 2
+          - promptCopy.position.x - promptCopy.getComponent(UITransform)!.width / 2,
+        `${context} prompt row needs balanced horizontal card insets`);
       };
       assertFeedbackPageSpacing(routeRoot, "long Feedback page");
       setMockWindowSize(640, 960);

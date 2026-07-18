@@ -213,7 +213,7 @@ export class RuntimeScreenFactory {
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
       safeTop - 164, 540, 80, "history", "coin");
     home.visualSlot(statusCard, "coin", -232, -13, 32, 32);
-    const status = home.label(statusCard, "BankStatus", "", 24, -13, 430, 36, 18, "homeText", 0);
+    const status = home.label(statusCard, "BankStatus", "", 20, -13, 456, 36, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
     const pageSize = 4;
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
@@ -649,7 +649,7 @@ export class RuntimeScreenFactory {
       () => controller.backHome(), "feedback");
     const formCard = home.accentCard(safe.node, "FeedbackFormCard", 0, formY, 560, 500, "join", 24);
     home.visualSlot(formCard, "feedback", -228, 206, 48, 48);
-    home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 424, 40, 18, "homeTextMuted", 0);
+    home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 448, 40, 18, "homeTextMuted", 0);
     const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 14, "homeTextMuted");
     home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
     const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 2, 500, 196, 300, true);
