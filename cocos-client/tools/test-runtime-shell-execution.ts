@@ -1749,10 +1749,10 @@ async function main(): Promise<void> {
       const feedbackPrivacy = findDeep(canvas, "OpenPrivacy")!;
       const feedbackSafe = findDeep(canvas, "FeedbackSafeArea")!;
       assertOk(verticalGap(feedbackHeader, formCard) >= 4);
-      assertOk(verticalGap(formCard, feedbackSubmit) >= 8);
+      assertOk(verticalGap(formCard, feedbackSubmit) >= 12);
       assertOk(verticalGap(feedbackSubmit, feedbackPrivacy) >= 8);
       assertOk(feedbackPrivacy.position.y - feedbackPrivacy.getComponent(UITransform)!.height / 2
-        >= -feedbackSafe.getComponent(UITransform)!.height / 2);
+        >= -feedbackSafe.getComponent(UITransform)!.height / 2 + 8);
       assertVisibleUiContract(findDeep(canvas, "FeedbackRuntimeScreen")!, "minimum Feedback route");
       assertPreGameTargetDevices(findDeep(canvas, "FeedbackRuntimeScreen")!);
       const screenY = (node: Node): number => node.parent === formCard

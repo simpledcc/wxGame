@@ -657,9 +657,9 @@ export class RuntimeScreenFactory {
     home.pill(formCard, "FeedbackStatusBand", 0, -226, 500, 36, "homeCard", "homeCardBorder");
     const status = home.label(formCard, "FeedbackStatus", "", 0, -226, 500, 34, 18, "homeTextMuted");
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,
-      formY - 310, 560, 94, () => void controller.submit(), "join", "feedback");
+      formY - 309, 560, 94, () => void controller.submit(), "join", "feedback");
     home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0,
-      formY - 407, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
+      formY - 404, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
     controller = root.addComponent(FeedbackScene);
     controller.contentInput = content.editBox;
     controller.contactInput = contact.editBox;
