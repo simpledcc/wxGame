@@ -173,7 +173,13 @@ function main(): void {
     height: 120,
     radius: 18
   });
-  assertOk(card.getChildByName("FoundationCardInnerBorder")?.getComponent(Graphics));
+  const cardInner = card.getChildByName("FoundationCardInnerBorder")!;
+  const cardHighlight = card.getChildByName("FoundationCardHighlight")!;
+  assertOk(cardInner.getComponent(Graphics));
+  assertEqual(cardHighlight.position.y, 50);
+  assertEqual(cardInner.position.y + transform(cardInner).height / 2
+    - cardHighlight.position.y - transform(cardHighlight).height / 2, 3,
+  "card highlight must remain clear of the inner border");
   const accentCard = preGame.accentCard(safe.node, "FoundationAccentCard", 0, 210, 560, 140, "practice");
   const accent = accentCard.getChildByName("FoundationAccentCardAccent");
   assertOk(accent?.getComponent(Graphics));

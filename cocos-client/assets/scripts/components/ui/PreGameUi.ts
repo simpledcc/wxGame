@@ -336,7 +336,7 @@ export class PreGameUi {
     const node = this.node(parent, name, x, y, width, height);
     this.addRoundedBackground(node, width, height, radius, "homeCard", "homeCardBorder");
     this.addInnerBorder(node, `${name}InnerBorder`, width, height, radius);
-    this.addHighlight(node, `${name}Highlight`, width - 24, height, radius);
+    this.addHighlight(node, `${name}Highlight`, width - 24, height, radius, 10);
     return node;
   }
 
@@ -810,8 +810,9 @@ export class PreGameUi {
     return graphics;
   }
 
-  private addHighlight(parent: Node, name: string, width: number, height: number, radius: number): Node {
-    const highlight = this.node(parent, name, 0, height / 2 - 7, width, 4);
+  private addHighlight(parent: Node, name: string, width: number, height: number, radius: number,
+    topInset = 7): Node {
+    const highlight = this.node(parent, name, 0, height / 2 - topInset, width, 4);
     const graphics = highlight.addComponent(Graphics);
     graphics.fillColor = new Color(255, 255, 255, 88);
     graphics.roundRect(-width / 2, -2, width, 4, Math.min(2, radius));

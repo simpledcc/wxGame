@@ -101,6 +101,15 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (buttonGraphics?.enabled && buttonGraphics.strokeCount < 1) {
       violations.push(`${nodePath} has no visible fallback border`);
     }
+    const cardInner = node.children.find((child) => child.name === `${node.name}InnerBorder`);
+    const cardHighlight = node.children.find((child) => child.name === `${node.name}Highlight`);
+    if (cardInner && cardHighlight) {
+      const innerTransform = cardInner.getComponent(UITransform)!;
+      const highlightTransform = cardHighlight.getComponent(UITransform)!;
+      const gap = cardInner.position.y + innerTransform.height / 2
+        - cardHighlight.position.y - highlightTransform.height / 2;
+      if (gap < 3) violations.push(`${nodePath} highlight crowds its inner border`);
+    }
     const squareIcon = node.children.find((child) => child.name === `${node.name}IconSlot`);
     const squareVisual = node.getComponent(RuntimeButtonVisual);
     if (transform && squareIcon?.active && squareVisual && transform.width === transform.height
