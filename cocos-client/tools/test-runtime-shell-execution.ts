@@ -2289,6 +2289,9 @@ async function main(): Promise<void> {
             `${context} rule ${ruleIndex + 1} title/body columns must stay aligned`);
           assertOk(verticalGap(titleNode, bodyNode) >= 8,
             `${context} rule ${ruleIndex + 1} title/body gap must remain visible`);
+          assertEqual((titleNode.position.y + titleNode.getComponent(UITransform)!.height / 2
+            + bodyNode.position.y - bodyNode.getComponent(UITransform)!.height / 2) / 2,
+          badge.position.y, `${context} rule ${ruleIndex + 1} copy must center on its number badge`);
           if (ruleIndex > 0) {
             assertOk(verticalGap(findDeep(card, `HelpRule${ruleIndex - 1}Body`)!, titleNode) >= 8,
               `${context} rule ${ruleIndex + 1} needs an inter-row gap`);
