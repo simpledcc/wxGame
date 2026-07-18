@@ -596,9 +596,9 @@ async function main(): Promise<void> {
     assertEqual(add.getComponent(UITransform)?.width, 34);
     assertEqual(add.getComponent(UITransform)?.height, 34);
     assertEqual(findDeep(add, "HomeCoinAddLabel")?.getComponent(Label)?.fontSize, 26);
-    assertOk(right(icon) + 4 <= left(value), `${context} coin icon/value gap must remain visible`);
-    assertOk(right(value) + 4 <= left(add), `${context} coin value/add gap must remain visible`);
-    assertOk(right(add) + 4 <= button.getComponent(UITransform)!.width / 2,
+    assertOk(right(icon) + 8 <= left(value), `${context} coin icon/value gap must remain visible`);
+    assertOk(right(value) + 8 <= left(add), `${context} coin value/add gap must remain visible`);
+    assertOk(right(add) + 8 <= button.getComponent(UITransform)!.width / 2,
       `${context} coin add badge must remain inside the coin action`);
   };
   assertHomeCoinLayout(canvas, "long Home");
