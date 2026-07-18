@@ -2019,11 +2019,21 @@ async function main(): Promise<void> {
       const formCard = findDeep(canvas, "FeedbackFormCard")!;
       const statusBand = findDeep(formCard, "FeedbackStatusBand")!;
       const statusCopy = findDeep(formCard, "FeedbackStatus")!;
+      const feedbackIcon = findDeep(formCard, "HomeFeedbackSlot")!;
+      const feedbackPrompt = findDeep(formCard, "FeedbackPrompt")!;
+      const feedbackNotice = findDeep(formCard, "FeedbackPrivacy")!;
       const feedbackHeader = findDeep(canvas, "FeedbackHeader")!;
       const feedbackSubmit = findDeep(canvas, "SubmitFeedback")!;
       const feedbackPrivacy = findDeep(canvas, "OpenPrivacy")!;
       const feedbackSafe = findDeep(canvas, "FeedbackSafeArea")!;
       assertOk(verticalGap(feedbackHeader, formCard) >= 4);
+      assertEqual(feedbackIcon.position.y - feedbackIcon.getComponent(UITransform)!.height / 2,
+        feedbackPrompt.position.y - feedbackPrompt.getComponent(UITransform)!.height / 2,
+      "feedback icon and prompt must share one bottom baseline");
+      assertOk(verticalGap(feedbackIcon, feedbackNotice) >= 8,
+        "feedback icon must clear the privacy notice");
+      assertOk(verticalGap(feedbackPrompt, feedbackNotice) >= 8,
+        "feedback prompt must clear the privacy notice");
       assertOk(verticalGap(formCard, feedbackSubmit) >= 12);
       assertOk(verticalGap(feedbackSubmit, feedbackPrivacy) >= 8);
       assertOk(feedbackPrivacy.position.y - feedbackPrivacy.getComponent(UITransform)!.height / 2

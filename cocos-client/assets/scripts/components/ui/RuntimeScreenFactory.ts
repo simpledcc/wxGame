@@ -649,7 +649,7 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议",
       () => controller.backHome(), "feedback");
     const formCard = home.accentCard(safe.node, "FeedbackFormCard", 0, formY, 560, 500, "join", 24);
-    home.visualSlot(formCard, "feedback", -228, 198, 48, 48);
+    home.visualSlot(formCard, "feedback", -228, 206, 48, 48);
     home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 424, 40, 18, "homeTextMuted", 0);
     const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 14, "homeTextMuted");
     home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
