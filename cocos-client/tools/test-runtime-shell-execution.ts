@@ -536,9 +536,16 @@ async function main(): Promise<void> {
     const coin = findDeep(root, "HomeCoinPill")!;
     const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
     const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+    const cardHeight = card.getComponent(UITransform)!.height;
     assertOk(right(avatar) + 8 <= left(card), `${context} avatar/player gap must remain visible`);
     assertOk(right(card) + 8 <= left(coin), `${context} player/coin gap must remain visible`);
-    assertOk(verticalGap(name, identity) >= 4, `${context} player name/identity gap must remain visible`);
+    assertEqual(cardHeight, coin.getComponent(UITransform)!.height, `${context} utility pills must align`);
+    assertEqual(card.position.y, coin.position.y, `${context} utility pills must share one axis`);
+    assertOk(cardHeight / 2 - name.position.y - name.getComponent(UITransform)!.height / 2 >= 5,
+      `${context} player name needs a top inset`);
+    assertOk(verticalGap(name, identity) >= 5, `${context} player name/identity gap must remain visible`);
+    assertOk(identity.position.y - identity.getComponent(UITransform)!.height / 2 >= -cardHeight / 2 + 5,
+      `${context} player identity needs a bottom inset`);
     assertEqual(identity.getComponent(Label)?.string, "系统安全身份");
     assertEqual(name.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
     assertEqual(card.getComponent(Button), null, `${context} player pill must not split the avatar click target`);
