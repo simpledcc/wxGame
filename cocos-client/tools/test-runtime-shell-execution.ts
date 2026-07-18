@@ -967,6 +967,28 @@ async function main(): Promise<void> {
   assertEqual(app.store.getState().route, "study");
   const studyRoot = findDeep(canvas, "StudyRuntimeScreen");
   assertOk(studyRoot);
+  const assertStudyCardSpacing = (root: Node, context: string): void => {
+    const card = findDeep(root, "StudyCard")!;
+    const caption = findDeep(card, "StudyProgressCaption")!;
+    const status = findDeep(card, "StudyStatus")!;
+    const progress = findDeep(card, "StudyProgress")!;
+    const word = findDeep(card, "StudyWord")!;
+    const meaning = findDeep(card, "StudyMeaning")!;
+    const previous = findDeep(card, "PreviousWord")!;
+    const random = findDeep(card, "RandomWord")!;
+    assertOk(verticalGap(caption, status) >= 4, `${context} progress caption/status gap must remain visible`);
+    assertOk(verticalGap(status, progress) >= 4, `${context} status/progress gap must remain visible`);
+    assertOk(verticalGap(progress, word) >= 6, `${context} progress/word gap must remain visible`);
+    assertOk(verticalGap(word, meaning) >= 6, `${context} word/meaning gap must remain visible`);
+    assertOk(verticalGap(meaning, previous) >= 6, `${context} meaning/action gap must remain visible`);
+    assertEqual(previous.position.y, random.position.y);
+    [previous, random].forEach((action) => {
+      assertOk(action.position.y - action.getComponent(UITransform)!.height / 2
+        - (-card.getComponent(UITransform)!.height / 2) >= 8,
+      `${context} bottom actions must retain their card inset`);
+    });
+  };
+  assertStudyCardSpacing(studyRoot, "long Study card");
   assertOk(findDeep(studyRoot, "StudySafeArea"));
   assertOk(findDeep(studyRoot, "StudyHeader"));
   assertPreGameTargetDevices(studyRoot);
@@ -996,8 +1018,6 @@ async function main(): Promise<void> {
   assertOk(verticalGap(studyReveal, studyMeaningToggle) >= 2);
   assertOk(verticalGap(studyMeaningToggle, studyNext) >= 2);
   assertOk(studyNext.position.y - studyNext.getComponent(UITransform)!.height / 2 >= -studySafe.getComponent(UITransform)!.height / 2);
-  assertOk(verticalGap(findDeep(studyCard, "StudyWord")!, findDeep(studyCard, "StudyMeaning")!) >= 2);
-  assertOk(verticalGap(findDeep(studyCard, "StudyMeaning")!, findDeep(studyCard, "PreviousWord")!) >= 2);
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
@@ -1023,6 +1043,16 @@ async function main(): Promise<void> {
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
+  setMockWindowSize(640, 960);
+  app.store.setRoute("study");
+  await flushMany();
+  const minimumStudyRoot = findDeep(canvas, "StudyRuntimeScreen")!;
+  assertStudyCardSpacing(minimumStudyRoot, "minimum Study card");
+  assertVisibleUiContract(minimumStudyRoot, "minimum Study route");
+  assertPreGameTargetDevices(minimumStudyRoot);
+  setMockWindowSize(393, 852);
+  app.store.setRoute("home");
+  await flushMany();
 
   const selectedBankBeforeHomePicker = app.wordBankStore.getSelectedBankId();
   findDeep(canvas, "CurrentBankBar")?.emit(Button.EventType.CLICK);

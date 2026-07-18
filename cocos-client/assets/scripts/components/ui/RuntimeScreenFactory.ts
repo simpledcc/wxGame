@@ -317,14 +317,14 @@ export class RuntimeScreenFactory {
     const cardY = safeTop - 382 - stretch * 0.05;
     const card = home.sectionCard(safe.node, "StudyCard", "学习卡", 0, cardY,
       540, 366, "practice", "practice");
-    home.label(card, "StudyProgressCaption", "学习进度", 182, 137, 120, 30, 16, "homeTextMuted");
-    const status = home.label(card, "StudyStatus", "", 182, 108, 120, 36, 18, "homeTextMuted");
-    const progress = home.progressBar(card, "StudyProgress", 182, 87, 124, 12, "practice");
-    const word = home.label(card, "StudyWord", "", 0, 34, 480, 88, 58, "homeText");
-    const meaning = home.label(card, "StudyMeaning", "", 0, -56, 480, 88, 29, "homeTextMuted");
-    home.button(card, "PreviousWord", "← 上一个", -142, -142, 220, 80,
+    home.label(card, "StudyProgressCaption", "学习进度", 182, 142, 120, 24, 16, "homeTextMuted");
+    const status = home.label(card, "StudyStatus", "", 182, 110, 120, 32, 18, "homeTextMuted");
+    const progress = home.progressBar(card, "StudyProgress", 182, 84, 124, 12, "practice");
+    const word = home.label(card, "StudyWord", "", 0, 32, 480, 80, 58, "homeText");
+    const meaning = home.label(card, "StudyMeaning", "", 0, -50, 480, 72, 29, "homeTextMuted");
+    home.button(card, "PreviousWord", "← 上一个", -142, -132, 220, 80,
       () => controller.previousWord(), "join", 17);
-    home.button(card, "RandomWord", "↻ 随机", 142, -142, 220, 80,
+    home.button(card, "RandomWord", "↻ 随机", 142, -132, 220, 80,
       () => controller.randomWord(), "surface", 17);
     const revealY = cardY - 226 - stretch * 0.28;
     home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 80,
