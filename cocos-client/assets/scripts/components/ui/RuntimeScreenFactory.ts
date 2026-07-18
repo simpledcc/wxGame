@@ -88,9 +88,9 @@ export class RuntimeScreenFactory {
       safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(131, 168), 520, fit(80, 92),
       () => controller.openBankPicker(), "surface", "wordBank"
     );
-    bank.titleLabel.node.setPosition(-22, 0, 0);
-    bank.titleLabel.node.getComponent(UITransform)?.setContentSize(350, 58);
-    home.label(bank.node, "CurrentBankCaption", "当前词库", -118, 25, 130, 28, 15, "homeTextMuted");
+    bank.titleLabel.node.setPosition(-10, -14, 0);
+    bank.titleLabel.node.getComponent(UITransform)?.setContentSize(326, 34);
+    home.label(bank.node, "CurrentBankCaption", "当前词库", -103, 20, 140, 20, 15, "homeTextMuted");
     const bankChange = home.pill(bank.node, "CurrentBankChangeBadge", 204, 0, 92, 54,
       "homeHistory", "homeTextOnColor");
     home.label(bankChange, "CurrentBankChangeLabel", "更换", 0, 0, 72, 36, 17, "homeTextOnColor");
@@ -212,7 +212,7 @@ export class RuntimeScreenFactory {
       () => controller.back(), "wordBank");
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
       safeTop - 158, 540, 80, "history", "coin");
-    home.visualSlot(statusCard, "coin", -232, 0, 44, 44);
+    home.visualSlot(statusCard, "coin", -232, -18, 32, 32);
     const status = home.label(statusCard, "BankStatus", "", 24, -14, 430, 46, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
     const pageSize = 4;

@@ -410,15 +410,29 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "CurrentBankCaption")?.getComponent(Label)?.string, "当前词库");
   assertEqual(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："), false,
     "Home Bank title must reserve its width for the real bank name");
+  const verticalGap = (upper: Node, lower: Node): number =>
+    upper.position.y - upper.getComponent(UITransform)!.height / 2
+      - lower.position.y - lower.getComponent(UITransform)!.height / 2;
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const bankChangeBadge = findDeep(canvas, "CurrentBankChangeBadge");
+  const currentBankCaption = findDeep(canvas, "CurrentBankCaption")!;
+  const currentBankTitle = findDeep(canvas, "CurrentBankBarTitle")!;
+  const currentBankIcon = findDeep(canvas, "CurrentBankBarIconSlot")!;
   const subtitleTransform = homeSubtitle?.getComponent(UITransform);
   const bankTransform = currentBankBar?.getComponent(UITransform);
   assertOk(homeSubtitle && currentBankBar && bankChangeBadge && subtitleTransform && bankTransform);
   assertOk(currentBankBar.getComponent(Button), "the whole Bank strip must remain clickable");
   assertEqual(bankChangeBadge.getComponent(Button), null, "the change badge must not nest another Button");
   assertOk(bankChangeBadge.getComponent(Graphics));
+  assertOk(verticalGap(currentBankCaption, currentBankTitle) >= 4,
+    "Home Bank caption and real Bank name must form separate rows");
+  assertOk(currentBankIcon.position.x + currentBankIcon.getComponent(UITransform)!.width / 2 + 4
+    <= currentBankTitle.position.x - currentBankTitle.getComponent(UITransform)!.width / 2,
+  "Home Bank icon must not enter the dynamic Bank-name column");
+  assertOk(currentBankTitle.position.x + currentBankTitle.getComponent(UITransform)!.width / 2 + 4
+    <= bankChangeBadge.position.x - bankChangeBadge.getComponent(UITransform)!.width / 2,
+  "Home Bank name must not enter the change badge");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
   assertOk(subtitleBankGap >= 2, "Home subtitle and bank bar must not overlap");
@@ -534,9 +548,6 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
   assertOk(findDeep(playerModal, "HomePlayerIdentity")?.getComponent(Graphics),
     "player identity must use a visible status badge");
-  const verticalGap = (upper: Node, lower: Node): number =>
-    upper.position.y - upper.getComponent(UITransform)!.height / 2
-      - lower.position.y - lower.getComponent(UITransform)!.height / 2;
   assertOk(verticalGap(findDeep(playerModal, "HomeAvatarSlot")!, findDeep(playerModal, "HomePlayerDetailName")!) >= 4);
   assertOk(verticalGap(findDeep(playerModal, "HomePlayerDetailName")!, findDeep(playerModal, "HomePlayerIdentity")!) >= 4);
   assertOk(verticalGap(findDeep(playerModal, "HomePlayerIdentity")!, findDeep(playerModal, "HomePlayerClose")!) >= 4);
@@ -594,11 +605,20 @@ async function main(): Promise<void> {
   await flushMany();
   const minimumHomeRoot = findDeep(canvas, "HomeRuntimeScreen")!;
   const minimumHomeSafe = findDeep(minimumHomeRoot, "HomeSafeArea")!;
+  const minimumBankCaption = findDeep(minimumHomeRoot, "CurrentBankCaption")!;
+  const minimumBankTitle = findDeep(minimumHomeRoot, "CurrentBankBarTitle")!;
+  const minimumBankIcon = findDeep(minimumHomeRoot, "CurrentBankBarIconSlot")!;
+  const minimumBankBadge = findDeep(minimumHomeRoot, "CurrentBankChangeBadge")!;
   const minimumHomeChain = [
     "HomeTopBar", "HomeLogoSlot", "HomeSubtitleRibbon", "CurrentBankBar", "CreateRoomButton",
     "JoinRoomButton", "StudyButton", "HelpButton", "HomePrivacy"
   ].map((name) => findDeep(minimumHomeRoot, name)!);
   assertOk(verticalGap(minimumHomeChain[0], minimumHomeChain[1]) >= 4);
+  assertOk(verticalGap(minimumBankCaption, minimumBankTitle) >= 4);
+  assertOk(minimumBankIcon.position.x + minimumBankIcon.getComponent(UITransform)!.width / 2 + 4
+    <= minimumBankTitle.position.x - minimumBankTitle.getComponent(UITransform)!.width / 2);
+  assertOk(minimumBankTitle.position.x + minimumBankTitle.getComponent(UITransform)!.width / 2 + 4
+    <= minimumBankBadge.position.x - minimumBankBadge.getComponent(UITransform)!.width / 2);
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
   assertOk(minimumRibbonTop - minimumLogoBottom >= 0 && minimumRibbonTop - minimumLogoBottom <= 8,
@@ -941,7 +961,7 @@ async function main(): Promise<void> {
   assertOk(bankTitleTransform);
   bankTitle!.getComponent(Label)!.string = "超长词库名称".repeat(12);
   assertEqual(bankTitle!.getComponent(Label)!.overflow, Label.Overflow.SHRINK);
-  assertEqual(bankTitleTransform.width, 350, "long bank text must retain space for the change affordance");
+  assertEqual(bankTitleTransform.width, 326, "long bank text must retain space for the icon and change affordance");
   app.wordBankStore.setSelectedBankId(selectedBankBeforeHomePicker);
   app.store.patch({ bankId: selectedBankBeforeHomePicker });
 
@@ -1105,10 +1125,18 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
       const bankStatusTab = findDeep(canvas, "BankStatusCardTab")!;
+      const bankStatusCard = findDeep(canvas, "BankStatusCard")!;
+      const bankStatusCoin = bankStatusCard.children.find((child) => child.name === "HomeCoinSlot")!;
+      const bankStatusCopy = findDeep(canvas, "BankStatus")!;
       assertEqual(bankStatusTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 18);
-      assertOk(verticalGap(bankStatusTab, findDeep(canvas, "BankStatus")!) >= 4);
+      assertEqual(bankStatusCoin.getComponent(UITransform)?.height, 32);
+      assertOk(verticalGap(bankStatusTab, bankStatusCoin) >= 4);
+      assertOk(verticalGap(bankStatusTab, bankStatusCopy) >= 4);
+      assertOk(bankStatusCoin.position.x + bankStatusCoin.getComponent(UITransform)!.width / 2 + 4
+        <= bankStatusCopy.position.x - bankStatusCopy.getComponent(UITransform)!.width / 2,
+      "Bank status icon must not enter its copy column");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
       assertOk(!findDeep(canvas, "BankSlot0Title")?.getComponent(Label)?.string.startsWith("✓"),
         "selected Bank title must leave state feedback to the ring and badge");
