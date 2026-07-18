@@ -824,6 +824,39 @@ async function main(): Promise<void> {
       `${context} avatar must not enter the player-name column`);
     });
   };
+  const assertLobbyUtilityCardSpacing = (lobby: Node, context: string): void => {
+    const codeCard = findDeep(lobby, "RoomCodeCard")!;
+    const codeTab = findDeep(codeCard, "RoomCodeCardTab")!;
+    const code = findDeep(codeCard, "RoomCode")!;
+    const copy = findDeep(codeCard, "CopyCode")!;
+    const invite = findDeep(codeCard, "InviteFriend")!;
+    const bankCard = findDeep(lobby, "LobbyBankCard")!;
+    const bankTab = findDeep(bankCard, "LobbyBankCardTab")!;
+    const bankCopy = findDeep(bankCard, "RoomMode")!;
+    const statusCard = findDeep(lobby, "RoomStatusCard")!;
+    const statusTab = findDeep(statusCard, "RoomStatusCardTab")!;
+    const statusCopy = findDeep(statusCard, "RoomStatus")!;
+    const indicators = [findDeep(statusCard, "RoomStatusReady")!, findDeep(statusCard, "RoomStatusAttention")!];
+    const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
+    const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+    assertOk(verticalGap(codeTab, code) >= 4, `${context} code tab/body gap must remain visible`);
+    assertEqual(copy.getComponent(UITransform)?.width, 112);
+    assertEqual(invite.getComponent(UITransform)?.width, 112);
+    assertOk(right(code) + 8 <= left(copy), `${context} code/copy columns must remain separate`);
+    assertOk(right(copy) + 8 <= left(invite), `${context} copy/invite actions must remain separate`);
+    assertOk(right(invite) + 8 <= codeCard.getComponent(UITransform)!.width / 2,
+      `${context} invite action must retain its right inset`);
+    assertOk(verticalGap(bankTab, bankCopy) >= 4, `${context} Bank tab/body gap must remain visible`);
+    assertOk(right(bankCopy) + 8 <= bankCard.getComponent(UITransform)!.width / 2,
+      `${context} Bank copy must retain its right inset`);
+    assertOk(verticalGap(statusTab, statusCopy) >= 4, `${context} status tab/copy gap must remain visible`);
+    indicators.forEach((indicator) => {
+      assertOk(verticalGap(statusTab, indicator) >= 4, `${context} status tab/indicator gap must remain visible`);
+      assertOk(right(indicator) + 8 <= left(statusCopy), `${context} indicator/copy columns must remain separate`);
+    });
+    assertOk(right(statusCopy) + 8 <= statusCard.getComponent(UITransform)!.width / 2,
+      `${context} status copy must retain its right inset`);
+  };
   assertCreateCardSpacing(findDeep(canvas, "RoomCreatePanel")!, "long create configuration");
   const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
   const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
@@ -902,6 +935,7 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
   const minimumLobby = findDeep(minimumRoomRoot, "RoomLobbyPanel")!;
   assertLobbyPlayerCardSpacing(minimumLobby, "minimum room lobby");
+  assertLobbyUtilityCardSpacing(minimumLobby, "minimum room lobby");
   const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
     .map((name) => findDeep(minimumLobby, name)!);
   for (let gap = 0; gap < lobbyChain.length - 1; gap += 1) {
@@ -1308,6 +1342,7 @@ async function main(): Promise<void> {
     }
     if (routes[index] === "room") {
       assertLobbyPlayerCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
+      assertLobbyUtilityCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
         findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,

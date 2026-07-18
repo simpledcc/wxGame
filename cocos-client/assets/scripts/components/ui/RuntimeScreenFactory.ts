@@ -451,10 +451,10 @@ export class RuntimeScreenFactory {
     const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, lobbyContentY, safe.width, 760);
     const codeCard = home.sectionCard(lobbyPanel, "RoomCodeCard", "房间码", 0, 252,
       548, 104, "join", "joinRoom");
-    const roomCode = home.label(codeCard, "RoomCode", "------", -76, -15, 220, 48, 30, "homeText");
-    const copy = home.button(codeCard, "CopyCode", "复制", 104, -15, 112, 80,
+    const roomCode = home.label(codeCard, "RoomCode", "------", -88, -15, 216, 48, 30, "homeText");
+    const copy = home.button(codeCard, "CopyCode", "复制", 84, -15, 112, 80,
       () => void controller.copyRoomCode(), "join", 16);
-    const invite = home.button(codeCard, "InviteFriend", "邀请", 218, -15, 104, 80,
+    const invite = home.button(codeCard, "InviteFriend", "邀请", 210, -15, 112, 80,
       () => void controller.inviteFriend(), "practice", 16);
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
       520, 72, "practice", "wordBank");
