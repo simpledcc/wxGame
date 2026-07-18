@@ -133,6 +133,7 @@ function main(): void {
     height: 120,
     radius: 18
   });
+  assertOk(card.getChildByName("FoundationCardInnerBorder")?.getComponent(Graphics));
   const accentCard = preGame.accentCard(safe.node, "FoundationAccentCard", 0, 210, 560, 140, "practice");
   assertOk(accentCard.getChildByName("FoundationAccentCardAccent")?.getComponent(Graphics));
 
@@ -179,11 +180,16 @@ function main(): void {
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
+  assertEqual(action.visual.getContentOffsetY(), -2);
+  assertEqual(action.iconSlot.position.y, -2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
+  assertEqual(action.visual.getContentOffsetY(), 0);
+  assertEqual(action.iconSlot.position.y, 0);
   action.button.interactable = false;
   action.visual.refresh();
   assertEqual(action.visual.isShowingDisabledState(), true);
+  assertOk(action.titleLabel.color.a < 255, "disabled button copy must visibly soften with its background");
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1, "disabled pre-game buttons must not execute their action");
   assertVisualMatchesHitArea(action.node, action.visual);
@@ -248,6 +254,9 @@ function main(): void {
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderBackdrop")?.getComponent(Graphics));
   assertEqual(pageHeader.backButton.background.enabled, true);
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon"));
+  assertOk(pageHeader.node.getChildByName("FoundationPageHeaderDivider")?.getComponent(Graphics));
+  assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon")?.getChildByName("HomeCatalogSlot"));
+  assertEqual(pageHeader.titleLabel.enableOutline, true);
   assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
   const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
   assertOk(directEdit.node.getComponent(EditBox));

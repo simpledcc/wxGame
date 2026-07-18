@@ -760,6 +760,11 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "history");
   assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, true, "empty history must show a complete empty-state card");
+  assertEqual(findDeep(canvas, "HistoryAllSelected")?.active, true, "history must expose the active filter");
+  assertEqual(findDeep(canvas, "HistoryPkSelected")?.active, false);
+  findDeep(canvas, "HistoryPk")?.emit(Button.EventType.CLICK);
+  assertEqual(findDeep(canvas, "HistoryAllSelected")?.active, false);
+  assertEqual(findDeep(canvas, "HistoryPkSelected")?.active, true, "history filter marker must follow selection");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   findDeep(canvas, "FeedbackButton")?.emit(Button.EventType.CLICK);

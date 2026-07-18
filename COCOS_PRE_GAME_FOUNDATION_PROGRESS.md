@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-16
+Updated: 2026-07-18
 
 ## Handoff
 
@@ -22,6 +22,7 @@ Updated: 2026-07-16
 - H8.4 completion commit: the commit containing the H8.4 record, with subject ending in `dev_done`; use `git log` after checkout for the exact SHA
 - H8.5 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - H8.6 completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
+- H8.7 visual-polish checkpoint: the commit containing this record; do not use `dev_done` before Creator/WeChat visual evidence
 - H4 art staging commit: `8f8ac1c` (`feat(home-art): stage H4 assets and integration checkpoint`)
 - H4 visual refinement commit: `6987f6f` (`fix(home-art): refine H4 visual assets and composition checkpoint`)
 - H4 import automation commit: `93f397f` (`feat(home-art): automate H4 Creator import handoff`)
@@ -32,8 +33,8 @@ Updated: 2026-07-16
 - H4 high-fidelity source checkpoint: `5b73bdf` (`fix(home-art): stage high-fidelity resource upgrade`)
 - H4 high-fidelity completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H4 HIGH-FIDELITY UPGRADE COMPLETE / PHASE 9 TWO-DEVICE QA PENDING`
-- Next stage: use two real phones to complete create/join/ready/start preparation-flow acceptance; gameplay implementation remains frozen
+- Current stage: `H8.7 PRE-GAME VISUAL POLISH IN_PROGRESS / SOURCE VERIFIED`
+- Next stage: inspect H8.7 in Creator 3.8.8 and WeChat Developer Tools, capture page/state evidence and continue visual adjustment before returning to Phase 9
 
 ## Baseline facts
 
@@ -102,6 +103,7 @@ Updated: 2026-07-16
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Formal page-header icons, refined card chrome, unified pressed/disabled content states and live History filter marker pass full source/runtime verification | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -672,6 +674,16 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - `npm run inspect:wechat-build`: `PASSED`; `147` files, `9,973,107` total bytes, `4,121,077 / 4,194,304` main-package bytes and `3,472,932` `home_common` bytes.
 - WeChat Developer Tools CLI authenticated with AppID `wx063a1823d29bed9e`; the generated package visibly loaded the formal Home background, Logo, icons and button skins. Final multi-page behavior is additionally covered by runtime click simulation.
 - Frozen-path audit: no changes under `mode_pk`, `mode_spell`, `cloudfunctions` or `miniprogram`.
+
+## H8.7 pre-game visual-polish checkpoint
+
+- Replaced single-character page-header emblems with cached formal `home_common` semantic icons for Bank, Study, mode catalog, Room, Result, History, Feedback and Help.
+- Added a subtle inner border to shared cards and EditBox backgrounds, plus a separate title-tab shadow and restrained title/subtitle outlines to improve hierarchy without changing layout bounds.
+- Extended `RuntimeButtonVisual` so pressed controls shift only their icon/text content by `2` design pixels and disabled controls soften labels and loaded icon sprites together with the background/skin.
+- Added selected-filter markers to History; the marker follows the actual `all/pk/coopShared/coopSpell` controller state, while the unsupported Other filter remains disabled.
+- Added regression assertions for new card/header nodes, pressed/restored content geometry, disabled copy treatment and History filter switching.
+- `npm run verify`: `PASSED` on the no-Creator computer; `home_common` images and metadata were not changed.
+- Creator 3.8.8 build, WeChat visual traversal and screenshots are pending, so H8.7 remains `IN_PROGRESS` and this checkpoint must not use `dev_done`.
 
 ## Assets
 

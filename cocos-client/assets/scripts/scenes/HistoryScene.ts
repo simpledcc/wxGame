@@ -51,6 +51,9 @@ export class HistoryScene extends Component {
   @property(Button)
   nextButton: Button | null = null;
 
+  @property([Node])
+  modeIndicators: Node[] = [];
+
   @property([HistoryRecordItem])
   recordItems: HistoryRecordItem[] = [];
 
@@ -153,6 +156,10 @@ export class HistoryScene extends Component {
 
   private showMode(mode: HistoryMode): void {
     this.selectedMode = mode;
+    const modeIndex = (["all", "pk", "coopShared", "coopSpell"] as HistoryMode[]).indexOf(mode);
+    this.modeIndicators.forEach((indicator, index) => {
+      indicator.active = index === modeIndex;
+    });
     this.page = 0;
     this.records = app.historyStore.getRecords(mode === "all" ? undefined : mode)
       .sort((left, right) => right.finishedAt - left.finishedAt);

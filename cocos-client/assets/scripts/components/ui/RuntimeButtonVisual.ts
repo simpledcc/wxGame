@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Graphics, Sprite, UITransform } from "cc";
+import { _decorator, Button, Color, Component, Graphics, Label, Node, Sprite, UITransform } from "cc";
 
 const { ccclass } = _decorator;
 
@@ -16,6 +16,13 @@ export class RuntimeButtonVisual extends Component {
   private radius = 8;
   private lastInteractable: boolean | null = null;
   private pressed = false;
+  private contentNodes: Node[] = [];
+  private contentLabels: Label[] = [];
+  private contentLabelColors: Color[] = [];
+  private contentSprites: Sprite[] = [];
+  private contentSpriteColors: Color[] = [];
+  private contentOffsetY = 0;
+  private contentTinted = false;
 
   configure(
     button: Button,
@@ -49,6 +56,17 @@ export class RuntimeButtonVisual extends Component {
     this.refresh(true);
   }
 
+  setContent(nodes: readonly Node[], labels: readonly Label[] = [], sprites: readonly Sprite[] = []): void {
+    this.contentNodes = [...nodes];
+    this.contentLabels = [...labels];
+    this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
+    this.contentSprites = [...sprites];
+    this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+    this.contentOffsetY = 0;
+    this.contentTinted = false;
+    this.refresh(true);
+  }
+
   refresh(force = false): void {
     if (!this.button || !this.background) return;
     this.ensureSkinSize();
@@ -76,6 +94,7 @@ export class RuntimeButtonVisual extends Component {
       const channel = interactable ? (this.pressed ? 220 : 255) : 158;
       this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);
     }
+    this.refreshContent(interactable);
   }
 
   isShowingDisabledState(): boolean {
@@ -84,6 +103,10 @@ export class RuntimeButtonVisual extends Component {
 
   getVisualGeometry(): { width: number; height: number; radius: number } {
     return { width: this.width, height: this.height, radius: this.radius };
+  }
+
+  getContentOffsetY(): number {
+    return this.contentOffsetY;
   }
 
   setPressed(pressed: boolean): void {
@@ -106,5 +129,54 @@ export class RuntimeButtonVisual extends Component {
     if (this.skin.node.scale.x !== scale || this.skin.node.scale.y !== scale) {
       this.skin.node.setScale(scale, scale, 1);
     }
+  }
+
+  private refreshContent(interactable: boolean): void {
+    const nextOffsetY = this.pressed && interactable ? -2 : 0;
+    if (nextOffsetY !== this.contentOffsetY) {
+      this.contentNodes.forEach((node) => {
+        node.setPosition(node.position.x, node.position.y - this.contentOffsetY + nextOffsetY, node.position.z);
+      });
+      this.contentOffsetY = nextOffsetY;
+    }
+    if (!interactable) {
+      if (!this.contentTinted) {
+        this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
+        this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+      }
+      this.contentLabels.forEach((label, index) => {
+        const base = this.contentLabelColors[index] || label.color;
+        label.color = new Color(
+          Math.round(base.r * 0.68 + this.disabledColor.r * 0.32),
+          Math.round(base.g * 0.68 + this.disabledColor.g * 0.32),
+          Math.round(base.b * 0.68 + this.disabledColor.b * 0.32),
+          Math.min(base.a, 190)
+        );
+      });
+      this.contentSprites.forEach((sprite, index) => {
+        const base = this.contentSpriteColors[index] || sprite.color;
+        sprite.color = new Color(
+          Math.round(base.r * 0.72 + this.disabledColor.r * 0.28),
+          Math.round(base.g * 0.72 + this.disabledColor.g * 0.28),
+          Math.round(base.b * 0.72 + this.disabledColor.b * 0.28),
+          Math.min(base.a, 184)
+        );
+      });
+      this.contentTinted = true;
+      return;
+    }
+    if (this.contentTinted) {
+      this.contentLabels.forEach((label, index) => {
+        label.color = this.copyColor(this.contentLabelColors[index] || label.color);
+      });
+      this.contentSprites.forEach((sprite, index) => {
+        sprite.color = this.copyColor(this.contentSpriteColors[index] || sprite.color);
+      });
+      this.contentTinted = false;
+    }
+  }
+
+  private copyColor(color: Color): Color {
+    return new Color(color.r, color.g, color.b, color.a);
   }
 }

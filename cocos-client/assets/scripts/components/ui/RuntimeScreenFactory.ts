@@ -205,7 +205,7 @@ export class RuntimeScreenFactory {
     const safeBottom = -safe.height / 2;
     let controller!: BankScene;
     home.pageHeader(safe, "BankHeader", "选择词库", "选择教材单元，练习和房间会同步使用",
-      () => controller.back(), "词");
+      () => controller.back(), "wordBank");
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
       safeTop - 164, 540, 92, "history", "coin");
     home.visualSlot(statusCard, "coin", -232, 0, 44, 44);
@@ -292,7 +292,7 @@ export class RuntimeScreenFactory {
     const stretch = Math.max(0, Math.min(360, safe.height - 822));
     let controller!: StudyScene;
     home.pageHeader(safe, "StudyHeader", "赛前练习", "背诵当前单元，随时标记需要复习的单词",
-      () => controller.backHome(), "书");
+      () => controller.backHome(), "practice");
     const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     home.actionButton(safe.node, "StudyBankBar", getWordBankLabel(selectedBank, true), "当前词库", "词",
       -62, safeTop - 164, 416, 96, () => controller.changeBank(), "surface", "wordBank");
@@ -335,7 +335,8 @@ export class RuntimeScreenFactory {
     const safe = home.safeArea(root, "CoopSelectSafeArea");
     const safeTop = safe.height / 2;
     let controller!: CoopSelectScene;
-    home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法", () => controller.backHome(), "玩");
+    home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法",
+      () => controller.backHome(), "catalog");
     const modes = [
       ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
       ["双人 PK 竞技", "快速抢答，一决高下", "practice", "surface"],
@@ -376,8 +377,9 @@ export class RuntimeScreenFactory {
     const roomState = app.roomStore.getState();
     const hasSession = !!roomState.roomId || !!roomState.room;
     const headerTitle = entryIntent === "join" ? "加入房间" : entryIntent === "create" ? "创建房间" : "双人房间";
+    const headerIcon = entryIntent === "join" ? "joinRoom" : "createRoom";
     const header = home.pageHeader(safe, "RoomHeader", headerTitle,
-      "两名真实玩家加入并准备后，由房主开始", () => controller.backHome(), "房");
+      "两名真实玩家加入并准备后，由房主开始", () => controller.backHome(), headerIcon);
 
     let createPanel: Node | null = null;
     let selectedBank: Label | null = null;
@@ -486,7 +488,7 @@ export class RuntimeScreenFactory {
     const stretch = Math.max(0, Math.min(360, safe.height - 822));
     let controller!: ResultScene;
     home.pageHeader(safe, "ResultHeader", "本局结算", "成绩已保存，可在战绩记录中继续查看",
-      () => controller.backHome(), "奖");
+      () => controller.backHome(), "history");
     const resultCardY = 70 + stretch * 0.56;
     const resultCard = home.accentCard(safe.node, "ResultCard", 0, resultCardY, 560, 450, "history", 24);
     home.visualSlot(resultCard, "history", 0, 154, 118, 118);
@@ -517,7 +519,7 @@ export class RuntimeScreenFactory {
     detailRoot.active = false;
     let controller!: HistoryScene;
     home.pageHeader(safe, "HistoryHeader", "战绩记录", "查看真实比赛成绩和历史最佳",
-      () => controller.back(), "绩");
+      () => controller.back(), "history");
     const tabs = [
       ["HistoryAll", "全部", () => controller.showAll(), "join"],
       ["HistoryPk", "PK", () => controller.showPk(), "surface"],
@@ -525,9 +527,14 @@ export class RuntimeScreenFactory {
       ["HistorySpell", "拼词", () => controller.showCoopSpell(), "surface"],
       ["HistoryOther", "其他", () => undefined, "surface"]
     ] as const;
+    const modeIndicators: Node[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
       const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 154,
         104, 80, action, kind, 16);
+      const indicator = home.pill(tab.node, `${name}Selected`, 0, -31, 58, 6,
+        "homeJoin", "homeJoin");
+      indicator.active = index === 0;
+      modeIndicators.push(indicator);
       if (name === "HistoryOther") {
         tab.button.interactable = false;
         tab.visual.refresh();
@@ -589,6 +596,7 @@ export class RuntimeScreenFactory {
     controller.pageLabel = page;
     controller.previousButton = previous.button;
     controller.nextButton = next.button;
+    controller.modeIndicators = modeIndicators;
     controller.recordItems = items;
     controller.listNode = listRoot;
     controller.detailNode = detailRoot;
@@ -609,7 +617,7 @@ export class RuntimeScreenFactory {
     const formY = safeTop - 360;
     let controller!: FeedbackScene;
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议",
-      () => controller.backHome(), "言");
+      () => controller.backHome(), "feedback");
     const formCard = home.accentCard(safe.node, "FeedbackFormCard", 0, formY, 560, 500, "join", 24);
     home.visualSlot(formCard, "feedback", -228, 198, 48, 48);
     home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 198, 424, 48, 18, "homeTextMuted", 0);
@@ -640,7 +648,7 @@ export class RuntimeScreenFactory {
     const safeTop = safe.height / 2;
     let controller!: HelpScene;
     home.pageHeader(safe, "HelpHeader", "玩法目录", "玩法说明：了解练习、对战和合作规则",
-      () => controller.backHome(), "玩");
+      () => controller.backHome(), "catalog");
     const cardHeight = Math.min(820, safe.height - 140);
     const cardY = safeTop - 112 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);

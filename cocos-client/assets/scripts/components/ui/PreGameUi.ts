@@ -300,14 +300,26 @@ export class PreGameUi {
   }
 
   pageHeader(parent: PreGameSafeAreaRef, name: string, title: string, subtitle: string,
-    backHandler: () => void, icon = "★"): PreGamePageHeaderRef {
+    backHandler: () => void, icon: HomeVisualSlotKey = "catalog"): PreGamePageHeaderRef {
     const node = this.topBar(parent, name, 116);
     this.pill(node, `${name}Backdrop`, 42, 0, 454, 96, "homeJoin", "homeTextOnColor");
     const backButton = this.iconButton(node, "BackButton", "←", -250, 0, 86, backHandler, undefined, "join", 48);
     backButton.titleLabel.color = this.color("homeTextOnColor");
-    this.label(node, `${name}Icon`, icon, -126, 16, 48, 48, 31, "homeTextOnColor");
+    const iconPlate = this.pill(node, `${name}Icon`, -126, 14, 58, 58, "homeCard", "homeTextOnColor");
+    this.visualSlot(iconPlate, icon, 0, 0, 48, 48);
     const titleLabel = this.label(node, `${name}Title`, title, 62, 18, 310, 44, 31, "homeTextOnColor");
+    titleLabel.enableOutline = true;
+    titleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.5);
+    titleLabel.outlineWidth = 2;
+    const divider = this.node(node, `${name}Divider`, 62, -4, 286, 2);
+    const dividerGraphics = divider.addComponent(Graphics);
+    dividerGraphics.fillColor = new Color(255, 255, 255, 92);
+    dividerGraphics.roundRect(-143, -1, 286, 2, 1);
+    dividerGraphics.fill();
     const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -25, 382, 30, 15, "homeTextOnColor");
+    subtitleLabel.enableOutline = true;
+    subtitleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.54);
+    subtitleLabel.outlineWidth = 1;
     return { node, backButton, titleLabel, subtitleLabel };
   }
 
@@ -319,6 +331,7 @@ export class PreGameUi {
     radius = 18): Node {
     const node = this.node(parent, name, x, y, width, height);
     this.addRoundedBackground(node, width, height, radius, "homeCard", "homeCardBorder");
+    this.addInnerBorder(node, `${name}InnerBorder`, width, height, radius);
     this.addHighlight(node, `${name}Highlight`, width - 24, height, radius);
     return node;
   }
@@ -338,6 +351,12 @@ export class PreGameUi {
     height: number, kind: PreGameActionKind, visualKey?: HomeVisualSlotKey): Node {
     const card = this.card(parent, name, x, y, width, height, 22);
     const tabWidth = Math.min(width - 36, Math.max(170, title.length * 26 + (visualKey ? 76 : 42)));
+    const tabShadow = this.node(card, `${name}TabShadow`, -width / 2 + tabWidth / 2 + 14,
+      height / 2 - 34, tabWidth, 58);
+    const tabShadowGraphics = tabShadow.addComponent(Graphics);
+    tabShadowGraphics.fillColor = new Color(24, 42, 56, 46);
+    tabShadowGraphics.roundRect(-tabWidth / 2, -29, tabWidth, 58, 18);
+    tabShadowGraphics.fill();
     const tab = this.node(card, `${name}Tab`, -width / 2 + tabWidth / 2 + 14, height / 2 - 30,
       tabWidth, 58);
     const tabBackground = tab.addComponent(Graphics);
@@ -349,8 +368,13 @@ export class PreGameUi {
     tabBackground.stroke();
     const textToken: ThemeColorToken = kind === "surface" ? "homeText" : "homeTextOnColor";
     if (visualKey) this.visualSlot(tab, visualKey, -tabWidth / 2 + 32, 0, 38, 38, textToken);
-    this.label(tab, `${name}TabTitle`, title, visualKey ? 18 : 0, 0,
+    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey ? 18 : 0, 0,
       tabWidth - (visualKey ? 68 : 24), 42, 22, textToken);
+    if (kind !== "surface") {
+      tabTitle.enableOutline = true;
+      tabTitle.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.42);
+      tabTitle.outlineWidth = 1;
+    }
     return card;
   }
 
@@ -384,6 +408,11 @@ export class PreGameUi {
     );
     this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
     const label = this.label(node, `${name}Label`, text, 0, 0, width - 18, height - 8, fontSize, textToken);
+    if (kind !== "surface") {
+      label.enableOutline = true;
+      label.outlineColor = this.darken(baseColor, 0.4);
+      label.outlineWidth = height >= 88 ? 2 : 1;
+    }
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);
     visual.configure(
@@ -396,6 +425,7 @@ export class PreGameUi {
       this.darken(baseColor, kind === "surface" ? 0.08 : 0.14),
       this.color("disabled")
     );
+    visual.setContent([label.node], [label]);
     this.bindButton(node, button, visual, handler);
     return { node, button, label, background, visual };
   }
@@ -412,6 +442,7 @@ export class PreGameUi {
       "homeCard",
       "homeCardBorder"
     );
+    this.addInnerBorder(backgroundNode, `${name}InnerBorder`, width, height, 16);
     const textLabel = this.label(node, `${name}Text`, "", 0, 0, width - 32, height - 18,
       multiline ? 18 : 20, "homeText", 0);
     const placeholderLabel = this.label(node, `${name}Placeholder`, "", 0, 0, width - 32,
@@ -473,9 +504,10 @@ export class PreGameUi {
       Math.min(34, iconSize * 0.5),
       textToken
     );
+    let iconSprite: Sprite | null = null;
     if (visualKey) {
       iconLabel.node.active = false;
-      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken);
+      iconSprite = this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken).sprite;
     }
 
     const textLeft = -width / 2 + iconInset + iconSize + 12;
@@ -511,6 +543,11 @@ export class PreGameUi {
           textToken
         )
       : null;
+    if (subtitleLabel && kind !== "surface") {
+      subtitleLabel.enableOutline = true;
+      subtitleLabel.outlineColor = this.darken(baseColor, 0.4);
+      subtitleLabel.outlineWidth = 1;
+    }
 
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);
@@ -523,6 +560,11 @@ export class PreGameUi {
       baseColor,
       this.darken(baseColor, 0.14),
       this.color("disabled")
+    );
+    visual.setContent(
+      [iconSlot, titleLabel.node, ...(subtitleLabel ? [subtitleLabel.node] : [])],
+      [iconLabel, titleLabel, ...(subtitleLabel ? [subtitleLabel] : [])],
+      iconSprite ? [iconSprite] : []
     );
     const skinKey = this.buttonSkinKey(kind);
     if (skinKey) {
@@ -579,9 +621,10 @@ export class PreGameUi {
       Math.min(30, size * 0.46),
       textToken
     );
+    let iconSprite: Sprite | null = null;
     if (visualKey) {
       iconLabel.node.active = false;
-      this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken);
+      iconSprite = this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken).sprite;
     }
     const button = node.addComponent(Button);
     const visual = node.addComponent(RuntimeButtonVisual);
@@ -595,6 +638,7 @@ export class PreGameUi {
       this.darken(baseColor, 0.08),
       this.color("disabled")
     );
+    visual.setContent([iconSlot], [iconLabel], iconSprite ? [iconSprite] : []);
     this.bindButton(node, button, visual, handler);
     return {
       node,
@@ -698,6 +742,23 @@ export class PreGameUi {
     graphics.roundRect(-width / 2, -2, width, 4, Math.min(2, radius));
     graphics.fill();
     return highlight;
+  }
+
+  private addInnerBorder(parent: Node, name: string, width: number, height: number, radius: number): Node {
+    const inset = 6;
+    const inner = this.node(parent, name, 0, 1, width - inset * 2, height - inset * 2);
+    const graphics = inner.addComponent(Graphics);
+    graphics.strokeColor = new Color(255, 255, 255, 112);
+    graphics.lineWidth = 1;
+    graphics.roundRect(
+      -(width - inset * 2) / 2,
+      -(height - inset * 2) / 2,
+      width - inset * 2,
+      height - inset * 2,
+      Math.max(4, Math.min(radius - 3, (width - inset * 2) / 2, (height - inset * 2) / 2))
+    );
+    graphics.stroke();
+    return inner;
   }
 
   private bindButton(
