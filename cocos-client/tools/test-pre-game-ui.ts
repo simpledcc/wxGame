@@ -177,13 +177,17 @@ function main(): void {
   const accentCard = preGame.accentCard(safe.node, "FoundationAccentCard", 0, 210, 560, 140, "practice");
   const accent = accentCard.getChildByName("FoundationAccentCardAccent");
   assertOk(accent?.getComponent(Graphics));
-  assertEqual(accent?.position.x, -272);
+  assertEqual(accent?.position.x, -277);
   assertEqual(accent?.position.y, 0);
-  assertEqual(transform(accent!).width, 6);
-  assertEqual(transform(accent!).height, 116);
+  assertEqual(transform(accent!).width, 4);
+  assertEqual(transform(accent!).height, 104);
   assertDeepEqual(accent?.getComponent(Graphics)?.lastRoundRect, {
-    x: -3, y: -58, width: 6, height: 116, radius: 3
+    x: -2, y: -52, width: 4, height: 104, radius: 2
   });
+  const accentInner = accentCard.getChildByName("FoundationAccentCardInnerBorder")!;
+  assertEqual(accent!.position.x + transform(accent!).width / 2 + 1,
+    accentInner.position.x - transform(accentInner).width / 2,
+    "accent rail must remain clear of the card inner border");
   const largeSection = preGame.sectionCard(
     safe.node, "FoundationLargeSection", "当前词库", 0, 210, 560, 148, "practice", "wordBank"
   );

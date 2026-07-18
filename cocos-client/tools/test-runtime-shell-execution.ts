@@ -1552,11 +1552,14 @@ async function main(): Promise<void> {
       const modeRow = findDeep(canvas, "ModeOption0")!;
       const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
       const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
-      assertEqual(modeAccent.getComponent(UITransform)?.width, 6);
-      assertEqual(modeAccent.getComponent(UITransform)?.height, 56);
-      assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 4
+      assertEqual(modeAccent.getComponent(UITransform)?.width, 4);
+      assertEqual(modeAccent.getComponent(UITransform)?.height, 44);
+      assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 8
         <= modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2,
       "mode accent rail must not enter its icon column");
+      assertEqual(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 1,
+        -modeRow.getComponent(UITransform)!.width / 2 + 6,
+      "mode accent rail must remain clear of the card inner border");
       const assertModeRowText = (root: Node, context: string): void => {
         for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
           const row = findDeep(root, `ModeOption${rowIndex}`)!;
@@ -1817,10 +1820,13 @@ async function main(): Promise<void> {
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
       const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;
-      assertEqual(historyAccent.getComponent(UITransform)?.width, 6);
-      assertOk(historyAccent.position.x + historyAccent.getComponent(UITransform)!.width / 2 + 4
+      assertEqual(historyAccent.getComponent(UITransform)?.width, 4);
+      assertOk(historyAccent.position.x + historyAccent.getComponent(UITransform)!.width / 2 + 8
         <= historyIcon.position.x - historyIcon.getComponent(UITransform)!.width / 2,
       "History accent rail must not enter its icon column");
+      assertEqual(historyAccent.position.x + historyAccent.getComponent(UITransform)!.width / 2 + 1,
+        -historyRow.getComponent(UITransform)!.width / 2 + 6,
+      "History accent rail must remain clear of the card inner border");
       const historyTitle = findDeep(historyRow, "Title")!;
       const historyScore = findDeep(historyRow, "Score")!;
       const historyDetail = findDeep(historyRow, "HistoryRow0Detail")!;
