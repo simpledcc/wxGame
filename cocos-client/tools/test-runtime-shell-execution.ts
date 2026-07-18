@@ -2010,6 +2010,25 @@ async function main(): Promise<void> {
           >= -safe.getComponent(UITransform)!.height / 2 + 8,
         `${context} pager must retain its safe-area clearance`);
       };
+      const assertHistoryRowCopy = (root: Node, context: string): void => {
+        for (let rowIndex = 0; rowIndex < 4; rowIndex += 1) {
+          const row = findDeep(root, `HistoryRow${rowIndex}`)!;
+          const title = findDeep(row, "Title")!;
+          const meta = findDeep(row, "Meta")!;
+          const halfHeight = row.getComponent(UITransform)!.height / 2;
+          const topInset = halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2;
+          const bottomInset = meta.position.y - meta.getComponent(UITransform)!.height / 2 + halfHeight;
+          assertEqual(title.getComponent(UITransform)!.height, 28,
+            `${context} row ${rowIndex + 1} title must keep its compact box`);
+          assertEqual(meta.getComponent(UITransform)!.height, 26,
+            `${context} row ${rowIndex + 1} meta must keep its compact box`);
+          assertEqual(verticalGap(title, meta), 8,
+            `${context} row ${rowIndex + 1} copy must keep its eight-pixel line gap`);
+          assertEqual(topInset, bottomInset,
+            `${context} row ${rowIndex + 1} copy must remain vertically centered`);
+          assertOk(topInset >= 12, `${context} row ${rowIndex + 1} copy must clear the card frame`);
+        }
+      };
       const recentCard = findDeep(canvas, "HistoryRecentCard")!;
       const bestCard = findDeep(canvas, "HistoryBestCard")!;
       assertHistorySummary(recentCard, "History", "HistoryRecentSummary");
@@ -2018,6 +2037,7 @@ async function main(): Promise<void> {
         findDeep(bestCard, "HistoryBestSummary")!.position.y,
       "History summary cards must share one body baseline");
       assertHistoryListSpacing(routeRoot, "long History list");
+      assertHistoryRowCopy(routeRoot, "long History list");
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
       const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;
@@ -2094,6 +2114,7 @@ async function main(): Promise<void> {
       assertHistorySummary(minimumBestCard, "Coin", "HistoryBestSummary");
       assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
       assertHistoryListSpacing(minimumHistoryRoot, "minimum History list");
+      assertHistoryRowCopy(minimumHistoryRoot, "minimum History list");
       assertOk(horizontalGap(minimumHistoryPrevious, minimumHistoryPage) >= 8);
       assertOk(horizontalGap(minimumHistoryPage, minimumHistoryNext) >= 8);
       assertVisibleUiContract(minimumHistoryRoot, "minimum History route");
