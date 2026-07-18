@@ -1880,9 +1880,17 @@ async function main(): Promise<void> {
           "History summary title tab must keep its formal icon");
         assertEqual(summary.position.x, 0);
         assertEqual(summary.getComponent(UITransform)?.width, 236);
+        assertOk(summary.position.y - summary.getComponent(UITransform)!.height / 2
+          >= -card.getComponent(UITransform)!.height / 2 + 8,
+        "History summary copy must clear its card bottom frame");
       };
-      assertHistorySummary(findDeep(canvas, "HistoryRecentCard")!, "History", "HistoryRecentSummary");
-      assertHistorySummary(findDeep(canvas, "HistoryBestCard")!, "Coin", "HistoryBestSummary");
+      const recentCard = findDeep(canvas, "HistoryRecentCard")!;
+      const bestCard = findDeep(canvas, "HistoryBestCard")!;
+      assertHistorySummary(recentCard, "History", "HistoryRecentSummary");
+      assertHistorySummary(bestCard, "Coin", "HistoryBestSummary");
+      assertEqual(findDeep(recentCard, "HistoryRecentSummary")!.position.y,
+        findDeep(bestCard, "HistoryBestSummary")!.position.y,
+      "History summary cards must share one body baseline");
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
       const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;

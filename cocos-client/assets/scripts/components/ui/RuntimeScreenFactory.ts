@@ -570,7 +570,7 @@ export class RuntimeScreenFactory {
     });
     const recentCard = home.sectionCard(listRoot, "HistoryRecentCard", "最近记录", -144,
       safeTop - 244, 272, 110, "join", "history");
-    const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 0, -24, 236, 54, 15, "homeText", 0);
+    const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 0, -22, 236, 46, 15, "homeText", 0);
     const bestCard = home.sectionCard(listRoot, "HistoryBestCard", "最佳成绩", 144,
       safeTop - 244, 272, 110, "history", "coin");
     const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 0, -22, 236, 44, 23, "homeText", 0);
