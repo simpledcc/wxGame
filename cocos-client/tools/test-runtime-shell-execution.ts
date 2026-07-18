@@ -620,6 +620,34 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomCreatePanel"), null, "join entry must not build the unused create form");
   assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
   assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
+  setMockWindowSize(640, 960);
+  app.store.setRoute("home");
+  await flushMany();
+  app.store.setRoute("room");
+  await flushMany();
+  const minimumJoinRoot = findDeep(canvas, "RoomRuntimeScreen")!;
+  const minimumJoinSafe = findDeep(minimumJoinRoot, "RoomSafeArea")!;
+  const minimumJoinHeader = findDeep(minimumJoinRoot, "RoomHeader")!;
+  const minimumJoinPanel = findDeep(minimumJoinRoot, "RoomJoinPanel")!;
+  const minimumJoinCard = findDeep(minimumJoinRoot, "JoinCodeCard")!;
+  const minimumJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
+    .map((name) => findDeep(minimumJoinCard, name)!);
+  const minimumJoinCardY = minimumJoinPanel.position.y + minimumJoinCard.position.y;
+  assertOk(minimumJoinHeader.position.y - minimumJoinHeader.getComponent(UITransform)!.height / 2
+    - minimumJoinCardY - minimumJoinCard.getComponent(UITransform)!.height / 2 >= 8);
+  for (let gap = 0; gap < minimumJoinChain.length - 1; gap += 1) {
+    assertOk(verticalGap(minimumJoinChain[gap], minimumJoinChain[gap + 1]) >= 4,
+      `minimum join-room gap ${gap} must remain visible`);
+  }
+  assertOk(minimumJoinCardY - minimumJoinCard.getComponent(UITransform)!.height / 2
+    >= -minimumJoinSafe.getComponent(UITransform)!.height / 2);
+  assertVisibleUiContract(minimumJoinRoot, "minimum join-room route");
+  assertPreGameTargetDevices(minimumJoinRoot);
+  setMockWindowSize(393, 852);
+  app.store.setRoute("home");
+  await flushMany();
+  app.store.setRoute("room");
+  await flushMany();
   const initialJoinHint = findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string || "";
   assertOk(initialJoinHint.includes("英文字母") && initialJoinHint.includes("数字"),
     `the visible join form must explain the room-code format: ${initialJoinHint}`);
@@ -1077,9 +1105,9 @@ async function main(): Promise<void> {
       await flushMany();
       assertEqual(app.store.getState().route, "coopSelect", "rules must return to the mode catalog");
       assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.width, 548);
-      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 86);
+      assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 80);
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 548);
-      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 86);
+      assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 80);
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
       assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
         "mode player count must use the shared status badge");
@@ -1090,6 +1118,32 @@ async function main(): Promise<void> {
           <= modeBadge.position.x - modeBadge.getComponent(UITransform)!.width / 2,
         "mode copy must reserve space for the player-count badge"
       );
+      setMockWindowSize(640, 960);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("coopSelect");
+      await flushMany();
+      const minimumCatalogRoot = findDeep(canvas, "CoopSelectRuntimeScreen")!;
+      const minimumCatalogSafe = findDeep(minimumCatalogRoot, "CoopSelectSafeArea")!;
+      const minimumCatalogHeader = findDeep(minimumCatalogRoot, "CoopSelectHeader")!;
+      const minimumModeRows = Array.from({ length: 8 }, (_, row) => findDeep(minimumCatalogRoot, `ModeOption${row}`)!);
+      assertOk(verticalGap(minimumCatalogHeader, minimumModeRows[0]) >= 4,
+        "minimum mode catalog must separate the header and first row");
+      for (let gap = 0; gap < minimumModeRows.length - 1; gap += 1) {
+        assertOk(verticalGap(minimumModeRows[gap], minimumModeRows[gap + 1]) >= 4,
+          `minimum mode catalog gap ${gap} must remain visible`);
+      }
+      const minimumLastMode = minimumModeRows[minimumModeRows.length - 1];
+      assertOk(minimumLastMode.position.y - minimumLastMode.getComponent(UITransform)!.height / 2
+        >= -minimumCatalogSafe.getComponent(UITransform)!.height / 2,
+      "minimum mode catalog must keep the final row inside the SafeArea");
+      assertVisibleUiContract(minimumCatalogRoot, "minimum mode catalog route");
+      assertPreGameTargetDevices(minimumCatalogRoot);
+      setMockWindowSize(393, 852);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("coopSelect");
+      await flushMany();
       findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().selectedMode, "pk");
@@ -1287,11 +1341,45 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "DetailPage")?.getComponent(Label)?.string, "2/3");
       findDeep(canvas, "CloseDetail")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "HistoryList")?.active, true);
+      setMockWindowSize(640, 960);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("history");
+      await flushMany();
+      const minimumHistoryRoot = findDeep(canvas, "HistoryRuntimeScreen")!;
+      const minimumHistorySafe = findDeep(minimumHistoryRoot, "HistorySafeArea")!;
+      const minimumHistoryHeader = findDeep(minimumHistoryRoot, "HistoryHeader")!;
+      const minimumRecentCard = findDeep(minimumHistoryRoot, "HistoryRecentCard")!;
+      const minimumHistoryTitle = findDeep(minimumHistoryRoot, "HistoryTitle")!;
+      const minimumHistoryRows = Array.from({ length: 4 }, (_, row) => findDeep(minimumHistoryRoot, `HistoryRow${row}`)!);
+      const minimumHistoryPrevious = findDeep(minimumHistoryRoot, "HistoryPrevious")!;
+      assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 2);
+      assertOk(verticalGap(minimumRecentCard, minimumHistoryTitle) >= 4);
+      assertOk(verticalGap(minimumHistoryTitle, minimumHistoryRows[0]) >= 4);
+      for (let gap = 0; gap < minimumHistoryRows.length - 1; gap += 1) {
+        assertOk(verticalGap(minimumHistoryRows[gap], minimumHistoryRows[gap + 1]) >= 8,
+          `minimum History row gap ${gap} must remain visible`);
+      }
+      assertOk(verticalGap(minimumHistoryRows[3], minimumHistoryPrevious) >= 4);
+      assertOk(minimumHistoryPrevious.position.y - minimumHistoryPrevious.getComponent(UITransform)!.height / 2
+        >= -minimumHistorySafe.getComponent(UITransform)!.height / 2);
+      assertVisibleUiContract(minimumHistoryRoot, "minimum History route");
+      assertPreGameTargetDevices(minimumHistoryRoot);
+      setMockWindowSize(393, 852);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("history");
+      await flushMany();
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "home");
     }
     if (routes[index] === "feedback") {
+      setMockWindowSize(640, 960);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("feedback");
+      await flushMany();
       const feedbackController = findDeep(canvas, "FeedbackRuntimeScreen")?.getComponent(FeedbackScene);
       const feedbackInput = findDeep(canvas, "FeedbackContent")?.getComponent(EditBox);
       const feedbackContact = findDeep(canvas, "FeedbackContact")?.getComponent(EditBox);
@@ -1308,6 +1396,17 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "FeedbackStatusBand")?.getComponent(Graphics),
         "feedback guidance must stay inside a stable status band");
       const formCard = findDeep(canvas, "FeedbackFormCard")!;
+      const feedbackHeader = findDeep(canvas, "FeedbackHeader")!;
+      const feedbackSubmit = findDeep(canvas, "SubmitFeedback")!;
+      const feedbackPrivacy = findDeep(canvas, "OpenPrivacy")!;
+      const feedbackSafe = findDeep(canvas, "FeedbackSafeArea")!;
+      assertOk(verticalGap(feedbackHeader, formCard) >= 4);
+      assertOk(verticalGap(formCard, feedbackSubmit) >= 8);
+      assertOk(verticalGap(feedbackSubmit, feedbackPrivacy) >= 8);
+      assertOk(feedbackPrivacy.position.y - feedbackPrivacy.getComponent(UITransform)!.height / 2
+        >= -feedbackSafe.getComponent(UITransform)!.height / 2);
+      assertVisibleUiContract(findDeep(canvas, "FeedbackRuntimeScreen")!, "minimum Feedback route");
+      assertPreGameTargetDevices(findDeep(canvas, "FeedbackRuntimeScreen")!);
       const screenY = (node: Node): number => node.parent === formCard
         ? formCard.position.y + node.position.y : node.position.y;
       const feedbackGap = (upper: Node, lower: Node): number =>
@@ -1376,8 +1475,28 @@ async function main(): Promise<void> {
       assertEqual(feedbackInput.string, abandonedContent, "late feedback success must not mutate a destroyed form");
       assertEqual(appRuntime.toastMessages.length, abandonedToastCount, "late feedback completion must stay silent");
       app.feedback.submit = originalFeedbackSubmit;
+      setMockWindowSize(393, 852);
     }
     if (routes[index] === "help") {
+      setMockWindowSize(640, 960);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("help");
+      await flushMany();
+      const minimumHelpRoot = findDeep(canvas, "HelpRuntimeScreen")!;
+      const minimumHelpSafe = findDeep(minimumHelpRoot, "HelpSafeArea")!;
+      const minimumHelpHeader = findDeep(minimumHelpRoot, "HelpHeader")!;
+      const minimumHelpCard = findDeep(minimumHelpRoot, "HelpCard")!;
+      assertOk(verticalGap(minimumHelpHeader, minimumHelpCard) >= 4);
+      assertOk(minimumHelpCard.position.y - minimumHelpCard.getComponent(UITransform)!.height / 2
+        >= -minimumHelpSafe.getComponent(UITransform)!.height / 2);
+      assertVisibleUiContract(minimumHelpRoot, "minimum Help route");
+      assertPreGameTargetDevices(minimumHelpRoot);
+      setMockWindowSize(393, 852);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("help");
+      await flushMany();
       const helpBody = findDeep(canvas, "HelpBody")?.getComponent(Label)?.string || "";
       assertOk(helpBody.includes("01  背单词\n") && helpBody.includes("06  战绩记录\n"),
         "help copy must expose a numbered title/body hierarchy");

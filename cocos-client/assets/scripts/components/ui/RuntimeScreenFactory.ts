@@ -371,8 +371,8 @@ export class RuntimeScreenFactory {
     ] as const;
     modes.forEach(([title, subtitle, icon, kind], index) => {
       const featured = index === 0;
-      const row = home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 166 - index * 92,
-        548, 86, featured ? "practice" : "surface", 18);
+      const row = home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 160 - index * 84,
+        548, 80, featured ? "practice" : "surface", 18);
       home.visualSlot(row, icon, -226, 0, 64, 64);
       home.label(row, `ModeOption${index}Title`, title, -65, 18, 236, 34, 23, "homeText", 0);
       home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -16, 236, 28, 15, "homeTextMuted", 0);
@@ -439,7 +439,7 @@ export class RuntimeScreenFactory {
       const joinCard = home.accentCard(joinPanel, "JoinCodeCard", 0, 20, 560, 600, "join", 24);
       home.visualSlot(joinCard, "joinRoom", 0, 212, 90, 90);
       home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 99, 480, 50, 30, "homeText");
-      joinHint = home.label(joinCard, "JoinCodeHint", "请输入 6 位英文字母或数字", 0, 58, 480, 34, 18, "homeTextMuted");
+      joinHint = home.label(joinCard, "JoinCodeHint", "请输入 6 位英文字母或数字", 0, 50, 480, 34, 18, "homeTextMuted");
       input = home.edit(joinCard, "RoomCodeInput", "", 0, -24, 500, 104, ROOM_CODE_LENGTH);
       home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -111, 480, 54, 18, "homeTextMuted");
       join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -218,
@@ -538,6 +538,7 @@ export class RuntimeScreenFactory {
     const { root, home, safe } = this.page(parent, ui, "History");
     const safeTop = safe.height / 2;
     const safeBottom = -safe.height / 2;
+    const stretch = Math.max(0, Math.min(112, safe.height - 822));
     const listRoot = home.group(safe.node, "HistoryList", 0, 0, safe.width, safe.height);
     const detailRoot = home.group(safe.node, "HistoryDetail", 0, 0, safe.width, safe.height);
     detailRoot.active = false;
@@ -554,7 +555,7 @@ export class RuntimeScreenFactory {
     const modeIndicators: Node[] = [];
     const modeVisuals: RuntimeButtonVisual[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
-      const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 154,
+      const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 158,
         104, 80, action, kind, 16);
       home.selectionStyle(tab.visual, "join");
       modeVisuals.push(tab.visual);
@@ -575,17 +576,20 @@ export class RuntimeScreenFactory {
       safeTop - 244, 272, 110, "history", "coin");
     home.visualSlot(bestCard, "coin", -98, 0, 44, 44);
     const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 24, -22, 190, 44, 23, "homeText", 0);
-    const title = home.label(listRoot, "HistoryTitle", "", -120, safeTop - 326, 320, 40, 25, "homeText", 0);
-    const best = home.label(listRoot, "HistoryBest", "", 190, safeTop - 326, 220, 36, 17, "homeTextMuted");
+    const titleY = safeTop - 338 + stretch * 12 / 112;
+    const title = home.label(listRoot, "HistoryTitle", "", -120, titleY, 320, 40, 25, "homeText", 0);
+    const best = home.label(listRoot, "HistoryBest", "", 190, titleY, 220, 36, 17, "homeTextMuted");
     const emptyState = home.sectionCard(listRoot, "HistoryEmptyState", "暂无记录", 0,
       safeTop - 488, 520, 236, "history", "history");
     home.visualSlot(emptyState, "history", 0, 58, 92, 92);
     const empty = home.label(emptyState, "HistoryEmpty", "", 0, -16, 440, 44, 26, "homeText");
     home.label(emptyState, "HistoryEmptyHint", "完成一局对战后，成绩会保存在这里", 0, -62, 450, 38, 17, "homeTextMuted");
     const items: HistoryRecordItem[] = [];
+    const rowHeight = 86 + stretch * 16 / 112;
+    const rowGap = 94 + stretch * 16 / 112;
     for (let index = 0; index < 4; index += 1) {
       const row = home.accentCard(listRoot, `HistoryRow${index}`, 0,
-        safeTop - 390 - index * 110, 548, 102, "history", 18);
+        safeTop - 405 + stretch * 15 / 112 - index * rowGap, 548, rowHeight, "history", 18);
       home.visualSlot(row, "history", -230, 0, 58, 58);
       const rowTitle = home.label(row, "Title", "", -82, 22, 286, 32, 18, "homeText", 0);
       const meta = home.label(row, "Meta", "", -82, -20, 286, 34, 13, "homeTextMuted", 0);
@@ -600,9 +604,10 @@ export class RuntimeScreenFactory {
       item.detailButton = detail.button;
       items.push(item);
     }
-    const page = home.label(listRoot, "HistoryPage", "", 0, safeBottom + 92, 120, 44, 17, "homeTextMuted");
-    const previous = home.iconButton(listRoot, "HistoryPrevious", "‹", -105, safeBottom + 92, 80, () => controller.previousPage());
-    const next = home.iconButton(listRoot, "HistoryNext", "›", 105, safeBottom + 92, 80, () => controller.nextPage());
+    const pageY = safeBottom + 48 + stretch * 44 / 112;
+    const page = home.label(listRoot, "HistoryPage", "", 0, pageY, 120, 44, 17, "homeTextMuted");
+    const previous = home.iconButton(listRoot, "HistoryPrevious", "‹", -105, pageY, 80, () => controller.previousPage());
+    const next = home.iconButton(listRoot, "HistoryNext", "›", 105, pageY, 80, () => controller.nextPage());
 
     const detailCard = home.accentCard(detailRoot, "HistoryDetailCard", 0, -5, 560, 680, "catalog", 22);
     home.iconButton(detailRoot, "CloseDetail", "←", -242, 300, 80,
@@ -639,7 +644,8 @@ export class RuntimeScreenFactory {
   private buildFeedback(parent: Node, ui: RuntimeUi): Node {
     const { root, home, safe } = this.page(parent, ui, "Feedback");
     const safeTop = safe.height / 2;
-    const formY = safeTop - 360;
+    const stretch = Math.max(0, Math.min(112, safe.height - 822));
+    const formY = safeTop - 370 + stretch * 10 / 112;
     let controller!: FeedbackScene;
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议",
       () => controller.backHome(), "feedback");
@@ -656,7 +662,7 @@ export class RuntimeScreenFactory {
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,
       formY - 310, 560, 94, () => void controller.submit(), "join", "feedback");
     home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0,
-      formY - 414, 560, 82, () => void controller.openPrivacyContract(), "surface", "privacy");
+      formY - 407, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
     controller = root.addComponent(FeedbackScene);
     controller.contentInput = content.editBox;
     controller.contactInput = contact.editBox;
@@ -673,7 +679,7 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "HelpHeader", "玩法说明", "了解练习、对战和合作规则",
       () => controller.backCatalog(), "catalog");
     const cardHeight = Math.min(820, safe.height - 140);
-    const cardY = safeTop - 112 - cardHeight / 2;
+    const cardY = safeTop - 120 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);
     home.visualSlot(helpCard, "catalog", -218, cardHeight / 2 - 76, 72, 72);
     home.label(helpCard, "HelpRulesSummary", "玩法规则 · 学习、对战、合作与战绩说明", 52,
