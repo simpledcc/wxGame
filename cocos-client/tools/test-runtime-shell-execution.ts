@@ -1628,6 +1628,17 @@ async function main(): Promise<void> {
       assertEqual(recentTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
+      const assertHistorySummary = (card: Node, key: "History" | "Coin", summaryName: string): void => {
+        const summary = findDeep(card, summaryName)!;
+        assertEqual(card.children.some((child) => child.name === `Home${key}Slot`), false,
+          "History summary body must not repeat its title-tab icon");
+        assertOk(findDeep(findDeep(card, `${card.name}Tab`)!, `Home${key}Slot`),
+          "History summary title tab must keep its formal icon");
+        assertEqual(summary.position.x, 0);
+        assertEqual(summary.getComponent(UITransform)?.width, 236);
+      };
+      assertHistorySummary(findDeep(canvas, "HistoryRecentCard")!, "History", "HistoryRecentSummary");
+      assertHistorySummary(findDeep(canvas, "HistoryBestCard")!, "Coin", "HistoryBestSummary");
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
       const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;
@@ -1674,9 +1685,12 @@ async function main(): Promise<void> {
       const minimumHistorySafe = findDeep(minimumHistoryRoot, "HistorySafeArea")!;
       const minimumHistoryHeader = findDeep(minimumHistoryRoot, "HistoryHeader")!;
       const minimumRecentCard = findDeep(minimumHistoryRoot, "HistoryRecentCard")!;
+      const minimumBestCard = findDeep(minimumHistoryRoot, "HistoryBestCard")!;
       const minimumHistoryTitle = findDeep(minimumHistoryRoot, "HistoryTitle")!;
       const minimumHistoryRows = Array.from({ length: 4 }, (_, row) => findDeep(minimumHistoryRoot, `HistoryRow${row}`)!);
       const minimumHistoryPrevious = findDeep(minimumHistoryRoot, "HistoryPrevious")!;
+      assertHistorySummary(minimumRecentCard, "History", "HistoryRecentSummary");
+      assertHistorySummary(minimumBestCard, "Coin", "HistoryBestSummary");
       assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
       assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 2);
       assertOk(verticalGap(minimumRecentCard, minimumHistoryTitle) >= 4);

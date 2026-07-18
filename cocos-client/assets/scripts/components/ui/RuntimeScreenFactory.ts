@@ -569,12 +569,10 @@ export class RuntimeScreenFactory {
     });
     const recentCard = home.sectionCard(listRoot, "HistoryRecentCard", "最近记录", -144,
       safeTop - 244, 272, 110, "join", "history");
-    home.visualSlot(recentCard, "history", -98, 0, 44, 44);
-    const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 24, -24, 190, 54, 15, "homeText", 0);
+    const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 0, -24, 236, 54, 15, "homeText", 0);
     const bestCard = home.sectionCard(listRoot, "HistoryBestCard", "最佳成绩", 144,
       safeTop - 244, 272, 110, "history", "coin");
-    home.visualSlot(bestCard, "coin", -98, 0, 44, 44);
-    const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 24, -22, 190, 44, 23, "homeText", 0);
+    const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 0, -22, 236, 44, 23, "homeText", 0);
     const titleY = safeTop - 338 + stretch * 12 / 112;
     const title = home.label(listRoot, "HistoryTitle", "", -120, titleY, 320, 40, 25, "homeText", 0);
     const best = home.label(listRoot, "HistoryBest", "", 190, titleY, 220, 36, 17, "homeTextMuted");
