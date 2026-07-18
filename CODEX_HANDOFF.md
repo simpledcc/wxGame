@@ -4,6 +4,8 @@
 >
 > H4 baseline/high-fidelity integration and H8.4-H8.6 are complete. The user temporarily deferred Phase 9 and reopened pre-game art direction as H8.7 visual polish. Keep `miniprogram/` as the stable uploadable client during migration. Other absolute paths below are historical machine records.
 
+- 2026-07-18 H8.7 eightieth source visual checkpoint: all eight catalog actions now render at 64px inside their 80px rows, leaving exact 8px vertical frame clearance, at least 8px on the badge/right boundaries and preserving the original 80px touch nodes for the 360x800 target-device gate. Labels, disabled states, handlers and availability are unchanged. Full verification and WeChat dry-run pass at `1,519,992 / 1,520,000`; formal art remains imported. Creator/WeChat visual review remains pending; not `dev_done`.
+
 ## Project
 
 WeChat Mini Game project: current Git worktree root (`D:\demo\wexin` during the latest 2026-07-14 documentation sync; never hard-code this path on another computer).

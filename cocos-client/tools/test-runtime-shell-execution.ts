@@ -1606,6 +1606,9 @@ async function main(): Promise<void> {
           const action = findDeep(row, `ModeOption${rowIndex}Action`)!;
           const actionLabel = findDeep(action, `ModeOption${rowIndex}ActionLabel`)!;
           const halfHeight = row.getComponent(UITransform)!.height / 2;
+          const halfWidth = row.getComponent(UITransform)!.width / 2;
+          const actionTransform = action.getComponent(UITransform)!;
+          const actionGeometry = action.getComponent(RuntimeButtonVisual)!.getVisualGeometry();
           assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 7,
             `${context} mode ${rowIndex + 1} title needs a top inset`);
           assertOk(verticalGap(title, subtitle) >= 8,
@@ -1616,9 +1619,15 @@ async function main(): Promise<void> {
             <= badge.position.x - badge.getComponent(UITransform)!.width / 2,
           `${context} mode ${rowIndex + 1} copy must reserve its badge column`);
           assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
-            <= action.position.x - action.getComponent(UITransform)!.width / 2,
+            <= action.position.x - actionTransform.width / 2,
           `${context} mode ${rowIndex + 1} badge/action columns must remain separate`);
-          assertOk((action.getComponent(UITransform)!.height - actionLabel.getComponent(UITransform)!.height) / 2 >= 8,
+          assertEqual(halfHeight - actionGeometry.height / 2, 8,
+            `${context} mode ${rowIndex + 1} action must clear the card frame vertically`);
+          assertOk(halfWidth - action.position.x - actionTransform.width / 2 >= 8,
+            `${context} mode ${rowIndex + 1} action must clear the card frame horizontally`);
+          assertEqual(actionTransform.height, 80,
+            `${context} mode ${rowIndex + 1} action must retain its target-device touch height`);
+          assertOk((actionGeometry.height - actionLabel.getComponent(UITransform)!.height) / 2 >= 8,
             `${context} mode ${rowIndex + 1} action copy needs vertical breathing room`);
         }
       };

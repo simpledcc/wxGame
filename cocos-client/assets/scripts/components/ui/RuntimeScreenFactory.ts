@@ -376,11 +376,12 @@ export class RuntimeScreenFactory {
       home.label(row, `ModeOption${index}Title`, title, -65, 19, 236, 28, 23, "homeText", 0);
       home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -17, 236, 28, 15, "homeTextMuted", 0);
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -17, 70, "surface");
-      const action = home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
-        204, 0, 126, 80, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
+      const a = home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
+        202, 0, 126, 64, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
+      a.node.getComponent(UITransform)!.height = 80;
       if (index > 0) {
-        action.button.interactable = false;
-        action.visual.refresh();
+        a.button.interactable = false;
+        a.visual.refresh();
       }
     });
     controller = root.addComponent(CoopSelectScene);
