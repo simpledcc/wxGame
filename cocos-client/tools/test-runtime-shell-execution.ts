@@ -415,6 +415,7 @@ async function main(): Promise<void> {
       - lower.position.y - lower.getComponent(UITransform)!.height / 2;
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
+  const createRoomButton = findDeep(canvas, "CreateRoomButton")!;
   const bankChangeBadge = findDeep(canvas, "CurrentBankChangeBadge");
   const currentBankCaption = findDeep(canvas, "CurrentBankCaption")!;
   const currentBankTitle = findDeep(canvas, "CurrentBankBarTitle")!;
@@ -435,7 +436,9 @@ async function main(): Promise<void> {
   "Home Bank name must not enter the change badge");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
-  assertOk(subtitleBankGap >= 2, "Home subtitle and bank bar must not overlap");
+  assertOk(subtitleBankGap >= 4, "Home subtitle and bank bar need a visible gap");
+  assertOk(verticalGap(currentBankBar, createRoomButton) >= 8,
+    "Home Bank strip and primary action must remain visually separate");
   assertEqual(
     findDeep(canvas, "HistoryButtonSubtitle")?.getComponent(Label)?.string,
     "暂无战绩，完成比赛后查看"

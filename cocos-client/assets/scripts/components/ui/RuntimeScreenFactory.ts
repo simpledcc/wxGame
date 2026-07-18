@@ -85,7 +85,7 @@ export class RuntimeScreenFactory {
       "homeCreate", "homeTextOnColor");
     home.label(subtitleRibbon, "HomeSubtitle", "和好友一起比拼单词实力", 0, 0, 338, 34, 20, "homeTextOnColor");
     const bank = home.actionButton(
-      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(131, 168), 520, fit(80, 92),
+      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(131, 170), 520, fit(80, 92),
       () => controller.openBankPicker(), "surface", "wordBank"
     );
     bank.titleLabel.node.setPosition(-10, -14, 0);
