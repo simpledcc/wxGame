@@ -120,9 +120,17 @@ function assertVisibleUiContract(root: Node, context: string): void {
         const iconRight = tabIcon.position.x + iconTransform.width / 2;
         const titleLeft = tabTitle.position.x - titleTransform.width / 2;
         const titleRight = tabTitle.position.x + titleTransform.width / 2;
+        const iconBottom = tabIcon.position.y - iconTransform.height / 2;
+        const iconTop = tabIcon.position.y + iconTransform.height / 2;
+        const titleBottom = tabTitle.position.y - titleTransform.height / 2;
+        const titleTop = tabTitle.position.y + titleTransform.height / 2;
         if (iconLeft < -transform.width / 2 + 8) violations.push(`${nodePath} icon misses its left inset`);
         if (titleLeft - iconRight < 8) violations.push(`${nodePath} icon crowds its title`);
         if (titleRight > transform.width / 2 - 8) violations.push(`${nodePath} title misses its right inset`);
+        if (iconBottom < -transform.height / 2 + 4) violations.push(`${nodePath} icon misses its bottom inset`);
+        if (iconTop > transform.height / 2 - 4) violations.push(`${nodePath} icon misses its top inset`);
+        if (titleBottom < -transform.height / 2 + 4) violations.push(`${nodePath} title misses its bottom inset`);
+        if (titleTop > transform.height / 2 - 4) violations.push(`${nodePath} title misses its top inset`);
       }
     }
     node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
@@ -1372,7 +1380,7 @@ async function main(): Promise<void> {
       const bankStatusCopy = findDeep(canvas, "BankStatus")!;
       assertEqual(bankStatusTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 14);
-      assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 18);
+      assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 16);
       assertEqual(bankStatusCoin.getComponent(UITransform)?.height, 32);
       assertOk(verticalGap(bankHeader, bankStatusCard) >= 4);
       assertOk(verticalGap(bankStatusCard, findDeep(canvas, "BankSlot0")!) >= 4);

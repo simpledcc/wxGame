@@ -79,9 +79,17 @@ function assertSectionTabSpacing(card: Node, name: string, visualKey: string): v
   const iconRight = icon.position.x + iconBounds.width / 2;
   const titleLeft = title.position.x - titleBounds.width / 2;
   const titleRight = title.position.x + titleBounds.width / 2;
+  const iconBottom = icon.position.y - iconBounds.height / 2;
+  const iconTop = icon.position.y + iconBounds.height / 2;
+  const titleBottom = title.position.y - titleBounds.height / 2;
+  const titleTop = title.position.y + titleBounds.height / 2;
   assertOk(iconLeft >= -tabBounds.width / 2 + 8, `${name} icon must keep its left inset`);
   assertOk(titleLeft - iconRight >= 8, `${name} icon must not crowd its title`);
   assertOk(titleRight <= tabBounds.width / 2 - 8, `${name} title must keep its right inset`);
+  assertOk(iconBottom >= -tabBounds.height / 2 + 4, `${name} icon must keep its bottom inset`);
+  assertOk(iconTop <= tabBounds.height / 2 - 4, `${name} icon must keep its top inset`);
+  assertOk(titleBottom >= -tabBounds.height / 2 + 4, `${name} title must keep its bottom inset`);
+  assertOk(titleTop <= tabBounds.height / 2 - 4, `${name} title must keep its top inset`);
 }
 
 function main(): void {
