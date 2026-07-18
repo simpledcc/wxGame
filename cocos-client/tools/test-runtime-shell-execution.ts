@@ -801,6 +801,29 @@ async function main(): Promise<void> {
       <= bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2,
     `${context} Bank name must not enter the change action`);
   };
+  const assertLobbyPlayerCardSpacing = (lobby: Node, context: string): void => {
+    ["RoomPlayerOne", "RoomPlayerTwo"].forEach((name) => {
+      const card = findDeep(lobby, `${name}Card`)!;
+      const tab = findDeep(card, `${name}CardTab`)!;
+      const avatar = card.children.find((child) => child.name === "HomeAvatarSlot")!;
+      const ready = findDeep(card, `${name}Ready`)!;
+      const waiting = findDeep(card, `${name}Waiting`)!;
+      const label = findDeep(card, name)!;
+      assertEqual(findDeep(tab, "HomeAvatarSlot"), null, `${context} title tab must not duplicate the avatar`);
+      assertEqual(avatar.getComponent(UITransform)?.height, 72);
+      assertOk(verticalGap(tab, avatar) >= 4, `${context} title tab/avatar gap must remain visible`);
+      [ready, waiting].forEach((badge) => {
+        assertOk(verticalGap(tab, badge) >= 4, `${context} title tab/badge gap must remain visible`);
+        assertOk(verticalGap(badge, label) >= 4, `${context} badge/name gap must remain visible`);
+        assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 4
+          <= badge.position.x - badge.getComponent(UITransform)!.width / 2,
+        `${context} avatar must not enter the status column`);
+      });
+      assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 4
+        <= label.position.x - label.getComponent(UITransform)!.width / 2,
+      `${context} avatar must not enter the player-name column`);
+    });
+  };
   assertCreateCardSpacing(findDeep(canvas, "RoomCreatePanel")!, "long create configuration");
   const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
   const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
@@ -878,6 +901,7 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomPlayerTwoWaiting")?.active, true);
   assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
   const minimumLobby = findDeep(minimumRoomRoot, "RoomLobbyPanel")!;
+  assertLobbyPlayerCardSpacing(minimumLobby, "minimum room lobby");
   const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
     .map((name) => findDeep(minimumLobby, name)!);
   for (let gap = 0; gap < lobbyChain.length - 1; gap += 1) {
@@ -1283,6 +1307,7 @@ async function main(): Promise<void> {
       assertEqual(app.store.getState().route, "room");
     }
     if (routes[index] === "room") {
+      assertLobbyPlayerCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
         findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,

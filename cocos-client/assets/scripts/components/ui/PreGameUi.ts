@@ -414,14 +414,14 @@ export class PreGameUi {
 
   playerStatusCard(parent: Node, name: string, title: string, x: number,
     kind: PreGameActionKind): { label: Label; ready: Node; waiting: Node } {
-    const card = this.sectionCard(parent, `${name}Card`, title, x, 2, 264, 220, kind, "avatar");
-    this.visualSlot(card, "avatar", 0, 34, 82, 82);
-    const ready = this.statusBadge(card, `${name}Ready`, "已准备", 82, 48, 94, "practice");
+    const card = this.sectionCard(parent, `${name}Card`, title, x, 2, 264, 220, kind);
+    this.visualSlot(card, "avatar", -72, -5, 72, 72);
+    const ready = this.statusBadge(card, `${name}Ready`, "已准备", 58, 10, 94, "practice");
     ready.active = false;
     return {
-      label: this.label(card, name, "", 0, -60, 226, 76, 20, "homeText"),
+      label: this.label(card, name, "", 58, -52, 130, 58, 20, "homeText"),
       ready,
-      waiting: this.statusBadge(card, `${name}Waiting`, "等待中", 82, 48, 94, "surface")
+      waiting: this.statusBadge(card, `${name}Waiting`, "等待中", 58, 10, 94, "surface")
     };
   }
 
