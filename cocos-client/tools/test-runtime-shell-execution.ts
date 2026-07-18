@@ -1363,6 +1363,22 @@ async function main(): Promise<void> {
       assertOk(bankStatusCoin.position.x + bankStatusCoin.getComponent(UITransform)!.width / 2 + 4
         <= bankStatusCopy.position.x - bankStatusCopy.getComponent(UITransform)!.width / 2,
       "Bank status icon must not enter its copy column");
+      const assertBankSlotText = (root: Node, context: string): void => {
+        for (let slotIndex = 0; slotIndex < 4; slotIndex += 1) {
+          const slot = findDeep(root, `BankSlot${slotIndex}`)!;
+          const title = findDeep(slot, `BankSlot${slotIndex}Title`)!;
+          const subtitle = findDeep(slot, `BankSlot${slotIndex}Subtitle`)!;
+          const halfHeight = slot.getComponent(UITransform)!.height / 2;
+          assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 4,
+            `${context} Bank title needs a top inset`);
+          assertOk(verticalGap(title, subtitle) >= 8, `${context} Bank title/subtitle gap must remain visible`);
+          assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
+            `${context} Bank subtitle needs a bottom inset`);
+          assertOk(subtitle.getComponent(Label)?.string.includes("个单词"),
+            `${context} Bank subtitle must expose the real word count`);
+        }
+      };
+      assertBankSlotText(routeRoot, "long");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
       assertOk(!findDeep(canvas, "BankSlot0Title")?.getComponent(Label)?.string.startsWith("✓"),
         "selected Bank title must leave state feedback to the ring and badge");
@@ -1415,6 +1431,7 @@ async function main(): Promise<void> {
         >= -minimumBankSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumBankRoot, "minimum Bank route");
       assertPreGameTargetDevices(minimumBankRoot);
+      assertBankSlotText(minimumBankRoot, "minimum");
       setMockWindowSize(393, 852);
     }
     if (routes[index] === "coopSelect") {

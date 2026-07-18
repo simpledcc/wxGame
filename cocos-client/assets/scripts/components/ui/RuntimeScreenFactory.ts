@@ -225,7 +225,7 @@ export class RuntimeScreenFactory {
     const firstSlotY = safeTop - 252;
     const slotGap = 104;
     for (let index = 0; index < pageSize; index += 1) {
-      const slot = home.actionButton(safe.node, `BankSlot${index}`, "", "", "词", 0,
+      const slot = home.actionButton(safe.node, `BankSlot${index}`, "", "词库信息", "词", 0,
         firstSlotY - index * slotGap, 540, 96, () => {
           const bankId = slotIds[index];
           if (!bankId) return;
@@ -233,9 +233,9 @@ export class RuntimeScreenFactory {
           renderPage();
         }, "surface", "wordBank");
       home.selectionStyle(slot.visual, "practice");
-      slot.titleLabel.node.setPosition(-32, 18, 0);
+      slot.titleLabel.node.setPosition(-32, 21, 0);
       slot.titleLabel.node.getComponent(UITransform)?.setContentSize(300, 42);
-      slot.subtitleLabel?.node.setPosition(-32, -22, 0);
+      slot.subtitleLabel?.node.setPosition(-32, -24, 0);
       slot.subtitleLabel?.node.getComponent(UITransform)?.setContentSize(300, 32);
       const badge = home.pill(slot.node, `BankSlot${index}Badge`, 198, 0, 112, 54,
         "homeCard", "homeCardBorder");
