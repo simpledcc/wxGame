@@ -1,6 +1,6 @@
 # Cocos Migration Completion Matrix
 
-Date: 2026-07-14
+Date: 2026-07-18
 
 Purpose: track the design document requirement-by-requirement and distinguish implemented source code from evidence that requires Cocos Creator, WeChat Developer Tools, cloud access, or real devices.
 
@@ -57,7 +57,7 @@ Status meanings:
 | Reused gameplay effect nodes | Fixed three-label `GameplayFeedbackPool` runtime test | Passed in source; frame-time proof pending |
 | Runtime performance evidence collection | Bounded `PerformanceService`, 60-frame shell execution, node sampling and DEV clipboard report test | Passed for instrumentation; target-device reports pending |
 | WeChat package boundaries | Dry-run and real inspector require five Bundle configs, place `home_common`/`mode_pk`/`mode_spell` in declared subpackages, and enforce forbidden-path, 4 MiB main and 30 MiB aggregate limits | Passed for current real package |
-| Main/subpackage/Bundle byte record | `build/wechatgame-report.json` records the H4.1 package at `6,849,298` total bytes, `4,121,077` main bytes and `355,148` bytes in the declared `home_common` subpackage | Passed for current real package |
+| Main/subpackage/Bundle byte record | The latest retained H8.6 inspection records 147 files / `9,973,107` total bytes, `4,121,077` main bytes and `3,472,932` bytes in the declared `home_common` subpackage; the ignored local report is not committed | Passed for latest retained real package |
 
 ## Phase 9 External Evidence
 

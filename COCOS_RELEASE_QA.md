@@ -1,17 +1,17 @@
 # Cocos Release QA Record
 
-Date: 2026-07-14
+Date: 2026-07-18
 
-Status: Phase 8 source development, H8.1 pre-game cleanup and H4 formal Home art integration are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and iPhone 12/13, 360x800 and 430x932 WeChat simulator traversal pass. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
+Status: Phase 8 source development, H4 high-fidelity Home art integration and H8.4-H8.6 preparation UI are complete. Cocos Creator 3.8.8 import/build, generated-package inspection and the retained iPhone 12/13, 360x800 and 430x932 preparation-screen traversal pass. H8.7 source visual polish is newer than the retained real build and still needs Creator/WeChat visual comparison. Phase 9 remains incomplete because full gameplay visual inspection, two-device testing, target-phone performance, final review screenshots and development upload are still pending.
 
 ## Latest Real Build Evidence
 
-- Source baseline for the latest real build: H4.1 import/build commit containing this updated record
-- `npm run verify`: `PASSED` in `48.1s` after importing formal Home art
+- Source baseline for the latest retained real build: 2026-07-17 H8.6 final reference-aligned preparation UI
+- `npm run verify`: `PASSED`
 - `npm run build:wechat`: `PASSED` with Cocos Creator `3.8.8`
-- Generated H4.1 package: `6,849,298` bytes total
+- Generated H8.6 package: 147 files / `9,973,107` bytes total
 - Main package: `4,121,077 / 4,194,304` bytes; `73,227` bytes remain
-- Subpackages: `2,728,221` bytes total; `home_common` is a declared `355,148`-byte subpackage
+- Subpackages: `5,852,030` bytes total; `home_common` is a declared `3,472,932`-byte subpackage
 - `npm run inspect:wechat-build`: `PASSED`; report retained at ignored local path `cocos-client/build/wechatgame-report.json`
 - WeChat Developer Tools CLI `auto`: `PASSED` with AppID `wx063a1823d29bed9e`
 - H4.1 iPhone 12/13 simulator traversal covered Home, mode catalog, create configuration, Bank, Study and History with formal art visible and application errors `0`
@@ -87,7 +87,7 @@ These are historical source measurements. The current final generated-package me
 | Two-device room QA | Pending | Create/join/ready/start on two real phones for the current preparation flow; later gameplay milestones must separately verify each enabled multiplayer mode |
 | Background recovery | Code implemented; device verification pending | Test hide/show invitation entry, reconnect, polling resume, stale requests, and timeout settlement |
 | Performance | Instrumentation ready; device evidence pending | Run all scenarios in `COCOS_RUNTIME_PERFORMANCE.md` and retain each DEV JSON report with device/runtime metadata |
-| WeChat package size | H4.1 passed | Main package is 4,121,077 bytes and `home_common` is a 355,148-byte declared subpackage |
+| WeChat package size | H8.6 passed | Main package is 4,121,077 bytes and `home_common` is a 3,472,932-byte declared subpackage |
 | Review screenshots | Partial | H4 preparation traversal passed on iPhone 12/13, 360x800 and 430x932; add final gameplay/privacy screenshots before upload |
 | Development upload | Pending | Upload a development version with WeChat Developer Tools and record version/package bytes |
 
