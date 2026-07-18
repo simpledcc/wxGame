@@ -643,8 +643,7 @@ export class RuntimeScreenFactory {
   private buildFeedback(parent: Node, ui: RuntimeUi): Node {
     const { root, home, safe } = this.page(parent, ui, "Feedback");
     const safeTop = safe.height / 2;
-    const stretch = Math.max(0, Math.min(112, safe.height - 822));
-    const formY = safeTop - 370 + stretch * 10 / 112;
+    const formY = safeTop - 374;
     let controller!: FeedbackScene;
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议",
       () => controller.backHome(), "feedback");
@@ -659,9 +658,9 @@ export class RuntimeScreenFactory {
     home.pill(formCard, "FeedbackStatusBand", 0, -225, 500, 34, "homeCard", "homeCardBorder");
     const status = home.label(formCard, "FeedbackStatus", "", 0, -225, 500, 26, 18, "homeTextMuted");
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,
-      formY - 309, 560, 94, () => void controller.submit(), "join", "feedback");
+      formY - 305, 560, 94, () => void controller.submit(), "join", "feedback");
     home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0,
-      formY - 404, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
+      formY - 400, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
     controller = root.addComponent(FeedbackScene);
     controller.contentInput = content.editBox;
     controller.contactInput = contact.editBox;
@@ -678,7 +677,7 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "HelpHeader", "玩法说明", "了解练习、对战和合作规则",
       () => controller.backCatalog(), "catalog");
     const cardHeight = Math.min(820, safe.height - 140);
-    const cardY = safeTop - 120 - cardHeight / 2;
+    const cardY = safeTop - 124 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);
     home.visualSlot(helpCard, "catalog", -218, cardHeight / 2 - 76, 72, 72);
     home.label(helpCard, "HelpRulesSummary", "学习、对战、合作与战绩规则", 52,

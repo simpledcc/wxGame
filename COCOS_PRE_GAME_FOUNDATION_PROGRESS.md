@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and four source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass gives History filters 56px visuals on 80px touch nodes and raises the complete long/minimum list chain to an eight-pixel visible rhythm; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and five source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass raises Feedback and Help's remaining four-pixel Header boundaries to eight pixels while preserving their form, actions, rule card and safe-bottom geometry; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1419,6 +1419,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Shifted the summary cards by three pixels and rebalanced the list title and four record axes. The complete Header/filter/summary/title/four-row/pager/safe-bottom chain now keeps at least eight visible pixels in long and minimum layouts instead of retaining an overlap plus three four-pixel boundaries.
 - Added the same 80px minimum touch-height rule to shared plain buttons and removed the catalog action's page-specific node override. Runtime coverage freezes filter visual/touch geometry, the complete History chain, real records, filters, details and paging. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source reduced to `1,519,983 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No History data, filter/paging behavior, bitmap, importer metadata, protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-fifth source checkpoint
+
+- Removed Feedback's unnecessary ten-pixel tall-screen lift and shifted its unchanged 500px form card down four pixels at minimum height. Rebalanced only the submit/privacy offsets so the long/minimum Header/form/submit/privacy/safe-bottom chain now keeps at least eight pixels throughout instead of starting with a four-pixel Header boundary.
+- Shifted the unchanged Help rule card down four pixels. Header/card clearance rises from four to eight pixels in long and minimum layouts, while the minimum screen still retains sixteen pixels below the card and all six rule rows keep their existing internal rhythm.
+- Runtime coverage now freezes both pages' outer chains at long and minimum heights in addition to Feedback input/status lifecycles and Help rule content. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source reduced to `1,519,895 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No Feedback data/protocol, native input behavior, Help content, route behavior, bitmap, importer metadata, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1462,7 +1468,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and four source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and five source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

@@ -2086,6 +2086,19 @@ async function main(): Promise<void> {
       assertEqual(app.store.getState().route, "home");
     }
     if (routes[index] === "feedback") {
+      const assertFeedbackPageSpacing = (root: Node, context: string): void => {
+        const safe = findDeep(root, "FeedbackSafeArea")!;
+        const chain = ["FeedbackHeader", "FeedbackFormCard", "SubmitFeedback", "OpenPrivacy"]
+          .map((name) => findDeep(root, name)!);
+        for (let gap = 0; gap < chain.length - 1; gap += 1) {
+          assertOk(verticalGap(chain[gap], chain[gap + 1]) >= 8,
+            `${context} gap ${gap} must retain the eight-pixel rhythm`);
+        }
+        assertOk(chain[3].position.y - chain[3].getComponent(UITransform)!.height / 2
+          >= -safe.getComponent(UITransform)!.height / 2 + 8,
+        `${context} privacy action must retain its safe-area clearance`);
+      };
+      assertFeedbackPageSpacing(routeRoot, "long Feedback page");
       setMockWindowSize(640, 960);
       app.store.setRoute("home");
       await flushMany();
@@ -2112,11 +2125,7 @@ async function main(): Promise<void> {
       const feedbackIcon = findDeep(formCard, "HomeFeedbackSlot")!;
       const feedbackPrompt = findDeep(formCard, "FeedbackPrompt")!;
       const feedbackNotice = findDeep(formCard, "FeedbackPrivacy")!;
-      const feedbackHeader = findDeep(canvas, "FeedbackHeader")!;
-      const feedbackSubmit = findDeep(canvas, "SubmitFeedback")!;
-      const feedbackPrivacy = findDeep(canvas, "OpenPrivacy")!;
-      const feedbackSafe = findDeep(canvas, "FeedbackSafeArea")!;
-      assertOk(verticalGap(feedbackHeader, formCard) >= 4);
+      assertFeedbackPageSpacing(findDeep(canvas, "FeedbackRuntimeScreen")!, "minimum Feedback page");
       assertEqual(feedbackIcon.position.y - feedbackIcon.getComponent(UITransform)!.height / 2,
         feedbackPrompt.position.y - feedbackPrompt.getComponent(UITransform)!.height / 2,
       "feedback icon and prompt must share one bottom baseline");
@@ -2124,10 +2133,6 @@ async function main(): Promise<void> {
         "feedback icon must clear the privacy notice");
       assertOk(verticalGap(feedbackPrompt, feedbackNotice) >= 8,
         "feedback prompt must clear the privacy notice");
-      assertOk(verticalGap(formCard, feedbackSubmit) >= 12);
-      assertOk(verticalGap(feedbackSubmit, feedbackPrivacy) >= 8);
-      assertOk(feedbackPrivacy.position.y - feedbackPrivacy.getComponent(UITransform)!.height / 2
-        >= -feedbackSafe.getComponent(UITransform)!.height / 2 + 8);
       assertVisibleUiContract(findDeep(canvas, "FeedbackRuntimeScreen")!, "minimum Feedback route");
       assertPreGameTargetDevices(findDeep(canvas, "FeedbackRuntimeScreen")!);
       const screenY = (node: Node): number => node.parent === formCard
@@ -2207,6 +2212,16 @@ async function main(): Promise<void> {
       setMockWindowSize(393, 852);
     }
     if (routes[index] === "help") {
+      const assertHelpPageSpacing = (root: Node, context: string): void => {
+        const safe = findDeep(root, "HelpSafeArea")!;
+        const header = findDeep(root, "HelpHeader")!;
+        const card = findDeep(root, "HelpCard")!;
+        assertOk(verticalGap(header, card) >= 8,
+          `${context} header/card gap must retain the eight-pixel rhythm`);
+        assertOk(card.position.y - card.getComponent(UITransform)!.height / 2
+          >= -safe.getComponent(UITransform)!.height / 2 + 8,
+        `${context} rule card must retain its safe-area clearance`);
+      };
       const assertHelpRuleSpacing = (root: Node, context: string): void => {
         const card = findDeep(root, "HelpCard")!;
         HELP_RULES.forEach(([title, detail], ruleIndex) => {
@@ -2227,6 +2242,7 @@ async function main(): Promise<void> {
           }
         });
       };
+      assertHelpPageSpacing(routeRoot, "long Help page");
       assertHelpRuleSpacing(routeRoot, "long Help");
       setMockWindowSize(640, 960);
       app.store.setRoute("home");
@@ -2234,16 +2250,11 @@ async function main(): Promise<void> {
       app.store.setRoute("help");
       await flushMany();
       const minimumHelpRoot = findDeep(canvas, "HelpRuntimeScreen")!;
-      const minimumHelpSafe = findDeep(minimumHelpRoot, "HelpSafeArea")!;
-      const minimumHelpHeader = findDeep(minimumHelpRoot, "HelpHeader")!;
-      const minimumHelpCard = findDeep(minimumHelpRoot, "HelpCard")!;
-      assertOk(verticalGap(minimumHelpHeader, minimumHelpCard) >= 4);
+      assertHelpPageSpacing(minimumHelpRoot, "minimum Help page");
       assertEqual(HELP_RULES.length, 6);
       assertEqual(HELP_RULES[0][0], "背单词");
       assertEqual(HELP_RULES[5][0], "战绩记录");
       assertHelpRuleSpacing(minimumHelpRoot, "minimum Help");
-      assertOk(minimumHelpCard.position.y - minimumHelpCard.getComponent(UITransform)!.height / 2
-        >= -minimumHelpSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumHelpRoot, "minimum Help route");
       assertPreGameTargetDevices(minimumHelpRoot);
       setMockWindowSize(393, 852);
