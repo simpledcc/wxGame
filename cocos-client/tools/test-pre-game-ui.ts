@@ -322,6 +322,11 @@ function main(): void {
     topBar, "TransparentSettings", "设", -250, 0, 64, () => undefined, "settings", "transparent"
   );
   assertEqual(transparentIcon.background.enabled, false);
+  const transparentHighlight = transparentIcon.node.getChildByName("TransparentSettingsHighlight")!;
+  assertEqual(transparentHighlight.active, false, "transparent control must not show a floating highlight");
+  transparentIcon.node.emit(Node.EventType.TOUCH_START);
+  transparentIcon.node.emit(Node.EventType.TOUCH_END);
+  assertEqual(transparentHighlight.active, false, "transparent control must stay highlight-free after release");
   const utilityPill = preGame.pill(topBar, "FoundationUtilityPill", 0, 0, 180, 56);
   assertOk(utilityPill.getComponent(Graphics));
   assertEqual(transform(utilityPill).width, 180);

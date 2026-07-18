@@ -131,7 +131,7 @@ export class RuntimeButtonVisual extends Component {
       this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);
     }
     const highlight=this.node.getChildByName(`${this.node.name}Highlight`);
-    if(highlight)highlight.active=interactable&&!this.pressed&&!this.skin;
+    if(highlight)highlight.active=interactable&&!this.pressed&&!this.skin&&bg.enabled;
     if (this.ring) this.ring.active = this.selected && interactable;
     this.refreshContent(interactable);
   }

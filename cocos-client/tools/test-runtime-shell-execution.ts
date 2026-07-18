@@ -532,6 +532,10 @@ async function main(): Promise<void> {
     false,
     "Home settings must not keep a white card background"
   );
+  ["HomeAvatarButton", "SettingsButton"].forEach((name) => {
+    assertEqual(findDeep(canvas, `${name}Highlight`)?.active, false,
+      `${name} must not show a floating highlight without its background`);
+  });
   assertEqual(
     findDeep(canvas, "HomeCoinButton")?.getComponent(Graphics)?.enabled,
     false,
@@ -1518,6 +1522,9 @@ async function main(): Promise<void> {
       const catalogSubtitle = findDeep(canvas, "CoopSelectHeaderSubtitle")?.getComponent(UITransform);
       assertOk(helpButton);
       assertOk(helpButton.getComponent(Button) && helpTransform && catalogTitle && catalogSubtitle);
+      assertEqual(helpButton.getComponent(Graphics)?.enabled, false);
+      assertEqual(findDeep(helpButton, "ModeHelpButtonHighlight")?.active, false,
+        "transparent rules action must not show a floating highlight");
       assertOk(catalogTitle.width / 2 + 62 <= helpButton.position.x - helpTransform.width / 2,
         "catalog title must leave room for the rules action");
       assertOk(catalogSubtitle.width / 2 + 14 <= helpButton.position.x - helpTransform.width / 2,
