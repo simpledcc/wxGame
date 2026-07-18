@@ -2015,6 +2015,8 @@ async function main(): Promise<void> {
           const row = findDeep(root, `HistoryRow${rowIndex}`)!;
           const title = findDeep(row, "Title")!;
           const meta = findDeep(row, "Meta")!;
+          const icon = findDeep(row, "HomeHistorySlot")!;
+          const score = findDeep(row, "Score")!;
           const halfHeight = row.getComponent(UITransform)!.height / 2;
           const topInset = halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2;
           const bottomInset = meta.position.y - meta.getComponent(UITransform)!.height / 2 + halfHeight;
@@ -2027,6 +2029,14 @@ async function main(): Promise<void> {
           assertEqual(topInset, bottomInset,
             `${context} row ${rowIndex + 1} copy must remain vertically centered`);
           assertOk(topInset >= 12, `${context} row ${rowIndex + 1} copy must clear the card frame`);
+          [title, meta].forEach((copy) => {
+            assertEqual(copy.position.x - copy.getComponent(UITransform)!.width / 2
+              - icon.position.x - icon.getComponent(UITransform)!.width / 2, 8,
+            `${context} row ${rowIndex + 1} icon/copy columns must remain separate`);
+            assertEqual(score.position.x - score.getComponent(UITransform)!.width / 2
+              - copy.position.x - copy.getComponent(UITransform)!.width / 2, 8,
+            `${context} row ${rowIndex + 1} copy/score columns must remain separate`);
+          });
         }
       };
       const recentCard = findDeep(canvas, "HistoryRecentCard")!;

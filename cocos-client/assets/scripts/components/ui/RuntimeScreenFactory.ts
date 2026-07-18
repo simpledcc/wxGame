@@ -590,8 +590,8 @@ export class RuntimeScreenFactory {
       const row = home.accentCard(listRoot, `HistoryRow${index}`, 0,
         safeTop - 401 - stretch * 8 / 112 - index * rowGap, 548, rowHeight, "history", 18);
       home.visualSlot(row, "history", -230, 0, 58, 58);
-      const t = home.label(row, "Title", "", -82, 17, 286, 28, 18, "homeText", 0);
-      const m = home.label(row, "Meta", "", -82, -18, 286, 26, 13, "homeTextMuted", 0);
+      const t = home.label(row, "Title", "", -64, 17, 258, 28, 18, "homeText", 0);
+      const m = home.label(row, "Meta", "", -64, -18, 258, 26, 13, "homeTextMuted", 0);
       const s = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
       const d = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 64,
         () => r.open(), "surface", "history");
