@@ -101,6 +101,12 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (buttonGraphics?.enabled && buttonGraphics.strokeCount < 1) {
       violations.push(`${nodePath} has no visible fallback border`);
     }
+    const squareIcon = node.children.find((child) => child.name === `${node.name}IconSlot`);
+    const squareVisual = node.getComponent(RuntimeButtonVisual);
+    if (transform && squareIcon?.active && squareVisual && transform.width === transform.height
+      && squareVisual.getVisualGeometry().radius !== transform.width / 2) {
+      violations.push(`${nodePath} square icon control is not circular`);
+    }
     const actionIcon = node.children.find((child) => child.name === `${node.name}IconSlot`);
     const actionTitle = node.children.find((child) => child.name === `${node.name}Title`);
     if (transform && actionIcon?.active && actionTitle?.active) {

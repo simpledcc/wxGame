@@ -668,7 +668,7 @@ export class PreGameUi {
     handler: () => void, visualKey?: HomeVisualSlotKey, backgroundStyle: PreGameIconBackground = "card",
     iconSizeOverride = 0): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, size, size);
-    const radius = Math.min(18, size / 2);
+    const radius=size/2;
     const fillToken: ThemeColorToken = backgroundStyle === "join" ? "homeJoin" : "homeCard";
     const textToken: ThemeColorToken = backgroundStyle === "join" ? "homeTextOnColor" : "homeText";
     const baseColor = this.color(fillToken);

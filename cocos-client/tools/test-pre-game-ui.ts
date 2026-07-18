@@ -300,6 +300,7 @@ function main(): void {
   const icon = preGame.iconButton(topBar, "SettingsIcon", "设", 250, 0, 64, () => { iconCount += 1; });
   assertVisualMatchesHitArea(icon.node, icon.visual);
   assertEqual(transform(icon.iconSlot).width, 36);
+  assertEqual(icon.visual.getVisualGeometry().radius, 32);
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
   const transparentIcon = preGame.iconButton(
@@ -330,6 +331,7 @@ function main(): void {
   assertEqual(pageHeader.titleLabel.string, "选择词库");
   assertEqual(pageHeader.subtitleLabel.string, "为练习和比赛选择学习内容");
   assertEqual(transform(pageHeader.backButton.node).height, 86);
+  assertEqual(pageHeader.backButton.visual.getVisualGeometry().radius, 43);
   const directButton = preGame.button(
     pageSafe.node,
     "FoundationTextButton",
