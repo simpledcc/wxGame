@@ -651,8 +651,8 @@ export class RuntimeScreenFactory {
     home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 424, 40, 18, "homeTextMuted", 0);
     const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 14, "homeTextMuted");
     home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
-    const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 4, 500, 202, 300, true);
-    home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -124, 460, 28, 16, "homeTextMuted", 0);
+    const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 2, 500, 196, 300, true);
+    home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -122, 460, 28, 16, "homeTextMuted", 0);
     const contact = home.edit(safe.node, "FeedbackContact", "", 0, formY - 172, 500, 56, 80);
     home.pill(formCard, "FeedbackStatusBand", 0, -226, 500, 36, "homeCard", "homeCardBorder");
     const status = home.label(formCard, "FeedbackStatus", "", 0, -226, 500, 34, 18, "homeTextMuted");

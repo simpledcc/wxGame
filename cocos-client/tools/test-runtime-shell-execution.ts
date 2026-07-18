@@ -1805,11 +1805,9 @@ async function main(): Promise<void> {
         "FeedbackContent", "FeedbackContactCaption", "FeedbackContact", "FeedbackStatusBand"]
         .map((name) => findDeep(canvas, name)!);
       for (let gap = 0; gap < feedbackNodes.length - 1; gap += 1) {
-        assertOk(feedbackGap(feedbackNodes[gap], feedbackNodes[gap + 1]) >= 4,
-          `feedback form gap ${gap} must remain visible`);
+        assertOk(feedbackGap(feedbackNodes[gap], feedbackNodes[gap + 1]) >= 8,
+          `feedback form gap ${gap} must retain the eight-pixel rhythm`);
       }
-      assertOk(feedbackGap(feedbackNodes[5], feedbackNodes[6]) >= 8,
-        "feedback contact input and status band must not overlap");
       assertEqual(feedbackButton.interactable, false, "empty feedback must keep submit disabled");
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
