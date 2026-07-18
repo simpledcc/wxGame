@@ -437,10 +437,10 @@ export class RuntimeScreenFactory {
       joinPanel = home.group(safe.node, "RoomJoinPanel", 0, roomContentY, safe.width, 760);
       const joinCard = home.accentCard(joinPanel, "JoinCodeCard", 0, 20, 560, 600, "join", 24);
       home.visualSlot(joinCard, "joinRoom", 0, 212, 90, 90);
-      home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 99, 480, 50, 30, "homeText");
+      home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 100, 480, 50, 30, "homeText");
       joinHint = home.label(joinCard, "JoinCodeHint", "请输入 6 位英文字母或数字", 0, 50, 480, 34, 18, "homeTextMuted");
-      input = home.edit(joinCard, "RoomCodeInput", "", 0, -24, 500, 104, ROOM_CODE_LENGTH);
-      home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -111, 480, 54, 18, "homeTextMuted");
+      input = home.edit(joinCard, "RoomCodeInput", "", 0, -27, 500, 104, ROOM_CODE_LENGTH);
+      home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -114, 480, 54, 18, "homeTextMuted");
       join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -218,
         500, 110, () => void controller.joinEnteredRoom(), "join", "joinRoom");
     }

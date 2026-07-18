@@ -739,6 +739,13 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomCreatePanel"), null, "join entry must not build the unused create form");
   assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
   assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
+  const longJoinCard = findDeep(canvas, "JoinCodeCard")!;
+  const longJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
+    .map((name) => findDeep(longJoinCard, name)!);
+  for (let gap = 0; gap < longJoinChain.length - 1; gap += 1) {
+    assertOk(verticalGap(longJoinChain[gap], longJoinChain[gap + 1]) >= 8,
+      `long join-room gap ${gap} must retain the eight-pixel rhythm`);
+  }
   setMockWindowSize(640, 960);
   app.store.setRoute("home");
   await flushMany();
@@ -755,8 +762,8 @@ async function main(): Promise<void> {
   assertOk(minimumJoinHeader.position.y - minimumJoinHeader.getComponent(UITransform)!.height / 2
     - minimumJoinCardY - minimumJoinCard.getComponent(UITransform)!.height / 2 >= 8);
   for (let gap = 0; gap < minimumJoinChain.length - 1; gap += 1) {
-    assertOk(verticalGap(minimumJoinChain[gap], minimumJoinChain[gap + 1]) >= 4,
-      `minimum join-room gap ${gap} must remain visible`);
+    assertOk(verticalGap(minimumJoinChain[gap], minimumJoinChain[gap + 1]) >= 8,
+      `minimum join-room gap ${gap} must retain the eight-pixel rhythm`);
   }
   assertOk(minimumJoinCardY - minimumJoinCard.getComponent(UITransform)!.height / 2
     >= -minimumJoinSafe.getComponent(UITransform)!.height / 2);
