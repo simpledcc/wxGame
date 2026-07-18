@@ -1640,8 +1640,19 @@ async function main(): Promise<void> {
       const historyDetail = findDeep(historyRow, "HistoryRow0Detail")!;
       const rightEdge = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
       const leftEdge = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+      const assertHistoryDetail = (detail: Node): void => {
+        const icon = findDeep(detail, `${detail.name}IconSlot`)!;
+        const label = findDeep(detail, `${detail.name}Title`)!;
+        const halfWidth = detail.getComponent(UITransform)!.width / 2;
+        assertOk(rightEdge(icon) + 4 <= leftEdge(label), "History detail icon and title must not overlap");
+        assertOk(leftEdge(icon) >= -halfWidth + 8, "History detail icon must remain inside its action");
+        assertOk(rightEdge(label) <= halfWidth - 4, "History detail title must remain inside its action");
+        assertOk(findDeep(detail, "HomeHistorySlot"), "History detail must mount the formal history icon");
+        assertEqual(label.getComponent(Label)?.string, "详情");
+      };
       assertOk(rightEdge(historyTitle) + 8 <= leftEdge(historyScore), "History title and score columns must not overlap");
       assertOk(rightEdge(historyScore) + 8 <= leftEdge(historyDetail), "History score and detail columns must not overlap");
+      assertHistoryDetail(historyDetail);
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
       findDeep(canvas, "HistoryRow0Detail")?.emit(Button.EventType.CLICK);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";
@@ -1666,6 +1677,7 @@ async function main(): Promise<void> {
       const minimumHistoryTitle = findDeep(minimumHistoryRoot, "HistoryTitle")!;
       const minimumHistoryRows = Array.from({ length: 4 }, (_, row) => findDeep(minimumHistoryRoot, `HistoryRow${row}`)!);
       const minimumHistoryPrevious = findDeep(minimumHistoryRoot, "HistoryPrevious")!;
+      assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
       assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 2);
       assertOk(verticalGap(minimumRecentCard, minimumHistoryTitle) >= 4);
       assertOk(verticalGap(minimumHistoryTitle, minimumHistoryRows[0]) >= 4);

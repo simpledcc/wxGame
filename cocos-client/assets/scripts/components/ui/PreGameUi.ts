@@ -559,8 +559,9 @@ export class PreGameUi {
     skinNode.active = false;
     const highlightNode = this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
-    const iconSize = Math.max(36, Math.min(height * 0.56, width * 0.18, 56));
-    const iconInset = Math.max(18, Math.min(24, width * 0.07));
+    const compact=width<120;
+    const iconSize = compact?28:Math.max(36, Math.min(height * 0.56, width * 0.18, 56));
+    const iconInset = compact?12:Math.max(18, Math.min(24, width * 0.07));
     const iconSlot = this.node(
       node,
       `${name}IconSlot`,
@@ -586,8 +587,8 @@ export class PreGameUi {
       iconSprite = this.visualSlot(iconSlot, visualKey, 0, 0, iconSize, iconSize, textToken).sprite;
     }
 
-    const textLeft = -width / 2 + iconInset + iconSize + 12;
-    const textWidth = Math.max(40, width - (textLeft + width / 2) - 24);
+    const textLeft = -width / 2 + iconInset + iconSize + (compact?6:12);
+    const textWidth = Math.max(40, width - (textLeft + width / 2) - (compact?8:24));
     const titleY = subtitle ? (height >= 120 ? 24 : height >= 96 ? 20 : 16) : 0;
     const titleFontSize = height >= 120 ? 38 : height >= 96 ? 31 : height >= 80 ? 27 : 24;
     const titleLabel = this.label(
