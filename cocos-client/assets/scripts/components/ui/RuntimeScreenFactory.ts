@@ -75,7 +75,7 @@ export class RuntimeScreenFactory {
     coins.node.setPosition(17, 0, 0);
     coins.node.getComponent(UITransform)?.setContentSize(82, 44);
     coins.color = home.color("homeTextOnColor");
-    home.statusBadge(coinButton.node, "HomeCoinAdd", "+", 84, 0, 34, "join", 26);
+    home.statusBadge(coinButton.node, "HomeCoinAdd", "+", 82, 0, 34, "join", 26);
     home.iconButton(
       top, "SettingsButton", "设", 252, 0, 80, () => openSettings(), "settings", "transparent", 54
     );
