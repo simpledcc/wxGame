@@ -410,8 +410,8 @@ export class RuntimeScreenFactory {
       const selectedModeCard = home.sectionCard(createPanel, "SelectedModeCard", "已选模式", 0, 248,
         548, 184, "join", "joinRoom");
       home.visualSlot(selectedModeCard, "joinRoom", -198, -21, 92, 92);
-      home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, -2, 360, 48, 32, "homeText", 0);
-      home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -50, 360, 32, 19, "homeTextMuted", 0);
+      home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 50, -2, 388, 48, 32, "homeText", 0);
+      home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 50, -50, 388, 32, 19, "homeTextMuted", 0);
       const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 74,
         548, 148, "practice", "wordBank");
       home.visualSlot(bankCard, "wordBank", -210, -26, 66, 66);
@@ -421,8 +421,8 @@ export class RuntimeScreenFactory {
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,
         548, 112, "history", "practice");
       home.visualSlot(guidance, "practice", -220, -13, 52, 52);
-      home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 29, -13,
-        430, 58, 19, "homeText", 0);
+      home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 30, -13,
+        432, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0,
         -187, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
       autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -294,

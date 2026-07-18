@@ -995,9 +995,16 @@ async function main(): Promise<void> {
     assertOk(verticalGap(modeTab, modeIcon) >= 8, `${context} mode tab/icon gap must remain visible`);
     assertOk(verticalGap(modeTab, modeTitle) >= 8, `${context} mode tab/title gap must remain visible`);
     assertOk(verticalGap(modeTitle, modeSummary) >= 8, `${context} mode title/summary gap must remain visible`);
-    assertOk(modeIcon.position.x + modeIcon.getComponent(UITransform)!.width / 2 + 8
-      <= modeTitle.position.x - modeTitle.getComponent(UITransform)!.width / 2,
-    `${context} mode icon must not enter the title column`);
+    [modeTitle, modeSummary].forEach((copy) => {
+      assertEqual(copy.position.x - copy.getComponent(UITransform)!.width / 2
+        - modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2, 8,
+      `${context} mode icon and copy need an eight-pixel boundary`);
+      assertEqual(modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2
+        + modeCard.getComponent(UITransform)!.width / 2,
+      modeCard.getComponent(UITransform)!.width / 2
+        - copy.position.x - copy.getComponent(UITransform)!.width / 2,
+      `${context} mode row needs balanced horizontal card insets`);
+    });
     assertOk(verticalGap(bankTab, bankIcon) >= 8, `${context} Bank tab/icon gap must remain visible`);
     assertOk(verticalGap(bankTab, bankName) >= 8, `${context} Bank tab/name gap must remain visible`);
     assertOk(bankIcon.position.x + bankIcon.getComponent(UITransform)!.width / 2 + 8
@@ -1011,9 +1018,14 @@ async function main(): Promise<void> {
     `${context} change-Bank icon/title gap must remain visible`);
     assertOk(findDeep(bankAction, "HomeWordBankSlot"), `${context} change-Bank action needs its formal icon`);
     assertEqual(bankActionTitle.getComponent(Label)?.string, "更换");
-    assertOk(guidanceIcon.position.x + guidanceIcon.getComponent(UITransform)!.width / 2 + 8
-      <= guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2,
-    `${context} guidance icon must not enter its copy column`);
+    assertEqual(guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2
+      - guidanceIcon.position.x - guidanceIcon.getComponent(UITransform)!.width / 2, 8,
+    `${context} guidance icon and copy need an eight-pixel boundary`);
+    assertEqual(guidanceIcon.position.x - guidanceIcon.getComponent(UITransform)!.width / 2
+      + guidanceCard.getComponent(UITransform)!.width / 2,
+    guidanceCard.getComponent(UITransform)!.width / 2
+      - guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2,
+    `${context} guidance row needs balanced horizontal card insets`);
   };
   const assertLobbyPlayerCardSpacing = (lobby: Node, context: string): void => {
     ["RoomPlayerOne", "RoomPlayerTwo"].forEach((name) => {
