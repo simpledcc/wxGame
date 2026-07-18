@@ -1003,7 +1003,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
-      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 110);
+      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
       assertOk(!findDeep(canvas, "BankSlot0Title")?.getComponent(Label)?.string.startsWith("✓"),
         "selected Bank title must leave state feedback to the ring and badge");
@@ -1038,6 +1038,25 @@ async function main(): Promise<void> {
         "解锁失败，本地保存不可用，金币未扣除"
       );
       app.persistWordBankProgress = originalPersistWordBankProgress;
+      setMockWindowSize(640, 960);
+      app.store.setRoute("home");
+      await flushMany();
+      app.store.setRoute("bank");
+      await flushMany();
+      const minimumBankRoot = findDeep(canvas, "BankRuntimeScreen")!;
+      const minimumBankSafe = findDeep(minimumBankRoot, "BankSafeArea")!;
+      const bankChain = ["BankStatusCard", "BankSlot0", "BankSlot1", "BankSlot2", "BankSlot3", "PreviousBanks", "UnlockBank"]
+        .map((name) => findDeep(minimumBankRoot, name)!);
+      for (let gap = 0; gap < bankChain.length - 1; gap += 1) {
+        assertOk(verticalGap(bankChain[gap], bankChain[gap + 1]) >= 4,
+          `minimum Bank gap ${gap} must remain visible`);
+      }
+      const minimumUnlock = bankChain[6];
+      assertOk(minimumUnlock.position.y - minimumUnlock.getComponent(UITransform)!.height / 2
+        >= -minimumBankSafe.getComponent(UITransform)!.height / 2);
+      assertVisibleUiContract(minimumBankRoot, "minimum Bank route");
+      assertPreGameTargetDevices(minimumBankRoot);
+      setMockWindowSize(393, 852);
     }
     if (routes[index] === "coopSelect") {
       const helpButton = findDeep(canvas, "ModeHelpButton");
