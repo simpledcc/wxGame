@@ -1575,11 +1575,14 @@ async function main(): Promise<void> {
           const title = findDeep(slot, `BankSlot${slotIndex}Title`)!;
           const subtitle = findDeep(slot, `BankSlot${slotIndex}Subtitle`)!;
           const halfHeight = slot.getComponent(UITransform)!.height / 2;
-          assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 6,
-            `${context} Bank title needs a top inset`);
-          assertOk(verticalGap(title, subtitle) >= 8, `${context} Bank title/subtitle gap must remain visible`);
-          assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
-            `${context} Bank subtitle needs a bottom inset`);
+          assertEqual(title.getComponent(UITransform)!.height, 36,
+            `${context} Bank title must retain its balanced text box`);
+          assertEqual(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2, 8,
+            `${context} Bank title needs an eight-pixel top inset`);
+          assertEqual(verticalGap(title, subtitle), 8,
+            `${context} Bank title/subtitle gap must retain the eight-pixel rhythm`);
+          assertEqual(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 + halfHeight, 8,
+            `${context} Bank subtitle needs an eight-pixel bottom inset`);
           assertOk(subtitle.getComponent(Label)?.string.includes("个单词"),
             `${context} Bank subtitle must expose the real word count`);
         }
