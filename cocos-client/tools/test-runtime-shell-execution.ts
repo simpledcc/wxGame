@@ -1004,6 +1004,12 @@ async function main(): Promise<void> {
       assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 8
         <= label.position.x - label.getComponent(UITransform)!.width / 2,
       `${context} avatar must not enter the player-name column`);
+      assertEqual(avatar.position.y, (ready.position.y + ready.getComponent(UITransform)!.height / 2
+        + label.position.y - label.getComponent(UITransform)!.height / 2) / 2,
+      `${context} avatar must center against the status/name block`);
+      assertOk(avatar.position.y - avatar.getComponent(UITransform)!.height / 2
+        >= -card.getComponent(UITransform)!.height / 2 + 8,
+      `${context} avatar must clear the card bottom frame`);
     });
   };
   const assertLobbyUtilityCardSpacing = (lobby: Node, context: string): void => {
