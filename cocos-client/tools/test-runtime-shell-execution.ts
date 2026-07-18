@@ -2280,6 +2280,16 @@ async function main(): Promise<void> {
       };
       const assertHelpRuleSpacing = (root: Node, context: string): void => {
         const card = findDeep(root, "HelpCard")!;
+        const summaryIcon = findDeep(card, "HomeCatalogSlot")!;
+        const summaryCopy = findDeep(card, "HelpRulesSummary")!;
+        assertEqual(summaryCopy.position.x - summaryCopy.getComponent(UITransform)!.width / 2
+          - summaryIcon.position.x - summaryIcon.getComponent(UITransform)!.width / 2, 8,
+        `${context} summary icon and copy need an eight-pixel boundary`);
+        assertEqual(summaryIcon.position.x - summaryIcon.getComponent(UITransform)!.width / 2
+          + card.getComponent(UITransform)!.width / 2,
+        card.getComponent(UITransform)!.width / 2
+          - summaryCopy.position.x - summaryCopy.getComponent(UITransform)!.width / 2,
+        `${context} summary row needs balanced horizontal card insets`);
         HELP_RULES.forEach(([title, detail], ruleIndex) => {
           const badge = findDeep(card, `HelpRule${ruleIndex}Number`)!;
           const titleNode = findDeep(card, `HelpRule${ruleIndex}Title`)!;

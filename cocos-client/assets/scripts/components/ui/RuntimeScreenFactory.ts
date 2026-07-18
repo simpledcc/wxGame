@@ -680,8 +680,8 @@ export class RuntimeScreenFactory {
     const cardY = safeTop - 124 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);
     home.visualSlot(helpCard, "catalog", -218, cardHeight / 2 - 76, 72, 72);
-    home.label(helpCard, "HelpRulesSummary", "学习、对战、合作与战绩规则", 52,
-      cardHeight / 2 - 76, 360, 40, 17, "homeTextMuted", 0);
+    home.label(helpCard, "HelpRulesSummary", "学习、对战、合作与战绩规则", 40,
+      cardHeight / 2 - 76, 428, 40, 17, "homeTextMuted", 0);
     const pitch = (cardHeight - 178) / HELP_RULES.length;
     HELP_RULES.forEach(([title, copy, kind], index) => {
       const y = cardHeight / 2 - 154 - index * pitch;
