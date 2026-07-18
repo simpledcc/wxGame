@@ -359,28 +359,29 @@ export class RuntimeScreenFactory {
     home.iconButton(header.node, "ModeHelpButton", "?", 229, 0, 80,
       () => controller.openHelp(), undefined, "join", 36);
     const modes = [
-      ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
-      ["双人 PK 竞技", "快速抢答，一决高下", "practice", "practice"],
-      ["魔法对战", "答对单词积累魔法能量", "catalog", "catalog"],
-      ["抢夺宝物", "一起争夺宝箱与奖励", "history", "history"],
-      ["搭桥比赛", "答对单词建桥前进", "createRoom", "create"],
-      ["造塔比赛", "收集材料搭建高塔", "wordBank", "bank"],
-      ["合作塔防", "合作守护词斗乐园", "joinRoom", "join"],
-      ["合作挑战 Boss", "一起挑战强大对手", "catalog", "catalog"]
+      ["准备体验模式","双人房间流程体验","joinRoom","practice"],
+      ["双人 PK 竞技","快速抢答，一决高下","practice","practice"],
+      ["魔法对战","答对单词积累魔法能量","catalog","catalog"],
+      ["抢夺宝物","一起争夺宝箱与奖励","history","history"],
+      ["搭桥比赛","答对单词建桥前进","createRoom","create"],
+      ["造塔比赛","收集材料搭建高塔","wordBank","bank"],
+      ["合作塔防","合作守护词斗乐园","joinRoom","join"],
+      ["合作挑战 Boss","一起挑战强大对手","catalog","catalog"]
     ] as const;
-    modes.forEach(([title, subtitle, icon, kind], index) => {
-      const featured = index === 0;
-      const row = home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 160 - index * 84,
-        548, 80, featured ? "practice" : kind, 18);
-      home.visualSlot(row, icon, -226, 0, 64, 64);
-      home.label(row, `ModeOption${index}Title`, title, -65, 19, 236, 28, 23, "homeText", 0);
-      home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -17, 236, 28, 15, "homeTextMuted", 0);
-      home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -17, 70, "surface");
-      const a = home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
-        202, 0, 126, 64, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
-      a.node.getComponent(UITransform)!.height = 80;
-      if (index > 0) {
-        a.button.interactable = false;
+    modes.forEach(([title,subtitle,icon,kind],index)=>{
+      const featured=index===0;
+      const row=home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 163 - index * 86,
+        548, 78, featured ? "practice" : kind, 18);
+      row.getComponent(UITransform)!.height=80;
+      home.visualSlot(row, icon, -226, 0, 62, 62);
+      home.label(row, `ModeOption${index}Title`, title, -65, 18, 236, 28, 23, "homeText", 0);
+      home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -18, 236, 28, 15, "homeTextMuted", 0);
+      home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -14, 70, "surface");
+      const a=home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
+        202, 0, 126, 62, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
+      a.node.getComponent(UITransform)!.height=80;
+      if(index>0){
+        a.button.interactable=false;
         a.visual.refresh();
       }
     });

@@ -1637,7 +1637,9 @@ async function main(): Promise<void> {
       const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
       const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
       assertEqual(modeAccent.getComponent(UITransform)?.width, 4);
-      assertEqual(modeAccent.getComponent(UITransform)?.height, 44);
+      assertEqual(modeAccent.getComponent(UITransform)?.height, 42);
+      assertEqual(findDeep(modeRow, "ModeOption0InnerBorder")?.getComponent(UITransform)?.height, 66,
+        "mode card visual must stay inset from its 80px layout node");
       assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 8
         <= modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2,
       "mode accent rail must not enter its icon column");
@@ -1685,7 +1687,7 @@ async function main(): Promise<void> {
           assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
             <= action.position.x - actionTransform.width / 2,
           `${context} mode ${rowIndex + 1} badge/action columns must remain separate`);
-          assertEqual(halfHeight - actionGeometry.height / 2, 8,
+          assertEqual(halfHeight - actionGeometry.height / 2, 9,
             `${context} mode ${rowIndex + 1} action must clear the card frame vertically`);
           assertOk(halfWidth - action.position.x - actionTransform.width / 2 >= 8,
             `${context} mode ${rowIndex + 1} action must clear the card frame horizontally`);
@@ -1706,11 +1708,11 @@ async function main(): Promise<void> {
       const minimumCatalogHeader = findDeep(minimumCatalogRoot, "CoopSelectHeader")!;
       const minimumModeRows = Array.from({ length: 8 }, (_, row) => findDeep(minimumCatalogRoot, `ModeOption${row}`)!);
       assertModeRowText(minimumCatalogRoot, "minimum catalog");
-      assertOk(verticalGap(minimumCatalogHeader, minimumModeRows[0]) >= 4,
+      assertOk(verticalGap(minimumCatalogHeader, minimumModeRows[0]) >= 7,
         "minimum mode catalog must separate the header and first row");
       for (let gap = 0; gap < minimumModeRows.length - 1; gap += 1) {
-        assertOk(verticalGap(minimumModeRows[gap], minimumModeRows[gap + 1]) >= 4,
-          `minimum mode catalog gap ${gap} must remain visible`);
+        assertOk(verticalGap(minimumModeRows[gap], minimumModeRows[gap + 1]) + 2 >= 8,
+          `minimum mode catalog visual gap ${gap} must retain the eight-pixel rhythm`);
       }
       const minimumLastMode = minimumModeRows[minimumModeRows.length - 1];
       assertOk(minimumLastMode.position.y - minimumLastMode.getComponent(UITransform)!.height / 2
