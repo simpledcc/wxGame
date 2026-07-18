@@ -319,13 +319,13 @@ export class RuntimeScreenFactory {
     home.button(card, "RandomWord", "↻ 随机", 142, -142, 220, 80,
       () => controller.randomWord(), "surface", 17);
     const revealY = cardY - 232 - stretch * 0.16;
-    home.button(safe.node, "RevealWord", "书 查看当前释义", -134, revealY, 252, 82,
-      () => controller.revealCurrentMeaning(), "join", 19);
-    const markWrong = home.button(safe.node, "MarkWrong", "★ 标记错词", 134, revealY, 252, 82,
-      () => controller.markCurrentUnfamiliar(), "history", 19);
+    home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 82,
+      () => controller.revealCurrentMeaning(), "join", "practice");
+    const markWrong = home.actionButton(safe.node, "MarkWrong", "标记错词", "", "★", 134, revealY, 252, 82,
+      () => controller.markCurrentUnfamiliar(), "history", "wordBank");
     home.selectionStyle(markWrong.visual, "history");
-    const meaningToggle = home.button(safe.node, "MeaningToggle", "", 0, cardY - 310 - stretch * 0.28,
-      500, 82, () => controller.toggleChinese(), "surface", 19);
+    const meaningToggle = home.actionButton(safe.node, "MeaningToggle", "", "", "书", 0,
+      cardY - 310 - stretch * 0.28, 500, 82, () => controller.toggleChinese(), "surface", "practice");
     home.selectionStyle(meaningToggle.visual, "join");
     home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "→", 0,
       cardY - 414 - stretch * 0.45, 500, 112, () => controller.nextWord(), "create", "practice");
@@ -368,7 +368,7 @@ export class RuntimeScreenFactory {
       home.visualSlot(row, icon, -226, 0, 64, 64);
       home.label(row, `ModeOption${index}Title`, title, -48, 18, 270, 34, 23, "homeText", 0);
       home.label(row, `ModeOption${index}Subtitle`, subtitle, -48, -16, 270, 28, 15, "homeTextMuted", 0);
-      home.label(row, `ModeOption${index}Players`, "双人", 96, -17, 70, 26, 14, "homeTextMuted");
+      home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -17, 70, "surface");
       const action = home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
         204, 0, 126, 80, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
       if (index > 0) {

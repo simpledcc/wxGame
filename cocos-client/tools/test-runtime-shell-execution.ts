@@ -708,6 +708,8 @@ async function main(): Promise<void> {
   assertPreGameTargetDevices(studyRoot);
   assertOk(findDeep(canvas, "RandomWord"));
   assertOk(findDeep(canvas, "MarkWrong"));
+  ["RevealWord", "MarkWrong", "MeaningToggle"].forEach((name) =>
+    assertOk(findDeep(canvas, `${name}IconSlot`), `${name} must expose a semantic icon slot`));
   assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 366);
   assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgress")?.getComponent(Graphics));
@@ -721,7 +723,7 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
-  assertEqual(findDeep(canvas, "MeaningToggleLabel")?.getComponent(Label)?.string, "显示后续单词中文");
+  assertEqual(findDeep(canvas, "MeaningToggleTitle")?.getComponent(Label)?.string, "显示后续单词中文");
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), false);
   findDeep(canvas, "NextWord")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
@@ -732,7 +734,7 @@ async function main(): Promise<void> {
   findDeep(canvas, "MarkWrong")?.emit(Button.EventType.CLICK);
   assertEqual(app.wordBankStore.getWrongWords().length, wrongWordCount + 1);
   assertEqual(findDeep(canvas, "MarkWrong")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
-  assertEqual(findDeep(canvas, "MarkWrongLabel")?.getComponent(Label)?.string, "★ 已在错题库");
+  assertEqual(findDeep(canvas, "MarkWrongTitle")?.getComponent(Label)?.string, "已在错题库");
   findDeep(canvas, "ChangeStudyBank")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "bank");
@@ -967,6 +969,8 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 548);
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 86);
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
+      assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
+        "mode player count must use the shared status badge");
       findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().selectedMode, "pk");

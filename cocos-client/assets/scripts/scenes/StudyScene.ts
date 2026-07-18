@@ -117,8 +117,8 @@ export class StudyScene extends Component {
     this.meaningToggleVisual?.setSelected(app.studyStore.getSession().showMeaning);
     const marked = app.wordBankStore.getWrongWords().some((item) => item.word === card.word);
     this.wrongVisual?.setSelected(marked);
-    const markLabel = this.wrongVisual?.node.getChildByName("MarkWrongLabel")?.getComponent(Label);
-    if (markLabel) markLabel.string = marked ? "★ 已在错题库" : "★ 标记错词";
+    const markLabel = this.wrongVisual?.node.getChildByName("MarkWrongTitle")?.getComponent(Label);
+    if (markLabel) markLabel.string = marked ? "已在错题库" : "标记错词";
     if (this.meaningToggleLabel) {
       this.meaningToggleLabel.string = app.studyStore.getSession().showMeaning
         ? "隐藏后续单词中文"

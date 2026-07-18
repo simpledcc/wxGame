@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Six source passes cover shared chrome, control states, persistent page/form feedback, player-card clarity and Home utility modals | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Seven source passes cover shared chrome, persistent state feedback, player/modal clarity and formal Study/catalog icon treatment | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -725,6 +725,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Home player identity is presented as a compact status badge. The Settings modal now carries the formal settings icon, and its sound action uses the shared selected treatment when audio is enabled.
 - The sound selection state follows the persisted SettingsStore value before and after toggling; no placeholder player, coin or room data was added.
 - Consolidated private button-visual field names to restore source headroom without changing public APIs or rendering behavior. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,796 / 1,520,000` core source bytes.
+- No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
+### H8.7 seventh source checkpoint
+
+- Study reveal, wrong-word and Chinese-display controls now use the shared icon action-button structure instead of embedding book/star characters in ordinary text buttons.
+- Reveal reuses the formal practice icon, wrong-word reuses the formal word-bank icon, and the Chinese toggle keeps its real selected state while gaining the practice icon; all existing controller actions remain unchanged.
+- Mode-catalog “双人” metadata now uses the same compact status-badge primitive as other preparation states instead of an unframed small label.
+- Runtime assertions cover all three icon slots, wrong-word title/selection transitions, Chinese-toggle title/selection transitions and the mode-player badge. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,847 / 1,520,000` core source bytes.
 - No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
 ## Assets
