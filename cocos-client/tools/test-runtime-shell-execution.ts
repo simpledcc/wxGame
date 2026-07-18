@@ -858,18 +858,18 @@ async function main(): Promise<void> {
     const bankAction = findDeep(bankCard, "ChangeRoomBank")!;
     const bankActionIcon = findDeep(bankAction, "ChangeRoomBankIconSlot")!;
     const bankActionTitle = findDeep(bankAction, "ChangeRoomBankTitle")!;
-    assertOk(verticalGap(modeTab, modeIcon) >= 4, `${context} mode tab/icon gap must remain visible`);
-    assertOk(verticalGap(modeTab, modeTitle) >= 4, `${context} mode tab/title gap must remain visible`);
-    assertOk(verticalGap(modeTitle, modeSummary) >= 4, `${context} mode title/summary gap must remain visible`);
-    assertOk(modeIcon.position.x + modeIcon.getComponent(UITransform)!.width / 2 + 4
+    assertOk(verticalGap(modeTab, modeIcon) >= 8, `${context} mode tab/icon gap must remain visible`);
+    assertOk(verticalGap(modeTab, modeTitle) >= 8, `${context} mode tab/title gap must remain visible`);
+    assertOk(verticalGap(modeTitle, modeSummary) >= 8, `${context} mode title/summary gap must remain visible`);
+    assertOk(modeIcon.position.x + modeIcon.getComponent(UITransform)!.width / 2 + 8
       <= modeTitle.position.x - modeTitle.getComponent(UITransform)!.width / 2,
     `${context} mode icon must not enter the title column`);
-    assertOk(verticalGap(bankTab, bankIcon) >= 4, `${context} Bank tab/icon gap must remain visible`);
-    assertOk(verticalGap(bankTab, bankName) >= 4, `${context} Bank tab/name gap must remain visible`);
-    assertOk(bankIcon.position.x + bankIcon.getComponent(UITransform)!.width / 2 + 4
+    assertOk(verticalGap(bankTab, bankIcon) >= 8, `${context} Bank tab/icon gap must remain visible`);
+    assertOk(verticalGap(bankTab, bankName) >= 8, `${context} Bank tab/name gap must remain visible`);
+    assertOk(bankIcon.position.x + bankIcon.getComponent(UITransform)!.width / 2 + 8
       <= bankName.position.x - bankName.getComponent(UITransform)!.width / 2,
     `${context} Bank icon must not enter the name column`);
-    assertOk(bankName.position.x + bankName.getComponent(UITransform)!.width / 2 + 4
+    assertOk(bankName.position.x + bankName.getComponent(UITransform)!.width / 2 + 8
       <= bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2,
     `${context} Bank name must not enter the change action`);
     assertOk(bankActionIcon.position.x + bankActionIcon.getComponent(UITransform)!.width / 2 + 4

@@ -408,13 +408,13 @@ export class RuntimeScreenFactory {
       createPanel = home.group(safe.node, "RoomCreatePanel", 0, roomContentY, safe.width, 760);
       const selectedModeCard = home.sectionCard(createPanel, "SelectedModeCard", "已选模式", 0, 248,
         548, 184, "join", "joinRoom");
-      home.visualSlot(selectedModeCard, "joinRoom", -198, -18, 92, 92);
+      home.visualSlot(selectedModeCard, "joinRoom", -198, -21, 92, 92);
       home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, -2, 360, 48, 32, "homeText", 0);
       home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -50, 360, 32, 19, "homeTextMuted", 0);
       const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 74,
         548, 148, "practice", "wordBank");
-      home.visualSlot(bankCard, "wordBank", -210, -23, 66, 66);
-      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -16, 300, 54, 25, "homeText", 0);
+      home.visualSlot(bankCard, "wordBank", -210, -26, 66, 66);
+      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -16, 300, 46, 25, "homeText", 0);
       home.actionButton(bankCard, "ChangeRoomBank", "更换", "", "词", 202, -15, 118, 80,
         () => controller.changeBank(), "practice", "wordBank");
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,
