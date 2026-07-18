@@ -377,8 +377,8 @@ export class RuntimeScreenFactory {
       const row = home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 166 - index * 92,
         548, 86, featured ? "practice" : "surface", 18);
       home.visualSlot(row, icon, -226, 0, 64, 64);
-      home.label(row, `ModeOption${index}Title`, title, -48, 18, 270, 34, 23, "homeText", 0);
-      home.label(row, `ModeOption${index}Subtitle`, subtitle, -48, -16, 270, 28, 15, "homeTextMuted", 0);
+      home.label(row, `ModeOption${index}Title`, title, -65, 18, 236, 34, 23, "homeText", 0);
+      home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -16, 236, 28, 15, "homeTextMuted", 0);
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -17, 70, "surface");
       const action = home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
         204, 0, 126, 80, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
@@ -650,14 +650,14 @@ export class RuntimeScreenFactory {
       () => controller.backHome(), "feedback");
     const formCard = home.accentCard(safe.node, "FeedbackFormCard", 0, formY, 560, 500, "join", 24);
     home.visualSlot(formCard, "feedback", -228, 198, 48, 48);
-    home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 198, 424, 48, 18, "homeTextMuted", 0);
-    const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 153, 500, 42, 14, "homeTextMuted");
-    home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 112, 460, 32, 16, "homeTextMuted", 0);
-    const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 8, 500, 202, 300, true);
-    home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -126, 460, 32, 16, "homeTextMuted", 0);
-    const contact = home.edit(safe.node, "FeedbackContact", "", 0, formY - 176, 500, 64, 80);
-    home.pill(formCard, "FeedbackStatusBand", 0, -224, 500, 40, "homeCard", "homeCardBorder");
-    const status = home.label(formCard, "FeedbackStatus", "", 0, -224, 500, 34, 18, "homeTextMuted");
+    home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 424, 40, 18, "homeTextMuted", 0);
+    const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 14, "homeTextMuted");
+    home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
+    const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 4, 500, 202, 300, true);
+    home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -124, 460, 28, 16, "homeTextMuted", 0);
+    const contact = home.edit(safe.node, "FeedbackContact", "", 0, formY - 172, 500, 56, 80);
+    home.pill(formCard, "FeedbackStatusBand", 0, -226, 500, 36, "homeCard", "homeCardBorder");
+    const status = home.label(formCard, "FeedbackStatus", "", 0, -226, 500, 34, 18, "homeTextMuted");
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,
       formY - 310, 560, 94, () => void controller.submit(), "join", "feedback");
     home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0,

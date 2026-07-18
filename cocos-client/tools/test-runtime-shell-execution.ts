@@ -1018,6 +1018,13 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
       assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
         "mode player count must use the shared status badge");
+      const modeText = findDeep(canvas, "ModeOption0Subtitle")!;
+      const modeBadge = findDeep(canvas, "ModeOption0Players")!;
+      assertOk(
+        modeText.position.x + modeText.getComponent(UITransform)!.width / 2 + 8
+          <= modeBadge.position.x - modeBadge.getComponent(UITransform)!.width / 2,
+        "mode copy must reserve space for the player-count badge"
+      );
       findDeep(canvas, "ModeOption0Action")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().selectedMode, "pk");
@@ -1236,6 +1243,21 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "FeedbackContactCaption"));
       assertOk(findDeep(canvas, "FeedbackStatusBand")?.getComponent(Graphics),
         "feedback guidance must stay inside a stable status band");
+      const formCard = findDeep(canvas, "FeedbackFormCard")!;
+      const screenY = (node: Node): number => node.parent === formCard
+        ? formCard.position.y + node.position.y : node.position.y;
+      const feedbackGap = (upper: Node, lower: Node): number =>
+        screenY(upper) - upper.getComponent(UITransform)!.height / 2
+          - screenY(lower) - lower.getComponent(UITransform)!.height / 2;
+      const feedbackNodes = ["FeedbackPrompt", "FeedbackPrivacy", "FeedbackContentCaption",
+        "FeedbackContent", "FeedbackContactCaption", "FeedbackContact", "FeedbackStatusBand"]
+        .map((name) => findDeep(canvas, name)!);
+      for (let gap = 0; gap < feedbackNodes.length - 1; gap += 1) {
+        assertOk(feedbackGap(feedbackNodes[gap], feedbackNodes[gap + 1]) >= 4,
+          `feedback form gap ${gap} must remain visible`);
+      }
+      assertOk(feedbackGap(feedbackNodes[5], feedbackNodes[6]) >= 8,
+        "feedback contact input and status band must not overlap");
       assertEqual(feedbackButton.interactable, false, "empty feedback must keep submit disabled");
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
