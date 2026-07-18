@@ -1532,17 +1532,21 @@ async function main(): Promise<void> {
     if (routes[index] === "coopSelect") {
       const helpButton = findDeep(canvas, "ModeHelpButton");
       const helpTransform = helpButton?.getComponent(UITransform);
-      const catalogTitle = findDeep(canvas, "CoopSelectHeaderTitle")?.getComponent(UITransform);
-      const catalogSubtitle = findDeep(canvas, "CoopSelectHeaderSubtitle")?.getComponent(UITransform);
+      const catalogTitleNode = findDeep(canvas, "CoopSelectHeaderTitle")!;
+      const catalogSubtitleNode = findDeep(canvas, "CoopSelectHeaderSubtitle")!;
+      const catalogTitle = catalogTitleNode.getComponent(UITransform);
+      const catalogSubtitle = catalogSubtitleNode.getComponent(UITransform);
       assertOk(helpButton);
       assertOk(helpButton.getComponent(Button) && helpTransform && catalogTitle && catalogSubtitle);
       assertEqual(helpButton.getComponent(Graphics)?.enabled, true,
         "rules action must use a visible high-contrast circular background");
       assertEqual(helpButton.getComponent(RuntimeButtonVisual)?.getVisualGeometry().radius, 40);
       assertEqual(findDeep(helpButton, "ModeHelpButtonHighlight")?.active, true);
-      assertOk(catalogTitle.width / 2 + 62 <= helpButton.position.x - helpTransform.width / 2,
+      assertOk(catalogTitleNode.position.x + catalogTitle.width / 2 + 8
+        <= helpButton.position.x - helpTransform.width / 2,
         "catalog title must leave room for the rules action");
-      assertOk(catalogSubtitle.width / 2 + 14 <= helpButton.position.x - helpTransform.width / 2,
+      assertOk(catalogSubtitleNode.position.x + catalogSubtitle.width / 2 + 8
+        <= helpButton.position.x - helpTransform.width / 2,
         "catalog subtitle must leave room for the rules action");
       helpButton.emit(Button.EventType.CLICK);
       await flushMany();
