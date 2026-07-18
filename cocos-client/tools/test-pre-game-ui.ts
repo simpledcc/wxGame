@@ -65,6 +65,25 @@ function assertActionIconClearOfText(action: ReturnType<PreGameUi["actionButton"
   assertOk(iconBounds.width <= 56, `${action.node.name} icon must stay within the compact visual cap`);
 }
 
+function assertSectionTabSpacing(card: Node, name: string, visualKey: string): void {
+  const tab = card.getChildByName(`${name}Tab`);
+  assertOk(tab, `${name} must have a section tab`);
+  const icon = tab.getChildByName(`Home${visualKey}Slot`);
+  const title = tab.getChildByName(`${name}TabTitle`);
+  assertOk(icon, `${name} must have its visual slot`);
+  assertOk(title, `${name} must have its tab title`);
+  const tabBounds = transform(tab);
+  const iconBounds = transform(icon);
+  const titleBounds = transform(title);
+  const iconLeft = icon.position.x - iconBounds.width / 2;
+  const iconRight = icon.position.x + iconBounds.width / 2;
+  const titleLeft = title.position.x - titleBounds.width / 2;
+  const titleRight = title.position.x + titleBounds.width / 2;
+  assertOk(iconLeft >= -tabBounds.width / 2 + 8, `${name} icon must keep its left inset`);
+  assertOk(titleLeft - iconRight >= 8, `${name} icon must not crowd its title`);
+  assertOk(titleRight <= tabBounds.width / 2 - 8, `${name} title must keep its right inset`);
+}
+
 function main(): void {
   const root = new Node("PreGameTestRoot");
   root.addComponent(UITransform).setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
@@ -144,6 +163,24 @@ function main(): void {
   assertDeepEqual(accent?.getComponent(Graphics)?.lastRoundRect, {
     x: -3, y: -58, width: 6, height: 116, radius: 3
   });
+  const largeSection = preGame.sectionCard(
+    safe.node, "FoundationLargeSection", "当前词库", 0, 210, 560, 148, "practice", "wordBank"
+  );
+  const compactSection = preGame.sectionCard(
+    safe.node, "FoundationCompactSection", "当前状态", 0, 130, 560, 70, "history", "history"
+  );
+  assertSectionTabSpacing(largeSection, "FoundationLargeSection", "WordBank");
+  assertSectionTabSpacing(compactSection, "FoundationCompactSection", "History");
+  assertEqual(
+    largeSection.getChildByName("FoundationLargeSectionTab")
+      ?.getChildByName("FoundationLargeSectionTabTitle")?.getComponent(Label)?.fontSize,
+    22
+  );
+  assertEqual(
+    compactSection.getChildByName("FoundationCompactSectionTab")
+      ?.getChildByName("FoundationCompactSectionTabTitle")?.getComponent(Label)?.fontSize,
+    14
+  );
 
   let actionCount = 0;
   const action = preGame.actionButton(

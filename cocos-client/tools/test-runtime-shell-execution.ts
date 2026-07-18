@@ -110,6 +110,21 @@ function assertVisibleUiContract(root: Node, context: string): void {
       const iconRight = headerIcon.position.x + headerIcon.getComponent(UITransform)!.width / 2;
       if (titleLeft - iconRight < 8) violations.push(`${nodePath} icon intersects its title`);
     }
+    if (node.name.endsWith("Tab")) {
+      const tabTitle = node.children.find((child) => child.name === `${node.name}Title`);
+      const tabIcon = node.children.find((child) => /^Home.+Slot$/.test(child.name));
+      const titleTransform = tabTitle?.getComponent(UITransform);
+      const iconTransform = tabIcon?.getComponent(UITransform);
+      if (transform && tabTitle?.active && tabIcon?.active && titleTransform && iconTransform) {
+        const iconLeft = tabIcon.position.x - iconTransform.width / 2;
+        const iconRight = tabIcon.position.x + iconTransform.width / 2;
+        const titleLeft = tabTitle.position.x - titleTransform.width / 2;
+        const titleRight = tabTitle.position.x + titleTransform.width / 2;
+        if (iconLeft < -transform.width / 2 + 8) violations.push(`${nodePath} icon misses its left inset`);
+        if (titleLeft - iconRight < 8) violations.push(`${nodePath} icon crowds its title`);
+        if (titleRight > transform.width / 2 - 8) violations.push(`${nodePath} title misses its right inset`);
+      }
+    }
     node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
   };
   visit(root, 0, 0, 1, 1, "");

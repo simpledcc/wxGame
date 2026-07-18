@@ -374,8 +374,8 @@ export class PreGameUi {
     const textToken:ThemeColorToken=kind==="surface"?"homeText":"homeTextOnColor";
     if (visualKey) this.visualSlot(tab, visualKey, -tabWidth/2+(h<58?18:32), 0,
       h<58?18:38, h<58?18:38, textToken);
-    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey?(h<58?10:18):0, 0,
-      tabWidth-(visualKey?(h<58?40:68):24), h<58?20:42, h<58?14:22, textToken);
+    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey?(h<58?14:22):0, 0,
+      tabWidth-(visualKey?(h<58?48:76):24), h<58?20:42, h<58?14:22, textToken);
     if (kind!=="surface") {
       tabTitle.enableOutline = true;
       tabTitle.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.42);
