@@ -1153,9 +1153,11 @@ async function main(): Promise<void> {
   assertLobbyUtilityCardSpacing(minimumLobby, "minimum room lobby");
   const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
     .map((name) => findDeep(minimumLobby, name)!);
+  assertEqual(lobbyChain[2].getComponent(UITransform)?.height, 218,
+    "lobby player cards must preserve their eight-pixel neighboring gaps");
   for (let gap = 0; gap < lobbyChain.length - 1; gap += 1) {
-    assertOk(verticalGap(lobbyChain[gap], lobbyChain[gap + 1]) >= 7,
-      `minimum room-lobby gap ${gap} must remain visible`);
+    assertOk(verticalGap(lobbyChain[gap], lobbyChain[gap + 1]) >= 8,
+      `minimum room-lobby gap ${gap} must retain the eight-pixel rhythm`);
   }
   assertEqual(findDeep(minimumLobby, "LeaveRoom"), null, "header Back must remain the single leave action");
   [["LobbyBankCardTab", "RoomMode"], ["RoomStatusCardTab", "RoomStatus"]].forEach(([tabName, contentName]) => {
