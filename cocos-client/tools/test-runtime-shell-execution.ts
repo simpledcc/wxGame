@@ -957,6 +957,9 @@ async function main(): Promise<void> {
     const bankAction = findDeep(bankCard, "ChangeRoomBank")!;
     const bankActionIcon = findDeep(bankAction, "ChangeRoomBankIconSlot")!;
     const bankActionTitle = findDeep(bankAction, "ChangeRoomBankTitle")!;
+    const guidanceCard = findDeep(panel, "CreateGuidanceCard")!;
+    const guidanceIcon = guidanceCard.children.find((child) => child.name === "HomePracticeSlot")!;
+    const guidanceCopy = findDeep(guidanceCard, "CreateGuidance")!;
     assertOk(verticalGap(modeTab, modeIcon) >= 8, `${context} mode tab/icon gap must remain visible`);
     assertOk(verticalGap(modeTab, modeTitle) >= 8, `${context} mode tab/title gap must remain visible`);
     assertOk(verticalGap(modeTitle, modeSummary) >= 8, `${context} mode title/summary gap must remain visible`);
@@ -976,6 +979,9 @@ async function main(): Promise<void> {
     `${context} change-Bank icon/title gap must remain visible`);
     assertOk(findDeep(bankAction, "HomeWordBankSlot"), `${context} change-Bank action needs its formal icon`);
     assertEqual(bankActionTitle.getComponent(Label)?.string, "更换");
+    assertOk(guidanceIcon.position.x + guidanceIcon.getComponent(UITransform)!.width / 2 + 8
+      <= guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2,
+    `${context} guidance icon must not enter its copy column`);
   };
   const assertLobbyPlayerCardSpacing = (lobby: Node, context: string): void => {
     ["RoomPlayerOne", "RoomPlayerTwo"].forEach((name) => {
@@ -1037,17 +1043,20 @@ async function main(): Promise<void> {
       `${context} invite action must retain its right inset`);
     assertOk(verticalGap(bankTab, bankCopy) >= 8, `${context} Bank tab/body gap must remain visible`);
     assertEqual(bankCopy.position.y - bankCopy.getComponent(UITransform)!.height / 2
-      + bankCard.getComponent(UITransform)!.height / 2, 7,
+      + bankCard.getComponent(UITransform)!.height / 2, 8,
     `${context} Bank copy must clear the card bottom frame`);
     assertOk(right(bankCopy) + 8 <= bankCard.getComponent(UITransform)!.width / 2,
       `${context} Bank copy must retain its right inset`);
     assertOk(verticalGap(statusTab, statusCopy) >= 8, `${context} status tab/copy gap must remain visible`);
     assertEqual(statusCopy.position.y - statusCopy.getComponent(UITransform)!.height / 2
-      + statusCard.getComponent(UITransform)!.height / 2, 7,
+      + statusCard.getComponent(UITransform)!.height / 2, 8,
     `${context} status copy must clear the card bottom frame`);
     indicators.forEach((indicator) => {
       assertOk(verticalGap(statusTab, indicator) >= 8, `${context} status tab/indicator gap must remain visible`);
       assertOk(right(indicator) + 8 <= left(statusCopy), `${context} indicator/copy columns must remain separate`);
+      assertEqual(indicator.position.y - indicator.getComponent(UITransform)!.height / 2
+        + statusCard.getComponent(UITransform)!.height / 2, 8,
+      `${context} status indicator must clear the card bottom frame`);
     });
     assertOk(right(statusCopy) + 8 <= statusCard.getComponent(UITransform)!.width / 2,
       `${context} status copy must retain its right inset`);

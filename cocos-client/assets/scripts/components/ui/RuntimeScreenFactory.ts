@@ -421,7 +421,7 @@ export class RuntimeScreenFactory {
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,
         548, 112, "history", "practice");
       home.visualSlot(guidance, "practice", -220, -13, 52, 52);
-      home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 28, -13,
+      home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 29, -13,
         430, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0,
         -187, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
@@ -456,18 +456,18 @@ export class RuntimeScreenFactory {
       () => void controller.inviteFriend(), "practice", "joinRoom");
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
       520, 72, "practice", "wordBank");
-    const mode = home.label(lobbyBank, "RoomMode", "", 18, -15, 430, 28, 20, "homeText");
+    const mode = home.label(lobbyBank, "RoomMode", "", 18, -14, 430, 28, 20, "homeText");
     const playerOne = home.playerStatusCard(lobbyPanel, "RoomPlayerOne", "房主", -140, "practice");
     const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -150,
       520, 70, "history");
-    const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -13, 30, 30,
+    const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -13, 28, 28,
       "homePractice", "homeTextOnColor");
     roomReadyIndicator.active = false;
-    const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -13, 30, 30,
+    const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -13, 28, 28,
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
-    const status = home.label(statusCard, "RoomStatus", "", 42, -15, 420, 26, 17, "homeTextMuted");
+    const status = home.label(statusCard, "RoomStatus", "", 42, -14, 420, 26, 17, "homeTextMuted");
     const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -233, 440, 80,
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");
