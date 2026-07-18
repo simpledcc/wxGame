@@ -124,7 +124,10 @@ function assertVisibleUiContract(root: Node, context: string): void {
       if (titleTransform && subtitleTransform) {
         const gap = title.position.y - titleTransform.height / 2
           - subtitle.position.y - subtitleTransform.height / 2;
-        if (gap < 2) violations.push(`${nodePath} title/subtitle gap is ${gap}`);
+        const action = !!node.getComponent(RuntimeButtonVisual);
+        if (gap < (action ? 8 : 2)) violations.push(`${nodePath} title/subtitle gap is ${gap}`);
+        if (action && transform && subtitle.position.y - subtitleTransform.height / 2
+          < -transform.height / 2 + 8) violations.push(`${nodePath} subtitle misses its bottom inset`);
       }
     }
     const divider = node.children.find((child) => child.name === `${node.name}Divider`);

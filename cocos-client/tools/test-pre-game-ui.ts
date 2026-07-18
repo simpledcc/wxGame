@@ -65,6 +65,19 @@ function assertActionIconClearOfText(action: ReturnType<PreGameUi["actionButton"
   assertOk(iconBounds.width <= 56, `${action.node.name} icon must stay within the compact visual cap`);
 }
 
+function assertActionTextRhythm(action: ReturnType<PreGameUi["actionButton"]>): void {
+  const subtitle = action.subtitleLabel?.node;
+  assertOk(subtitle, `${action.node.name} must have a subtitle`);
+  const buttonBounds = transform(action.node);
+  const titleBounds = transform(action.titleLabel.node);
+  const subtitleBounds = transform(subtitle);
+  const gap = action.titleLabel.node.position.y - titleBounds.height / 2
+    - subtitle.position.y - subtitleBounds.height / 2;
+  const bottomInset = subtitle.position.y - subtitleBounds.height / 2 + buttonBounds.height / 2;
+  assertOk(gap >= 8, `${action.node.name} title and subtitle need an eight-pixel gap`);
+  assertOk(bottomInset >= 8, `${action.node.name} subtitle needs an eight-pixel bottom inset`);
+}
+
 function assertSectionTabSpacing(card: Node, name: string, visualKey: string): void {
   const tab = card.getChildByName(`${name}Tab`);
   assertOk(tab, `${name} must have a section tab`);
@@ -212,6 +225,7 @@ function main(): void {
   assertEqual(action.background.strokeCount, 1, "fallback action border must survive visual setup");
   assertEqual(transform(action.iconSlot).width, 56);
   assertActionIconClearOfText(action);
+  assertActionTextRhythm(action);
   const actionSkinNode = action.node.getChildByName("FoundationActionSkin");
   assertOk(actionSkinNode, "action button must keep a dedicated skin node");
   assertEqual(actionSkinNode.getComponent(Sprite)?.sizeMode, Sprite.SizeMode.CUSTOM);
