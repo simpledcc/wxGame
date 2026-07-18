@@ -2205,6 +2205,9 @@ async function main(): Promise<void> {
       assertEqual((statusBand.getComponent(UITransform)!.height
         - statusCopy.getComponent(UITransform)!.height) / 2, 4,
       "feedback status copy needs balanced vertical insets");
+      assertEqual((statusBand.getComponent(UITransform)!.width
+        - statusCopy.getComponent(UITransform)!.width) / 2, 16,
+      "feedback status copy needs balanced horizontal insets");
       assertEqual(statusBand.position.y - statusBand.getComponent(UITransform)!.height / 2
         + formCard.getComponent(UITransform)!.height / 2, 8,
       "feedback status band must clear the card bottom frame");
