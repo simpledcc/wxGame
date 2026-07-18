@@ -513,6 +513,12 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
   assertOk(findDeep(playerModal, "HomePlayerIdentity")?.getComponent(Graphics),
     "player identity must use a visible status badge");
+  const verticalGap = (upper: Node, lower: Node): number =>
+    upper.position.y - upper.getComponent(UITransform)!.height / 2
+      - lower.position.y - lower.getComponent(UITransform)!.height / 2;
+  assertOk(verticalGap(findDeep(playerModal, "HomeAvatarSlot")!, findDeep(playerModal, "HomePlayerDetailName")!) >= 4);
+  assertOk(verticalGap(findDeep(playerModal, "HomePlayerDetailName")!, findDeep(playerModal, "HomePlayerIdentity")!) >= 4);
+  assertOk(verticalGap(findDeep(playerModal, "HomePlayerIdentity")!, findDeep(playerModal, "HomePlayerClose")!) >= 4);
   assertVisibleUiContract(playerModal, "Home player modal");
   assertPreGameTargetDevices(playerModal);
   findDeep(canvas, "HomePlayerClose")?.emit(Button.EventType.CLICK);
@@ -526,6 +532,8 @@ async function main(): Promise<void> {
   assertVisibleUiContract(settingsModal, "Home settings modal");
   assertPreGameTargetDevices(settingsModal);
   assertOk(findDeep(settingsModal, "HomeSettingsSlot"), "settings modal must retain its semantic icon");
+  assertOk(verticalGap(findDeep(settingsModal, "HomeSoundStatus")!, findDeep(settingsModal, "HomeSoundToggle")!) >= 8);
+  assertOk(verticalGap(findDeep(settingsModal, "HomeSoundToggle")!, findDeep(settingsModal, "HomeSettingsClose")!) >= 8);
   const mutedBefore = app.settingsStore.isMuted();
   const soundVisual = findDeep(settingsModal, "HomeSoundToggle")?.getComponent(RuntimeButtonVisual);
   assertEqual(soundVisual?.isShowingSelectedState(), !mutedBefore);

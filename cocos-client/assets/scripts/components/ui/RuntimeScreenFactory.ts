@@ -155,10 +155,10 @@ export class RuntimeScreenFactory {
     const playerModal = home.modal(root, "HomePlayerModal", 500, 360);
     home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 125, 420, 48, 30);
     home.visualSlot(playerModal.content, "avatar", 0, 58, 96, 96);
-    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -14, 400, 42, 24);
-    home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -52, 160, "surface");
+    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -16, 400, 42, 24);
+    home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -59, 160, "surface");
     home.actionButton(
-      playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -120, 260, 80,
+      playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -122, 260, 80,
       () => { playerModal.root.active = false; }, "surface"
     );
     openPlayer = (): void => {
@@ -170,7 +170,7 @@ export class RuntimeScreenFactory {
     home.visualSlot(settingsModal.content, "settings", -150, 105, 52, 52);
     home.label(settingsModal.content, "HomeSettingsTitle", "设置", 28, 105, 330, 48, 30);
     const soundStatus = home.label(
-      settingsModal.content, "HomeSoundStatus", "", 0, 48, 420, 40, 20, "homeTextMuted"
+      settingsModal.content, "HomeSoundStatus", "", 0, 50, 420, 36, 20, "homeTextMuted"
     );
     let soundToggle!: PreGameActionButtonRef;
     const renderSound = (): void => {
@@ -185,7 +185,7 @@ export class RuntimeScreenFactory {
     );
     home.selectionStyle(soundToggle.visual, "join");
     home.actionButton(
-      settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -102, 260, 80,
+      settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -106, 260, 80,
       () => { settingsModal.root.active = false; }, "surface"
     );
     openSettings = (): void => {
