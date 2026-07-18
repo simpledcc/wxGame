@@ -1527,9 +1527,10 @@ async function main(): Promise<void> {
       const catalogSubtitle = findDeep(canvas, "CoopSelectHeaderSubtitle")?.getComponent(UITransform);
       assertOk(helpButton);
       assertOk(helpButton.getComponent(Button) && helpTransform && catalogTitle && catalogSubtitle);
-      assertEqual(helpButton.getComponent(Graphics)?.enabled, false);
-      assertEqual(findDeep(helpButton, "ModeHelpButtonHighlight")?.active, false,
-        "transparent rules action must not show a floating highlight");
+      assertEqual(helpButton.getComponent(Graphics)?.enabled, true,
+        "rules action must use a visible high-contrast circular background");
+      assertEqual(helpButton.getComponent(RuntimeButtonVisual)?.getVisualGeometry().radius, 40);
+      assertEqual(findDeep(helpButton, "ModeHelpButtonHighlight")?.active, true);
       assertOk(catalogTitle.width / 2 + 62 <= helpButton.position.x - helpTransform.width / 2,
         "catalog title must leave room for the rules action");
       assertOk(catalogSubtitle.width / 2 + 14 <= helpButton.position.x - helpTransform.width / 2,

@@ -357,7 +357,7 @@ export class RuntimeScreenFactory {
     header.titleLabel.node.getComponent(UITransform)?.setContentSize(250, 44);
     header.subtitleLabel.node.getComponent(UITransform)?.setContentSize(348, 24);
     home.iconButton(header.node, "ModeHelpButton", "?", 229, 14, 80,
-      () => controller.openHelp(), undefined, "transparent", 36);
+      () => controller.openHelp(), undefined, "join", 36);
     const modes = [
       ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
       ["双人 PK 竞技", "快速抢答，一决高下", "practice", "surface"],
