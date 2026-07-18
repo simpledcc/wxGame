@@ -16,17 +16,17 @@ export class RuntimeButtonVisual extends Component {
   private radius = 8;
   private lastInteractable: boolean | null = null;
   private pressed = false;
-  private contentNodes: Node[] = [];
-  private contentLabels: Label[] = [];
+  private content: Node[] = [];
+  private labels: Label[] = [];
   private labelColors: Color[] = [];
-  private contentSprites: Sprite[] = [];
+  private sprites: Sprite[] = [];
   private spriteColors: Color[] = [];
   private contentY = 0;
   private tintMode: "normal" | "selected" | "disabled" = "normal";
   private selected = false;
-  private selectedFillColor: Color | null = null;
-  private selectedTextColor: Color | null = null;
-  private selectionRing: Node | null = null;
+  private selectedFill: Color | null = null;
+  private selectedText: Color | null = null;
+  private ring: Node | null = null;
 
   configure(
     button: Button,
@@ -61,20 +61,20 @@ export class RuntimeButtonVisual extends Component {
   }
 
   setContent(nodes: readonly Node[], labels: readonly Label[] = [], sprites: readonly Sprite[] = []): void {
-    this.contentNodes = [...nodes];
-    this.contentLabels = [...labels];
-    this.labelColors = this.contentLabels.map((label) => this.copyColor(label.color));
-    this.contentSprites = [...sprites];
-    this.spriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+    this.content = [...nodes];
+    this.labels = [...labels];
+    this.labelColors = this.labels.map((label) => this.copyColor(label.color));
+    this.sprites = [...sprites];
+    this.spriteColors = this.sprites.map((sprite) => this.copyColor(sprite.color));
     this.contentY = 0;
     this.tintMode = "normal";
     this.refresh(true);
   }
 
   setSelectionStyle(fillColor: Color, strokeColor: Color, contentColor: Color): void {
-    this.selectedFillColor = this.copyColor(fillColor);
-    this.selectedTextColor = this.copyColor(contentColor);
-    if (!this.selectionRing) {
+    this.selectedFill = this.copyColor(fillColor);
+    this.selectedText = this.copyColor(contentColor);
+    if (!this.ring) {
       const inset = 4;
       const ring = new Node(`${this.node.name}SelectionRing`);
       ring.layer = this.node.layer;
@@ -87,7 +87,7 @@ export class RuntimeButtonVisual extends Component {
         this.width - inset * 2, this.height - inset * 2, Math.max(0, this.radius - inset));
       graphics.stroke();
       ring.active = false;
-      this.selectionRing = ring;
+      this.ring = ring;
     }
     this.refresh(true);
   }
@@ -120,7 +120,7 @@ export class RuntimeButtonVisual extends Component {
     this.background.fillColor = interactable
       ? (this.pressed
           ? this.pressedColor
-          : (this.selected && this.selectedFillColor ? this.selectedFillColor : this.normalColor))
+          : (this.selected && this.selectedFill ? this.selectedFill : this.normalColor))
       : this.disabledColor;
     this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, this.radius);
     this.background.fill();
@@ -128,7 +128,7 @@ export class RuntimeButtonVisual extends Component {
       const channel = interactable ? (this.pressed ? 220 : 255) : 158;
       this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);
     }
-    if (this.selectionRing) this.selectionRing.active = this.selected && interactable;
+    if (this.ring) this.ring.active = this.selected && interactable;
     this.refreshContent(interactable);
   }
 
@@ -169,21 +169,21 @@ export class RuntimeButtonVisual extends Component {
   private refreshContent(interactable: boolean): void {
     const nextOffsetY = this.pressed && interactable ? -2 : 0;
     if (nextOffsetY !== this.contentY) {
-      this.contentNodes.forEach((node) => {
+      this.content.forEach((node) => {
         node.setPosition(node.position.x, node.position.y - this.contentY + nextOffsetY, node.position.z);
       });
       this.contentY = nextOffsetY;
     }
     const nextTintMode = !interactable
       ? "disabled"
-      : (this.selected && this.selectedTextColor ? "selected" : "normal");
+      : (this.selected && this.selectedText ? "selected" : "normal");
     if (this.tintMode === "normal" && nextTintMode !== "normal") {
-      this.labelColors = this.contentLabels.map((label) => this.copyColor(label.color));
-      this.spriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+      this.labelColors = this.labels.map((label) => this.copyColor(label.color));
+      this.spriteColors = this.sprites.map((sprite) => this.copyColor(sprite.color));
     }
     if (nextTintMode !== "normal" || this.tintMode !== "normal") {
-      this.tint(this.contentLabels, this.labelColors, nextTintMode, 0.68, 190);
-      this.tint(this.contentSprites, this.spriteColors, nextTintMode, 0.72, 184);
+      this.tint(this.labels, this.labelColors, nextTintMode, 0.68, 190);
+      this.tint(this.sprites, this.spriteColors, nextTintMode, 0.72, 184);
     }
     this.tintMode = nextTintMode;
   }
@@ -199,9 +199,9 @@ export class RuntimeButtonVisual extends Component {
             Math.round(base.b * keep + this.disabledColor.b * (1 - keep)),
             Math.min(base.a, alpha)
           )
-        : mode === "selected" && this.selectedTextColor
-          ? new Color(this.selectedTextColor.r, this.selectedTextColor.g, this.selectedTextColor.b,
-              Math.min(base.a, this.selectedTextColor.a))
+        : mode === "selected" && this.selectedText
+          ? new Color(this.selectedText.r, this.selectedText.g, this.selectedText.b,
+              Math.min(base.a, this.selectedText.a))
           : this.copyColor(base);
     });
   }

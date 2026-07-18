@@ -500,11 +500,13 @@ async function main(): Promise<void> {
   assertPreGameIconLayout(initialHomeRoot, "home route");
 
   const playerModal = findDeep(canvas, "HomePlayerModal");
+  assertOk(playerModal);
   assertEqual(playerModal?.active, false);
   findDeep(canvas, "HomeAvatarButton")?.emit(Button.EventType.CLICK);
   assertEqual(playerModal?.active, true);
   assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
-  assertOk(playerModal);
+  assertOk(findDeep(playerModal, "HomePlayerIdentity")?.getComponent(Graphics),
+    "player identity must use a visible status badge");
   assertVisibleUiContract(playerModal, "Home player modal");
   assertPreGameTargetDevices(playerModal);
   findDeep(canvas, "HomePlayerClose")?.emit(Button.EventType.CLICK);
@@ -517,7 +519,10 @@ async function main(): Promise<void> {
   assertOk(settingsModal);
   assertVisibleUiContract(settingsModal, "Home settings modal");
   assertPreGameTargetDevices(settingsModal);
+  assertOk(findDeep(settingsModal, "HomeSettingsSlot"), "settings modal must retain its semantic icon");
   const mutedBefore = app.settingsStore.isMuted();
+  const soundVisual = findDeep(settingsModal, "HomeSoundToggle")?.getComponent(RuntimeButtonVisual);
+  assertEqual(soundVisual?.isShowingSelectedState(), !mutedBefore);
   findDeep(canvas, "HomeSoundToggle")?.emit(Button.EventType.CLICK);
   assertEqual(app.settingsStore.isMuted(), !mutedBefore);
   assertEqual(app.audio.isMuted(), !mutedBefore, "settings modal must persist through AudioService");
@@ -525,6 +530,8 @@ async function main(): Promise<void> {
     findDeep(canvas, "HomeSoundStatus")?.getComponent(Label)?.string,
     mutedBefore ? "当前音效：已开启" : "当前音效：已静音"
   );
+  assertEqual(soundVisual?.isShowingSelectedState(), mutedBefore,
+    "sound selection treatment must follow the persisted audio state");
   findDeep(canvas, "HomeSettingsClose")?.emit(Button.EventType.CLICK);
   assertEqual(settingsModal.active, false);
 
@@ -983,9 +990,10 @@ async function main(): Promise<void> {
       app.roomStore.applySnapshot(waitingRoom);
       assertEqual(
         findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,
-        "玩家1（你）\n○ 未准备",
-        "human system names must not be rendered twice"
+        "玩家1（你）",
+        "player cards must leave readiness to the status badge"
       );
+      assertEqual(findDeep(canvas, "RoomPlayerOneWaiting")?.active, true);
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "InviteFriend")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "RefreshRoom"), null, "room refresh stays in background polling");

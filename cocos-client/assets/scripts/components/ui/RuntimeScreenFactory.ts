@@ -155,7 +155,7 @@ export class RuntimeScreenFactory {
     home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 125, 420, 48, 30);
     home.visualSlot(playerModal.content, "avatar", 0, 58, 96, 96);
     const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -14, 400, 42, 24);
-    home.label(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -52, 400, 32, 18, "homeTextMuted");
+    home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -52, 160, "surface");
     home.actionButton(
       playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -120, 260, 80,
       () => { playerModal.root.active = false; }, "surface"
@@ -166,7 +166,8 @@ export class RuntimeScreenFactory {
     };
 
     const settingsModal = home.modal(root, "HomeSettingsModal", 500, 330);
-    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 0, 105, 420, 48, 30);
+    home.visualSlot(settingsModal.content, "settings", -150, 105, 52, 52);
+    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 28, 105, 330, 48, 30);
     const soundStatus = home.label(
       settingsModal.content, "HomeSoundStatus", "", 0, 48, 420, 40, 20, "homeTextMuted"
     );
@@ -175,11 +176,13 @@ export class RuntimeScreenFactory {
       const muted = app.settingsStore.isMuted();
       soundStatus.string = muted ? "当前音效：已静音" : "当前音效：已开启";
       soundToggle.titleLabel.string = muted ? "开启音效" : "静音音效";
+      soundToggle.visual.setSelected(!muted);
     };
     soundToggle = home.actionButton(
       settingsModal.content, "HomeSoundToggle", "", "", "声", 0, -18, 360, 80,
       () => { controller.toggleMuted(); renderSound(); }, "surface"
     );
+    home.selectionStyle(soundToggle.visual, "join");
     home.actionButton(
       settingsModal.content, "HomeSettingsClose", "关闭", "", "×", 0, -102, 260, 80,
       () => { settingsModal.root.active = false; }, "surface"
