@@ -154,13 +154,13 @@ export class RuntimeScreenFactory {
       () => controller.openFeedback(), "bank", "feedback"
     );
 
-    const playerModal = home.modal(root, "HomePlayerModal", 500, 360);
-    home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 125, 420, 48, 30);
-    home.visualSlot(playerModal.content, "avatar", 0, 58, 96, 96);
-    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -16, 400, 42, 24);
-    home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -59, 160, "surface");
+    const playerModal = home.modal(root, "HomePlayerModal", 500, 400);
+    home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 145, 420, 48, 30);
+    home.visualSlot(playerModal.content, "avatar", 0, 62, 96, 96);
+    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -18, 400, 42, 24);
+    home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -64, 160, "surface");
     home.actionButton(
-      playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -122, 260, 80,
+      playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -130, 260, 80,
       () => { playerModal.root.active = false; }, "surface"
     );
     openPlayer = (): void => {

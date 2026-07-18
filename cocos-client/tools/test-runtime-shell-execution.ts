@@ -586,9 +586,19 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "HomePlayerDetailName")?.getComponent(Label)?.string, "玩家");
   assertOk(findDeep(playerModal, "HomePlayerIdentity")?.getComponent(Graphics),
     "player identity must use a visible status badge");
-  assertOk(verticalGap(findDeep(playerModal, "HomeAvatarSlot")!, findDeep(playerModal, "HomePlayerDetailName")!) >= 4);
-  assertOk(verticalGap(findDeep(playerModal, "HomePlayerDetailName")!, findDeep(playerModal, "HomePlayerIdentity")!) >= 4);
-  assertOk(verticalGap(findDeep(playerModal, "HomePlayerIdentity")!, findDeep(playerModal, "HomePlayerClose")!) >= 4);
+  const playerContent = findDeep(playerModal, "HomePlayerModalContent")!;
+  const playerChain = ["HomePlayerModalTitle", "HomeAvatarSlot", "HomePlayerDetailName", "HomePlayerIdentity", "HomePlayerClose"]
+    .map((name) => findDeep(playerContent, name)!);
+  assertEqual(findDeep(playerModal, "HomePlayerModalPanel")?.getComponent(UITransform)?.height, 400);
+  assertEqual(playerContent.getComponent(UITransform)?.height, 364);
+  for (let gap = 0; gap < playerChain.length - 1; gap += 1) {
+    assertOk(verticalGap(playerChain[gap], playerChain[gap + 1]) >= 8,
+      `player modal gap ${gap} must remain visible`);
+  }
+  assertOk(playerContent.getComponent(UITransform)!.height / 2
+    - playerChain[0].position.y - playerChain[0].getComponent(UITransform)!.height / 2 >= 8);
+  assertOk(playerChain[4].position.y - playerChain[4].getComponent(UITransform)!.height / 2
+    >= -playerContent.getComponent(UITransform)!.height / 2 + 8);
   assertVisibleUiContract(playerModal, "Home player modal");
   assertPreGameTargetDevices(playerModal);
   findDeep(canvas, "HomePlayerClose")?.emit(Button.EventType.CLICK);
