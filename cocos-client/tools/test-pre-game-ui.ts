@@ -322,6 +322,14 @@ function main(): void {
   );
   assertVisualMatchesHitArea(directButton.node, directButton.visual);
   assertEqual(directButton.background.strokeCount, 1, "plain buttons must retain their border after setup");
+  const compactAction = preGame.actionButton(
+    pageSafe.node, "FoundationCompactAction", "详情", "", "绩", 0, 100, 92, 80,
+    () => undefined, "surface", "history"
+  );
+  assertEqual(transform(compactAction.iconSlot).width, 24);
+  assertActionIconClearOfText(compactAction);
+  assertOk(compactAction.titleLabel.node.position.x + transform(compactAction.titleLabel.node).width / 2
+    <= transform(compactAction.node).width / 2 - 8);
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderBackdrop")?.getComponent(Graphics));
   assertEqual(pageHeader.backButton.background.enabled, true);
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon"));

@@ -90,6 +90,21 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (buttonGraphics?.enabled && buttonGraphics.strokeCount < 1) {
       violations.push(`${nodePath} has no visible fallback border`);
     }
+    const actionIcon = node.children.find((child) => child.name === `${node.name}IconSlot`);
+    const actionTitle = node.children.find((child) => child.name === `${node.name}Title`);
+    if (transform && actionIcon?.active && actionTitle?.active) {
+      const iconTransform = actionIcon.getComponent(UITransform);
+      const titleTransform = actionTitle.getComponent(UITransform);
+      if (iconTransform && titleTransform) {
+        const iconLeft = actionIcon.position.x - iconTransform.width / 2;
+        const iconRight = actionIcon.position.x + iconTransform.width / 2;
+        const titleLeft = actionTitle.position.x - titleTransform.width / 2;
+        const titleRight = actionTitle.position.x + titleTransform.width / 2;
+        if (iconLeft < -transform.width / 2 + 8) violations.push(`${nodePath} action icon misses its inset`);
+        if (titleLeft - iconRight < 8) violations.push(`${nodePath} action icon crowds its title`);
+        if (titleRight > transform.width / 2 - 8) violations.push(`${nodePath} action title misses its inset`);
+      }
+    }
     const title = node.children.find((child) => child.name === `${node.name}Title`);
     const subtitle = node.children.find((child) => child.name === `${node.name}Subtitle`);
     if (title?.active && subtitle?.active) {
@@ -952,7 +967,7 @@ async function main(): Promise<void> {
     [copy, invite].forEach((action) => {
       const icon = findDeep(action, `${action.name}IconSlot`)!;
       const title = findDeep(action, `${action.name}Title`)!;
-      assertOk(right(icon) + 4 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
+      assertOk(right(icon) + 8 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
     });
     assertEqual(findDeep(copy, "CopyCodeTitle")?.getComponent(Label)?.string, "复制");
     assertEqual(findDeep(invite, "InviteFriendTitle")?.getComponent(Label)?.string, "邀请");
@@ -1757,9 +1772,9 @@ async function main(): Promise<void> {
         const icon = findDeep(detail, `${detail.name}IconSlot`)!;
         const label = findDeep(detail, `${detail.name}Title`)!;
         const halfWidth = detail.getComponent(UITransform)!.width / 2;
-        assertOk(rightEdge(icon) + 4 <= leftEdge(label), "History detail icon and title must not overlap");
+        assertOk(rightEdge(icon) + 8 <= leftEdge(label), "History detail icon and title must not overlap");
         assertOk(leftEdge(icon) >= -halfWidth + 8, "History detail icon must remain inside its action");
-        assertOk(rightEdge(label) <= halfWidth - 4, "History detail title must remain inside its action");
+        assertOk(rightEdge(label) <= halfWidth - 8, "History detail title must remain inside its action");
         assertOk(findDeep(detail, "HomeHistorySlot"), "History detail must mount the formal history icon");
         assertEqual(label.getComponent(Label)?.string, "详情");
       };
