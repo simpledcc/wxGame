@@ -1055,11 +1055,12 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "MarkWrong"));
   ["RevealWord", "MarkWrong", "MeaningToggle"].forEach((name) =>
     assertOk(findDeep(canvas, `${name}IconSlot`), `${name} must expose a semantic icon slot`));
-  assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 366);
+  assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 360);
   assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgress")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgressFill")?.getComponent(Graphics));
   const studySafe = findDeep(studyRoot, "StudySafeArea")!;
+  const studyHeader = findDeep(canvas, "StudyHeader")!;
   const studyCard = findDeep(canvas, "StudyCard")!;
   const studyReveal = findDeep(canvas, "RevealWord")!;
   const studyMeaningToggle = findDeep(canvas, "MeaningToggle")!;
@@ -1082,11 +1083,13 @@ async function main(): Promise<void> {
   findDeep(canvas, "RandomWord")?.emit(Button.EventType.CLICK);
   assertOk(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string !== initialStudyStatus,
     "RandomWord must choose a different Study card");
-  assertOk(verticalGap(studyBankBar!, studyCard) >= 2);
-  assertOk(verticalGap(studyCard, studyReveal) >= 2);
-  assertOk(verticalGap(studyReveal, studyMeaningToggle) >= 2);
-  assertOk(verticalGap(studyMeaningToggle, studyNext) >= 2);
-  assertOk(studyNext.position.y - studyNext.getComponent(UITransform)!.height / 2 >= -studySafe.getComponent(UITransform)!.height / 2);
+  assertOk(verticalGap(studyHeader, studyBankBar!) >= 4);
+  assertOk(verticalGap(studyBankBar!, studyCard) >= 4);
+  assertOk(verticalGap(studyCard, studyReveal) >= 4);
+  assertOk(verticalGap(studyReveal, studyMeaningToggle) >= 4);
+  assertOk(verticalGap(studyMeaningToggle, studyNext) >= 4);
+  assertOk(studyNext.position.y - studyNext.getComponent(UITransform)!.height / 2
+    >= -studySafe.getComponent(UITransform)!.height / 2 + 4);
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);

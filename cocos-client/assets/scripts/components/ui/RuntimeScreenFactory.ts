@@ -305,7 +305,7 @@ export class RuntimeScreenFactory {
       () => controller.backHome(), "practice");
     const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     const bankBar = home.actionButton(safe.node, "StudyBankBar", getWordBankLabel(selectedBank, true),
-      "当前词库", "词", 0, safeTop - 156, 560, 80, () => controller.changeBank(), "surface", "wordBank");
+      "当前词库", "词", 0, safeTop - 160, 560, 80, () => controller.changeBank(), "surface", "wordBank");
     [bankBar.titleLabel, bankBar.subtitleLabel].forEach((label) => {
       if (!label) return;
       label.node.setPosition(-20, label.node.position.y, 0);
@@ -314,9 +314,9 @@ export class RuntimeScreenFactory {
     const bankChange = home.pill(bankBar.node, "StudyBankChangeBadge", 220, 0, 104, 54,
       "homePractice", "homeTextOnColor");
     home.label(bankChange, "StudyBankChangeLabel", "更换", 0, 0, 78, 36, 17, "homeTextOnColor");
-    const cardY = safeTop - 382 - stretch * 0.05;
+    const cardY = safeTop - 384 - stretch * 0.05;
     const card = home.sectionCard(safe.node, "StudyCard", "学习卡", 0, cardY,
-      540, 366, "practice", "practice");
+      540, 360, "practice", "practice");
     home.label(card, "StudyProgressCaption", "学习进度", 182, 142, 120, 24, 16, "homeTextMuted");
     const status = home.label(card, "StudyStatus", "", 182, 110, 120, 32, 18, "homeTextMuted");
     const progress = home.progressBar(card, "StudyProgress", 182, 84, 124, 12, "practice");
@@ -326,7 +326,7 @@ export class RuntimeScreenFactory {
       () => controller.previousWord(), "join", "wordBank");
     home.actionButton(card, "RandomWord", "随机", "", "练", 142, -132, 220, 80,
       () => controller.randomWord(), "surface", "practice");
-    const revealY = cardY - 226 - stretch * 0.28;
+    const revealY = cardY - 224 - stretch * 0.28;
     home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 80,
       () => controller.revealCurrentMeaning(), "join", "practice");
     const markWrong = home.actionButton(safe.node, "MarkWrong", "标记错词", "", "★", 134, revealY, 252, 80,
@@ -336,7 +336,7 @@ export class RuntimeScreenFactory {
       cardY - 308 - stretch * 0.39, 500, 80, () => controller.toggleChinese(), "surface", "practice");
     home.selectionStyle(meaningToggle.visual, "join");
     home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "→", 0,
-      cardY - 398 - stretch * 0.6, 500, 80, () => controller.nextWord(), "create", "practice");
+      cardY - 392 - stretch * 0.6, 500, 80, () => controller.nextWord(), "create", "practice");
     controller = root.addComponent(StudyScene);
     controller.wordLabel = word;
     controller.meaningLabel = meaning;
