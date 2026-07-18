@@ -936,6 +936,9 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 110);
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
+      assertOk(!findDeep(canvas, "BankSlot0Title")?.getComponent(Label)?.string.startsWith("✓"),
+        "selected Bank title must leave state feedback to the ring and badge");
+      assertEqual(findDeep(canvas, "BankSlot0State")?.getComponent(Label)?.string, "已选择");
       const selectedBankId = app.store.getState().bankPickerSelectedBankId;
       const canUnlock = isUnlockableWordBankId(app.wordBankCatalog, selectedBankId)
         && !app.wordBankStore.isUnlocked(app.wordBankCatalog, selectedBankId);

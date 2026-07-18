@@ -254,7 +254,7 @@ export class RuntimeScreenFactory {
         const unlocked = app.wordBankStore.isUnlocked(app.wordBankCatalog, id);
         const selected = id === selectedId;
         slot.visual.setSelected(selected);
-        slot.titleLabel.string = `${id === selectedId ? "✓ " : ""}${getWordBankLabel(bank, true)}`;
+        slot.titleLabel.string = getWordBankLabel(bank, true);
         if (slot.subtitleLabel) {
           slot.subtitleLabel.string = `${bank.words.length} 个单词 · ${unlocked ? "已解锁" : "未解锁"}`;
         }
