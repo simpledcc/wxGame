@@ -53,7 +53,7 @@ export class RuntimeScreenFactory {
     const compact = safe.height < 1000;
     const fit = (a: number, b: number) => compact ? a : b;
     const logoY = safeTop - fit(174, 180);
-    const footerY = safeBottom + 46;
+    const footerY = safeBottom + 48;
     const top = home.topBar(safe, "HomeTopBar", 92);
     let controller!: HomeScene;
     let openPlayer!: () => void;
@@ -135,7 +135,7 @@ export class RuntimeScreenFactory {
 
     let privacy!: PreGameActionButtonRef;
     privacy = home.actionButton(
-      safe.node, "HomePrivacy", "隐私保护指引", "", "隐", -134, footerY, 252, 84,
+      safe.node, "HomePrivacy", "隐私保护指引", "", "隐", -134, footerY, 252, 80,
       () => {
         if (!privacy.button.interactable) return;
         privacy.button.interactable = false;
@@ -150,7 +150,7 @@ export class RuntimeScreenFactory {
       }, "practice", "privacy"
     );
     home.actionButton(
-      safe.node, "FeedbackButton", "问题反馈", "", "言", 134, footerY, 252, 84,
+      safe.node, "FeedbackButton", "问题反馈", "", "言", 134, footerY, 252, 80,
       () => controller.openFeedback(), "bank", "feedback"
     );
 

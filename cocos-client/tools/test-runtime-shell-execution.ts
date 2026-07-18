@@ -602,6 +602,17 @@ async function main(): Promise<void> {
       `${context} coin add badge must remain inside the coin action`);
   };
   assertHomeCoinLayout(canvas, "long Home");
+  const assertHomeFooterLayout = (root: Node, context: string): void => {
+    const safe = findDeep(root, "HomeSafeArea")!;
+    ["HomePrivacy", "FeedbackButton"].forEach((name) => {
+      const action = findDeep(root, name)!;
+      const height = action.getComponent(UITransform)!.height;
+      assertEqual(height, 80, `${context} ${name} must retain its target-device touch height`);
+      assertEqual(action.position.y - height / 2 + safe.getComponent(UITransform)!.height / 2, 8,
+        `${context} ${name} must clear the safe-area bottom`);
+    });
+  };
+  assertHomeFooterLayout(canvas, "long Home");
   const homeLogoTransform = findDeep(canvas, "HomeLogoSlot")?.getComponent(UITransform);
   assertEqual(homeLogoTransform?.width, 520);
   assertEqual(homeLogoTransform?.height, 156);
@@ -813,6 +824,7 @@ async function main(): Promise<void> {
   assertPreGameIconLayout(minimumHomeRoot, "minimum Home route");
   assertHomePlayerLayout(minimumHomeRoot, "minimum Home");
   assertHomeCoinLayout(minimumHomeRoot, "minimum Home");
+  assertHomeFooterLayout(minimumHomeRoot, "minimum Home");
   setMockWindowSize(393, 852);
   app.store.setRoute("bank");
   await flushMany();
