@@ -467,7 +467,7 @@ export class RuntimeScreenFactory {
     const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -13, 28, 28,
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
-    const status = home.label(statusCard, "RoomStatus", "", 42, -14, 420, 26, 17, "homeTextMuted");
+    const status = home.label(statusCard, "RoomStatus", "", 18, -14, 436, 26, 17, "homeTextMuted");
     const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -233, 440, 80,
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");

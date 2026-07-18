@@ -1103,7 +1103,11 @@ async function main(): Promise<void> {
     `${context} status copy must clear the card bottom frame`);
     indicators.forEach((indicator) => {
       assertOk(verticalGap(statusTab, indicator) >= 8, `${context} status tab/indicator gap must remain visible`);
-      assertOk(right(indicator) + 8 <= left(statusCopy), `${context} indicator/copy columns must remain separate`);
+      assertEqual(left(statusCopy) - right(indicator), 8,
+        `${context} status indicator and copy need an eight-pixel boundary`);
+      assertEqual(left(indicator) + statusCard.getComponent(UITransform)!.width / 2,
+        statusCard.getComponent(UITransform)!.width / 2 - right(statusCopy),
+      `${context} status row needs balanced horizontal card insets`);
       assertEqual(indicator.position.y - indicator.getComponent(UITransform)!.height / 2
         + statusCard.getComponent(UITransform)!.height / 2, 8,
       `${context} status indicator must clear the card bottom frame`);
