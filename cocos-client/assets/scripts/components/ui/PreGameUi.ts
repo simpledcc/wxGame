@@ -315,12 +315,12 @@ export class PreGameUi {
     titleLabel.enableOutline = true;
     titleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.5);
     titleLabel.outlineWidth = 2;
-    const divider = this.node(node, `${name}Divider`, 62, -4, 286, 2);
+    const divider = this.node(node, `${name}Divider`, 62, -7, 286, 2);
     const dividerGraphics = divider.addComponent(Graphics);
     dividerGraphics.fillColor = new Color(255, 255, 255, 92);
     dividerGraphics.roundRect(-143, -1, 286, 2, 1);
     dividerGraphics.fill();
-    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -25, 382, 30, 15, "homeTextOnColor");
+    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -29, 382, 24, 15, "homeTextOnColor");
     subtitleLabel.enableOutline = true;
     subtitleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.54);
     subtitleLabel.outlineWidth = 1;

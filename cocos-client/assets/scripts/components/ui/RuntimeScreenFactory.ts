@@ -358,7 +358,7 @@ export class RuntimeScreenFactory {
     const header = home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法",
       () => controller.backHome(), "catalog");
     header.titleLabel.node.getComponent(UITransform)?.setContentSize(250, 44);
-    header.subtitleLabel.node.getComponent(UITransform)?.setContentSize(348, 30);
+    header.subtitleLabel.node.getComponent(UITransform)?.setContentSize(348, 24);
     home.iconButton(header.node, "ModeHelpButton", "?", 229, 14, 80,
       () => controller.openHelp(), undefined, "transparent", 36);
     const modes = [

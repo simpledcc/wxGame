@@ -96,6 +96,16 @@ function assertVisibleUiContract(root: Node, context: string): void {
         if (gap < 2) violations.push(`${nodePath} title/subtitle gap is ${gap}`);
       }
     }
+    const divider = node.children.find((child) => child.name === `${node.name}Divider`);
+    const headerIcon = node.children.find((child) => child.name === `${node.name}Icon`);
+    if (title && subtitle && divider && headerIcon) {
+      const edgeGap = (upper: Node, lower: Node): number =>
+        upper.position.y - upper.getComponent(UITransform)!.height / 2
+          - lower.position.y - lower.getComponent(UITransform)!.height / 2;
+      if (edgeGap(title, divider) < 2) violations.push(`${nodePath} title intersects its divider`);
+      if (edgeGap(divider, subtitle) < 2) violations.push(`${nodePath} divider intersects its subtitle`);
+      if (edgeGap(headerIcon, subtitle) < 2) violations.push(`${nodePath} icon intersects its subtitle`);
+    }
     node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
   };
   visit(root, 0, 0, 1, 1, "");
