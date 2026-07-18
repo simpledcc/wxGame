@@ -525,7 +525,7 @@ async function main(): Promise<void> {
   "Home Bank name must not enter the change badge");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
-  assertOk(subtitleBankGap >= 4, "Home subtitle and bank bar need a visible gap");
+  assertOk(subtitleBankGap >= 8, "Home subtitle and bank bar need the eight-pixel rhythm");
   assertOk(verticalGap(currentBankBar, createRoomButton) >= 8,
     "Home Bank strip and primary action must remain visually separate");
   assertEqual(
@@ -629,6 +629,12 @@ async function main(): Promise<void> {
     && (findDeep(canvas, "StudyButton")?.position.y || 0) > (findDeep(canvas, "HelpButton")?.position.y || 0),
     "Home actions must follow create, join, learning, then extension hierarchy"
   );
+  const longHomeChain = ["CurrentBankBar", "CreateRoomButton", "JoinRoomButton", "StudyButton", "HelpButton"]
+    .map((name) => findDeep(canvas, name)!);
+  for (let gap = 0; gap < longHomeChain.length - 1; gap += 1) {
+    assertOk(verticalGap(longHomeChain[gap], longHomeChain[gap + 1]) >= 8,
+      `long Home action gap ${gap} must retain the eight-pixel rhythm`);
+  }
   const createSkin = findDeep(canvas, "CreateRoomButtonSkin");
   assertEqual(createSkin?.active, true, "formal primary button skin must load");
   assertEqual(createSkin?.getComponent(Sprite)?.type, Sprite.Type.SLICED);
@@ -789,12 +795,12 @@ async function main(): Promise<void> {
   assertOk(minimumRibbonTop - minimumLogoBottom >= 0 && minimumRibbonTop - minimumLogoBottom <= 8,
     "minimum Home ribbon must stay attached to the Logo without covering its core");
   for (let gap = 2; gap < minimumHomeChain.length - 1; gap += 1) {
-    assertOk(verticalGap(minimumHomeChain[gap], minimumHomeChain[gap + 1]) >= 4,
-      `minimum Home gap ${gap} must remain visible`);
+    assertOk(verticalGap(minimumHomeChain[gap], minimumHomeChain[gap + 1]) >= 8,
+      `minimum Home gap ${gap} must retain the eight-pixel rhythm`);
   }
   assertEqual(minimumHomeChain[1].getComponent(UITransform)?.height, 108);
-  assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 96);
-  assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 96);
+  assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 92);
+  assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 92);
   assertEqual(minimumHomeChain[6].getComponent(UITransform)?.height, 80);
   assertEqual(findDeep(minimumHomeRoot, "BankButton")?.position.y, minimumHomeChain[6].position.y);
   assertEqual(findDeep(minimumHomeRoot, "HistoryButton")?.position.y, minimumHomeChain[7].position.y);
