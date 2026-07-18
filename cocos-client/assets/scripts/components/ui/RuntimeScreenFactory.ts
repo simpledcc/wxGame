@@ -415,7 +415,7 @@ export class RuntimeScreenFactory {
       const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 74,
         548, 148, "practice", "wordBank");
       home.visualSlot(bankCard, "wordBank", -210, -26, 66, 66);
-      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -16, 300, 46, 25, "homeText", 0);
+      selectedBank = home.label(bankCard, "CreateBankLabel", "", -17, -16, 304, 46, 25, "homeText", 0);
       home.actionButton(bankCard, "ChangeRoomBank", "更换", "", "词", 202, -15, 118, 80,
         () => controller.changeBank(), "practice", "wordBank");
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,

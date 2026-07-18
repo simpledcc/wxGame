@@ -1007,15 +1007,15 @@ async function main(): Promise<void> {
     });
     assertOk(verticalGap(bankTab, bankIcon) >= 8, `${context} Bank tab/icon gap must remain visible`);
     assertOk(verticalGap(bankTab, bankName) >= 8, `${context} Bank tab/name gap must remain visible`);
-    assertOk(bankIcon.position.x + bankIcon.getComponent(UITransform)!.width / 2 + 8
-      <= bankName.position.x - bankName.getComponent(UITransform)!.width / 2,
-    `${context} Bank icon must not enter the name column`);
-    assertOk(bankName.position.x + bankName.getComponent(UITransform)!.width / 2 + 8
-      <= bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2,
-    `${context} Bank name must not enter the change action`);
-    assertOk(bankActionIcon.position.x + bankActionIcon.getComponent(UITransform)!.width / 2 + 4
-      <= bankActionTitle.position.x - bankActionTitle.getComponent(UITransform)!.width / 2,
-    `${context} change-Bank icon/title gap must remain visible`);
+    assertEqual(bankName.position.x - bankName.getComponent(UITransform)!.width / 2
+      - bankIcon.position.x - bankIcon.getComponent(UITransform)!.width / 2, 8,
+    `${context} Bank icon and name need an eight-pixel boundary`);
+    assertEqual(bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2
+      - bankName.position.x - bankName.getComponent(UITransform)!.width / 2, 8,
+    `${context} Bank name and change action need an eight-pixel boundary`);
+    assertEqual(bankActionTitle.position.x - bankActionTitle.getComponent(UITransform)!.width / 2
+      - bankActionIcon.position.x - bankActionIcon.getComponent(UITransform)!.width / 2, 8,
+    `${context} change-Bank icon and title need an eight-pixel boundary`);
     assertOk(findDeep(bankAction, "HomeWordBankSlot"), `${context} change-Bank action needs its formal icon`);
     assertEqual(bankActionTitle.getComponent(Label)?.string, "更换");
     assertEqual(guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2
