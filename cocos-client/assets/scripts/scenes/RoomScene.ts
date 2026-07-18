@@ -13,7 +13,7 @@ import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
 import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
 import type { RoomSessionState } from "../store/RoomStore";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 const ACTION_LABELS: Record<string, string> = {
   create: "正在创建房间...",
@@ -26,73 +26,30 @@ const ACTION_LABELS: Record<string, string> = {
 
 @ccclass("RoomScene")
 export class RoomScene extends Component {
-  @property(EditBox)
   roomCodeInput: EditBox | null = null;
-
-  @property(Label)
   roomCodeLabel: Label | null = null;
-
-  @property(Label)
   modeLabel: Label | null = null;
-
-  @property(Label)
   playerOneLabel: Label | null = null;
-
-  @property(Label)
   playerTwoLabel: Label | null = null;
-
-  @property(Label)
   statusLabel: Label | null = null;
-
-  @property(Label)
   pageTitleLabel: Label | null = null;
-
-  @property(Label)
   selectedBankLabel: Label | null = null;
-
-  @property(Label)
   autoReadyLabel: Label | null = null;
-
-  @property(Label)
   readyLabel: Label | null = null;
 
-  @property(Node)
   createPanel: Node | null = null;
-
-  @property(Node)
   joinPanel: Node | null = null;
-
-  @property(Node)
   lobbyPanel: Node | null = null;
 
-  @property(Button)
   readyButton: Button | null = null;
-
-  @property(Button)
   createButton: Button | null = null;
-
-  @property(Button)
   joinButton: Button | null = null;
-
-  @property(Button)
   copyButton: Button | null = null;
-
-  @property(Button)
   inviteButton: Button | null = null;
-
-  @property(Button)
   backButton: Button | null = null;
-
-  @property(Button)
   leaveButton: Button | null = null;
-
-  @property(Button)
   startButton: Button | null = null;
-
-  @property(Label)
   startSubtitleLabel: Label | null = null;
-
-  @property(Button)
   autoReadyButton: Button | null = null;
 
   autoReadyVisual: RuntimeButtonVisual | null = null;
@@ -100,7 +57,8 @@ export class RoomScene extends Component {
   startVisual: RuntimeButtonVisual | null = null;
   playerReadyIndicators: Node[] = [];
   playerWaitingIndicators: Node[] = [];
-  roomReadyIndicator: Node | null = null;
+  readyIndicator: Node | null = null;
+  attentionIndicator: Node | null = null;
   joinHintLabel: Label | null = null;
   joinSubtitleLabel: Label | null = null;
 
@@ -227,6 +185,7 @@ export class RoomScene extends Component {
   private render(state: RoomSessionState): void {
     const room = state.room;
     const hasSession = !!state.roomId || !!room;
+    const attention = !!state.pendingAction || !!state.syncError;
     const intent = app.store.getState().roomEntryIntent;
     if (hasSession) {
       this.releaseEntryPanels();
@@ -255,7 +214,8 @@ export class RoomScene extends Component {
     }
     if (!room) {
       this.renderPlayerStateIndicators([]);
-      if (this.roomReadyIndicator) this.roomReadyIndicator.active = false;
+      if (this.readyIndicator) this.readyIndicator.active = false;
+      if (this.attentionIndicator) this.attentionIndicator.active = attention;
       this.readyVisual?.setSelected(false);
       this.startVisual?.setSelected(false);
       if (hasSession) {
@@ -276,7 +236,8 @@ export class RoomScene extends Component {
     const availability = getRoomActionAvailability(room, localOpenId);
     const localPlayer = getLocalRoomPlayer(room, localOpenId);
     this.renderPlayerStateIndicators(room.players);
-    if (this.roomReadyIndicator) this.roomReadyIndicator.active = availability.canStart;
+    if (this.readyIndicator) this.readyIndicator.active = availability.canStart && !attention;
+    if (this.attentionIndicator) this.attentionIndicator.active = attention;
     this.readyVisual?.setSelected(!!localPlayer?.ready);
     this.startVisual?.setSelected(availability.canStart);
     if (this.modeLabel) {

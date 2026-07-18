@@ -459,6 +459,9 @@ export class RuntimeScreenFactory {
     const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -10, 30, 30,
       "homePractice", "homeTextOnColor");
     roomReadyIndicator.active = false;
+    const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -10, 30, 30,
+      "homeHistory", "homeTextOnColor");
+    roomAttentionIndicator.active = false;
     const status = home.label(statusCard, "RoomStatus", "", 42, -10, 420, 46, 17, "homeTextMuted");
     const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -238, 440, 90,
       () => void controller.toggleReady(), "practice", "practice");
@@ -500,7 +503,8 @@ export class RuntimeScreenFactory {
     controller.startVisual = start.visual;
     controller.playerReadyIndicators = [playerOne.ready, playerTwo.ready];
     controller.playerWaitingIndicators = [playerOne.waiting, playerTwo.waiting];
-    controller.roomReadyIndicator = roomReadyIndicator;
+    controller.readyIndicator = roomReadyIndicator;
+    controller.attentionIndicator = roomAttentionIndicator;
     return root;
   }
 

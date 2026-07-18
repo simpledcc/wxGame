@@ -1011,6 +1011,7 @@ async function main(): Promise<void> {
       );
       assertEqual(findDeep(canvas, "RoomPlayerTwo")?.getComponent(Label)?.string, "等待加入");
       assertEqual(findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string, "正在进入房间...");
+      assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, false);
       assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
       assertEqual(findDeep(canvas, "CreateRoom"), null);
       assertEqual(findDeep(canvas, "JoinRoom"), null);
@@ -1042,6 +1043,12 @@ async function main(): Promise<void> {
         "background polling must not replace the visible preparation status"
       );
       app.roomStore.setSyncing(false);
+      app.roomStore.setSyncError("网络波动");
+      assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, true);
+      assertEqual(findDeep(canvas, "RoomStatusReady")?.active, false);
+      assertOk(findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string.includes("后台将自动重试"));
+      app.roomStore.setSyncError("");
+      assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, false);
 
       const twoReadyPlayers: RoomSnapshot = {
         ...waitingRoom,
@@ -1057,6 +1064,12 @@ async function main(): Promise<void> {
       enabledStartVisual?.refresh();
       assertEqual(enabledStartVisual?.isShowingDisabledState(), false, "enabled start must use the highlighted action color");
       assertEqual(enabledStartVisual?.isShowingSelectedState(), true, "ready room must expose the selected start state");
+      assertEqual(findDeep(canvas, "RoomStatusReady")?.active, true);
+      app.roomStore.setPendingAction("start");
+      assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, true);
+      assertEqual(findDeep(canvas, "RoomStatusReady")?.active, false);
+      app.roomStore.setPendingAction(null);
+      assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, false);
       assertEqual(findDeep(canvas, "RoomStatusReady")?.active, true);
       assertEqual(findDeep(canvas, "RoomPlayerTwoReady")?.active, true);
       assertEqual(

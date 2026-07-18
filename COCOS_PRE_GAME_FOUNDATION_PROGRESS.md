@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Twelve source passes cover shared chrome, persistent state feedback, formal icons/badges, room readiness actions, copy hierarchy, reachable rules, Feedback status containment and Help reading hierarchy | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Thirteen source passes cover shared chrome, persistent state feedback, formal icons/badges, room readiness/attention states, copy hierarchy, reachable rules, Feedback status containment and Help reading hierarchy | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -772,6 +772,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Runtime assertions click the entry and return path, verify the title, enforce title/subtitle separation and run the existing target-device touch/bounds traversal. Release QA freezes ownership of the visible handler. Full verification passes at `1,519,959 / 1,520,000` core source bytes.
 - No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 thirteenth source checkpoint
+
+- Added an orange attention dot to the existing room status card for pending commands and background synchronization errors. It shares the green can-start position but is mutually exclusive, so the same visual slot cannot claim both “ready” and “working/retrying”.
+- Normal waiting has no dot, two-ready availability shows green, and pending/error states show orange while the existing status copy remains authoritative.
+- Removed unused Cocos Inspector property decorators from `RoomScene` fields that are dynamically created and assigned by `RuntimeScreenFactory`; no serialized scene references these fields. This offsets the visible node and keeps the core source at `1,519,981 / 1,520,000` bytes.
+- Runtime assertions cover normal, can-start, pending and sync-error transitions plus orange/green exclusivity. No bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -815,7 +822,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has twelve source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has thirteen source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
