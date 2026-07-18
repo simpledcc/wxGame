@@ -1459,8 +1459,6 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
       assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
         "mode player count must use the shared status badge");
-      const modeText = findDeep(canvas, "ModeOption0Subtitle")!;
-      const modeBadge = findDeep(canvas, "ModeOption0Players")!;
       const modeRow = findDeep(canvas, "ModeOption0")!;
       const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
       const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
@@ -1469,13 +1467,29 @@ async function main(): Promise<void> {
       assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 4
         <= modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2,
       "mode accent rail must not enter its icon column");
-      assertOk(verticalGap(findDeep(modeRow, "ModeOption0Title")!, modeText) >= 4,
-        "mode title and subtitle must retain a readable gap");
-      assertOk(
-        modeText.position.x + modeText.getComponent(UITransform)!.width / 2 + 8
-          <= modeBadge.position.x - modeBadge.getComponent(UITransform)!.width / 2,
-        "mode copy must reserve space for the player-count badge"
-      );
+      const assertModeRowText = (root: Node, context: string): void => {
+        for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
+          const row = findDeep(root, `ModeOption${rowIndex}`)!;
+          const title = findDeep(row, `ModeOption${rowIndex}Title`)!;
+          const subtitle = findDeep(row, `ModeOption${rowIndex}Subtitle`)!;
+          const badge = findDeep(row, `ModeOption${rowIndex}Players`)!;
+          const action = findDeep(row, `ModeOption${rowIndex}Action`)!;
+          const halfHeight = row.getComponent(UITransform)!.height / 2;
+          assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 7,
+            `${context} mode ${rowIndex + 1} title needs a top inset`);
+          assertOk(verticalGap(title, subtitle) >= 8,
+            `${context} mode ${rowIndex + 1} title/subtitle gap must remain visible`);
+          assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
+            `${context} mode ${rowIndex + 1} subtitle needs a bottom inset`);
+          assertOk(subtitle.position.x + subtitle.getComponent(UITransform)!.width / 2 + 8
+            <= badge.position.x - badge.getComponent(UITransform)!.width / 2,
+          `${context} mode ${rowIndex + 1} copy must reserve its badge column`);
+          assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
+            <= action.position.x - action.getComponent(UITransform)!.width / 2,
+          `${context} mode ${rowIndex + 1} badge/action columns must remain separate`);
+        }
+      };
+      assertModeRowText(findDeep(canvas, "CoopSelectRuntimeScreen")!, "long catalog");
       setMockWindowSize(640, 960);
       app.store.setRoute("home");
       await flushMany();
@@ -1485,6 +1499,7 @@ async function main(): Promise<void> {
       const minimumCatalogSafe = findDeep(minimumCatalogRoot, "CoopSelectSafeArea")!;
       const minimumCatalogHeader = findDeep(minimumCatalogRoot, "CoopSelectHeader")!;
       const minimumModeRows = Array.from({ length: 8 }, (_, row) => findDeep(minimumCatalogRoot, `ModeOption${row}`)!);
+      assertModeRowText(minimumCatalogRoot, "minimum catalog");
       assertOk(verticalGap(minimumCatalogHeader, minimumModeRows[0]) >= 4,
         "minimum mode catalog must separate the header and first row");
       for (let gap = 0; gap < minimumModeRows.length - 1; gap += 1) {
