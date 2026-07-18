@@ -724,11 +724,13 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgress")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgressFill")?.getComponent(Graphics));
-  assertEqual(
-    findDeep(canvas, "StudyBankBar")?.position.y,
-    findDeep(canvas, "ChangeStudyBank")?.position.y,
-    "Study bank name and change action must share one compact row"
-  );
+  const studyBankBar = findDeep(canvas, "StudyBankBar");
+  const studyBankBadge = findDeep(canvas, "StudyBankChangeBadge");
+  assertOk(studyBankBar?.getComponent(Button), "Study bank strip must remain the single route target");
+  assertOk(studyBankBadge?.getComponent(Graphics), "Study bank strip must expose a visual change badge");
+  assertEqual(studyBankBadge?.getComponent(Button), null, "Study bank change badge must not nest a second Button");
+  assertEqual(findDeep(canvas, "ChangeStudyBank"), null, "Study bank strip must not retain a split click target");
+  assertEqual(findDeep(canvas, "StudyBankBarTitle")?.getComponent(UITransform)?.width, 350);
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
@@ -745,7 +747,7 @@ async function main(): Promise<void> {
   assertEqual(app.wordBankStore.getWrongWords().length, wrongWordCount + 1);
   assertEqual(findDeep(canvas, "MarkWrong")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   assertEqual(findDeep(canvas, "MarkWrongTitle")?.getComponent(Label)?.string, "已在错题库");
-  findDeep(canvas, "ChangeStudyBank")?.emit(Button.EventType.CLICK);
+  studyBankBar?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "bank");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);

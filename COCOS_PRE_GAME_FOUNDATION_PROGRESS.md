@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Fourteen source passes cover shared chrome, persistent state feedback, formal icons/badges, room states, copy hierarchy, reachable rules and single-area Home Bank interaction | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Fifteen source passes cover shared chrome, persistent state feedback, formal icons/badges, room states, copy hierarchy, reachable rules and single-area Home/Study Bank interaction | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -786,6 +786,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Removed unused Inspector property decorators from Home, Bank, Study, Result, History, Feedback and Help fields. Like Room, these controllers are created and assigned only by `RuntimeScreenFactory`, and no serialized scene references them.
 - Focused and full verification pass with core source reduced to `1,519,267 / 1,520,000` bytes. No bitmap, importer metadata, Store/route/data protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 fifteenth source checkpoint
+
+- Rebuilt the Study current-Bank row as one full-width action Button with a compact non-Button “更换” badge. The old adjacent duplicate target is removed, while the existing bottom Bank shortcut remains available.
+- The dynamic Bank title and fixed “当前词库” subtitle now share a reserved 350-design-pixel text column, preventing long real names from colliding with the badge. The formal word-Bank icon and route behavior are unchanged.
+- Runtime assertions require one top-row Button, no split child/adjacent Button, a rendered badge, the fixed title boundary and the existing Study-to-Bank return route.
+- Focused and full `npm run verify` plus `npm run build:wechat:dry-run` pass with core source at `1,519,652 / 1,520,000` bytes. No bitmap, importer metadata, Store/route/data protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -829,7 +836,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has fourteen source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has fifteen source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

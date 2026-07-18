@@ -303,10 +303,16 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "StudyHeader", "赛前练习", "背诵当前单元，随时标记需要复习的单词",
       () => controller.backHome(), "practice");
     const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
-    home.actionButton(safe.node, "StudyBankBar", getWordBankLabel(selectedBank, true), "当前词库", "词",
-      -62, safeTop - 164, 416, 96, () => controller.changeBank(), "surface", "wordBank");
-    home.button(safe.node, "ChangeStudyBank", "↻ 更换", 226, safeTop - 164, 124, 80,
-      () => controller.changeBank(), "bank", 18);
+    const bankBar = home.actionButton(safe.node, "StudyBankBar", getWordBankLabel(selectedBank, true),
+      "当前词库", "词", 0, safeTop - 164, 560, 96, () => controller.changeBank(), "surface", "wordBank");
+    [bankBar.titleLabel, bankBar.subtitleLabel].forEach((label) => {
+      if (!label) return;
+      label.node.setPosition(-20, label.node.position.y, 0);
+      label.node.getComponent(UITransform)?.setContentSize(350, label.node.getComponent(UITransform)?.height || 44);
+    });
+    const bankChange = home.pill(bankBar.node, "StudyBankChangeBadge", 220, 0, 104, 54,
+      "homePractice", "homeTextOnColor");
+    home.label(bankChange, "StudyBankChangeLabel", "更换", 0, 0, 78, 36, 17, "homeTextOnColor");
     const cardY = safeTop - 398 - stretch * 0.05;
     const card = home.sectionCard(safe.node, "StudyCard", "学习卡", 0, cardY,
       540, 366, "practice", "practice");
