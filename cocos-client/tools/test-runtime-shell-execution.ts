@@ -1467,6 +1467,15 @@ async function main(): Promise<void> {
       assertOk(verticalGap(bankStatusCard, findDeep(canvas, "BankSlot0")!) >= 4);
       assertOk(verticalGap(bankStatusTab, bankStatusCoin) >= 4);
       assertOk(verticalGap(bankStatusTab, bankStatusCopy) >= 4);
+      assertEqual(bankStatusCoin.position.y, bankStatusCopy.position.y,
+        "Bank status icon and copy must share one baseline");
+      [bankStatusCoin, bankStatusCopy].forEach((content) => {
+        assertOk(verticalGap(bankStatusTab, content) >= 8,
+          "Bank status content must clear its compact title tab");
+        assertOk(content.position.y - content.getComponent(UITransform)!.height / 2
+          >= -bankStatusCard.getComponent(UITransform)!.height / 2 + 8,
+        "Bank status content must clear the card bottom frame");
+      });
       assertOk(bankStatusCoin.position.x + bankStatusCoin.getComponent(UITransform)!.width / 2 + 4
         <= bankStatusCopy.position.x - bankStatusCopy.getComponent(UITransform)!.width / 2,
       "Bank status icon must not enter its copy column");

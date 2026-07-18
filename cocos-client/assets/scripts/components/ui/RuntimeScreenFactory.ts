@@ -212,8 +212,8 @@ export class RuntimeScreenFactory {
       () => controller.back(), "wordBank");
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
       safeTop - 160, 540, 80, "history", "coin");
-    home.visualSlot(statusCard, "coin", -232, -18, 32, 32);
-    const status = home.label(statusCard, "BankStatus", "", 24, -14, 430, 46, 18, "homeText", 0);
+    home.visualSlot(statusCard, "coin", -232, -13, 32, 32);
+    const status = home.label(statusCard, "BankStatus", "", 24, -13, 430, 36, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
     const pageSize = 4;
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
