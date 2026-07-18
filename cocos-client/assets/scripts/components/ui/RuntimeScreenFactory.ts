@@ -170,7 +170,7 @@ export class RuntimeScreenFactory {
 
     const settingsModal = home.modal(root, "HomeSettingsModal", 500, 350);
     home.visualSlot(settingsModal.content, "settings", -150, 112, 52, 52);
-    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 28, 112, 330, 48, 30);
+    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 49, 112, 330, 48, 30);
     const soundStatus = home.label(
       settingsModal.content, "HomeSoundStatus", "", 0, 57, 420, 36, 20, "homeTextMuted"
     );

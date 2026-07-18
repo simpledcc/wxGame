@@ -722,6 +722,11 @@ async function main(): Promise<void> {
   assertOk(verticalGap(settingsTitle, settingsStatus) >= 8);
   assertOk(verticalGap(settingsStatus, settingsToggle) >= 8);
   assertOk(verticalGap(settingsToggle, settingsClose) >= 8);
+  assertOk(horizontalGap(settingsIcon, settingsTitle) >= 8,
+    "settings icon/title gap must remain visible");
+  assertOk(settingsTitle.position.x + settingsTitle.getComponent(UITransform)!.width / 2
+    <= settingsContent.getComponent(UITransform)!.width / 2 - 8,
+  "settings title must retain its right inset");
   assertOk(settingsContent.getComponent(UITransform)!.height / 2
     - settingsIcon.position.y - settingsIcon.getComponent(UITransform)!.height / 2 >= 8);
   assertOk(settingsClose.position.y - settingsClose.getComponent(UITransform)!.height / 2
