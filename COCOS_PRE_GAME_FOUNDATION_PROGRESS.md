@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Four source passes cover shared chrome, control states, learning/room/filter feedback, Bank/Study persistence and live room-code/feedback counters | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Five source passes cover shared chrome, control states, persistent learning/room/filter feedback, input counters and live form availability | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -710,6 +710,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Successful Feedback submission emits the existing text-change event after clearing content so the visible counter resets immediately.
 - Corrected the local Cocos type surface so `Node.emit`, `Node.getChildByName` and `EditBox extends Component` match the runtime APIs already used by Creator and the test mock.
 - Runtime assertions cover room-code updates, feedback updates and post-submit reset. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,857 / 1,520,000` core source bytes.
+
+### H8.7 fifth source checkpoint
+
+- Room code input now changes its hint from format guidance to remaining-length feedback and then a complete state; Join stays disabled until the normalized code is exactly six characters.
+- Feedback content now immediately reports short/valid state; Submit stays disabled below the existing four-character rule, enables for a valid draft and disables again after successful clearing.
+- Consolidated duplicate button tinting and seven page-shell constructors before adding the visible states, preserving node names and the unchanged `1.52 MB` warning gate.
+- Runtime assertions cover empty, partial, complete, pending, failed and successful form states. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,888 / 1,520,000` core source bytes.
+- No bitmap, importer metadata, room/feedback protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
 ## Assets
 

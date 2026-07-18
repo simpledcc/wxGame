@@ -599,22 +599,30 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomCreatePanel"), null, "join entry must not build the unused create form");
   assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
   assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
-  assertOk(
-    findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string.includes("英文字母和数字"),
-    "the visible join form must explain the room-code format"
-  );
+  const initialJoinHint = findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string || "";
+  assertOk(initialJoinHint.includes("英文字母") && initialJoinHint.includes("数字"),
+    `the visible join form must explain the room-code format: ${initialJoinHint}`);
   assertEqual(findDeep(canvas, "JoinCodeCard")?.getComponent(UITransform)?.height, 600);
   assertOk(findDeep(canvas, "JoinCodeCardAccent")?.getComponent(Graphics));
   const entryRoomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
+  const entryJoinButton = findDeep(canvas, "JoinRoom")?.getComponent(Button);
   assertOk(entryRoomCodeInput);
+  assertOk(entryJoinButton);
+  assertEqual(entryJoinButton.interactable, false, "empty room code must keep Join disabled");
   entryRoomCodeInput.string = "ABC";
   entryRoomCodeInput.node.emit("text-changed");
   assertEqual(findDeep(canvas, "RoomCodeInputCount")?.getComponent(Label)?.string, "3/6");
+  assertEqual(findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string, "还需输入 3 位");
+  assertEqual(entryJoinButton.interactable, false, "partial room code must keep Join disabled");
   const callsBeforeEntryInvalidJoin = appRuntime.cloudCalls.length;
   findDeep(canvas, "JoinRoom")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(appRuntime.cloudCalls.length, callsBeforeEntryInvalidJoin, "invalid room input must not call joinRoom");
-  assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "请输入 6 位房间码");
+  entryRoomCodeInput.string = "ABC123";
+  entryRoomCodeInput.node.emit("text-changed");
+  assertEqual(findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string, "房间码已完整，可以加入");
+  assertEqual(findDeep(canvas, "JoinRoomSubtitle")?.getComponent(Label)?.string, "房间码已完整，点击加入");
+  assertEqual(entryJoinButton.interactable, true, "complete room code must enable Join");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "home");
@@ -1143,9 +1151,11 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "FeedbackFormCard")?.getComponent(UITransform)?.height, 500);
       assertOk(findDeep(canvas, "FeedbackContentCaption"));
       assertOk(findDeep(canvas, "FeedbackContactCaption"));
+      assertEqual(feedbackButton.interactable, false, "empty feedback must keep submit disabled");
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
       assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.string, "1/300");
+      assertEqual(feedbackButton.interactable, false, "short feedback must keep submit disabled");
       const cloudCallCount = appRuntime.cloudCalls.length;
       findDeep(canvas, "SubmitFeedback")?.emit(Button.EventType.CLICK);
       assertEqual(appRuntime.cloudCalls.length, cloudCallCount, "invalid feedback must not call cloud functions");
@@ -1154,18 +1164,22 @@ async function main(): Promise<void> {
       const originalFeedbackSubmit = app.feedback.submit;
       app.feedback.submit = async () => ({ ok: true });
       feedbackInput.string = "切换页面时偶尔会看到状态异常";
+      feedbackInput.node.emit("text-changed");
       feedbackContact.string = "contact@example.com";
+      assertEqual(feedbackButton.interactable, true, "valid feedback must enable submit");
+      assertEqual(findDeep(canvas, "FeedbackStatus")?.getComponent(Label)?.string, "内容已达到提交要求");
       await feedbackController.submit();
       assertEqual(feedbackInput.string, "", "successful feedback must clear its content");
       assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.string, "0/300");
       assertEqual(feedbackContact.string, "", "successful feedback must clear its optional contact");
       assertEqual(findDeep(canvas, "FeedbackStatus")?.getComponent(Label)?.string, "反馈已提交，谢谢你的帮助");
-      assertEqual(feedbackButton.interactable, true, "feedback submit must unlock after success");
+      assertEqual(feedbackButton.interactable, false, "cleared feedback must disable submit after success");
 
       app.feedback.submit = async () => {
         throw new Error("反馈内容不合规");
       };
       feedbackInput.string = "这是一条需要被内容安全拦截的反馈";
+      feedbackInput.node.emit("text-changed");
       const activeFailureToastCount = appRuntime.toastMessages.length;
       await feedbackController.submit();
       assertEqual(feedbackInput.string, "这是一条需要被内容安全拦截的反馈");

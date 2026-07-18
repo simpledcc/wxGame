@@ -111,7 +111,7 @@ declare module "cc" {
     clear(): void;
   }
 
-  export class Button {
+  export class Button extends Component {
     static readonly EventType: {
       CLICK: string;
     };

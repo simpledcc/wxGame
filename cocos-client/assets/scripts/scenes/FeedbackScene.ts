@@ -33,6 +33,7 @@ export class FeedbackScene extends Component {
     if (this.privacyLabel) {
       this.privacyLabel.string = `提交时会处理反馈内容和可选联系方式，详见${app.privacy.contractName}`;
     }
+    this.contentInput?.node.on("text-changed", () => this.render(), this);
     this.render();
   }
 
@@ -104,10 +105,13 @@ export class FeedbackScene extends Component {
     app.router.navigate("home");
   }
 
-  private render(message = "请描述遇到的问题或建议"): void {
+  private render(message = ""): void {
     if (this.destroyed) return;
+    const draft = normalizeFeedbackDraft(this.contentInput?.string || "", this.contactInput?.string || "");
+    const error = getFeedbackValidationError(draft);
+    if (!message) message = draft.content ? error || "内容已达到提交要求" : "请描述遇到的问题或建议";
     if (this.statusLabel) this.statusLabel.string = message;
-    if (this.submitButton) this.submitButton.interactable = !this.submitting;
+    if (this.submitButton) this.submitButton.interactable = !this.submitting && !error;
   }
 
   private isCurrentSubmission(sequence: number): boolean {

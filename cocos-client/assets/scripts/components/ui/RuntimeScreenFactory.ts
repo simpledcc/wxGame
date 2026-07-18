@@ -198,10 +198,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildBank(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "BankRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "BankScenery");
-    const safe = home.safeArea(root, "BankSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Bank");
     const safeTop = safe.height / 2;
     const safeBottom = -safe.height / 2;
     let controller!: BankScene;
@@ -294,10 +291,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildStudy(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "StudyRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "StudyScenery");
-    const safe = home.safeArea(root, "StudySafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Study");
     const safeTop = safe.height / 2;
     const safeBottom = -safe.height / 2;
     const stretch = Math.max(0, Math.min(360, safe.height - 822));
@@ -384,10 +378,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildRoom(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "RoomRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "RoomScenery");
-    const safe = home.safeArea(root, "RoomSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Room");
     const roomContentY = (safe.height - 886) / 2 - 18;
     let controller!: RoomScene;
     const entryIntent = app.store.getState().roomEntryIntent;
@@ -430,12 +421,13 @@ export class RuntimeScreenFactory {
     let joinPanel: Node | null = null;
     let input: RuntimeEditRef | null = null;
     let join: PreGameActionButtonRef | null = null;
+    let joinHint: Label | null = null;
     if (!hasSession && entryIntent === "join") {
       joinPanel = home.group(safe.node, "RoomJoinPanel", 0, roomContentY, safe.width, 760);
       const joinCard = home.accentCard(joinPanel, "JoinCodeCard", 0, 20, 560, 600, "join", 24);
       home.visualSlot(joinCard, "joinRoom", 0, 212, 90, 90);
       home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 99, 480, 50, 30, "homeText");
-      home.label(joinCard, "JoinCodeHint", "支持英文字母和数字", 0, 58, 480, 34, 18, "homeTextMuted");
+      joinHint = home.label(joinCard, "JoinCodeHint", "请输入 6 位英文字母或数字", 0, 58, 480, 34, 18, "homeTextMuted");
       input = home.edit(joinCard, "RoomCodeInput", "", 0, -24, 500, 104, ROOM_CODE_LENGTH);
       home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -111, 480, 54, 18, "homeTextMuted");
       join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -218,
@@ -486,6 +478,8 @@ export class RuntimeScreenFactory {
     controller.statusLabel = status;
     controller.createButton = create?.button ?? null;
     controller.joinButton = join?.button ?? null;
+    controller.joinHintLabel = joinHint;
+    controller.joinSubtitleLabel = join?.subtitleLabel ?? null;
     controller.copyButton = copy.button;
     controller.inviteButton = invite.button;
     controller.backButton = header.backButton.button;
@@ -504,10 +498,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildResult(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "ResultRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "ResultScenery");
-    const safe = home.safeArea(root, "ResultSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Result");
     const stretch = Math.max(0, Math.min(360, safe.height - 822));
     let controller!: ResultScene;
     home.pageHeader(safe, "ResultHeader", "本局结算", "成绩已保存，可在战绩记录中继续查看",
@@ -531,10 +522,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildHistory(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "HistoryRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "HistoryScenery");
-    const safe = home.safeArea(root, "HistorySafeArea");
+    const { root, home, safe } = this.page(parent, ui, "History");
     const safeTop = safe.height / 2;
     const safeBottom = -safe.height / 2;
     const listRoot = home.group(safe.node, "HistoryList", 0, 0, safe.width, safe.height);
@@ -636,10 +624,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildFeedback(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "FeedbackRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "FeedbackScenery");
-    const safe = home.safeArea(root, "FeedbackSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Feedback");
     const safeTop = safe.height / 2;
     const formY = safeTop - 360;
     let controller!: FeedbackScene;
@@ -668,10 +653,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildHelp(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "HelpRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "HelpScenery");
-    const safe = home.safeArea(root, "HelpSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "Help");
     const safeTop = safe.height / 2;
     let controller!: HelpScene;
     home.pageHeader(safe, "HelpHeader", "玩法目录", "玩法说明：了解练习、对战和合作规则",
@@ -686,6 +668,13 @@ export class RuntimeScreenFactory {
     controller = root.addComponent(HelpScene);
     controller.bodyLabel = body;
     return root;
+  }
+
+  private page(parent: Node, ui: RuntimeUi, name: string) {
+    const root = ui.root(parent, `${name}RuntimeScreen`);
+    const home = new PreGameUi(app.themes.getCurrentTheme());
+    home.scenicBackdrop(root, `${name}Scenery`);
+    return { root, home, safe: home.safeArea(root, `${name}SafeArea`) };
   }
 
 }

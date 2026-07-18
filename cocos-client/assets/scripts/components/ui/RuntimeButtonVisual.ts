@@ -181,40 +181,29 @@ export class RuntimeButtonVisual extends Component {
       this.labelColors = this.contentLabels.map((label) => this.copyColor(label.color));
       this.spriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
     }
-    if (nextTintMode === "disabled") {
-      const muted = (base: Color, keep: number, alpha: number): Color => new Color(
-        Math.round(base.r * keep + this.disabledColor.r * (1 - keep)),
-        Math.round(base.g * keep + this.disabledColor.g * (1 - keep)),
-        Math.round(base.b * keep + this.disabledColor.b * (1 - keep)), Math.min(base.a, alpha)
-      );
-      this.contentLabels.forEach((label, index) => {
-        const base = this.labelColors[index] || label.color;
-        label.color = muted(base, 0.68, 190);
-      });
-      this.contentSprites.forEach((sprite, index) => {
-        const base = this.spriteColors[index] || sprite.color;
-        sprite.color = muted(base, 0.72, 184);
-      });
-    } else if (nextTintMode === "selected" && this.selectedTextColor) {
-      const tint = (base: Color): Color => new Color(
-        this.selectedTextColor!.r, this.selectedTextColor!.g, this.selectedTextColor!.b,
-        Math.min(base.a, this.selectedTextColor!.a)
-      );
-      this.contentLabels.forEach((label, index) => {
-        label.color = tint(this.labelColors[index] || label.color);
-      });
-      this.contentSprites.forEach((sprite, index) => {
-        sprite.color = tint(this.spriteColors[index] || sprite.color);
-      });
-    } else if (this.tintMode !== "normal") {
-      this.contentLabels.forEach((label, index) => {
-        label.color = this.copyColor(this.labelColors[index] || label.color);
-      });
-      this.contentSprites.forEach((sprite, index) => {
-        sprite.color = this.copyColor(this.spriteColors[index] || sprite.color);
-      });
+    if (nextTintMode !== "normal" || this.tintMode !== "normal") {
+      this.tint(this.contentLabels, this.labelColors, nextTintMode, 0.68, 190);
+      this.tint(this.contentSprites, this.spriteColors, nextTintMode, 0.72, 184);
     }
     this.tintMode = nextTintMode;
+  }
+
+  private tint(items: readonly { color: Color }[], colors: readonly Color[], mode: string,
+    keep: number, alpha: number): void {
+    items.forEach((item, index) => {
+      const base = colors[index] || item.color;
+      item.color = mode === "disabled"
+        ? new Color(
+            Math.round(base.r * keep + this.disabledColor.r * (1 - keep)),
+            Math.round(base.g * keep + this.disabledColor.g * (1 - keep)),
+            Math.round(base.b * keep + this.disabledColor.b * (1 - keep)),
+            Math.min(base.a, alpha)
+          )
+        : mode === "selected" && this.selectedTextColor
+          ? new Color(this.selectedTextColor.r, this.selectedTextColor.g, this.selectedTextColor.b,
+              Math.min(base.a, this.selectedTextColor.a))
+          : this.copyColor(base);
+    });
   }
 
   private copyColor(color: Color): Color {

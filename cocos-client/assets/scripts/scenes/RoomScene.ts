@@ -5,7 +5,8 @@ import {
   buildRoomGameOptions,
   getLocalRoomPlayer,
   getRoomActionAvailability,
-  getRoomStartStatusText
+  getRoomStartStatusText,
+  normalizeRoomCode
 } from "../domain/RoomRules";
 import type { RoomSnapshot } from "../domain/RoomTypes";
 import { getSpellTemplatesForBank } from "../domain/SpellTemplateCatalog";
@@ -100,6 +101,8 @@ export class RoomScene extends Component {
   playerReadyIndicators: Node[] = [];
   playerWaitingIndicators: Node[] = [];
   roomReadyIndicator: Node | null = null;
+  joinHintLabel: Label | null = null;
+  joinSubtitleLabel: Label | null = null;
 
   private unsubscribe: (() => void) | null = null;
 
@@ -109,6 +112,7 @@ export class RoomScene extends Component {
   }
 
   start(): void {
+    this.roomCodeInput?.node.on("text-changed", () => this.renderJoinDraft(), this);
     this.render(app.roomStore.getState());
   }
 
@@ -315,7 +319,7 @@ export class RoomScene extends Component {
   private setSessionControls(state: RoomSessionState, hasSession: boolean): void {
     const busy = !!state.pendingAction;
     if (this.createButton) this.createButton.interactable = !hasSession && !busy;
-    if (this.joinButton) this.joinButton.interactable = !hasSession && !busy;
+    if (this.joinButton) this.renderJoinDraft();
     if (this.copyButton) this.copyButton.interactable = !!state.room && !busy;
     if (this.inviteButton) this.inviteButton.interactable = !!state.room && !busy;
     if (this.backButton) this.backButton.interactable = !busy;
@@ -335,6 +339,20 @@ export class RoomScene extends Component {
     this.joinButton = null;
     this.autoReadyButton = null;
     this.autoReadyVisual = null;
+  }
+
+  private renderJoinDraft(): boolean {
+    const length = normalizeRoomCode(this.roomCodeInput?.string || "").length;
+    const ready = length === 6;
+    if (this.joinHintLabel) this.joinHintLabel.string = ready
+      ? "房间码已完整，可以加入"
+      : length ? `还需输入 ${6 - length} 位` : "请输入 6 位英文字母或数字";
+    if (this.joinSubtitleLabel) this.joinSubtitleLabel.string = ready
+      ? "房间码已完整，点击加入"
+      : "输入完整房间码后可加入";
+    if (this.joinButton) this.joinButton.interactable = ready && !app.roomStore.getState().pendingAction;
+    this.joinButton?.node.getComponent(RuntimeButtonVisual)?.refresh();
+    return ready;
   }
 
   private getSelectedModeLabel(room: RoomSnapshot | null = null): string {
