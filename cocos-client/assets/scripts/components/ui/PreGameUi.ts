@@ -343,10 +343,10 @@ export class PreGameUi {
   accentCard(parent: Node, name: string, x: number, y: number, width: number, height: number,
     kind: PreGameActionKind, radius = 20): Node {
     const node = this.card(parent, name, x, y, width, height, radius);
-    const accent = this.node(node, `${name}Accent`, 0, height/2-14, width-36, 10);
+    const accent=this.node(node,`${name}Accent`,-width/2+8,0,6,height-24);
     const graphics = accent.addComponent(Graphics);
     graphics.fillColor = this.color(this.actionToken(kind));
-    graphics.roundRect(-(width-36)/2,-5,width-36,10,5);
+    graphics.roundRect(-3,-(height-24)/2,6,height-24,3);
     graphics.fill();
     return node;
   }

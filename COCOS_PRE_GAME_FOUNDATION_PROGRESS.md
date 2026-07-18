@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Thirty source passes cover shared header/action/card typography, Home/room Bank, lobby-player and lobby-utility hierarchy, persistent state feedback, formal icons/badges, room states, dynamic boundaries, dense forms and minimum-height Home/Bank/Study/Room/catalog/supporting-page layouts | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Thirty-one source passes cover shared header/action/card typography, non-crossing accent rails, Home/room Bank, lobby-player and lobby-utility hierarchy, persistent state feedback, formal icons/badges, room states, dynamic boundaries, dense forms and minimum-height Home/Bank/Study/Room/catalog/supporting-page layouts | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -904,6 +904,13 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Added one shared lobby-utility contract for both long and rebuilt `640x960` trees. It covers room-code tab/body and three columns, current-Bank tab/body/right inset, current-status tab/indicator/copy columns and the status-copy right inset for both ready and attention indicators.
 - Focused tests, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,856 / 1,520,000` bytes. No visible room code/status copy, copy/invite behavior, room state, card bounds, bitmap, importer metadata, protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 thirty-first source checkpoint
+
+- Replaced the shared accent card's 10px horizontal top rail, which crossed titles in 80px mode and compact History rows, with a 6px vertical rail inset eight pixels from the card's left edge and spanning `height - 24`.
+- The new primitive preserves each card's action color and rounded treatment while moving decoration outside text rows. Mode and History representative contracts require at least four pixels between the rail and formal icon column; the primitive test freezes `6 x (height - 24)` geometry.
+- Moved mode-catalog subtitles down one pixel so the 23px title and 15px summary rectangles retain four pixels. Join, Result, History detail, Feedback and Help automatically inherit the same left rail without changing their content geometry.
+- Focused tests, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source reduced to `1,519,849 / 1,520,000` bytes. No visible copy, card bounds, route/action/state behavior, bitmap, importer metadata, protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -942,12 +949,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, traverse every H8.7 pre-game page and capture the required `360x800`, `393x852` and `430x932` state evidence. Check the preparation player cards and room-code/Copy/Invite/Bank/status utility cards together with the Home/create Bank hierarchies and existing text, inputs and state feedback, then continue screenshot-driven visual adjustment. Two-device gameplay acceptance remains deferred until H8.7 is complete.
+Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, traverse every H8.7 pre-game page and capture the required `360x800`, `393x852` and `430x932` state evidence. Check the new left accent rails across catalog, Join, History, Feedback and Help together with the preparation cards, Home/create Bank hierarchies, text, inputs and state feedback, then continue screenshot-driven visual adjustment. Two-device gameplay acceptance remains deferred until H8.7 is complete.
 
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has thirty source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has thirty-one source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

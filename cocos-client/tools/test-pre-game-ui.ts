@@ -135,7 +135,15 @@ function main(): void {
   });
   assertOk(card.getChildByName("FoundationCardInnerBorder")?.getComponent(Graphics));
   const accentCard = preGame.accentCard(safe.node, "FoundationAccentCard", 0, 210, 560, 140, "practice");
-  assertOk(accentCard.getChildByName("FoundationAccentCardAccent")?.getComponent(Graphics));
+  const accent = accentCard.getChildByName("FoundationAccentCardAccent");
+  assertOk(accent?.getComponent(Graphics));
+  assertEqual(accent?.position.x, -272);
+  assertEqual(accent?.position.y, 0);
+  assertEqual(transform(accent!).width, 6);
+  assertEqual(transform(accent!).height, 116);
+  assertDeepEqual(accent?.getComponent(Graphics)?.lastRoundRect, {
+    x: -3, y: -58, width: 6, height: 116, radius: 3
+  });
 
   let actionCount = 0;
   const action = preGame.actionButton(

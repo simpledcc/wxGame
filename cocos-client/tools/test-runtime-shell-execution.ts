@@ -1304,6 +1304,16 @@ async function main(): Promise<void> {
         "mode player count must use the shared status badge");
       const modeText = findDeep(canvas, "ModeOption0Subtitle")!;
       const modeBadge = findDeep(canvas, "ModeOption0Players")!;
+      const modeRow = findDeep(canvas, "ModeOption0")!;
+      const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
+      const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
+      assertEqual(modeAccent.getComponent(UITransform)?.width, 6);
+      assertEqual(modeAccent.getComponent(UITransform)?.height, 56);
+      assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 4
+        <= modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2,
+      "mode accent rail must not enter its icon column");
+      assertOk(verticalGap(findDeep(modeRow, "ModeOption0Title")!, modeText) >= 4,
+        "mode title and subtitle must retain a readable gap");
       assertOk(
         modeText.position.x + modeText.getComponent(UITransform)!.width / 2 + 8
           <= modeBadge.position.x - modeBadge.getComponent(UITransform)!.width / 2,
@@ -1519,6 +1529,12 @@ async function main(): Promise<void> {
       assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
       const historyRow = findDeep(canvas, "HistoryRow0")!;
+      const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
+      const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;
+      assertEqual(historyAccent.getComponent(UITransform)?.width, 6);
+      assertOk(historyAccent.position.x + historyAccent.getComponent(UITransform)!.width / 2 + 4
+        <= historyIcon.position.x - historyIcon.getComponent(UITransform)!.width / 2,
+      "History accent rail must not enter its icon column");
       const historyTitle = findDeep(historyRow, "Title")!;
       const historyScore = findDeep(historyRow, "Score")!;
       const historyDetail = findDeep(historyRow, "HistoryRow0Detail")!;
