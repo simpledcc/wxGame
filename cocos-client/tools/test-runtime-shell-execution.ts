@@ -1530,6 +1530,7 @@ async function main(): Promise<void> {
           const subtitle = findDeep(row, `ModeOption${rowIndex}Subtitle`)!;
           const badge = findDeep(row, `ModeOption${rowIndex}Players`)!;
           const action = findDeep(row, `ModeOption${rowIndex}Action`)!;
+          const actionLabel = findDeep(action, `ModeOption${rowIndex}ActionLabel`)!;
           const halfHeight = row.getComponent(UITransform)!.height / 2;
           assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 7,
             `${context} mode ${rowIndex + 1} title needs a top inset`);
@@ -1543,6 +1544,8 @@ async function main(): Promise<void> {
           assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
             <= action.position.x - action.getComponent(UITransform)!.width / 2,
           `${context} mode ${rowIndex + 1} badge/action columns must remain separate`);
+          assertOk((action.getComponent(UITransform)!.height - actionLabel.getComponent(UITransform)!.height) / 2 >= 8,
+            `${context} mode ${rowIndex + 1} action copy needs vertical breathing room`);
         }
       };
       assertModeRowText(findDeep(canvas, "CoopSelectRuntimeScreen")!, "long catalog");
@@ -1756,6 +1759,14 @@ async function main(): Promise<void> {
       assertEqual(recentTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
+      const historyFilter = findDeep(canvas, "HistoryAll")!;
+      const historyFilterLabel = findDeep(historyFilter, "HistoryAllLabel")!;
+      const historyFilterIndicator = findDeep(historyFilter, "HistoryAllSelected")!;
+      assertOk(verticalGap(historyFilterLabel, historyFilterIndicator) >= 4,
+        "History filter copy must remain above its selected marker");
+      assertOk(historyFilterIndicator.position.y - historyFilterIndicator.getComponent(UITransform)!.height / 2
+        >= -historyFilter.getComponent(UITransform)!.height / 2 + 6,
+      "History selected marker needs a bottom inset");
       const assertHistorySummary = (card: Node, key: "History" | "Coin", summaryName: string): void => {
         const summary = findDeep(card, summaryName)!;
         assertEqual(card.children.some((child) => child.name === `Home${key}Slot`), false,

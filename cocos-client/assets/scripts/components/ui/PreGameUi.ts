@@ -467,7 +467,7 @@ export class PreGameUi {
       kind === "surface" ? "homeCardBorder" : "homeTextOnColor"
     );
     this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
-    const label = this.label(node, `${name}Label`, text, 0, 0, width - 18, height - 8, fontSize, textToken);
+    const label = this.label(node, `${name}Label`, text, 0, 0, width - 18, height - 32, fontSize, textToken);
     if (kind !== "surface") {
       label.enableOutline = true;
       label.outlineColor = this.darken(baseColor, 0.4);

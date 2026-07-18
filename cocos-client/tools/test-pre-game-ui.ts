@@ -328,6 +328,8 @@ function main(): void {
     "bank"
   );
   assertVisualMatchesHitArea(directButton.node, directButton.visual);
+  assertEqual(transform(directButton.label.node).height, 48);
+  assertEqual((transform(directButton.node).height - transform(directButton.label.node).height) / 2, 16);
   assertEqual(directButton.background.strokeCount, 1, "plain buttons must retain their border after setup");
   const compactAction = preGame.actionButton(
     pageSafe.node, "FoundationCompactAction", "详情", "", "绩", 0, 100, 92, 80,
