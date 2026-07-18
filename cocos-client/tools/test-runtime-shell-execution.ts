@@ -1313,6 +1313,17 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "history");
   assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, true, "empty history must show a complete empty-state card");
+  const emptyHistoryCard = findDeep(canvas, "HistoryEmptyState")!;
+  const emptyHistoryIcon = emptyHistoryCard.children.find((child) => child.name === "HomeHistorySlot")!;
+  const emptyHistoryTitle = findDeep(emptyHistoryCard, "HistoryEmpty")!;
+  const emptyHistoryHint = findDeep(emptyHistoryCard, "HistoryEmptyHint")!;
+  assertOk(verticalGap(emptyHistoryIcon, emptyHistoryTitle) >= 8,
+    "empty History icon/title gap must remain visible");
+  assertOk(verticalGap(emptyHistoryTitle, emptyHistoryHint) >= 8,
+    "empty History title/hint gap must remain visible");
+  assertOk(emptyHistoryHint.position.y - emptyHistoryHint.getComponent(UITransform)!.height / 2
+    >= -emptyHistoryCard.getComponent(UITransform)!.height / 2 + 8,
+  "empty History hint must clear the card bottom frame");
   assertEqual(findDeep(canvas, "HistoryAllSelected")?.active, true, "history must expose the active filter");
   assertEqual(findDeep(canvas, "HistoryPkSelected")?.active, false);
   findDeep(canvas, "HistoryPk")?.emit(Button.EventType.CLICK);

@@ -580,7 +580,7 @@ export class RuntimeScreenFactory {
     const emptyState = home.sectionCard(listRoot, "HistoryEmptyState", "暂无记录", 0,
       safeTop - 488, 520, 236, "history", "history");
     home.visualSlot(emptyState, "history", 0, 58, 92, 92);
-    const empty = home.label(emptyState, "HistoryEmpty", "", 0, -16, 440, 44, 26, "homeText");
+    const empty = home.label(emptyState, "HistoryEmpty", "", 0, -15, 440, 38, 26, "homeText");
     home.label(emptyState, "HistoryEmptyHint", "完成一局对战后，成绩会保存在这里", 0, -62, 450, 38, 17, "homeTextMuted");
     const items: HistoryRecordItem[] = [];
     const rowHeight = 86 + stretch * 16 / 112;
