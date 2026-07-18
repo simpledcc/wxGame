@@ -1536,12 +1536,18 @@ async function main(): Promise<void> {
       const catalogSubtitleNode = findDeep(canvas, "CoopSelectHeaderSubtitle")!;
       const catalogTitle = catalogTitleNode.getComponent(UITransform);
       const catalogSubtitle = catalogSubtitleNode.getComponent(UITransform);
+      const catalogBack = findDeep(canvas, "BackButton")!;
+      const catalogBackdrop = findDeep(canvas, "CoopSelectHeaderBackdrop")!;
       assertOk(helpButton);
       assertOk(helpButton.getComponent(Button) && helpTransform && catalogTitle && catalogSubtitle);
       assertEqual(helpButton.getComponent(Graphics)?.enabled, true,
         "rules action must use a visible high-contrast circular background");
       assertEqual(helpButton.getComponent(RuntimeButtonVisual)?.getVisualGeometry().radius, 40);
       assertEqual(findDeep(helpButton, "ModeHelpButtonHighlight")?.active, true);
+      assertEqual(helpButton.position.y, catalogBack.position.y,
+        "catalog header actions must share one horizontal axis");
+      assertEqual((catalogBackdrop.getComponent(UITransform)!.height - helpTransform.height) / 2, 8,
+        "rules action must keep symmetric vertical backdrop insets");
       assertOk(catalogTitleNode.position.x + catalogTitle.width / 2 + 8
         <= helpButton.position.x - helpTransform.width / 2,
         "catalog title must leave room for the rules action");
