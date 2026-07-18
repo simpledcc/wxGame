@@ -454,6 +454,7 @@ export class PreGameUi {
   button(parent: Node, name: string, text: string, x: number, y: number, width: number, height: number,
     handler: () => void, kind: PreGameActionKind = "surface", fontSize = 20): RuntimeButtonRef {
     const node = this.node(parent, name, x, y, width, height);
+    if(height<80) node.getComponent(UITransform)!.height=80;
     const radius = Math.min(18, height / 2);
     const token = this.actionToken(kind);
     const baseColor = this.color(token);

@@ -379,7 +379,6 @@ export class RuntimeScreenFactory {
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -14, 70, "surface");
       const a=home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
         202, 0, 126, 62, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
-      a.node.getComponent(UITransform)!.height=80;
       if(index>0){
         a.button.interactable=false;
         a.visual.refresh();
@@ -556,12 +555,12 @@ export class RuntimeScreenFactory {
     const modeIndicators: Node[] = [];
     const modeVisuals: RuntimeButtonVisual[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
-      const b = home.button(listRoot, name, label, -224 + index * 112, safeTop - 160,
-        104, 80, action, kind, 16);
+      const b = home.button(listRoot, name, label, -224 + index * 112, safeTop - 156,
+        104, 56, action, kind, 16);
       home.selectionStyle(b.visual, "join");
       b.label.node.setPosition(0,4,0);
       modeVisuals.push(b.visual);
-      const mark = home.pill(b.node, `${name}Selected`, 0, -31, 58, 6,
+      const mark = home.pill(b.node, `${name}Selected`, 0, -21, 58, 6,
         "homeJoin", "homeJoin");
       mark.active = index === 0;
       modeIndicators.push(mark);
@@ -571,12 +570,12 @@ export class RuntimeScreenFactory {
       }
     });
     const recentCard = home.sectionCard(listRoot, "HistoryRecentCard", "最近记录", -144,
-      safeTop - 244, 272, 110, "join", "history");
+      safeTop - 247, 272, 110, "join", "history");
     const recentSummary = home.label(recentCard, "HistoryRecentSummary", "", 0, -22, 236, 46, 15, "homeText", 0);
     const bestCard = home.sectionCard(listRoot, "HistoryBestCard", "最佳成绩", 144,
-      safeTop - 244, 272, 110, "history", "coin");
+      safeTop - 247, 272, 110, "history", "coin");
     const bestSummary = home.label(bestCard, "HistoryBestSummary", "", 0, -22, 236, 44, 23, "homeText", 0);
-    const titleY = safeTop - 338 + stretch * 12 / 112;
+    const titleY = safeTop - 330;
     const title = home.label(listRoot, "HistoryTitle", "", -120, titleY, 320, 40, 25, "homeText", 0);
     const best = home.label(listRoot, "HistoryBest", "", 190, titleY, 220, 36, 17, "homeTextMuted");
     const emptyState = home.sectionCard(listRoot, "HistoryEmptyState", "暂无记录", 0,
@@ -589,7 +588,7 @@ export class RuntimeScreenFactory {
     const rowGap = 94 + stretch * 16 / 112;
     for (let index = 0; index < 4; index += 1) {
       const row = home.accentCard(listRoot, `HistoryRow${index}`, 0,
-        safeTop - 405 + stretch * 15 / 112 - index * rowGap, 548, rowHeight, "history", 18);
+        safeTop - 401 - stretch * 8 / 112 - index * rowGap, 548, rowHeight, "history", 18);
       home.visualSlot(row, "history", -230, 0, 58, 58);
       const t = home.label(row, "Title", "", -82, 22, 286, 32, 18, "homeText", 0);
       const m = home.label(row, "Meta", "", -82, -20, 286, 34, 13, "homeTextMuted", 0);

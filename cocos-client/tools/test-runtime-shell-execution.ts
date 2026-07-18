@@ -1943,13 +1943,15 @@ async function main(): Promise<void> {
       const historyFilter = findDeep(canvas, "HistoryAll")!;
       const historyFilterLabel = findDeep(historyFilter, "HistoryAllLabel")!;
       const historyFilterIndicator = findDeep(historyFilter, "HistoryAllSelected")!;
+      const historyFilterHalfHeight = historyFilter.getComponent(RuntimeButtonVisual)!
+        .getVisualGeometry().height / 2;
       assertOk(verticalGap(historyFilterLabel, historyFilterIndicator) >= 8,
         "History filter copy must remain above its selected marker");
-      assertOk(historyFilter.getComponent(UITransform)!.height / 2
+      assertOk(historyFilterHalfHeight
         - historyFilterLabel.position.y - historyFilterLabel.getComponent(UITransform)!.height / 2 >= 8,
       "History filter copy needs a top inset");
       assertOk(historyFilterIndicator.position.y - historyFilterIndicator.getComponent(UITransform)!.height / 2
-        >= -historyFilter.getComponent(UITransform)!.height / 2 + 6,
+        >= -historyFilterHalfHeight + 4,
       "History selected marker needs a bottom inset");
       const assertHistorySummary = (card: Node, key: "History" | "Coin", summaryName: string): void => {
         const summary = findDeep(card, summaryName)!;
@@ -1963,6 +1965,29 @@ async function main(): Promise<void> {
           >= -card.getComponent(UITransform)!.height / 2 + 8,
         "History summary copy must clear its card bottom frame");
       };
+      const assertHistoryListSpacing = (root: Node, context: string): void => {
+        const safe = findDeep(root, "HistorySafeArea")!;
+        const chain = ["HistoryHeader", "HistoryAll", "HistoryRecentCard", "HistoryTitle",
+          "HistoryRow0", "HistoryRow1", "HistoryRow2", "HistoryRow3", "HistoryPrevious"]
+          .map((name) => findDeep(root, name)!);
+        const visualHalfHeight = (node: Node): number =>
+          (node.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height
+            ?? node.getComponent(UITransform)!.height) / 2;
+        const visualGap = (upper: Node, lower: Node): number =>
+          upper.position.y - visualHalfHeight(upper) - lower.position.y - visualHalfHeight(lower);
+        assertEqual(chain[1].getComponent(UITransform)?.height, 80,
+          `${context} filters must retain their target-device touch height`);
+        assertEqual(chain[1].getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 56,
+          `${context} filters must use their compact visible height`);
+        for (let gap = 0; gap < chain.length - 1; gap += 1) {
+          assertOk(visualGap(chain[gap], chain[gap + 1]) >= 8,
+            `${context} gap ${gap} must retain the eight-pixel rhythm`);
+        }
+        assertOk(chain[chain.length - 1].position.y
+          - chain[chain.length - 1].getComponent(UITransform)!.height / 2
+          >= -safe.getComponent(UITransform)!.height / 2 + 8,
+        `${context} pager must retain its safe-area clearance`);
+      };
       const recentCard = findDeep(canvas, "HistoryRecentCard")!;
       const bestCard = findDeep(canvas, "HistoryBestCard")!;
       assertHistorySummary(recentCard, "History", "HistoryRecentSummary");
@@ -1970,6 +1995,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(recentCard, "HistoryRecentSummary")!.position.y,
         findDeep(bestCard, "HistoryBestSummary")!.position.y,
       "History summary cards must share one body baseline");
+      assertHistoryListSpacing(routeRoot, "long History list");
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyAccent = findDeep(historyRow, "HistoryRow0Accent")!;
       const historyIcon = findDeep(historyRow, "HomeHistorySlot")!;
@@ -2036,11 +2062,8 @@ async function main(): Promise<void> {
       app.store.setRoute("history");
       await flushMany();
       const minimumHistoryRoot = findDeep(canvas, "HistoryRuntimeScreen")!;
-      const minimumHistorySafe = findDeep(minimumHistoryRoot, "HistorySafeArea")!;
-      const minimumHistoryHeader = findDeep(minimumHistoryRoot, "HistoryHeader")!;
       const minimumRecentCard = findDeep(minimumHistoryRoot, "HistoryRecentCard")!;
       const minimumBestCard = findDeep(minimumHistoryRoot, "HistoryBestCard")!;
-      const minimumHistoryTitle = findDeep(minimumHistoryRoot, "HistoryTitle")!;
       const minimumHistoryRows = Array.from({ length: 4 }, (_, row) => findDeep(minimumHistoryRoot, `HistoryRow${row}`)!);
       const minimumHistoryPrevious = findDeep(minimumHistoryRoot, "HistoryPrevious")!;
       const minimumHistoryPage = findDeep(minimumHistoryRoot, "HistoryPage")!;
@@ -2048,18 +2071,9 @@ async function main(): Promise<void> {
       assertHistorySummary(minimumRecentCard, "History", "HistoryRecentSummary");
       assertHistorySummary(minimumBestCard, "Coin", "HistoryBestSummary");
       assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
-      assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 4);
-      assertOk(verticalGap(minimumRecentCard, minimumHistoryTitle) >= 4);
-      assertOk(verticalGap(minimumHistoryTitle, minimumHistoryRows[0]) >= 4);
-      for (let gap = 0; gap < minimumHistoryRows.length - 1; gap += 1) {
-        assertOk(verticalGap(minimumHistoryRows[gap], minimumHistoryRows[gap + 1]) >= 8,
-          `minimum History row gap ${gap} must remain visible`);
-      }
-      assertOk(verticalGap(minimumHistoryRows[3], minimumHistoryPrevious) >= 4);
+      assertHistoryListSpacing(minimumHistoryRoot, "minimum History list");
       assertOk(horizontalGap(minimumHistoryPrevious, minimumHistoryPage) >= 8);
       assertOk(horizontalGap(minimumHistoryPage, minimumHistoryNext) >= 8);
-      assertOk(minimumHistoryPrevious.position.y - minimumHistoryPrevious.getComponent(UITransform)!.height / 2
-        >= -minimumHistorySafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumHistoryRoot, "minimum History route");
       assertPreGameTargetDevices(minimumHistoryRoot);
       setMockWindowSize(393, 852);
