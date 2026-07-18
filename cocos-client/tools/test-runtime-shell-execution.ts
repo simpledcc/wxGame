@@ -386,7 +386,9 @@ async function main(): Promise<void> {
     String(app.wordBankStore.getWordCoins()),
     "Home coins must come from WordBankStore"
   );
-  assertOk(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："));
+  assertEqual(findDeep(canvas, "CurrentBankCaption")?.getComponent(Label)?.string, "当前词库");
+  assertEqual(findDeep(canvas, "CurrentBankBarTitle")?.getComponent(Label)?.string.startsWith("当前词库："), false,
+    "Home Bank title must reserve its width for the real bank name");
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const subtitleTransform = homeSubtitle?.getComponent(UITransform);
@@ -770,7 +772,7 @@ async function main(): Promise<void> {
   const bankTitle = findDeep(canvas, "CurrentBankBarTitle");
   const bankTitleTransform = bankTitle?.getComponent(UITransform);
   assertOk(bankTitleTransform);
-  bankTitle!.getComponent(Label)!.string = `当前词库：${"超长词库名称".repeat(12)}`;
+  bankTitle!.getComponent(Label)!.string = "超长词库名称".repeat(12);
   assertEqual(bankTitle!.getComponent(Label)!.overflow, Label.Overflow.SHRINK);
   assertEqual(bankTitleTransform.width, 350, "long bank text must retain space for the change affordance");
   app.wordBankStore.setSelectedBankId(selectedBankBeforeHomePicker);
@@ -987,9 +989,11 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
         findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,
-        "玩家1（你）\n正在读取...",
-        "accepted joins without a snapshot must show a syncing state"
+        "玩家1（你）",
+        "player cards must not duplicate the central syncing state"
       );
+      assertEqual(findDeep(canvas, "RoomPlayerTwo")?.getComponent(Label)?.string, "等待加入");
+      assertEqual(findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string, "正在进入房间...");
       assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
       assertEqual(findDeep(canvas, "CreateRoom"), null);
       assertEqual(findDeep(canvas, "JoinRoom"), null);
@@ -1005,6 +1009,7 @@ async function main(): Promise<void> {
         "player cards must leave readiness to the status badge"
       );
       assertEqual(findDeep(canvas, "RoomPlayerOneWaiting")?.active, true);
+      assertEqual(findDeep(canvas, "RoomPlayerTwo")?.getComponent(Label)?.string, "等待加入");
       assertEqual(findDeep(canvas, "CopyCode")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "InviteFriend")?.getComponent(Button)?.interactable, true);
       assertEqual(findDeep(canvas, "RefreshRoom"), null, "room refresh stays in background polling");

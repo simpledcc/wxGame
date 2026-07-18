@@ -260,8 +260,8 @@ export class RoomScene extends Component {
       this.startVisual?.setSelected(false);
       if (hasSession) {
         if (this.modeLabel) this.modeLabel.string = this.getSelectedBankLabel();
-        if (this.playerOneLabel) this.playerOneLabel.string = "玩家1（你）\n正在读取...";
-        if (this.playerTwoLabel) this.playerTwoLabel.string = "玩家2\n等待加入";
+        if (this.playerOneLabel) this.playerOneLabel.string = "玩家1（你）";
+        if (this.playerTwoLabel) this.playerTwoLabel.string = "等待加入";
         if (this.statusLabel) {
           this.statusLabel.string = state.pendingAction
             ? ACTION_LABELS[state.pendingAction]
@@ -372,7 +372,7 @@ export class RoomScene extends Component {
 
   private formatPlayer(player: RoomSnapshot["players"][number] | undefined, index: number,
     localOpenId: string): string {
-    if (!player) return `玩家${index + 1}\n等待加入`;
+    if (!player) return "等待加入";
     const identity = player.openid === localOpenId ? "（你）" : "";
     return `玩家${index + 1}${identity}`;
   }

@@ -39,7 +39,7 @@ export class HomeScene extends Component {
     const bank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     if (this.playerLabel) this.playerLabel.string = app.playerStore.getLocalPlayer().displayName;
     if (this.coinLabel) this.coinLabel.string = String(app.wordBankStore.getWordCoins());
-    if (this.bankLabel) this.bankLabel.string = `当前词库：${getWordBankLabel(bank, true)}`;
+    if (this.bankLabel) this.bankLabel.string = getWordBankLabel(bank, true);
     if (this.historySummaryLabel) {
       const best = app.historyStore.getBestScores();
       const scores = [best.pk?.score, best.coopShared?.score, best.coopSpell?.score]
