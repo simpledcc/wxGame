@@ -309,9 +309,9 @@ export class PreGameUi {
     this.pill(node, `${name}Backdrop`, 42, 0, 454, 96, "homeJoin", "homeTextOnColor");
     const backButton = this.iconButton(node, "BackButton", "←", -250, 0, 86, backHandler, undefined, "join", 48);
     backButton.titleLabel.color = this.color("homeTextOnColor");
-    const iconPlate = this.pill(node, `${name}Icon`, -126, 14, 58, 58, "homeCard", "homeTextOnColor");
+    const iconPlate = this.pill(node, `${name}Icon`, -126, 18, 58, 58, "homeCard", "homeTextOnColor");
     this.visualSlot(iconPlate, icon, 0, 0, 48, 48);
-    const titleLabel = this.label(node, `${name}Title`, title, 62, 18, 310, 44, 31, "homeTextOnColor");
+    const titleLabel = this.label(node, `${name}Title`, title, 66, 22, 302, 44, 31, "homeTextOnColor");
     titleLabel.enableOutline = true;
     titleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.5);
     titleLabel.outlineWidth = 2;

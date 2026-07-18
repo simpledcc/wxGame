@@ -278,6 +278,15 @@ function main(): void {
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon"));
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderDivider")?.getComponent(Graphics));
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon")?.getChildByName("HomeCatalogSlot"));
+  const headerIcon = pageHeader.node.getChildByName("FoundationPageHeaderIcon")!;
+  const headerDivider = pageHeader.node.getChildByName("FoundationPageHeaderDivider")!;
+  const edgeGap = (upper: Node, lower: Node): number =>
+    upper.position.y - transform(upper).height / 2 - lower.position.y - transform(lower).height / 2;
+  assertOk(edgeGap(pageHeader.titleLabel.node, headerDivider) >= 8);
+  assertOk(edgeGap(headerDivider, pageHeader.subtitleLabel.node) >= 8);
+  assertOk(edgeGap(headerIcon, pageHeader.subtitleLabel.node) >= 8);
+  assertOk(pageHeader.titleLabel.node.position.x - transform(pageHeader.titleLabel.node).width / 2
+    - headerIcon.position.x - transform(headerIcon).width / 2 >= 8);
   assertEqual(pageHeader.titleLabel.enableOutline, true);
   assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
   const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
