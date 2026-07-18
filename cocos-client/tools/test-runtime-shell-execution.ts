@@ -566,6 +566,44 @@ async function main(): Promise<void> {
   await flushMany(2);
   assertEqual(appRuntime.privacyContractOpenCount, privacyOpenCount + 1);
   assertEqual(findDeep(canvas, "HomePrivacy")?.getComponent(Button)?.interactable, true);
+  setMockWindowSize(640, 960);
+  app.store.setRoute("bank");
+  await flushMany();
+  app.store.setRoute("home");
+  await flushMany();
+  const minimumHomeRoot = findDeep(canvas, "HomeRuntimeScreen")!;
+  const minimumHomeSafe = findDeep(minimumHomeRoot, "HomeSafeArea")!;
+  const minimumHomeChain = [
+    "HomeTopBar", "HomeLogoSlot", "HomeSubtitleRibbon", "CurrentBankBar", "CreateRoomButton",
+    "JoinRoomButton", "StudyButton", "HelpButton", "HomePrivacy"
+  ].map((name) => findDeep(minimumHomeRoot, name)!);
+  assertOk(verticalGap(minimumHomeChain[0], minimumHomeChain[1]) >= 4);
+  const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
+  const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
+  assertOk(minimumRibbonTop - minimumLogoBottom >= 0 && minimumRibbonTop - minimumLogoBottom <= 8,
+    "minimum Home ribbon must stay attached to the Logo without covering its core");
+  for (let gap = 2; gap < minimumHomeChain.length - 1; gap += 1) {
+    assertOk(verticalGap(minimumHomeChain[gap], minimumHomeChain[gap + 1]) >= 4,
+      `minimum Home gap ${gap} must remain visible`);
+  }
+  assertEqual(minimumHomeChain[1].getComponent(UITransform)?.height, 108);
+  assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 96);
+  assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 96);
+  assertEqual(minimumHomeChain[6].getComponent(UITransform)?.height, 80);
+  assertEqual(findDeep(minimumHomeRoot, "BankButton")?.position.y, minimumHomeChain[6].position.y);
+  assertEqual(findDeep(minimumHomeRoot, "HistoryButton")?.position.y, minimumHomeChain[7].position.y);
+  assertEqual(findDeep(minimumHomeRoot, "HomeCharacterSlot")?.active, false);
+  const minimumPrivacy = minimumHomeChain[8];
+  assertOk(minimumPrivacy.position.y - minimumPrivacy.getComponent(UITransform)!.height / 2
+    >= -minimumHomeSafe.getComponent(UITransform)!.height / 2);
+  assertVisibleUiContract(minimumHomeRoot, "minimum Home route");
+  assertPreGameTargetDevices(minimumHomeRoot);
+  assertPreGameIconLayout(minimumHomeRoot, "minimum Home route");
+  setMockWindowSize(393, 852);
+  app.store.setRoute("bank");
+  await flushMany();
+  app.store.setRoute("home");
+  await flushMany();
 
   const originalNavigate = app.router.navigate.bind(app.router);
   let failNextNavigation = true;

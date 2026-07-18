@@ -51,7 +51,9 @@ export class RuntimeScreenFactory {
     const safe = home.safeArea(root, "HomeSafeArea");
     const safeTop = safe.height / 2;
     const safeBottom = -safe.height / 2;
-    const logoY = safeTop - 180;
+    const compact = safe.height < 1000;
+    const fit = (a: number, b: number) => compact ? a : b;
+    const logoY = safeTop - fit(174, 180);
     const footerY = safeBottom + 46;
     const top = home.topBar(safe, "HomeTopBar", 92);
     let controller!: HomeScene;
@@ -78,12 +80,12 @@ export class RuntimeScreenFactory {
       top, "SettingsButton", "设", 252, 0, 80, () => openSettings(), "settings", "transparent", 54
     );
 
-    home.visualSlot(safe.node, "logo", 0, logoY, 520, 156);
-    const subtitleRibbon = home.pill(safe.node, "HomeSubtitleRibbon", 0, logoY - 96, 372, 48,
+    home.visualSlot(safe.node, "logo", 0, logoY, 520, fit(108, 156));
+    const subtitleRibbon = home.pill(safe.node, "HomeSubtitleRibbon", 0, logoY - fit(67, 96), 372, fit(40, 48),
       "homeCreate", "homeTextOnColor");
     home.label(subtitleRibbon, "HomeSubtitle", "和好友一起比拼单词实力", 0, 0, 338, 34, 20, "homeTextOnColor");
     const bank = home.actionButton(
-      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - 168, 520, 92,
+      safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(131, 168), 520, fit(80, 92),
       () => controller.openBankPicker(), "surface", "wordBank"
     );
     bank.titleLabel.node.setPosition(-22, 0, 0);
@@ -93,30 +95,30 @@ export class RuntimeScreenFactory {
       "homeHistory", "homeTextOnColor");
     home.label(bankChange, "CurrentBankChangeLabel", "更换", 0, 0, 72, 36, 17, "homeTextOnColor");
     home.actionButton(
-      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, logoY - 302, 520, 146,
+      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, logoY - fit(223, 302), 520, fit(96, 146),
       () => controller.openModeCatalog(), "create", "createRoom"
     );
     home.actionButton(
-      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, logoY - 452, 520, 136,
+      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, logoY - fit(323, 452), 520, fit(96, 136),
       () => controller.openJoinRoom(), "join", "joinRoom"
     );
     home.actionButton(
-      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -134, logoY - 586, 252, 118,
+      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -134, logoY - fit(415, 586), 252, fit(80, 118),
       () => controller.openStudy(), "practice", "practice"
     );
     home.actionButton(
-      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 134, logoY - 586, 252, 118,
+      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 134, logoY - fit(415, 586), 252, fit(80, 118),
       () => controller.openBankPicker(), "bank", "wordBank"
     );
     home.actionButton(
-      safe.node, "HelpButton", "玩法目录", "多种玩法，敬请期待", "玩", -134, logoY - 712, 252, 118,
+      safe.node, "HelpButton", "玩法目录", "多种玩法，敬请期待", "玩", -134, logoY - fit(499, 712), 252, fit(80, 118),
       () => controller.openModeCatalog(), "catalog", "catalog"
     );
     const history = home.actionButton(
-      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 134, logoY - 712, 252, 118,
+      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 134, logoY - fit(499, 712), 252, fit(80, 118),
       () => controller.openHistory(), "history", "history"
     );
-    const secondaryBottom = logoY - 712 - 59;
+    const secondaryBottom = logoY - fit(499, 712) - fit(40, 59);
     const footerTop = footerY + 42;
     const characterSpace = secondaryBottom - footerTop;
     const characterVisible = characterSpace >= 136;
