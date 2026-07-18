@@ -354,27 +354,29 @@ export class PreGameUi {
   sectionCard(parent: Node, name: string, title: string, x: number, y: number, width: number,
     height: number, kind: PreGameActionKind, visualKey?: HomeVisualSlotKey): Node {
     const card = this.card(parent, name, x, y, width, height, 22);
-    const tabWidth = Math.min(width - 36, Math.max(170, title.length * 26 + (visualKey ? 76 : 42)));
-    const tabShadow = this.node(card, `${name}TabShadow`, -width / 2 + tabWidth / 2 + 14,
-      height / 2 - 34, tabWidth, 58);
+    const h=height<120?24:58;
+    const tabWidth=Math.min(width-36,Math.max(170,title.length*26+(visualKey?76:42)));
+    const tabShadow = this.node(card, `${name}TabShadow`, -width/2+tabWidth/2+14,
+      height/2-h/2-5, tabWidth, h);
     const tabShadowGraphics = tabShadow.addComponent(Graphics);
     tabShadowGraphics.fillColor = new Color(24, 42, 56, 46);
-    tabShadowGraphics.roundRect(-tabWidth / 2, -29, tabWidth, 58, 18);
+    tabShadowGraphics.roundRect(-tabWidth/2,-h/2,tabWidth,h,Math.min(18,h/2));
     tabShadowGraphics.fill();
-    const tab = this.node(card, `${name}Tab`, -width / 2 + tabWidth / 2 + 14, height / 2 - 30,
-      tabWidth, 58);
+    const tab = this.node(card, `${name}Tab`, -width/2+tabWidth/2+14,
+      height/2-h/2-1, tabWidth, h);
     const tabBackground = tab.addComponent(Graphics);
     tabBackground.fillColor = this.color(this.actionToken(kind));
-    tabBackground.strokeColor = kind === "surface" ? this.color("homeCardBorder") : this.color("homeTextOnColor");
+    tabBackground.strokeColor=kind==="surface"?this.color("homeCardBorder"):this.color("homeTextOnColor");
     tabBackground.lineWidth = 2;
-    tabBackground.roundRect(-tabWidth / 2, -29, tabWidth, 58, 18);
+    tabBackground.roundRect(-tabWidth/2,-h/2,tabWidth,h,Math.min(18,h/2));
     tabBackground.fill();
     tabBackground.stroke();
-    const textToken: ThemeColorToken = kind === "surface" ? "homeText" : "homeTextOnColor";
-    if (visualKey) this.visualSlot(tab, visualKey, -tabWidth / 2 + 32, 0, 38, 38, textToken);
-    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey ? 18 : 0, 0,
-      tabWidth - (visualKey ? 68 : 24), 42, 22, textToken);
-    if (kind !== "surface") {
+    const textToken:ThemeColorToken=kind==="surface"?"homeText":"homeTextOnColor";
+    if (visualKey) this.visualSlot(tab, visualKey, -tabWidth/2+(h<58?18:32), 0,
+      h<58?18:38, h<58?18:38, textToken);
+    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey?(h<58?10:18):0, 0,
+      tabWidth-(visualKey?(h<58?40:68):24), h<58?20:42, h<58?14:22, textToken);
+    if (kind!=="surface") {
       tabTitle.enableOutline = true;
       tabTitle.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.42);
       tabTitle.outlineWidth = 1;

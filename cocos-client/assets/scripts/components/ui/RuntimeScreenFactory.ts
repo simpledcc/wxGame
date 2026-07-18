@@ -213,7 +213,7 @@ export class RuntimeScreenFactory {
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
       safeTop - 158, 540, 80, "history", "coin");
     home.visualSlot(statusCard, "coin", -232, 0, 44, 44);
-    const status = home.label(statusCard, "BankStatus", "", 24, -2, 430, 66, 18, "homeText", 0);
+    const status = home.label(statusCard, "BankStatus", "", 24, -14, 430, 46, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
     const pageSize = 4;
     let page = Math.max(0, Math.floor(Math.max(0, entries.findIndex(([id]) => id === app.store.getState().bankPickerSelectedBankId)) / pageSize));
@@ -458,7 +458,7 @@ export class RuntimeScreenFactory {
       () => void controller.inviteFriend(), "practice", 16);
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
       520, 72, "practice", "wordBank");
-    const mode = home.label(lobbyBank, "RoomMode", "", 18, -14, 430, 44, 20, "homeText");
+    const mode = home.label(lobbyBank, "RoomMode", "", 18, -16, 430, 36, 20, "homeText");
     const playerOne = home.playerStatusCard(lobbyPanel, "RoomPlayerOne", "房主", -140, "practice");
     const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -150,
@@ -469,7 +469,7 @@ export class RuntimeScreenFactory {
     const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -10, 30, 30,
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
-    const status = home.label(statusCard, "RoomStatus", "", 42, -10, 420, 46, 17, "homeTextMuted");
+    const status = home.label(statusCard, "RoomStatus", "", 42, -16, 420, 34, 17, "homeTextMuted");
     const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -233, 440, 80,
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");

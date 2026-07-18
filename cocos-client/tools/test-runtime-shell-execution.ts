@@ -752,6 +752,9 @@ async function main(): Promise<void> {
   );
   assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 184);
   assertOk(findDeep(canvas, "SelectedModeCardTab")?.getComponent(Graphics));
+  assertEqual(findDeep(canvas, "SelectedModeCardTab")?.getComponent(UITransform)?.height, 58);
+  assertEqual(findDeep(canvas, "SelectedModeCardTabTitle")?.getComponent(Label)?.fontSize, 22);
+  assertEqual(findDeep(findDeep(canvas, "SelectedModeCardTab")!, "HomeJoinRoomSlot")?.getComponent(UITransform)?.height, 38);
   const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
   const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
   assertOk(
@@ -785,6 +788,10 @@ async function main(): Promise<void> {
   const minimumCreatePanel = findDeep(minimumRoomRoot, "RoomCreatePanel")!;
   const createChain = ["SelectedModeCard", "CreateBankCard", "CreateGuidanceCard", "CreateRoom", "AutoReady"]
     .map((name) => findDeep(minimumCreatePanel, name)!);
+  const minimumGuidanceTab = findDeep(minimumCreatePanel, "CreateGuidanceCardTab")!;
+  assertEqual(minimumGuidanceTab.getComponent(UITransform)?.height, 24);
+  assertEqual(findDeep(minimumGuidanceTab, "CreateGuidanceCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+  assertOk(verticalGap(minimumGuidanceTab, findDeep(minimumCreatePanel, "CreateGuidance")!) >= 4);
   for (let gap = 0; gap < createChain.length - 1; gap += 1) {
     assertOk(verticalGap(createChain[gap], createChain[gap + 1]) >= 8,
       `minimum create-room gap ${gap} must remain visible`);
@@ -830,6 +837,12 @@ async function main(): Promise<void> {
       `minimum room-lobby gap ${gap} must remain visible`);
   }
   assertEqual(findDeep(minimumLobby, "LeaveRoom"), null, "header Back must remain the single leave action");
+  [["LobbyBankCardTab", "RoomMode"], ["RoomStatusCardTab", "RoomStatus"]].forEach(([tabName, contentName]) => {
+    const tab = findDeep(minimumLobby, tabName)!;
+    assertEqual(tab.getComponent(UITransform)?.height, 24);
+    assertEqual(findDeep(tab, `${tabName}Title`)?.getComponent(Label)?.fontSize, 14);
+    assertOk(verticalGap(tab, findDeep(minimumLobby, contentName)!) >= 4);
+  });
   const minimumStart = lobbyChain[5];
   assertOk(minimumLobby.position.y + minimumStart.position.y
     - minimumStart.getComponent(UITransform)!.height / 2
@@ -1091,6 +1104,11 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
+      const bankStatusTab = findDeep(canvas, "BankStatusCardTab")!;
+      assertEqual(bankStatusTab.getComponent(UITransform)?.height, 24);
+      assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+      assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 18);
+      assertOk(verticalGap(bankStatusTab, findDeep(canvas, "BankStatus")!) >= 4);
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
       assertOk(!findDeep(canvas, "BankSlot0Title")?.getComponent(Label)?.string.startsWith("✓"),
         "selected Bank title must leave state feedback to the ring and badge");
@@ -1380,6 +1398,10 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
       assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, false, "history records must hide the empty-state card");
       assertOk(findDeep(canvas, "HistoryRecentCardTab")?.getComponent(Graphics));
+      const recentTab = findDeep(canvas, "HistoryRecentCardTab")!;
+      assertEqual(recentTab.getComponent(UITransform)?.height, 24);
+      assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+      assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
       const historyRow = findDeep(canvas, "HistoryRow0")!;
       const historyTitle = findDeep(historyRow, "Title")!;
       const historyScore = findDeep(historyRow, "Score")!;
