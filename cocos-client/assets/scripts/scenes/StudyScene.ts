@@ -1,4 +1,6 @@
 import { _decorator, Component, Label } from "cc";
+import type { PreGameProgressRef } from "../components/ui/PreGameUi";
+import { RuntimeButtonVisual } from "../components/ui/RuntimeButtonVisual";
 import { app } from "../core/App";
 
 const { ccclass, property } = _decorator;
@@ -16,6 +18,9 @@ export class StudyScene extends Component {
 
   @property(Label)
   meaningToggleLabel: Label | null = null;
+
+  progressView: PreGameProgressRef | null = null;
+  meaningToggleVisual: RuntimeButtonVisual | null = null;
 
   onLoad(): void {
     app.store.setRoute("study");
@@ -92,6 +97,8 @@ export class StudyScene extends Component {
       if (this.wordLabel) this.wordLabel.string = "暂无单词";
       if (this.meaningLabel) this.meaningLabel.string = "";
       if (this.statusLabel) this.statusLabel.string = "请先选择有单词的词库";
+      this.progressView?.setValue(0, 1);
+      this.meaningToggleVisual?.setSelected(false);
       return;
     }
     if (this.wordLabel) {
@@ -103,6 +110,8 @@ export class StudyScene extends Component {
     if (this.statusLabel) {
       this.statusLabel.string = `${card.index + 1}/${card.total}`;
     }
+    this.progressView?.setValue(card.index + 1, card.total);
+    this.meaningToggleVisual?.setSelected(app.studyStore.getSession().showMeaning);
     if (this.meaningToggleLabel) {
       this.meaningToggleLabel.string = app.studyStore.getSession().showMeaning
         ? "隐藏后续单词中文"

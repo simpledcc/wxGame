@@ -15,6 +15,7 @@ import { RoomScene } from "../../scenes/RoomScene";
 import { StudyScene } from "../../scenes/StudyScene";
 import type { RouteName } from "../../store/GameStore";
 import { PreGameUi, type PreGameActionButtonRef } from "./PreGameUi";
+import { RuntimeButtonVisual } from "./RuntimeButtonVisual";
 import { RuntimeUi, type RuntimeButtonRef, type RuntimeEditRef } from "./RuntimeUi";
 
 export class RuntimeScreenFactory {
@@ -228,6 +229,7 @@ export class RuntimeScreenFactory {
           controller.selectBank(bankId);
           renderPage();
         }, "surface", "wordBank");
+      home.selectionStyle(slot.visual, "practice");
       slot.titleLabel.node.setPosition(-32, 18, 0);
       slot.titleLabel.node.getComponent(UITransform)?.setContentSize(300, 42);
       slot.subtitleLabel?.node.setPosition(-32, -22, 0);
@@ -250,11 +252,14 @@ export class RuntimeScreenFactory {
         if (!entry) return;
         const [id, bank] = entry;
         const unlocked = app.wordBankStore.isUnlocked(app.wordBankCatalog, id);
+        const selected = id === selectedId;
+        slot.visual.setSelected(selected);
         slot.titleLabel.string = `${id === selectedId ? "✓ " : ""}${getWordBankLabel(bank, true)}`;
         if (slot.subtitleLabel) {
           slot.subtitleLabel.string = `${bank.words.length} 个单词 · ${unlocked ? "已解锁" : "未解锁"}`;
         }
-        slotStates[index].string = id === selectedId ? "已选择" : unlocked ? "选择" : "需解锁";
+        slotStates[index].string = selected ? "已选择" : unlocked ? "选择" : "需解锁";
+        slotStates[index].color = selected ? home.color("homePractice") : home.color("homeText");
       });
       pageLabel.string = `${page + 1}/${pageCount}`;
       previous.button.interactable = page > 0;
@@ -303,6 +308,7 @@ export class RuntimeScreenFactory {
       540, 366, "practice", "practice");
     home.label(card, "StudyProgressCaption", "学习进度", 182, 137, 120, 30, 16, "homeTextMuted");
     const status = home.label(card, "StudyStatus", "", 182, 108, 120, 36, 18, "homeTextMuted");
+    const progress = home.progressBar(card, "StudyProgress", 182, 87, 124, 12, "practice");
     const word = home.label(card, "StudyWord", "", 0, 34, 480, 92, 58, "homeText");
     const meaning = home.label(card, "StudyMeaning", "", 0, -58, 480, 92, 29, "homeTextMuted");
     home.button(card, "PreviousWord", "← 上一个", -142, -142, 220, 80,
@@ -316,6 +322,7 @@ export class RuntimeScreenFactory {
       () => controller.markCurrentUnfamiliar(), "history", 19);
     const meaningToggle = home.button(safe.node, "MeaningToggle", "", 0, cardY - 310 - stretch * 0.28,
       500, 82, () => controller.toggleChinese(), "surface", 19);
+    home.selectionStyle(meaningToggle.visual, "join");
     home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "→", 0,
       cardY - 414 - stretch * 0.45, 500, 112, () => controller.nextWord(), "create", "practice");
     home.button(safe.node, "StudyBottomChangeBank", "↻ 更换词库", 0, safeBottom + 48, 230, 80,
@@ -325,6 +332,8 @@ export class RuntimeScreenFactory {
     controller.meaningLabel = meaning;
     controller.statusLabel = status;
     controller.meaningToggleLabel = meaningToggle.label;
+    controller.progressView = progress;
+    controller.meaningToggleVisual = meaningToggle.visual;
     return root;
   }
 
@@ -407,6 +416,7 @@ export class RuntimeScreenFactory {
         -224, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
       autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -340, 390, 80,
         () => controller.toggleAutoReady(), "surface", 18);
+      home.selectionStyle(autoReady.visual, "practice");
     }
 
     let joinPanel: Node | null = null;
@@ -438,18 +448,33 @@ export class RuntimeScreenFactory {
     const playerOneCard = home.sectionCard(lobbyPanel, "RoomPlayerOneCard", "房主", -140, 2,
       264, 234, "practice", "avatar");
     home.visualSlot(playerOneCard, "avatar", 0, 34, 82, 82);
+    const playerOneReady = home.statusBadge(playerOneCard, "RoomPlayerOneReady", "已准备",
+      82, 48, 94, "practice");
+    playerOneReady.active = false;
+    const playerOneWaiting = home.statusBadge(playerOneCard, "RoomPlayerOneWaiting", "等待中",
+      82, 48, 94, "surface");
     const playerOne = home.label(playerOneCard, "RoomPlayerOne", "", 0, -60, 226, 76, 20, "homeText");
     const playerTwoCard = home.sectionCard(lobbyPanel, "RoomPlayerTwoCard", "玩家", 140, 2,
       264, 234, "join", "avatar");
     home.visualSlot(playerTwoCard, "avatar", 0, 34, 82, 82);
+    const playerTwoReady = home.statusBadge(playerTwoCard, "RoomPlayerTwoReady", "已准备",
+      82, 48, 94, "practice");
+    playerTwoReady.active = false;
+    const playerTwoWaiting = home.statusBadge(playerTwoCard, "RoomPlayerTwoWaiting", "等待中",
+      82, 48, 94, "surface");
     const playerTwo = home.label(playerTwoCard, "RoomPlayerTwo", "", 0, -60, 226, 76, 20, "homeText");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -146,
       520, 78, "history");
+    const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -10, 30, 30,
+      "homePractice", "homeTextOnColor");
+    roomReadyIndicator.active = false;
     const status = home.label(statusCard, "RoomStatus", "", 42, -10, 420, 46, 17, "homeTextMuted");
     const ready = home.button(lobbyPanel, "Ready", "✓ 我准备好了", 0, -238, 440, 90,
       () => void controller.toggleReady(), "practice", 22);
+    home.selectionStyle(ready.visual, "practice");
     const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0,
       -348, 500, 112, () => void controller.startSelectedMode(), "create", "createRoom");
+    home.selectionStyle(start.visual, "create");
     const leave = home.button(lobbyPanel, "LeaveRoom", "离开房间", 0, -448, 320, 80,
       () => controller.backHome(), "join", 19);
 
@@ -477,6 +502,12 @@ export class RuntimeScreenFactory {
     controller.startButton = start.button;
     controller.startSubtitleLabel = start.subtitleLabel;
     controller.autoReadyButton = autoReady?.button ?? null;
+    controller.autoReadyVisual = autoReady?.visual ?? null;
+    controller.readyVisual = ready.visual;
+    controller.startVisual = start.visual;
+    controller.playerReadyIndicators = [playerOneReady, playerTwoReady];
+    controller.playerWaitingIndicators = [playerOneWaiting, playerTwoWaiting];
+    controller.roomReadyIndicator = roomReadyIndicator;
     return root;
   }
 
@@ -521,16 +552,19 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "HistoryHeader", "战绩记录", "查看真实比赛成绩和历史最佳",
       () => controller.back(), "history");
     const tabs = [
-      ["HistoryAll", "全部", () => controller.showAll(), "join"],
+      ["HistoryAll", "全部", () => controller.showAll(), "surface"],
       ["HistoryPk", "PK", () => controller.showPk(), "surface"],
       ["HistoryShared", "合作", () => controller.showCoopShared(), "surface"],
       ["HistorySpell", "拼词", () => controller.showCoopSpell(), "surface"],
       ["HistoryOther", "其他", () => undefined, "surface"]
     ] as const;
     const modeIndicators: Node[] = [];
+    const modeVisuals: RuntimeButtonVisual[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
       const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 154,
         104, 80, action, kind, 16);
+      home.selectionStyle(tab.visual, "join");
+      modeVisuals.push(tab.visual);
       const indicator = home.pill(tab.node, `${name}Selected`, 0, -31, 58, 6,
         "homeJoin", "homeJoin");
       indicator.active = index === 0;
@@ -597,6 +631,7 @@ export class RuntimeScreenFactory {
     controller.previousButton = previous.button;
     controller.nextButton = next.button;
     controller.modeIndicators = modeIndicators;
+    controller.modeVisuals = modeVisuals;
     controller.recordItems = items;
     controller.listNode = listRoot;
     controller.detailNode = detailRoot;

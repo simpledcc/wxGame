@@ -118,6 +118,10 @@ export interface PreGamePageHeaderRef {
   subtitleLabel: Label;
 }
 
+export interface PreGameProgressRef {
+  setValue(current: number, total: number): void;
+}
+
 export class PreGameUi {
   constructor(readonly theme: ThemeManifest) {}
 
@@ -391,6 +395,47 @@ export class PreGameUi {
     return node;
   }
 
+  selectionStyle(visual: RuntimeButtonVisual, kind: PreGameActionKind): void {
+    const onColor = this.color("homeTextOnColor");
+    visual.setSelectionStyle(this.color(this.actionToken(kind)), onColor, onColor);
+  }
+
+  statusBadge(parent: Node, name: string, text: string, x: number, y: number, width: number,
+    kind: PreGameActionKind): Node {
+    const surface = kind === "surface";
+    const node = this.pill(parent, name, x, y, width, 34, this.actionToken(kind),
+      surface ? "homeCardBorder" : "homeTextOnColor");
+    this.label(node, `${name}Label`, text, 0, 0, width - 16, 28, 14,
+      surface ? "homeTextMuted" : "homeTextOnColor");
+    return node;
+  }
+
+  progressBar(parent: Node, name: string, x: number, y: number, width: number, height: number,
+    kind: PreGameActionKind): PreGameProgressRef {
+    const node = this.node(parent, name, x, y, width, height);
+    const track = node.addComponent(Graphics);
+    track.fillColor = new Color(48, 68, 91, 40);
+    track.roundRect(-width / 2, -height / 2, width, height, height / 2);
+    track.fill();
+    track.strokeColor = this.color("homeCardBorder");
+    track.lineWidth = 1;
+    track.roundRect(-width / 2, -height / 2, width, height, height / 2);
+    track.stroke();
+    const fillNode = this.node(node, `${name}Fill`, 0, 0, width, height);
+    const fill = fillNode.addComponent(Graphics);
+    const setValue = (current: number, total: number): void => {
+      const ratio = total > 0 ? Math.max(0, Math.min(1, current / total)) : 0;
+      fill.clear();
+      if (ratio <= 0) return;
+      const fillWidth = Math.max(height, width * ratio);
+      fill.fillColor = this.color(this.actionToken(kind));
+      fill.roundRect(-width / 2, -height / 2, fillWidth, height, height / 2);
+      fill.fill();
+    };
+    setValue(0, 1);
+    return { setValue };
+  }
+
   button(parent: Node, name: string, text: string, x: number, y: number, width: number, height: number,
     handler: () => void, kind: PreGameActionKind = "surface", fontSize = 20): RuntimeButtonRef {
     const node = this.node(parent, name, x, y, width, height);
@@ -443,6 +488,13 @@ export class PreGameUi {
       "homeCardBorder"
     );
     this.addInnerBorder(backgroundNode, `${name}InnerBorder`, width, height, 16);
+    const focusRing = this.node(node, `${name}FocusRing`, 0, 0, width - 6, height - 6);
+    const focusGraphics = focusRing.addComponent(Graphics);
+    focusGraphics.strokeColor = this.color("homeJoin");
+    focusGraphics.lineWidth = 3;
+    focusGraphics.roundRect(-(width - 6) / 2, -(height - 6) / 2, width - 6, height - 6, 14);
+    focusGraphics.stroke();
+    focusRing.active = false;
     const textLabel = this.label(node, `${name}Text`, "", 0, 0, width - 32, height - 18,
       multiline ? 18 : 20, "homeText", 0);
     const placeholderLabel = this.label(node, `${name}Placeholder`, "", 0, 0, width - 32,
@@ -456,6 +508,8 @@ export class PreGameUi {
     editBox.textLabel = textLabel;
     editBox.placeholderLabel = placeholderLabel;
     if (multiline) editBox.inputMode = EditBox.InputMode.ANY;
+    node.on("editing-did-began", () => { focusRing.active = true; });
+    node.on("editing-did-ended", () => { focusRing.active = false; });
     return { node, backgroundNode, background, editBox, textLabel, placeholderLabel };
   }
 

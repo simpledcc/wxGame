@@ -670,6 +670,9 @@ async function main(): Promise<void> {
   assertEqual(autoReadyCount, 1, "enabled auto-ready must use the existing ready action once");
   assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
   assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "✓ 已准备，点击取消");
+  assertEqual(findDeep(canvas, "Ready")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
+  assertEqual(findDeep(canvas, "RoomPlayerOneReady")?.active, true);
+  assertEqual(findDeep(canvas, "RoomPlayerTwoWaiting")?.active, true);
   assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
   app.roomSession.create = originalCreateRoom;
   app.roomSession.toggleReady = originalToggleReady;
@@ -689,15 +692,19 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "MarkWrong"));
   assertEqual(findDeep(canvas, "StudyCard")?.getComponent(UITransform)?.height, 366);
   assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
+  assertOk(findDeep(canvas, "StudyProgress")?.getComponent(Graphics));
+  assertOk(findDeep(canvas, "StudyProgressFill")?.getComponent(Graphics));
   assertEqual(
     findDeep(canvas, "StudyBankBar")?.position.y,
     findDeep(canvas, "ChangeStudyBank")?.position.y,
     "Study bank name and change action must share one compact row"
   );
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
+  assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
   assertEqual(findDeep(canvas, "MeaningToggleLabel")?.getComponent(Label)?.string, "显示后续单词中文");
+  assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), false);
   findDeep(canvas, "NextWord")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string, "");
   findDeep(canvas, "RevealWord")?.emit(Button.EventType.CLICK);
@@ -765,6 +772,8 @@ async function main(): Promise<void> {
   findDeep(canvas, "HistoryPk")?.emit(Button.EventType.CLICK);
   assertEqual(findDeep(canvas, "HistoryAllSelected")?.active, false);
   assertEqual(findDeep(canvas, "HistoryPkSelected")?.active, true, "history filter marker must follow selection");
+  assertEqual(findDeep(canvas, "HistoryAll")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), false);
+  assertEqual(findDeep(canvas, "HistoryPk")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   findDeep(canvas, "FeedbackButton")?.emit(Button.EventType.CLICK);
@@ -899,6 +908,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 110);
+      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);
@@ -985,6 +995,9 @@ async function main(): Promise<void> {
       assertEqual(enabledStart?.interactable, true, "two ready human players must enable the start action");
       enabledStartVisual?.refresh();
       assertEqual(enabledStartVisual?.isShowingDisabledState(), false, "enabled start must use the highlighted action color");
+      assertEqual(enabledStartVisual?.isShowingSelectedState(), true, "ready room must expose the selected start state");
+      assertEqual(findDeep(canvas, "RoomStatusReady")?.active, true);
+      assertEqual(findDeep(canvas, "RoomPlayerTwoReady")?.active, true);
       assertEqual(
         findDeep(canvas, "StartRoomSubtitle")?.getComponent(Label)?.string,
         "双方已准备，点击开始游戏"

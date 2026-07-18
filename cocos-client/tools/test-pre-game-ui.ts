@@ -211,6 +211,22 @@ function main(): void {
   assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeText"));
   assertEqual(surfaceAction.titleLabel.enableOutline, false);
   assertActionIconClearOfText(surfaceAction);
+  surfaceAction.visual.setSelectionStyle(
+    preGame.color("homeJoin"),
+    preGame.color("homeTextOnColor"),
+    preGame.color("homeTextOnColor")
+  );
+  surfaceAction.visual.setSelected(true);
+  assertEqual(surfaceAction.visual.isShowingSelectedState(), true);
+  assertEqual(surfaceAction.node.getChildByName("FoundationSurfaceActionSelectionRing")?.active, true);
+  assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeTextOnColor"));
+  surfaceAction.visual.setSelected(false);
+  assertEqual(surfaceAction.visual.isShowingSelectedState(), false);
+  assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeText"));
+
+  const progress = preGame.progressBar(safe.node, "FoundationProgress", 0, -240, 240, 14, "practice");
+  progress.setValue(3, 8);
+  progress.setValue(99, 8);
 
   let iconCount = 0;
   const icon = preGame.iconButton(topBar, "SettingsIcon", "设", 250, 0, 64, () => { iconCount += 1; });
@@ -260,6 +276,12 @@ function main(): void {
   assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
   const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
   assertOk(directEdit.node.getComponent(EditBox));
+  const focusRing = directEdit.node.getChildByName("FoundationEditFocusRing");
+  assertEqual(focusRing?.active, false);
+  directEdit.node.emit("editing-did-began");
+  assertEqual(focusRing?.active, true);
+  directEdit.node.emit("editing-did-ended");
+  assertEqual(focusRing?.active, false);
   assertEqual(directEdit.textLabel.node.getComponent(UITransform)?.anchorX, 0);
   assertEqual(directEdit.textLabel.node.getComponent(UITransform)?.anchorY, 1);
   assertEqual(directEdit.editBox.placeholder, "", "native placeholder must stay blank to avoid adapter ghost text");

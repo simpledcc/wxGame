@@ -1,4 +1,5 @@
 import { _decorator, Button, Component, EditBox, Label, Node } from "cc";
+import { RuntimeButtonVisual } from "../components/ui/RuntimeButtonVisual";
 import { app } from "../core/App";
 import {
   buildRoomGameOptions,
@@ -95,6 +96,13 @@ export class RoomScene extends Component {
 
   @property(Button)
   autoReadyButton: Button | null = null;
+
+  autoReadyVisual: RuntimeButtonVisual | null = null;
+  readyVisual: RuntimeButtonVisual | null = null;
+  startVisual: RuntimeButtonVisual | null = null;
+  playerReadyIndicators: Node[] = [];
+  playerWaitingIndicators: Node[] = [];
+  roomReadyIndicator: Node | null = null;
 
   private unsubscribe: (() => void) | null = null;
 
@@ -245,6 +253,10 @@ export class RoomScene extends Component {
       this.roomCodeLabel.string = state.roomCode || "------";
     }
     if (!room) {
+      this.renderPlayerStateIndicators([]);
+      if (this.roomReadyIndicator) this.roomReadyIndicator.active = false;
+      this.readyVisual?.setSelected(false);
+      this.startVisual?.setSelected(false);
       if (hasSession) {
         if (this.modeLabel) this.modeLabel.string = this.getSelectedBankLabel();
         if (this.playersLabel) this.playersLabel.string = "正在读取房间信息";
@@ -263,6 +275,10 @@ export class RoomScene extends Component {
     const localOpenId = app.playerStore.getLocalPlayer().openid;
     const availability = getRoomActionAvailability(room, localOpenId);
     const localPlayer = getLocalRoomPlayer(room, localOpenId);
+    this.renderPlayerStateIndicators(room.players);
+    if (this.roomReadyIndicator) this.roomReadyIndicator.active = availability.canStart;
+    this.readyVisual?.setSelected(!!localPlayer?.ready);
+    this.startVisual?.setSelected(availability.canStart);
     if (this.modeLabel) {
       this.modeLabel.string = this.getSelectedBankLabel(room);
     }
@@ -305,6 +321,8 @@ export class RoomScene extends Component {
     const busy = !!app.roomStore.getState().pendingAction;
     if (this.readyButton) this.readyButton.interactable = canReady && !busy;
     if (this.startButton) this.startButton.interactable = canStart && !busy;
+    this.readyVisual?.refresh();
+    this.startVisual?.refresh();
   }
 
   private setSessionControls(state: RoomSessionState, hasSession: boolean): void {
@@ -329,6 +347,7 @@ export class RoomScene extends Component {
     this.createButton = null;
     this.joinButton = null;
     this.autoReadyButton = null;
+    this.autoReadyVisual = null;
   }
 
   private getSelectedModeLabel(room: RoomSnapshot | null = null): string {
@@ -354,11 +373,22 @@ export class RoomScene extends Component {
   }
 
   private renderAutoReady(): void {
+    const enabled = app.store.getState().roomAutoReady;
     if (this.autoReadyLabel) {
-      this.autoReadyLabel.string = app.store.getState().roomAutoReady
+      this.autoReadyLabel.string = enabled
         ? "✓ 房主创建后自动准备"
         : "房主创建后手动准备";
     }
+    this.autoReadyVisual?.setSelected(enabled);
+  }
+
+  private renderPlayerStateIndicators(players: RoomSnapshot["players"]): void {
+    this.playerReadyIndicators.forEach((indicator, index) => {
+      indicator.active = !!players[index]?.ready;
+    });
+    this.playerWaitingIndicators.forEach((indicator, index) => {
+      indicator.active = !players[index]?.ready;
+    });
   }
 
   private showError(error: unknown, fallback: string): void {

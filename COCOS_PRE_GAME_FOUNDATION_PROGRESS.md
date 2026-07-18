@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Formal page-header icons, refined card chrome, unified pressed/disabled content states and live History filter marker pass full source/runtime verification | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Two source passes now cover formal headers/cards, pressed/disabled/selected controls, learning progress, room-ready badges, input focus and live History filtering | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -684,6 +684,16 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Added regression assertions for new card/header nodes, pressed/restored content geometry, disabled copy treatment and History filter switching.
 - `npm run verify`: `PASSED` on the no-Creator computer; `home_common` images and metadata were not changed.
 - Creator 3.8.8 build, WeChat visual traversal and screenshots are pending, so H8.7 remains `IN_PROGRESS` and this checkpoint must not use `dev_done`.
+
+### H8.7 second source checkpoint
+
+- Extended `RuntimeButtonVisual` with an explicit selected state that preserves hit geometry, respects disabled priority, recolors registered text/icons and renders a stable inset selection ring even when a formal bitmap skin is active.
+- Bound selected visuals to real Bank selection, Study Chinese visibility, room auto-ready/local-ready/start availability and History mode state.
+- Added a clamped Study progress bar, per-player ready/waiting badges, a room can-start indicator and native EditBox focus rings for Join and Feedback forms.
+- Added component and runtime assertions for selected-state restoration, progress clamping, input focus, Bank selection, Study toggle state, both room player indicators and History tab selection.
+- No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed.
+- Full `npm run verify` and `npm run build:wechat:dry-run` pass. Core source payload remains under the unchanged warning gate at `1,519,708 / 1,520,000` bytes.
+- Creator/WeChat visual traversal and screenshots remain pending, so this checkpoint is still not `dev_done`.
 
 ## Assets
 

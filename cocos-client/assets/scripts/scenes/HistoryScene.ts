@@ -1,5 +1,6 @@
 import { _decorator, Button, Component, Label, Node } from "cc";
 import { HistoryRecordItem } from "../components/history/HistoryRecordItem";
+import { RuntimeButtonVisual } from "../components/ui/RuntimeButtonVisual";
 import { app } from "../core/App";
 import type { GameModeKey } from "../domain/GameTypes";
 import type { MatchRecord, SpellRoundRecord } from "../domain/RoomTypes";
@@ -53,6 +54,8 @@ export class HistoryScene extends Component {
 
   @property([Node])
   modeIndicators: Node[] = [];
+
+  modeVisuals: RuntimeButtonVisual[] = [];
 
   @property([HistoryRecordItem])
   recordItems: HistoryRecordItem[] = [];
@@ -159,6 +162,9 @@ export class HistoryScene extends Component {
     const modeIndex = (["all", "pk", "coopShared", "coopSpell"] as HistoryMode[]).indexOf(mode);
     this.modeIndicators.forEach((indicator, index) => {
       indicator.active = index === modeIndex;
+    });
+    this.modeVisuals.forEach((visual, index) => {
+      visual.setSelected(index === modeIndex);
     });
     this.page = 0;
     this.records = app.historyStore.getRecords(mode === "all" ? undefined : mode)

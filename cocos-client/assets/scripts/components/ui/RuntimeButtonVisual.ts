@@ -22,7 +22,11 @@ export class RuntimeButtonVisual extends Component {
   private contentSprites: Sprite[] = [];
   private contentSpriteColors: Color[] = [];
   private contentOffsetY = 0;
-  private contentTinted = false;
+  private contentTintMode: "normal" | "selected" | "disabled" = "normal";
+  private selected = false;
+  private selectedFillColor: Color | null = null;
+  private selectedContentColor: Color | null = null;
+  private selectionRing: Node | null = null;
 
   configure(
     button: Button,
@@ -63,7 +67,35 @@ export class RuntimeButtonVisual extends Component {
     this.contentSprites = [...sprites];
     this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
     this.contentOffsetY = 0;
-    this.contentTinted = false;
+    this.contentTintMode = "normal";
+    this.refresh(true);
+  }
+
+  setSelectionStyle(fillColor: Color, strokeColor: Color, contentColor: Color): void {
+    this.selectedFillColor = this.copyColor(fillColor);
+    this.selectedContentColor = this.copyColor(contentColor);
+    if (!this.selectionRing) {
+      const inset = 4;
+      const ring = new Node(`${this.node.name}SelectionRing`);
+      ring.layer = this.node.layer;
+      this.node.addChild(ring);
+      ring.addComponent(UITransform).setContentSize(this.width, this.height);
+      const graphics = ring.addComponent(Graphics);
+      graphics.strokeColor = strokeColor;
+      graphics.lineWidth = 4;
+      graphics.roundRect(-this.width / 2 + inset, -this.height / 2 + inset,
+        this.width - inset * 2, this.height - inset * 2, Math.max(0, this.radius - inset));
+      graphics.stroke();
+      ring.active = false;
+      this.selectionRing = ring;
+    }
+    this.refresh(true);
+  }
+
+  setSelected(selected: boolean): void {
+    const next = !!selected;
+    if (next === this.selected) return;
+    this.selected = next;
     this.refresh(true);
   }
 
@@ -86,7 +118,9 @@ export class RuntimeButtonVisual extends Component {
     );
     this.background.fill();
     this.background.fillColor = interactable
-      ? (this.pressed ? this.pressedColor : this.normalColor)
+      ? (this.pressed
+          ? this.pressedColor
+          : (this.selected && this.selectedFillColor ? this.selectedFillColor : this.normalColor))
       : this.disabledColor;
     this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, this.radius);
     this.background.fill();
@@ -94,6 +128,7 @@ export class RuntimeButtonVisual extends Component {
       const channel = interactable ? (this.pressed ? 220 : 255) : 158;
       this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);
     }
+    if (this.selectionRing) this.selectionRing.active = this.selected && interactable;
     this.refreshContent(interactable);
   }
 
@@ -107,6 +142,10 @@ export class RuntimeButtonVisual extends Component {
 
   getContentOffsetY(): number {
     return this.contentOffsetY;
+  }
+
+  isShowingSelectedState(): boolean {
+    return this.selected && this.lastInteractable === true;
   }
 
   setPressed(pressed: boolean): void {
@@ -139,11 +178,14 @@ export class RuntimeButtonVisual extends Component {
       });
       this.contentOffsetY = nextOffsetY;
     }
-    if (!interactable) {
-      if (!this.contentTinted) {
-        this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
-        this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
-      }
+    const nextTintMode = !interactable
+      ? "disabled"
+      : (this.selected && this.selectedContentColor ? "selected" : "normal");
+    if (this.contentTintMode === "normal" && nextTintMode !== "normal") {
+      this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
+      this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+    }
+    if (nextTintMode === "disabled") {
       this.contentLabels.forEach((label, index) => {
         const base = this.contentLabelColors[index] || label.color;
         label.color = new Color(
@@ -162,18 +204,26 @@ export class RuntimeButtonVisual extends Component {
           Math.min(base.a, 184)
         );
       });
-      this.contentTinted = true;
-      return;
-    }
-    if (this.contentTinted) {
+    } else if (nextTintMode === "selected" && this.selectedContentColor) {
+      const tint = (base: Color): Color => new Color(
+        this.selectedContentColor!.r, this.selectedContentColor!.g, this.selectedContentColor!.b,
+        Math.min(base.a, this.selectedContentColor!.a)
+      );
+      this.contentLabels.forEach((label, index) => {
+        label.color = tint(this.contentLabelColors[index] || label.color);
+      });
+      this.contentSprites.forEach((sprite, index) => {
+        sprite.color = tint(this.contentSpriteColors[index] || sprite.color);
+      });
+    } else if (this.contentTintMode !== "normal") {
       this.contentLabels.forEach((label, index) => {
         label.color = this.copyColor(this.contentLabelColors[index] || label.color);
       });
       this.contentSprites.forEach((sprite, index) => {
         sprite.color = this.copyColor(this.contentSpriteColors[index] || sprite.color);
       });
-      this.contentTinted = false;
     }
+    this.contentTintMode = nextTintMode;
   }
 
   private copyColor(color: Color): Color {
