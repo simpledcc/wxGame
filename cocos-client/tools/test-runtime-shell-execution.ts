@@ -86,6 +86,17 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (label && label.overflow !== Label.Overflow.SHRINK) {
       violations.push(`${nodePath} uses non-shrinking Label overflow ${label.overflow}`);
     }
+    const badgeLabel = node.children.find((child) => child.name === `${node.name}Label`);
+    const badgeLabelTransform = badgeLabel?.getComponent(UITransform);
+    const badgeText = badgeLabel?.getComponent(Label);
+    if (transform?.height === 34 && badgeLabel?.active && badgeLabelTransform && badgeText) {
+      const horizontalInset = (transform.width - badgeLabelTransform.width) / 2;
+      const verticalInset = (transform.height - badgeLabelTransform.height) / 2;
+      if (horizontalInset < 8) violations.push(`${nodePath} badge text misses its horizontal inset`);
+      if (badgeText.fontSize <= 20 && verticalInset < 4) {
+        violations.push(`${nodePath} badge text misses its vertical inset`);
+      }
+    }
     const buttonGraphics = node.getComponent(RuntimeButtonVisual) ? node.getComponent(Graphics) : null;
     if (buttonGraphics?.enabled && buttonGraphics.strokeCount < 1) {
       violations.push(`${nodePath} has no visible fallback border`);

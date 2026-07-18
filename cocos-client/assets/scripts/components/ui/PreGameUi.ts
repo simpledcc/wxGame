@@ -407,7 +407,7 @@ export class PreGameUi {
     const surface = kind === "surface";
     const node = this.pill(parent, name, x, y, width, 34, this.actionToken(kind),
       surface ? "homeCardBorder" : "homeTextOnColor");
-    this.label(node, `${name}Label`, text, 0, 0, width - 16, 28, fontSize,
+    this.label(node, `${name}Label`, text, 0, 0, width - 16, fontSize>20?28:26, fontSize,
       surface ? "homeTextMuted" : "homeTextOnColor");
     return node;
   }
