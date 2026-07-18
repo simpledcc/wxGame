@@ -318,10 +318,10 @@ export class RuntimeScreenFactory {
     const card = home.sectionCard(safe.node, "StudyCard", "学习卡", 0, cardY,
       540, 360, "practice", "practice");
     home.label(card, "StudyProgressCaption", "学习进度", 182, 142, 120, 24, 16, "homeTextMuted");
-    const status = home.label(card, "StudyStatus", "", 182, 110, 120, 32, 18, "homeTextMuted");
+    const status = home.label(card, "StudyStatus", "", 182, 110, 120, 24, 18, "homeTextMuted");
     const progress = home.progressBar(card, "StudyProgress", 182, 84, 124, 12, "practice");
-    const word = home.label(card, "StudyWord", "", 0, 32, 480, 80, 58, "homeText");
-    const meaning = home.label(card, "StudyMeaning", "", 0, -50, 480, 72, 29, "homeTextMuted");
+    const word = home.label(card, "StudyWord", "", 0, 32, 480, 76, 58, "homeText");
+    const meaning = home.label(card, "StudyMeaning", "", 0, -50, 480, 68, 29, "homeTextMuted");
     home.actionButton(card, "PreviousWord", "上一个", "", "词", -142, -132, 220, 80,
       () => controller.previousWord(), "join", "wordBank");
     home.actionButton(card, "RandomWord", "随机", "", "练", 142, -132, 220, 80,

@@ -1061,11 +1061,11 @@ async function main(): Promise<void> {
     const meaning = findDeep(card, "StudyMeaning")!;
     const previous = findDeep(card, "PreviousWord")!;
     const random = findDeep(card, "RandomWord")!;
-    assertOk(verticalGap(caption, status) >= 4, `${context} progress caption/status gap must remain visible`);
-    assertOk(verticalGap(status, progress) >= 4, `${context} status/progress gap must remain visible`);
-    assertOk(verticalGap(progress, word) >= 6, `${context} progress/word gap must remain visible`);
-    assertOk(verticalGap(word, meaning) >= 6, `${context} word/meaning gap must remain visible`);
-    assertOk(verticalGap(meaning, previous) >= 6, `${context} meaning/action gap must remain visible`);
+    assertOk(verticalGap(caption, status) >= 8, `${context} progress caption/status gap must remain visible`);
+    assertOk(verticalGap(status, progress) >= 8, `${context} status/progress gap must remain visible`);
+    assertOk(verticalGap(progress, word) >= 8, `${context} progress/word gap must remain visible`);
+    assertOk(verticalGap(word, meaning) >= 8, `${context} word/meaning gap must remain visible`);
+    assertOk(verticalGap(meaning, previous) >= 8, `${context} meaning/action gap must remain visible`);
     assertEqual(previous.position.y, random.position.y);
     [previous, random].forEach((action) => {
       const icon = findDeep(action, `${action.name}IconSlot`)!;
