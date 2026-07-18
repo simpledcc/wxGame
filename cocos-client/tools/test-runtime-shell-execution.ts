@@ -1163,6 +1163,8 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "FeedbackFormCard")?.getComponent(UITransform)?.height, 500);
       assertOk(findDeep(canvas, "FeedbackContentCaption"));
       assertOk(findDeep(canvas, "FeedbackContactCaption"));
+      assertOk(findDeep(canvas, "FeedbackStatusBand")?.getComponent(Graphics),
+        "feedback guidance must stay inside a stable status band");
       assertEqual(feedbackButton.interactable, false, "empty feedback must keep submit disabled");
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
@@ -1219,7 +1221,9 @@ async function main(): Promise<void> {
       app.feedback.submit = originalFeedbackSubmit;
     }
     if (routes[index] === "help") {
-      assertOk(findDeep(canvas, "HelpBody")?.getComponent(Label)?.string);
+      const helpBody = findDeep(canvas, "HelpBody")?.getComponent(Label)?.string || "";
+      assertOk(helpBody.includes("01  背单词\n") && helpBody.includes("06  战绩记录\n"),
+        "help copy must expose a numbered title/body hierarchy");
       assertOk(findDeep(canvas, "HelpRulesSummary"));
       assertEqual(findDeep(canvas, "HelpBody")?.getComponent(Label)?.fontSize, 20);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);

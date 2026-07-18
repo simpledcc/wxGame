@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Seven source passes cover shared chrome, persistent state feedback, player/modal clarity and formal Study/catalog icon treatment | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Eight source passes cover shared chrome, persistent state feedback, formal icons/badges, Feedback status containment and Help copy hierarchy | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -734,6 +734,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Mode-catalog “双人” metadata now uses the same compact status-badge primitive as other preparation states instead of an unframed small label.
 - Runtime assertions cover all three icon slots, wrong-word title/selection transitions, Chinese-toggle title/selection transitions and the mode-player badge. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,847 / 1,520,000` core source bytes.
 - No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
+### H8.7 eighth source checkpoint
+
+- Feedback guidance, validation, pending, success and failure text now share a fixed rounded status band at the bottom of the existing form card instead of floating over the card surface.
+- Help copy now presents six real topics as `01-06` title/body groups with consistent blank-line spacing, improving scan order without adding routes, fake features or extra data.
+- Runtime assertions require the status-band Graphics node and both ends of the numbered Help hierarchy while preserving all Feedback validation/submission and Help navigation checks.
+- Consolidated private button-visual geometry/color names before adding the visible structure. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,769 / 1,520,000` core source bytes.
+- No bitmap, importer metadata, room/feedback protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
 ## Assets
 

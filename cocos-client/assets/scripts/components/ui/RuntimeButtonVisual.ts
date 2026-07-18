@@ -7,14 +7,14 @@ export class RuntimeButtonVisual extends Component {
   private button: Button | null = null;
   private background: Graphics | null = null;
   private skin: Sprite | null = null;
-  private skinDensity = 1;
-  private normalColor = new Color();
-  private pressedColor = new Color();
-  private disabledColor = new Color();
-  private width = 0;
-  private height = 0;
-  private radius = 8;
-  private lastInteractable: boolean | null = null;
+  private density = 1;
+  private fill = new Color();
+  private pressedFill = new Color();
+  private disabledFill = new Color();
+  private w = 0;
+  private h = 0;
+  private r = 8;
+  private lastEnabled: boolean | null = null;
   private pressed = false;
   private content: Node[] = [];
   private labels: Label[] = [];
@@ -40,12 +40,12 @@ export class RuntimeButtonVisual extends Component {
   ): void {
     this.button = button;
     this.background = background;
-    this.width = width;
-    this.height = height;
-    this.radius = Math.max(0, Math.min(radius, width / 2, height / 2));
-    this.normalColor = normalColor;
-    this.pressedColor = pressedColor;
-    this.disabledColor = disabledColor;
+    this.w = width;
+    this.h = height;
+    this.r = Math.max(0, Math.min(radius, width / 2, height / 2));
+    this.fill = normalColor;
+    this.pressedFill = pressedColor;
+    this.disabledFill = disabledColor;
     this.refresh(true);
   }
 
@@ -55,7 +55,7 @@ export class RuntimeButtonVisual extends Component {
 
   setSkin(skin: Sprite | null, density = 1): void {
     this.skin = skin;
-    this.skinDensity = skin ? Math.max(1, density) : 1;
+    this.density = skin ? Math.max(1, density) : 1;
     this.ensureSkinSize();
     this.refresh(true);
   }
@@ -79,12 +79,12 @@ export class RuntimeButtonVisual extends Component {
       const ring = new Node(`${this.node.name}SelectionRing`);
       ring.layer = this.node.layer;
       this.node.addChild(ring);
-      ring.addComponent(UITransform).setContentSize(this.width, this.height);
+      ring.addComponent(UITransform).setContentSize(this.w, this.h);
       const graphics = ring.addComponent(Graphics);
       graphics.strokeColor = strokeColor;
       graphics.lineWidth = 4;
-      graphics.roundRect(-this.width / 2 + inset, -this.height / 2 + inset,
-        this.width - inset * 2, this.height - inset * 2, Math.max(0, this.radius - inset));
+      graphics.roundRect(-this.w / 2 + inset, -this.h / 2 + inset,
+        this.w - inset * 2, this.h - inset * 2, Math.max(0, this.r - inset));
       graphics.stroke();
       ring.active = false;
       this.ring = ring;
@@ -103,26 +103,26 @@ export class RuntimeButtonVisual extends Component {
     if (!this.button || !this.background) return;
     this.ensureSkinSize();
     const interactable = this.button.interactable;
-    if (!force && interactable === this.lastInteractable) return;
-    this.lastInteractable = interactable;
+    if (!force && interactable === this.lastEnabled) return;
+    this.lastEnabled = interactable;
     if (!interactable) this.pressed = false;
     this.background.clear();
     this.background.fillColor = new Color(24, 42, 56, interactable ? 42 : 24);
     const shadowOffset = this.pressed ? -1 : -4;
     this.background.roundRect(
-      -this.width / 2,
-      -this.height / 2 + shadowOffset,
-      this.width,
-      this.height,
-      this.radius
+      -this.w / 2,
+      -this.h / 2 + shadowOffset,
+      this.w,
+      this.h,
+      this.r
     );
     this.background.fill();
     this.background.fillColor = interactable
       ? (this.pressed
-          ? this.pressedColor
-          : (this.selected && this.selectedFill ? this.selectedFill : this.normalColor))
-      : this.disabledColor;
-    this.background.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, this.radius);
+          ? this.pressedFill
+          : (this.selected && this.selectedFill ? this.selectedFill : this.fill))
+      : this.disabledFill;
+    this.background.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, this.r);
     this.background.fill();
     if (this.skin) {
       const channel = interactable ? (this.pressed ? 220 : 255) : 158;
@@ -133,15 +133,15 @@ export class RuntimeButtonVisual extends Component {
   }
 
   isShowingDisabledState(): boolean {
-    return this.lastInteractable === false;
+    return this.lastEnabled === false;
   }
 
   getVisualGeometry(): { width: number; height: number; radius: number } {
-    return { width: this.width, height: this.height, radius: this.radius };
+    return { width: this.w, height: this.h, radius: this.r };
   }
 
   isShowingSelectedState(): boolean {
-    return this.selected && this.lastInteractable === true;
+    return this.selected && this.lastEnabled === true;
   }
 
   setPressed(pressed: boolean): void {
@@ -155,12 +155,12 @@ export class RuntimeButtonVisual extends Component {
     if (!this.skin) return;
     this.skin.sizeMode = Sprite.SizeMode.CUSTOM;
     const transform = this.skin.node.getComponent(UITransform);
-    const targetW = this.width * this.skinDensity;
-    const targetH = this.height * this.skinDensity;
+    const targetW = this.w * this.density;
+    const targetH = this.h * this.density;
     if (transform && (transform.width !== targetW || transform.height !== targetH)) {
       transform.setContentSize(targetW, targetH);
     }
-    const scale = 1 / this.skinDensity;
+    const scale = 1 / this.density;
     if (this.skin.node.scale.x !== scale || this.skin.node.scale.y !== scale) {
       this.skin.node.setScale(scale, scale, 1);
     }
@@ -194,9 +194,9 @@ export class RuntimeButtonVisual extends Component {
       const base = colors[index] || item.color;
       item.color = mode === "disabled"
         ? new Color(
-            Math.round(base.r * keep + this.disabledColor.r * (1 - keep)),
-            Math.round(base.g * keep + this.disabledColor.g * (1 - keep)),
-            Math.round(base.b * keep + this.disabledColor.b * (1 - keep)),
+            Math.round(base.r * keep + this.disabledFill.r * (1 - keep)),
+            Math.round(base.g * keep + this.disabledFill.g * (1 - keep)),
+            Math.round(base.b * keep + this.disabledFill.b * (1 - keep)),
             Math.min(base.a, alpha)
           )
         : mode === "selected" && this.selectedText
