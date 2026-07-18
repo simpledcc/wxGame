@@ -349,10 +349,7 @@ export class RuntimeScreenFactory {
   }
 
   private buildCoopSelect(parent: Node, ui: RuntimeUi): Node {
-    const root = ui.root(parent, "CoopSelectRuntimeScreen");
-    const home = new PreGameUi(app.themes.getCurrentTheme());
-    home.scenicBackdrop(root, "ModeCatalogScenery");
-    const safe = home.safeArea(root, "CoopSelectSafeArea");
+    const { root, home, safe } = this.page(parent, ui, "CoopSelect");
     const safeTop = safe.height / 2;
     let controller!: CoopSelectScene;
     const header = home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法",
@@ -452,10 +449,10 @@ export class RuntimeScreenFactory {
     const codeCard = home.sectionCard(lobbyPanel, "RoomCodeCard", "房间码", 0, 252,
       548, 104, "join", "joinRoom");
     const roomCode = home.label(codeCard, "RoomCode", "------", -88, -15, 216, 48, 30, "homeText");
-    const copy = home.button(codeCard, "CopyCode", "复制", 84, -15, 112, 80,
-      () => void controller.copyRoomCode(), "join", 16);
-    const invite = home.button(codeCard, "InviteFriend", "邀请", 210, -15, 112, 80,
-      () => void controller.inviteFriend(), "practice", 16);
+    const copy = home.actionButton(codeCard, "CopyCode", "复制", "", "码", 84, -15, 112, 80,
+      () => void controller.copyRoomCode(), "join");
+    const invite = home.actionButton(codeCard, "InviteFriend", "邀请", "", "友", 210, -15, 112, 80,
+      () => void controller.inviteFriend(), "practice", "joinRoom");
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
       520, 72, "practice", "wordBank");
     const mode = home.label(lobbyBank, "RoomMode", "", 18, -16, 430, 36, 20, "homeText");

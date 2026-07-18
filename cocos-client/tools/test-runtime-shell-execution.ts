@@ -878,6 +878,14 @@ async function main(): Promise<void> {
     assertOk(verticalGap(codeTab, code) >= 4, `${context} code tab/body gap must remain visible`);
     assertEqual(copy.getComponent(UITransform)?.width, 112);
     assertEqual(invite.getComponent(UITransform)?.width, 112);
+    [copy, invite].forEach((action) => {
+      const icon = findDeep(action, `${action.name}IconSlot`)!;
+      const title = findDeep(action, `${action.name}Title`)!;
+      assertOk(right(icon) + 4 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
+    });
+    assertEqual(findDeep(copy, "CopyCodeTitle")?.getComponent(Label)?.string, "复制");
+    assertEqual(findDeep(invite, "InviteFriendTitle")?.getComponent(Label)?.string, "邀请");
+    assertOk(findDeep(invite, "HomeJoinRoomSlot"), `${context} Invite must retain its formal semantic icon`);
     assertOk(right(code) + 8 <= left(copy), `${context} code/copy columns must remain separate`);
     assertOk(right(copy) + 8 <= left(invite), `${context} copy/invite actions must remain separate`);
     assertOk(right(invite) + 8 <= codeCard.getComponent(UITransform)!.width / 2,
