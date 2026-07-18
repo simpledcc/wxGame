@@ -558,9 +558,9 @@ export class RuntimeScreenFactory {
       const b = home.button(listRoot, name, label, -224 + index * 112, safeTop - 156,
         104, 56, action, kind, 16);
       home.selectionStyle(b.visual, "join");
-      b.label.node.setPosition(0,4,0);
+      b.label.node.setPosition(0,7,0);
       modeVisuals.push(b.visual);
-      const mark = home.pill(b.node, `${name}Selected`, 0, -21, 58, 6,
+      const mark = home.pill(b.node, `${name}Selected`, 0, -16, 58, 6,
         "homeJoin", "homeJoin");
       mark.active = index === 0;
       modeIndicators.push(mark);

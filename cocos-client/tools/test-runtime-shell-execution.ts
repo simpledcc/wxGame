@@ -1967,14 +1967,14 @@ async function main(): Promise<void> {
       const historyFilterIndicator = findDeep(historyFilter, "HistoryAllSelected")!;
       const historyFilterHalfHeight = historyFilter.getComponent(RuntimeButtonVisual)!
         .getVisualGeometry().height / 2;
-      assertOk(verticalGap(historyFilterLabel, historyFilterIndicator) >= 8,
+      assertEqual(verticalGap(historyFilterLabel, historyFilterIndicator), 8,
         "History filter copy must remain above its selected marker");
-      assertOk(historyFilterHalfHeight
-        - historyFilterLabel.position.y - historyFilterLabel.getComponent(UITransform)!.height / 2 >= 8,
-      "History filter copy needs a top inset");
-      assertOk(historyFilterIndicator.position.y - historyFilterIndicator.getComponent(UITransform)!.height / 2
-        >= -historyFilterHalfHeight + 4,
-      "History selected marker needs a bottom inset");
+      assertEqual(historyFilterHalfHeight
+        - historyFilterLabel.position.y - historyFilterLabel.getComponent(UITransform)!.height / 2, 9,
+      "History filter copy needs its balanced top inset");
+      assertEqual(historyFilterIndicator.position.y - historyFilterIndicator.getComponent(UITransform)!.height / 2
+        + historyFilterHalfHeight, 9,
+      "History selected marker needs its balanced bottom inset");
       const assertHistorySummary = (card: Node, key: "History" | "Coin", summaryName: string): void => {
         const summary = findDeep(card, summaryName)!;
         assertEqual(card.children.some((child) => child.name === `Home${key}Slot`), false,
