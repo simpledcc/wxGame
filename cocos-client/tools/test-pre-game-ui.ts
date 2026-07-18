@@ -289,7 +289,10 @@ function main(): void {
     () => undefined,
     "surface"
   );
-  assertVisualMatchesHitArea(surfaceAction.node, surfaceAction.visual);
+  assertEqual(transform(surfaceAction.node).width, 420);
+  assertEqual(transform(surfaceAction.node).height, 80,
+    "compact action must retain the shared target-device touch height");
+  assertDeepEqual(surfaceAction.visual.getVisualGeometry(), { width: 420, height: 72, radius: 22 });
   assertDeepEqual(surfaceAction.titleLabel.color, preGame.color("homeText"));
   assertEqual(surfaceAction.titleLabel.enableOutline, false);
   assertActionIconClearOfText(surfaceAction);

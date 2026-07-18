@@ -1228,7 +1228,34 @@ async function main(): Promise<void> {
       `${context} bottom actions must retain their card inset`);
     });
   };
+  const assertStudyPageSpacing = (root: Node, context: string): void => {
+    const safe = findDeep(root, "StudySafeArea")!;
+    const header = findDeep(root, "StudyHeader")!;
+    const bank = findDeep(root, "StudyBankBar")!;
+    const card = findDeep(root, "StudyCard")!;
+    const reveal = findDeep(root, "RevealWord")!;
+    const toggle = findDeep(root, "MeaningToggle")!;
+    const next = findDeep(root, "NextWord")!;
+    const visualHalfHeight = (node: Node): number =>
+      (node.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height
+        ?? node.getComponent(UITransform)!.height) / 2;
+    const visualGap = (upper: Node, lower: Node): number =>
+      upper.position.y - visualHalfHeight(upper) - lower.position.y - visualHalfHeight(lower);
+    [bank, reveal, toggle, next].forEach((action) => {
+      assertEqual(action.getComponent(UITransform)?.height, 80,
+        `${context} ${action.name} must retain its target-device touch height`);
+      assertEqual(action.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 72,
+        `${context} ${action.name} must use its inset visual height`);
+    });
+    [[header, bank], [bank, card], [card, reveal], [reveal, toggle], [toggle, next]]
+      .forEach(([upper, lower], index) => assertOk(visualGap(upper, lower) >= 8,
+        `${context} visual gap ${index} must retain the eight-pixel rhythm`));
+    assertOk(next.position.y - visualHalfHeight(next)
+      >= -safe.getComponent(UITransform)!.height / 2 + 8,
+    `${context} final action must retain its eight-pixel safe-area clearance`);
+  };
   assertStudyCardSpacing(studyRoot, "long Study card");
+  assertStudyPageSpacing(studyRoot, "long Study page");
   assertOk(findDeep(studyRoot, "StudySafeArea"));
   assertOk(findDeep(studyRoot, "StudyHeader"));
   assertPreGameTargetDevices(studyRoot);
@@ -1243,12 +1270,6 @@ async function main(): Promise<void> {
   assertOk(findDeep(canvas, "StudyCardTab")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgress")?.getComponent(Graphics));
   assertOk(findDeep(canvas, "StudyProgressFill")?.getComponent(Graphics));
-  const studySafe = findDeep(studyRoot, "StudySafeArea")!;
-  const studyHeader = findDeep(canvas, "StudyHeader")!;
-  const studyCard = findDeep(canvas, "StudyCard")!;
-  const studyReveal = findDeep(canvas, "RevealWord")!;
-  const studyMeaningToggle = findDeep(canvas, "MeaningToggle")!;
-  const studyNext = findDeep(canvas, "NextWord")!;
   const studyBankBar = findDeep(canvas, "StudyBankBar");
   const studyBankBadge = findDeep(canvas, "StudyBankChangeBadge");
   assertOk(studyBankBar?.getComponent(Button), "Study bank strip must remain the single route target");
@@ -1267,13 +1288,6 @@ async function main(): Promise<void> {
   findDeep(canvas, "RandomWord")?.emit(Button.EventType.CLICK);
   assertOk(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string !== initialStudyStatus,
     "RandomWord must choose a different Study card");
-  assertOk(verticalGap(studyHeader, studyBankBar!) >= 4);
-  assertOk(verticalGap(studyBankBar!, studyCard) >= 4);
-  assertOk(verticalGap(studyCard, studyReveal) >= 4);
-  assertOk(verticalGap(studyReveal, studyMeaningToggle) >= 4);
-  assertOk(verticalGap(studyMeaningToggle, studyNext) >= 4);
-  assertOk(studyNext.position.y - studyNext.getComponent(UITransform)!.height / 2
-    >= -studySafe.getComponent(UITransform)!.height / 2 + 4);
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   assertEqual(findDeep(canvas, "MeaningToggle")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   findDeep(canvas, "MeaningToggle")?.emit(Button.EventType.CLICK);
@@ -1304,6 +1318,7 @@ async function main(): Promise<void> {
   await flushMany();
   const minimumStudyRoot = findDeep(canvas, "StudyRuntimeScreen")!;
   assertStudyCardSpacing(minimumStudyRoot, "minimum Study card");
+  assertStudyPageSpacing(minimumStudyRoot, "minimum Study page");
   assertVisibleUiContract(minimumStudyRoot, "minimum Study route");
   assertPreGameTargetDevices(minimumStudyRoot);
   setMockWindowSize(393, 852);

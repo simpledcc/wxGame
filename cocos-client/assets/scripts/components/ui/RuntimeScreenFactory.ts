@@ -305,7 +305,7 @@ export class RuntimeScreenFactory {
       () => controller.backHome(), "practice");
     const selectedBank = getWordBank(app.wordBankCatalog, app.wordBankStore.getSelectedBankId());
     const bankBar = home.actionButton(safe.node, "StudyBankBar", getWordBankLabel(selectedBank, true),
-      "当前词库", "词", 0, safeTop - 160, 560, 80, () => controller.changeBank(), "surface", "wordBank");
+      "当前词库", "词", 0, safeTop - 160, 560, 72, () => controller.changeBank(), "surface", "wordBank");
     [bankBar.titleLabel, bankBar.subtitleLabel].forEach((label) => {
       if (!label) return;
       label.node.setPosition(-20, label.node.position.y, 0);
@@ -327,16 +327,16 @@ export class RuntimeScreenFactory {
     home.actionButton(card, "RandomWord", "随机", "", "练", 142, -132, 220, 80,
       () => controller.randomWord(), "surface", "practice");
     const revealY = cardY - 224 - stretch * 0.28;
-    home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 80,
+    home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 72,
       () => controller.revealCurrentMeaning(), "join", "practice");
     const markWrong = home.actionButton(safe.node, "MarkWrong", "标记错词", "", "★", 134, revealY, 252, 80,
       () => controller.markCurrentUnfamiliar(), "history", "wordBank");
     home.selectionStyle(markWrong.visual, "history");
     const meaningToggle = home.actionButton(safe.node, "MeaningToggle", "", "", "书", 0,
-      cardY - 308 - stretch * 0.39, 500, 80, () => controller.toggleChinese(), "surface", "practice");
+      cardY - 308 - stretch * 0.39, 500, 72, () => controller.toggleChinese(), "surface", "practice");
     home.selectionStyle(meaningToggle.visual, "join");
     home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "→", 0,
-      cardY - 392 - stretch * 0.6, 500, 80, () => controller.nextWord(), "create", "practice");
+      cardY - 392 - stretch * 0.6, 500, 72, () => controller.nextWord(), "create", "practice");
     controller = root.addComponent(StudyScene);
     controller.wordLabel = word;
     controller.meaningLabel = meaning;
@@ -596,7 +596,6 @@ export class RuntimeScreenFactory {
       const s = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
       const d = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 64,
         () => r.open(), "surface", "history");
-      d.node.getComponent(UITransform)!.height=80;
       let r!: HistoryRecordItem;
       r = row.addComponent(HistoryRecordItem);
       r.titleLabel = t;

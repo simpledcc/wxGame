@@ -539,6 +539,7 @@ export class PreGameUi {
     x: number, y: number, width: number, height: number, handler: () => void, kind: PreGameActionKind,
     visualKey?: HomeVisualSlotKey): PreGameActionButtonRef {
     const node = this.node(parent, name, x, y, width, height);
+    if(height<80) node.getComponent(UITransform)!.height=80;
     const radius = Math.min(22, height / 2);
     const baseColor = this.color(this.actionToken(kind));
     const textToken: ThemeColorToken = kind === "surface" ? "homeText" : "homeTextOnColor";

@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and one source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass gives Home Privacy/Feedback 80px target-device touch nodes with an eight-pixel safe-area bottom boundary while preserving their top edge; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and two source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass separates Study's 72px compact visuals from their shared 80px target-device touch nodes and gives the complete long/minimum page chain an eight-pixel visible rhythm; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1401,6 +1401,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Runtime coverage freezes both heights and bottom clearances across long/minimum Home. Formal button skins, Privacy pending/disabled/restore behavior, Feedback navigation, labels and horizontal layout remain unchanged.
 - Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,985 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-second source checkpoint
+
+- Added a shared 80px minimum touch height to `PreGameUi.actionButton` without changing the requested visible geometry. The existing History detail action therefore keeps its 64px inset visual through the shared path instead of a page-specific node override.
+- Tightened Study Bank, Reveal, Meaning and Next visuals from 80px to 72px while retaining 80px click nodes. The complete long and minimum Study page chain now keeps at least eight visible pixels from the header through Bank, card and lower actions to the safe-area bottom.
+- Runtime coverage freezes both visual and touch heights, all five page boundaries, the final safe-area clearance and the unchanged Study interactions. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,995 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No Study data/state, History behavior, bitmap, importer metadata, protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1444,7 +1450,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and one source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and two source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
