@@ -822,6 +822,8 @@ async function main(): Promise<void> {
     const bankIcon = bankCard.children.find((child) => child.name === "HomeWordBankSlot")!;
     const bankName = findDeep(bankCard, "CreateBankLabel")!;
     const bankAction = findDeep(bankCard, "ChangeRoomBank")!;
+    const bankActionIcon = findDeep(bankAction, "ChangeRoomBankIconSlot")!;
+    const bankActionTitle = findDeep(bankAction, "ChangeRoomBankTitle")!;
     assertOk(verticalGap(modeTab, modeIcon) >= 4, `${context} mode tab/icon gap must remain visible`);
     assertOk(verticalGap(modeTab, modeTitle) >= 4, `${context} mode tab/title gap must remain visible`);
     assertOk(verticalGap(modeTitle, modeSummary) >= 4, `${context} mode title/summary gap must remain visible`);
@@ -836,6 +838,11 @@ async function main(): Promise<void> {
     assertOk(bankName.position.x + bankName.getComponent(UITransform)!.width / 2 + 4
       <= bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2,
     `${context} Bank name must not enter the change action`);
+    assertOk(bankActionIcon.position.x + bankActionIcon.getComponent(UITransform)!.width / 2 + 4
+      <= bankActionTitle.position.x - bankActionTitle.getComponent(UITransform)!.width / 2,
+    `${context} change-Bank icon/title gap must remain visible`);
+    assertOk(findDeep(bankAction, "HomeWordBankSlot"), `${context} change-Bank action needs its formal icon`);
+    assertEqual(bankActionTitle.getComponent(Label)?.string, "更换");
   };
   const assertLobbyPlayerCardSpacing = (lobby: Node, context: string): void => {
     ["RoomPlayerOne", "RoomPlayerTwo"].forEach((name) => {
