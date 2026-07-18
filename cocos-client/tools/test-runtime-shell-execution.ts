@@ -661,9 +661,12 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(app.store.getState().route, "room", "room bank picker must return to room configuration");
   assertEqual(app.store.getState().roomAutoReady, false, "auto-ready preference must survive bank selection");
-  assertEqual(findDeep(canvas, "AutoReadyLabel")?.getComponent(Label)?.string, "房主创建后手动准备");
+  assertEqual(findDeep(canvas, "AutoReadyTitle")?.getComponent(Label)?.string, "创建后手动准备");
+  assertOk(findDeep(canvas, "AutoReadyIconSlot"));
+  assertEqual(findDeep(canvas, "AutoReady")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), false);
   findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
   assertEqual(app.store.getState().roomAutoReady, true);
+  assertEqual(findDeep(canvas, "AutoReady")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   const originalCreateRoom = app.roomSession.create.bind(app.roomSession);
   const originalToggleReady = app.roomSession.toggleReady.bind(app.roomSession);
   let autoReadyCount = 0;
@@ -687,7 +690,8 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(autoReadyCount, 1, "enabled auto-ready must use the existing ready action once");
   assertEqual(findDeep(canvas, "RoomLobbyPanel")?.active, true);
-  assertEqual(findDeep(canvas, "ReadyLabel")?.getComponent(Label)?.string, "✓ 已准备，点击取消");
+  assertEqual(findDeep(canvas, "ReadyTitle")?.getComponent(Label)?.string, "已准备，点击取消");
+  assertOk(findDeep(canvas, "ReadyIconSlot"));
   assertEqual(findDeep(canvas, "Ready")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
   assertEqual(findDeep(canvas, "RoomPlayerOneReady")?.active, true);
   assertEqual(findDeep(canvas, "RoomPlayerTwoWaiting")?.active, true);

@@ -416,8 +416,8 @@ export class RuntimeScreenFactory {
         430, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0,
         -224, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
-      autoReady = home.button(createPanel, "AutoReady", "✓ 房主创建后自动准备", 0, -340, 390, 80,
-        () => controller.toggleAutoReady(), "surface", 18);
+      autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -340,
+        390, 80, () => controller.toggleAutoReady(), "surface", "practice");
       home.selectionStyle(autoReady.visual, "practice");
     }
 
@@ -456,8 +456,8 @@ export class RuntimeScreenFactory {
       "homePractice", "homeTextOnColor");
     roomReadyIndicator.active = false;
     const status = home.label(statusCard, "RoomStatus", "", 42, -10, 420, 46, 17, "homeTextMuted");
-    const ready = home.button(lobbyPanel, "Ready", "✓ 我准备好了", 0, -238, 440, 90,
-      () => void controller.toggleReady(), "practice", 22);
+    const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -238, 440, 90,
+      () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");
     const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0,
       -348, 500, 112, () => void controller.startSelectedMode(), "create", "createRoom");

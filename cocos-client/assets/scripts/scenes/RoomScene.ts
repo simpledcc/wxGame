@@ -304,7 +304,7 @@ export class RoomScene extends Component {
           : "双方准备后可开始";
     }
     if (this.readyLabel) {
-      this.readyLabel.string = localPlayer?.ready ? "✓ 已准备，点击取消" : "✓ 我准备好了";
+      this.readyLabel.string = localPlayer?.ready ? "已准备，点击取消" : "我准备好了";
     }
   }
 
@@ -381,8 +381,8 @@ export class RoomScene extends Component {
     const enabled = app.store.getState().roomAutoReady;
     if (this.autoReadyLabel) {
       this.autoReadyLabel.string = enabled
-        ? "✓ 房主创建后自动准备"
-        : "房主创建后手动准备";
+        ? "创建后自动准备"
+        : "创建后手动准备";
     }
     this.autoReadyVisual?.setSelected(enabled);
   }
