@@ -360,12 +360,12 @@ export class RuntimeScreenFactory {
       () => controller.openHelp(), undefined, "join", 36);
     const modes = [
       ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
-      ["双人 PK 竞技", "快速抢答，一决高下", "practice", "create"],
+      ["双人 PK 竞技", "快速抢答，一决高下", "practice", "practice"],
       ["魔法对战", "答对单词积累魔法能量", "catalog", "catalog"],
       ["抢夺宝物", "一起争夺宝箱与奖励", "history", "history"],
-      ["搭桥比赛", "答对单词建桥前进", "createRoom", "join"],
+      ["搭桥比赛", "答对单词建桥前进", "createRoom", "create"],
       ["造塔比赛", "收集材料搭建高塔", "wordBank", "bank"],
-      ["合作塔防", "合作守护词斗乐园", "joinRoom", "practice"],
+      ["合作塔防", "合作守护词斗乐园", "joinRoom", "join"],
       ["合作挑战 Boss", "一起挑战强大对手", "catalog", "catalog"]
     ] as const;
     modes.forEach(([title, subtitle, icon, kind], index) => {

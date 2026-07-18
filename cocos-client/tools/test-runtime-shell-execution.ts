@@ -22,6 +22,7 @@ import { HomePlaceholder } from "../assets/scripts/components/HomePlaceholder";
 import { GameplayFeedbackPool } from "../assets/bundles/mode_pk/scripts/GameplayFeedbackPool";
 import { ThemedWordTargetVisual } from "../assets/bundles/mode_pk/scripts/ThemedWordTargetVisual";
 import { RuntimeButtonVisual } from "../assets/scripts/components/ui/RuntimeButtonVisual";
+import { parseThemeColor } from "../assets/scripts/themes/ThemeCatalog";
 import {
   configurePortraitViewport,
   getPortraitViewportHeight
@@ -1584,6 +1585,11 @@ async function main(): Promise<void> {
       ).map((color) => `${color.r},${color.g},${color.b},${color.a}`);
       assertOk(new Set(modeRailColors).size >= 5,
         `mode accent rails must retain category color hierarchy: ${modeRailColors.join(" | ")}`);
+      const expectedRailTokens = ["homePractice", "homePractice", "homeCatalog", "homeHistory",
+        "homeCreate", "homeBank", "homeJoin", "homeCatalog"] as const;
+      expectedRailTokens.forEach((token, rowIndex) => assertEqual(modeRailColors[rowIndex],
+        parseThemeColor(app.themes.getCurrentTheme().colors[token]).join(","),
+      `mode ${rowIndex + 1} rail must match its formal icon semantics`));
       for (let disabledIndex = 1; disabledIndex < 8; disabledIndex += 1) {
         const disabledAction = findDeep(canvas, `ModeOption${disabledIndex}Action`)!;
         assertEqual(disabledAction.getComponent(Button)?.interactable, false,
