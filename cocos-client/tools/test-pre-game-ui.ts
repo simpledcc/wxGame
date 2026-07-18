@@ -180,11 +180,9 @@ function main(): void {
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
-  assertEqual(action.visual.getContentOffsetY(), -2);
   assertEqual(action.iconSlot.position.y, -2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
-  assertEqual(action.visual.getContentOffsetY(), 0);
   assertEqual(action.iconSlot.position.y, 0);
   action.button.interactable = false;
   action.visual.refresh();

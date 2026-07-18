@@ -32,6 +32,7 @@ import { SceneRouter } from "../assets/scripts/core/SceneRouter";
 import { PRIVACY_VERSION } from "../assets/scripts/domain/StorageKeys";
 import { buildRoomGameOptions } from "../assets/scripts/domain/RoomRules";
 import type { MatchRecord, RoomSnapshot } from "../assets/scripts/domain/RoomTypes";
+import { isUnlockableWordBankId } from "../assets/scripts/domain/WordBankRules";
 import { HomeScene } from "../assets/scripts/scenes/HomeScene";
 import { BankScene } from "../assets/scripts/scenes/BankScene";
 import { BootScene } from "../assets/scripts/scenes/BootScene";
@@ -710,8 +711,11 @@ async function main(): Promise<void> {
   findDeep(canvas, "RevealWord")?.emit(Button.EventType.CLICK);
   assertOk(findDeep(canvas, "StudyMeaning")?.getComponent(Label)?.string);
   const wrongWordCount = app.wordBankStore.getWrongWords().length;
+  assertEqual(findDeep(canvas, "MarkWrong")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), false);
   findDeep(canvas, "MarkWrong")?.emit(Button.EventType.CLICK);
   assertEqual(app.wordBankStore.getWrongWords().length, wrongWordCount + 1);
+  assertEqual(findDeep(canvas, "MarkWrong")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
+  assertEqual(findDeep(canvas, "MarkWrongLabel")?.getComponent(Label)?.string, "★ 已在错题库");
   findDeep(canvas, "ChangeStudyBank")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(app.store.getState().route, "bank");
@@ -909,6 +913,12 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 110);
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
+      const selectedBankId = app.store.getState().bankPickerSelectedBankId;
+      const canUnlock = isUnlockableWordBankId(app.wordBankCatalog, selectedBankId)
+        && !app.wordBankStore.isUnlocked(app.wordBankCatalog, selectedBankId);
+      assertEqual(findDeep(canvas, "UnlockBank")?.getComponent(Button)?.interactable, canUnlock);
+      assertEqual(findDeep(canvas, "UnlockBankTitle")?.getComponent(Label)?.string,
+        canUnlock ? "解锁所选" : "无需解锁");
       findDeep(canvas, "PreviousBanks")?.emit(Button.EventType.CLICK);
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       findDeep(canvas, "NextBanks")?.emit(Button.EventType.CLICK);

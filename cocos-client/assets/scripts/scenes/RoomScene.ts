@@ -35,9 +35,6 @@ export class RoomScene extends Component {
   modeLabel: Label | null = null;
 
   @property(Label)
-  playersLabel: Label | null = null;
-
-  @property(Label)
   playerOneLabel: Label | null = null;
 
   @property(Label)
@@ -259,7 +256,6 @@ export class RoomScene extends Component {
       this.startVisual?.setSelected(false);
       if (hasSession) {
         if (this.modeLabel) this.modeLabel.string = this.getSelectedBankLabel();
-        if (this.playersLabel) this.playersLabel.string = "正在读取房间信息";
         if (this.playerOneLabel) this.playerOneLabel.string = "玩家1（你）\n正在读取...";
         if (this.playerTwoLabel) this.playerTwoLabel.string = "等待玩家加入\n○ 未准备";
         if (this.statusLabel) {
@@ -281,15 +277,6 @@ export class RoomScene extends Component {
     this.startVisual?.setSelected(availability.canStart);
     if (this.modeLabel) {
       this.modeLabel.string = this.getSelectedBankLabel(room);
-    }
-    if (this.playersLabel) {
-      this.playersLabel.string = room.players.length
-        ? room.players.map((player, index) => {
-            const identity = player.openid === localOpenId ? "（我）" : "";
-            const displayName = `玩家${index + 1}${identity}`;
-            return `${displayName} · ${player.ready ? "已准备" : "未准备"}`;
-          }).join("\n")
-        : "等待玩家加入";
     }
     if (this.playerOneLabel) {
       this.playerOneLabel.string = this.formatPlayer(room.players[0], 0, localOpenId);

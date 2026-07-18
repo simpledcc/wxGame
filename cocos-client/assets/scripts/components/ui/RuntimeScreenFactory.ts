@@ -3,7 +3,7 @@ import { HistoryRecordItem } from "../history/HistoryRecordItem";
 import { app } from "../../core/App";
 import { gameplayScreens, type GameplayRoute } from "../../core/GameplayBundles";
 import { ROOM_CODE_LENGTH } from "../../domain/RoomRules";
-import { getWordBank, getWordBankLabel } from "../../domain/WordBankRules";
+import { getWordBank, getWordBankLabel, isUnlockableWordBankId } from "../../domain/WordBankRules";
 import { BankScene } from "../../scenes/BankScene";
 import { CoopSelectScene } from "../../scenes/CoopSelectScene";
 import { FeedbackScene } from "../../scenes/FeedbackScene";
@@ -261,6 +261,12 @@ export class RuntimeScreenFactory {
         slotStates[index].string = selected ? "已选择" : unlocked ? "选择" : "需解锁";
         slotStates[index].color = selected ? home.color("homePractice") : home.color("homeText");
       });
+      const canUnlock = isUnlockableWordBankId(app.wordBankCatalog, selectedId)
+        && !app.wordBankStore.isUnlocked(app.wordBankCatalog, selectedId);
+      unlock.button.interactable = canUnlock;
+      unlock.titleLabel.string = canUnlock ? "解锁所选" : "无需解锁";
+      if (unlock.subtitleLabel) unlock.subtitleLabel.string = canUnlock ? "使用真实单词金币" : "当前词库可以直接使用";
+      unlock.visual.refresh();
       pageLabel.string = `${page + 1}/${pageCount}`;
       previous.button.interactable = page > 0;
       next.button.interactable = page < pageCount - 1;
@@ -275,7 +281,7 @@ export class RuntimeScreenFactory {
       page += 1;
       renderPage();
     });
-    home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, safeBottom + 54, 272, 86, () => {
+    const unlock = home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, safeBottom + 54, 272, 86, () => {
       controller.unlockSelectedBank();
       renderPage();
     }, "history", "coin");
@@ -318,8 +324,9 @@ export class RuntimeScreenFactory {
     const revealY = cardY - 232 - stretch * 0.16;
     home.button(safe.node, "RevealWord", "书 查看当前释义", -134, revealY, 252, 82,
       () => controller.revealCurrentMeaning(), "join", 19);
-    home.button(safe.node, "MarkWrong", "★ 标记错词", 134, revealY, 252, 82,
+    const markWrong = home.button(safe.node, "MarkWrong", "★ 标记错词", 134, revealY, 252, 82,
       () => controller.markCurrentUnfamiliar(), "history", 19);
+    home.selectionStyle(markWrong.visual, "history");
     const meaningToggle = home.button(safe.node, "MeaningToggle", "", 0, cardY - 310 - stretch * 0.28,
       500, 82, () => controller.toggleChinese(), "surface", 19);
     home.selectionStyle(meaningToggle.visual, "join");
@@ -334,6 +341,7 @@ export class RuntimeScreenFactory {
     controller.meaningToggleLabel = meaningToggle.label;
     controller.progressView = progress;
     controller.meaningToggleVisual = meaningToggle.visual;
+    controller.wrongVisual = markWrong.visual;
     return root;
   }
 

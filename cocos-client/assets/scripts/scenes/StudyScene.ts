@@ -21,6 +21,7 @@ export class StudyScene extends Component {
 
   progressView: PreGameProgressRef | null = null;
   meaningToggleVisual: RuntimeButtonVisual | null = null;
+  wrongVisual: RuntimeButtonVisual | null = null;
 
   onLoad(): void {
     app.store.setRoute("study");
@@ -80,6 +81,7 @@ export class StudyScene extends Component {
     } catch {
       app.runtime.showToast("已加入错题库，但本地保存失败");
     }
+    this.renderCard();
   }
 
   changeBank(): void {
@@ -99,6 +101,7 @@ export class StudyScene extends Component {
       if (this.statusLabel) this.statusLabel.string = "请先选择有单词的词库";
       this.progressView?.setValue(0, 1);
       this.meaningToggleVisual?.setSelected(false);
+      this.wrongVisual?.setSelected(false);
       return;
     }
     if (this.wordLabel) {
@@ -112,6 +115,10 @@ export class StudyScene extends Component {
     }
     this.progressView?.setValue(card.index + 1, card.total);
     this.meaningToggleVisual?.setSelected(app.studyStore.getSession().showMeaning);
+    const marked = app.wordBankStore.getWrongWords().some((item) => item.word === card.word);
+    this.wrongVisual?.setSelected(marked);
+    const markLabel = this.wrongVisual?.node.getChildByName("MarkWrongLabel")?.getComponent(Label);
+    if (markLabel) markLabel.string = marked ? "★ 已在错题库" : "★ 标记错词";
     if (this.meaningToggleLabel) {
       this.meaningToggleLabel.string = app.studyStore.getSession().showMeaning
         ? "隐藏后续单词中文"

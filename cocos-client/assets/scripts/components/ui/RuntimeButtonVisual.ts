@@ -140,10 +140,6 @@ export class RuntimeButtonVisual extends Component {
     return { width: this.width, height: this.height, radius: this.radius };
   }
 
-  getContentOffsetY(): number {
-    return this.contentOffsetY;
-  }
-
   isShowingSelectedState(): boolean {
     return this.selected && this.lastInteractable === true;
   }
@@ -186,23 +182,18 @@ export class RuntimeButtonVisual extends Component {
       this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
     }
     if (nextTintMode === "disabled") {
+      const muted = (base: Color, keep: number, alpha: number): Color => new Color(
+        Math.round(base.r * keep + this.disabledColor.r * (1 - keep)),
+        Math.round(base.g * keep + this.disabledColor.g * (1 - keep)),
+        Math.round(base.b * keep + this.disabledColor.b * (1 - keep)), Math.min(base.a, alpha)
+      );
       this.contentLabels.forEach((label, index) => {
         const base = this.contentLabelColors[index] || label.color;
-        label.color = new Color(
-          Math.round(base.r * 0.68 + this.disabledColor.r * 0.32),
-          Math.round(base.g * 0.68 + this.disabledColor.g * 0.32),
-          Math.round(base.b * 0.68 + this.disabledColor.b * 0.32),
-          Math.min(base.a, 190)
-        );
+        label.color = muted(base, 0.68, 190);
       });
       this.contentSprites.forEach((sprite, index) => {
         const base = this.contentSpriteColors[index] || sprite.color;
-        sprite.color = new Color(
-          Math.round(base.r * 0.72 + this.disabledColor.r * 0.28),
-          Math.round(base.g * 0.72 + this.disabledColor.g * 0.28),
-          Math.round(base.b * 0.72 + this.disabledColor.b * 0.28),
-          Math.min(base.a, 184)
-        );
+        sprite.color = muted(base, 0.72, 184);
       });
     } else if (nextTintMode === "selected" && this.selectedContentColor) {
       const tint = (base: Color): Color => new Color(

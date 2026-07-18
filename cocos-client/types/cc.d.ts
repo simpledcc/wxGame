@@ -13,6 +13,7 @@ declare module "cc" {
     scale: Vec3;
     readonly children: Node[];
     addChild(child: Node): void;
+    getChildByName(name: string): Node | null;
     addComponent<T>(type: new (...args: any[]) => T): T;
     getComponent<T>(type: new (...args: any[]) => T): T | null;
     setPosition(x: number, y: number, z?: number): void;

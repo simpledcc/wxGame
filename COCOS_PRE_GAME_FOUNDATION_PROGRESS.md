@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Two source passes now cover formal headers/cards, pressed/disabled/selected controls, learning progress, room-ready badges, input focus and live History filtering | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Three source passes cover shared chrome, control states, learning/room/filter feedback, Bank unlock availability and persistent wrong-word selection | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -694,6 +694,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - No bitmap, importer metadata, room/gameplay protocol, gameplay Bundle, cloud function, legacy client or AppID changed.
 - Full `npm run verify` and `npm run build:wechat:dry-run` pass. Core source payload remains under the unchanged warning gate at `1,519,708 / 1,520,000` bytes.
 - Creator/WeChat visual traversal and screenshots remain pending, so this checkpoint is still not `dev_done`.
+
+### H8.7 third source checkpoint
+
+- Bank unlock action now reads the selected bank's real unlockability and progress state; directly usable banks show a disabled “无需解锁” action instead of a misleading active purchase control.
+- Study wrong-word action now reflects whether the current real word is already stored, preserves its selected treatment after a successful add and restores the normal state on another word.
+- Removed the unassigned `RoomScene.playersLabel` summary path so player-card badges remain the single visible source of preparation state.
+- Added runtime assertions for Bank unlock availability/title and Study wrong-word selected/title transitions; no data, storage, room or gameplay contract changed.
+- Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,994 / 1,520,000` core source bytes. Future source work must reclaim space before adding UI code; do not raise the gate merely to continue styling.
 
 ## Assets
 
