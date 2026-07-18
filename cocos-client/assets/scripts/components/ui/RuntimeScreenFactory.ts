@@ -391,6 +391,7 @@ export class RuntimeScreenFactory {
   private buildRoom(parent: Node, ui: RuntimeUi): Node {
     const { root, home, safe } = this.page(parent, ui, "Room");
     const roomContentY = (safe.height - 886) / 2 - 18;
+    const lobbyContentY = (safe.height - 822) / 2 - 14;
     let controller!: RoomScene;
     const entryIntent = app.store.getState().roomEntryIntent;
     const roomState = app.roomStore.getState();
@@ -406,25 +407,25 @@ export class RuntimeScreenFactory {
     let autoReady: RuntimeButtonRef | null = null;
     if (!hasSession && entryIntent === "create") {
       createPanel = home.group(safe.node, "RoomCreatePanel", 0, roomContentY, safe.width, 760);
-      const selectedModeCard = home.sectionCard(createPanel, "SelectedModeCard", "已选模式", 0, 232,
+      const selectedModeCard = home.sectionCard(createPanel, "SelectedModeCard", "已选模式", 0, 248,
         548, 184, "join", "joinRoom");
       home.visualSlot(selectedModeCard, "joinRoom", -198, -18, 92, 92);
       home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, -2, 360, 54, 32, "homeText", 0);
       home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -48, 360, 36, 19, "homeTextMuted", 0);
-      const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 50,
+      const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 74,
         548, 148, "practice", "wordBank");
       home.visualSlot(bankCard, "wordBank", -210, -15, 66, 66);
       selectedBank = home.label(bankCard, "CreateBankLabel", "", -28, -16, 320, 54, 25, "homeText", 0);
       home.button(bankCard, "ChangeRoomBank", "更换", 202, -15, 118, 80,
         () => controller.changeBank(), "practice", 18);
-      const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -93,
+      const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,
         548, 112, "history", "practice");
       home.visualSlot(guidance, "practice", -220, -13, 52, 52);
       home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 28, -13,
         430, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0,
-        -224, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
-      autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -340,
+        -187, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
+      autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -294,
         390, 80, () => controller.toggleAutoReady(), "surface", "practice");
       home.selectionStyle(autoReady.visual, "practice");
     }
@@ -445,21 +446,21 @@ export class RuntimeScreenFactory {
         500, 110, () => void controller.joinEnteredRoom(), "join", "joinRoom");
     }
 
-    const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, roomContentY, safe.width, 760);
-    const codeCard = home.sectionCard(lobbyPanel, "RoomCodeCard", "房间码", 0, 276,
-      548, 112, "join", "joinRoom");
+    const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, lobbyContentY, safe.width, 760);
+    const codeCard = home.sectionCard(lobbyPanel, "RoomCodeCard", "房间码", 0, 252,
+      548, 104, "join", "joinRoom");
     const roomCode = home.label(codeCard, "RoomCode", "------", -76, -15, 220, 48, 30, "homeText");
     const copy = home.button(codeCard, "CopyCode", "复制", 104, -15, 112, 80,
       () => void controller.copyRoomCode(), "join", 16);
     const invite = home.button(codeCard, "InviteFriend", "邀请", 218, -15, 104, 80,
       () => void controller.inviteFriend(), "practice", 16);
-    const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 168,
-      520, 82, "practice", "wordBank");
+    const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
+      520, 72, "practice", "wordBank");
     const mode = home.label(lobbyBank, "RoomMode", "", 18, -14, 430, 44, 20, "homeText");
     const playerOne = home.playerStatusCard(lobbyPanel, "RoomPlayerOne", "房主", -140, "practice");
     const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
-    const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -146,
-      520, 78, "history");
+    const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -150,
+      520, 70, "history");
     const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -10, 30, 30,
       "homePractice", "homeTextOnColor");
     roomReadyIndicator.active = false;
@@ -467,14 +468,12 @@ export class RuntimeScreenFactory {
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
     const status = home.label(statusCard, "RoomStatus", "", 42, -10, 420, 46, 17, "homeTextMuted");
-    const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -238, 440, 90,
+    const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -233, 440, 80,
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");
     const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0,
-      -348, 500, 112, () => void controller.startSelectedMode(), "create", "createRoom");
+      -342, 500, 90, () => void controller.startSelectedMode(), "create", "createRoom");
     home.selectionStyle(start.visual, "create");
-    const leave = home.button(lobbyPanel, "LeaveRoom", "离开房间", 0, -448, 320, 80,
-      () => controller.backHome(), "join", 19);
 
     controller = root.addComponent(RoomScene);
     controller.roomCodeInput = input?.editBox ?? null;
@@ -497,7 +496,6 @@ export class RuntimeScreenFactory {
     controller.copyButton = copy.button;
     controller.inviteButton = invite.button;
     controller.backButton = header.backButton.button;
-    controller.leaveButton = leave.button;
     controller.readyButton = ready.button;
     controller.startButton = start.button;
     controller.startSubtitleLabel = start.subtitleLabel;

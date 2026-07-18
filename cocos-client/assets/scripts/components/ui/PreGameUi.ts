@@ -412,7 +412,7 @@ export class PreGameUi {
 
   playerStatusCard(parent: Node, name: string, title: string, x: number,
     kind: PreGameActionKind): { label: Label; ready: Node; waiting: Node } {
-    const card = this.sectionCard(parent, `${name}Card`, title, x, 2, 264, 234, kind, "avatar");
+    const card = this.sectionCard(parent, `${name}Card`, title, x, 2, 264, 220, kind, "avatar");
     this.visualSlot(card, "avatar", 0, 34, 82, 82);
     const ready = this.statusBadge(card, `${name}Ready`, "已准备", 82, 48, 94, "practice");
     ready.active = false;

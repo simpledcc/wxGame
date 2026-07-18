@@ -688,6 +688,24 @@ async function main(): Promise<void> {
   findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
   assertEqual(app.store.getState().roomAutoReady, true);
   assertEqual(findDeep(canvas, "AutoReady")?.getComponent(RuntimeButtonVisual)?.isShowingSelectedState(), true);
+  setMockWindowSize(640, 960);
+  app.store.setRoute("home");
+  await flushMany();
+  app.store.setRoute("room");
+  await flushMany();
+  const minimumRoomRoot = findDeep(canvas, "RoomRuntimeScreen")!;
+  const minimumRoomSafe = findDeep(minimumRoomRoot, "RoomSafeArea")!;
+  const minimumCreatePanel = findDeep(minimumRoomRoot, "RoomCreatePanel")!;
+  const createChain = ["SelectedModeCard", "CreateBankCard", "CreateGuidanceCard", "CreateRoom", "AutoReady"]
+    .map((name) => findDeep(minimumCreatePanel, name)!);
+  for (let gap = 0; gap < createChain.length - 1; gap += 1) {
+    assertOk(verticalGap(createChain[gap], createChain[gap + 1]) >= 8,
+      `minimum create-room gap ${gap} must remain visible`);
+  }
+  const minimumAutoReady = createChain[4];
+  assertOk(minimumCreatePanel.position.y + minimumAutoReady.position.y
+    - minimumAutoReady.getComponent(UITransform)!.height / 2
+    >= -minimumRoomSafe.getComponent(UITransform)!.height / 2);
   const originalCreateRoom = app.roomSession.create.bind(app.roomSession);
   const originalToggleReady = app.roomSession.toggleReady.bind(app.roomSession);
   let autoReadyCount = 0;
@@ -717,6 +735,21 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomPlayerOneReady")?.active, true);
   assertEqual(findDeep(canvas, "RoomPlayerTwoWaiting")?.active, true);
   assertEqual(findDeep(canvas, "RoomMode")?.getComponent(Label)?.string?.includes("秒"), false);
+  const minimumLobby = findDeep(minimumRoomRoot, "RoomLobbyPanel")!;
+  const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
+    .map((name) => findDeep(minimumLobby, name)!);
+  for (let gap = 0; gap < lobbyChain.length - 1; gap += 1) {
+    assertOk(verticalGap(lobbyChain[gap], lobbyChain[gap + 1]) >= 7,
+      `minimum room-lobby gap ${gap} must remain visible`);
+  }
+  assertEqual(findDeep(minimumLobby, "LeaveRoom"), null, "header Back must remain the single leave action");
+  const minimumStart = lobbyChain[5];
+  assertOk(minimumLobby.position.y + minimumStart.position.y
+    - minimumStart.getComponent(UITransform)!.height / 2
+    >= -minimumRoomSafe.getComponent(UITransform)!.height / 2);
+  assertVisibleUiContract(minimumRoomRoot, "minimum room route");
+  assertPreGameTargetDevices(minimumRoomRoot);
+  setMockWindowSize(393, 852);
   app.roomSession.create = originalCreateRoom;
   app.roomSession.toggleReady = originalToggleReady;
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
@@ -1142,8 +1175,7 @@ async function main(): Promise<void> {
         "Ready",
         "StartRoom",
         "CopyCode",
-        "InviteFriend",
-        "LeaveRoom"
+        "InviteFriend"
       ].forEach((name) => {
         const node = findDeep(canvas, name);
         assertEqual(node?.getComponent(Button)?.interactable, false, `${name} must lock while a room action is pending`);

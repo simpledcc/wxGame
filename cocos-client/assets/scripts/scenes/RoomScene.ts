@@ -47,7 +47,6 @@ export class RoomScene extends Component {
   copyButton: Button | null = null;
   inviteButton: Button | null = null;
   backButton: Button | null = null;
-  leaveButton: Button | null = null;
   startButton: Button | null = null;
   startSubtitleLabel: Label | null = null;
   autoReadyButton: Button | null = null;
@@ -284,7 +283,6 @@ export class RoomScene extends Component {
     if (this.copyButton) this.copyButton.interactable = !!state.room && !busy;
     if (this.inviteButton) this.inviteButton.interactable = !!state.room && !busy;
     if (this.backButton) this.backButton.interactable = !busy;
-    if (this.leaveButton) this.leaveButton.interactable = !busy;
     if (this.autoReadyButton) this.autoReadyButton.interactable = !busy;
   }
 
