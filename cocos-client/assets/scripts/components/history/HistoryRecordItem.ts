@@ -1,20 +1,16 @@
 import { _decorator, Button, Component, Label } from "cc";
 import type { MatchRecord } from "../../domain/RoomTypes";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("HistoryRecordItem")
 export class HistoryRecordItem extends Component {
-  @property(Label)
   titleLabel: Label | null = null;
 
-  @property(Label)
   metaLabel: Label | null = null;
 
-  @property(Label)
   scoreLabel: Label | null = null;
 
-  @property(Button)
   detailButton: Button | null = null;
 
   private recordIndex = -1;

@@ -417,7 +417,7 @@ export class RuntimeScreenFactory {
       const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 50,
         548, 148, "practice", "wordBank");
       home.visualSlot(bankCard, "wordBank", -210, -15, 66, 66);
-      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -16, 340, 54, 25, "homeText", 0);
+      selectedBank = home.label(bankCard, "CreateBankLabel", "", -28, -16, 320, 54, 25, "homeText", 0);
       home.button(bankCard, "ChangeRoomBank", "更换", 202, -15, 118, 80,
         () => controller.changeBank(), "practice", 18);
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -93,
@@ -592,9 +592,9 @@ export class RuntimeScreenFactory {
       const row = home.accentCard(listRoot, `HistoryRow${index}`, 0,
         safeTop - 390 - index * 110, 548, 102, "history", 18);
       home.visualSlot(row, "history", -230, 0, 58, 58);
-      const rowTitle = home.label(row, "Title", "", -70, 22, 310, 32, 18, "homeText", 0);
-      const meta = home.label(row, "Meta", "", -70, -20, 310, 34, 13, "homeTextMuted", 0);
-      const rowScore = home.label(row, "Score", "", 124, 0, 100, 42, 20, "homeText");
+      const rowTitle = home.label(row, "Title", "", -82, 22, 286, 32, 18, "homeText", 0);
+      const meta = home.label(row, "Meta", "", -82, -20, 286, 34, 13, "homeTextMuted", 0);
+      const rowScore = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
       const detail = home.button(row, `HistoryRow${index}Detail`, "详情", 220, 0, 92, 80,
         () => item.open(), "surface", 16);
       let item!: HistoryRecordItem;

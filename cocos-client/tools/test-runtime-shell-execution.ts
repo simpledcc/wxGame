@@ -657,6 +657,13 @@ async function main(): Promise<void> {
   );
   assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 184);
   assertOk(findDeep(canvas, "SelectedModeCardTab")?.getComponent(Graphics));
+  const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
+  const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
+  assertOk(
+    createBankLabel.position.x + createBankLabel.getComponent(UITransform)!.width / 2 + 8
+      <= createBankAction.position.x - createBankAction.getComponent(UITransform)!.width / 2,
+    "Create-room Bank name and change action must not overlap"
+  );
   assertEqual(findDeep(canvas, "RoomCreatePanel")?.active, true);
   findDeep(canvas, "AutoReady")?.emit(Button.EventType.CLICK);
   assertEqual(app.store.getState().roomAutoReady, false);
@@ -1181,6 +1188,14 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
       assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, false, "history records must hide the empty-state card");
       assertOk(findDeep(canvas, "HistoryRecentCardTab")?.getComponent(Graphics));
+      const historyRow = findDeep(canvas, "HistoryRow0")!;
+      const historyTitle = findDeep(historyRow, "Title")!;
+      const historyScore = findDeep(historyRow, "Score")!;
+      const historyDetail = findDeep(historyRow, "HistoryRow0Detail")!;
+      const rightEdge = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
+      const leftEdge = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+      assertOk(rightEdge(historyTitle) + 8 <= leftEdge(historyScore), "History title and score columns must not overlap");
+      assertOk(rightEdge(historyScore) + 8 <= leftEdge(historyDetail), "History score and detail columns must not overlap");
       findDeep(canvas, "HistorySpell")?.emit(Button.EventType.CLICK);
       findDeep(canvas, "HistoryRow0Detail")?.emit(Button.EventType.CLICK);
       const firstBody = findDeep(canvas, "DetailBody")?.getComponent(Label)?.string || "";
