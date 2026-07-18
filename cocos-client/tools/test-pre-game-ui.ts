@@ -332,6 +332,7 @@ function main(): void {
   assertEqual(pageHeader.subtitleLabel.string, "为练习和比赛选择学习内容");
   assertEqual(transform(pageHeader.backButton.node).height, 86);
   assertEqual(pageHeader.backButton.visual.getVisualGeometry().radius, 43);
+  assertEqual(pageHeader.backButton.iconLabel.fontSize, 34);
   const directButton = preGame.button(
     pageSafe.node,
     "FoundationTextButton",

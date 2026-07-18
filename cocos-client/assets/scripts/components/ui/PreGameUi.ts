@@ -695,7 +695,7 @@ export class PreGameUi {
       0,
       iconSize,
       iconSize,
-      Math.min(30, size * 0.46),
+      Math.min(34, size * 0.46),
       textToken
     );
     let iconSprite: Sprite | null = null;

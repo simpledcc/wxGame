@@ -107,6 +107,11 @@ function assertVisibleUiContract(root: Node, context: string): void {
       && squareVisual.getVisualGeometry().radius !== transform.width / 2) {
       violations.push(`${nodePath} square icon control is not circular`);
     }
+    const squareFallback = squareIcon?.children.find((child) => child.name === `${node.name}IconFallback`);
+    if (transform && transform.width === transform.height && transform.width >= 80 && squareFallback?.active
+      && squareFallback.getComponent(Label)?.fontSize !== 34) {
+      violations.push(`${nodePath} large icon fallback is undersized`);
+    }
     const actionIcon = node.children.find((child) => child.name === `${node.name}IconSlot`);
     const actionTitle = node.children.find((child) => child.name === `${node.name}Title`);
     if (transform && actionIcon?.active && actionTitle?.active) {
