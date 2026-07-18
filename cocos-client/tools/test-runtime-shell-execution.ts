@@ -775,6 +775,33 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "SelectedModeCardTab")?.getComponent(UITransform)?.height, 58);
   assertEqual(findDeep(canvas, "SelectedModeCardTabTitle")?.getComponent(Label)?.fontSize, 22);
   assertEqual(findDeep(findDeep(canvas, "SelectedModeCardTab")!, "HomeJoinRoomSlot")?.getComponent(UITransform)?.height, 38);
+  const assertCreateCardSpacing = (panel: Node, context: string): void => {
+    const modeCard = findDeep(panel, "SelectedModeCard")!;
+    const modeTab = findDeep(modeCard, "SelectedModeCardTab")!;
+    const modeIcon = modeCard.children.find((child) => child.name === "HomeJoinRoomSlot")!;
+    const modeTitle = findDeep(modeCard, "SelectedModeTitle")!;
+    const modeSummary = findDeep(modeCard, "SelectedModeSummary")!;
+    const bankCard = findDeep(panel, "CreateBankCard")!;
+    const bankTab = findDeep(bankCard, "CreateBankCardTab")!;
+    const bankIcon = bankCard.children.find((child) => child.name === "HomeWordBankSlot")!;
+    const bankName = findDeep(bankCard, "CreateBankLabel")!;
+    const bankAction = findDeep(bankCard, "ChangeRoomBank")!;
+    assertOk(verticalGap(modeTab, modeIcon) >= 4, `${context} mode tab/icon gap must remain visible`);
+    assertOk(verticalGap(modeTab, modeTitle) >= 4, `${context} mode tab/title gap must remain visible`);
+    assertOk(verticalGap(modeTitle, modeSummary) >= 4, `${context} mode title/summary gap must remain visible`);
+    assertOk(modeIcon.position.x + modeIcon.getComponent(UITransform)!.width / 2 + 4
+      <= modeTitle.position.x - modeTitle.getComponent(UITransform)!.width / 2,
+    `${context} mode icon must not enter the title column`);
+    assertOk(verticalGap(bankTab, bankIcon) >= 4, `${context} Bank tab/icon gap must remain visible`);
+    assertOk(verticalGap(bankTab, bankName) >= 4, `${context} Bank tab/name gap must remain visible`);
+    assertOk(bankIcon.position.x + bankIcon.getComponent(UITransform)!.width / 2 + 4
+      <= bankName.position.x - bankName.getComponent(UITransform)!.width / 2,
+    `${context} Bank icon must not enter the name column`);
+    assertOk(bankName.position.x + bankName.getComponent(UITransform)!.width / 2 + 4
+      <= bankAction.position.x - bankAction.getComponent(UITransform)!.width / 2,
+    `${context} Bank name must not enter the change action`);
+  };
+  assertCreateCardSpacing(findDeep(canvas, "RoomCreatePanel")!, "long create configuration");
   const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
   const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
   assertOk(
@@ -806,6 +833,7 @@ async function main(): Promise<void> {
   const minimumRoomRoot = findDeep(canvas, "RoomRuntimeScreen")!;
   const minimumRoomSafe = findDeep(minimumRoomRoot, "RoomSafeArea")!;
   const minimumCreatePanel = findDeep(minimumRoomRoot, "RoomCreatePanel")!;
+  assertCreateCardSpacing(minimumCreatePanel, "minimum create configuration");
   const createChain = ["SelectedModeCard", "CreateBankCard", "CreateGuidanceCard", "CreateRoom", "AutoReady"]
     .map((name) => findDeep(minimumCreatePanel, name)!);
   const minimumGuidanceTab = findDeep(minimumCreatePanel, "CreateGuidanceCardTab")!;

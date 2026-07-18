@@ -412,12 +412,12 @@ export class RuntimeScreenFactory {
       const selectedModeCard = home.sectionCard(createPanel, "SelectedModeCard", "已选模式", 0, 248,
         548, 184, "join", "joinRoom");
       home.visualSlot(selectedModeCard, "joinRoom", -198, -18, 92, 92);
-      home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, -2, 360, 54, 32, "homeText", 0);
-      home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -48, 360, 36, 19, "homeTextMuted", 0);
+      home.label(selectedModeCard, "SelectedModeTitle", "准备体验模式", 42, -2, 360, 48, 32, "homeText", 0);
+      home.label(selectedModeCard, "SelectedModeSummary", "双人房间流程体验", 42, -50, 360, 32, 19, "homeTextMuted", 0);
       const bankCard = home.sectionCard(createPanel, "CreateBankCard", "当前词库", 0, 74,
         548, 148, "practice", "wordBank");
-      home.visualSlot(bankCard, "wordBank", -210, -15, 66, 66);
-      selectedBank = home.label(bankCard, "CreateBankLabel", "", -28, -16, 320, 54, 25, "homeText", 0);
+      home.visualSlot(bankCard, "wordBank", -210, -23, 66, 66);
+      selectedBank = home.label(bankCard, "CreateBankLabel", "", -18, -16, 300, 54, 25, "homeText", 0);
       home.button(bankCard, "ChangeRoomBank", "更换", 202, -15, 118, 80,
         () => controller.changeBank(), "practice", 18);
       const guidance = home.sectionCard(createPanel, "CreateGuidanceCard", "开始条件", 0, -64,
