@@ -1013,12 +1013,17 @@ async function main(): Promise<void> {
     const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
     const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
     assertOk(verticalGap(codeTab, code) >= 8, `${context} code tab/body gap must remain visible`);
+    assertEqual(code.position.y, copy.position.y, `${context} code/copy baseline must remain aligned`);
+    assertEqual(copy.position.y, invite.position.y, `${context} copy/invite baseline must remain aligned`);
     assertEqual(copy.getComponent(UITransform)?.width, 112);
     assertEqual(invite.getComponent(UITransform)?.width, 112);
     [copy, invite].forEach((action) => {
       const icon = findDeep(action, `${action.name}IconSlot`)!;
       const title = findDeep(action, `${action.name}Title`)!;
       assertOk(right(icon) + 8 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
+      assertEqual(action.position.y - action.getComponent(UITransform)!.height / 2
+        + codeCard.getComponent(UITransform)!.height / 2, 6,
+      `${context} ${action.name} must clear the card bottom frame`);
     });
     assertEqual(findDeep(copy, "CopyCodeTitle")?.getComponent(Label)?.string, "复制");
     assertEqual(findDeep(invite, "InviteFriendTitle")?.getComponent(Label)?.string, "邀请");
@@ -1028,9 +1033,15 @@ async function main(): Promise<void> {
     assertOk(right(invite) + 8 <= codeCard.getComponent(UITransform)!.width / 2,
       `${context} invite action must retain its right inset`);
     assertOk(verticalGap(bankTab, bankCopy) >= 8, `${context} Bank tab/body gap must remain visible`);
+    assertEqual(bankCopy.position.y - bankCopy.getComponent(UITransform)!.height / 2
+      + bankCard.getComponent(UITransform)!.height / 2, 7,
+    `${context} Bank copy must clear the card bottom frame`);
     assertOk(right(bankCopy) + 8 <= bankCard.getComponent(UITransform)!.width / 2,
       `${context} Bank copy must retain its right inset`);
     assertOk(verticalGap(statusTab, statusCopy) >= 8, `${context} status tab/copy gap must remain visible`);
+    assertEqual(statusCopy.position.y - statusCopy.getComponent(UITransform)!.height / 2
+      + statusCard.getComponent(UITransform)!.height / 2, 7,
+    `${context} status copy must clear the card bottom frame`);
     indicators.forEach((indicator) => {
       assertOk(verticalGap(statusTab, indicator) >= 8, `${context} status tab/indicator gap must remain visible`);
       assertOk(right(indicator) + 8 <= left(statusCopy), `${context} indicator/copy columns must remain separate`);

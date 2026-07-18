@@ -449,14 +449,14 @@ export class RuntimeScreenFactory {
     const lobbyPanel = home.group(safe.node, "RoomLobbyPanel", 0, lobbyContentY, safe.width, 760);
     const codeCard = home.sectionCard(lobbyPanel, "RoomCodeCard", "房间码", 0, 252,
       548, 104, "join", "joinRoom");
-    const roomCode = home.label(codeCard, "RoomCode", "------", -88, -15, 216, 48, 30, "homeText");
-    const copy = home.actionButton(codeCard, "CopyCode", "复制", "", "码", 84, -15, 112, 80,
+    const roomCode = home.label(codeCard, "RoomCode", "------", -88, -6, 216, 48, 30, "homeText");
+    const copy = home.actionButton(codeCard, "CopyCode", "复制", "", "码", 84, -6, 112, 80,
       () => void controller.copyRoomCode(), "join");
-    const invite = home.actionButton(codeCard, "InviteFriend", "邀请", "", "友", 210, -15, 112, 80,
+    const invite = home.actionButton(codeCard, "InviteFriend", "邀请", "", "友", 210, -6, 112, 80,
       () => void controller.inviteFriend(), "practice", "joinRoom");
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 155,
       520, 72, "practice", "wordBank");
-    const mode = home.label(lobbyBank, "RoomMode", "", 18, -16, 430, 36, 20, "homeText");
+    const mode = home.label(lobbyBank, "RoomMode", "", 18, -15, 430, 28, 20, "homeText");
     const playerOne = home.playerStatusCard(lobbyPanel, "RoomPlayerOne", "房主", -140, "practice");
     const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -150,
@@ -467,7 +467,7 @@ export class RuntimeScreenFactory {
     const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -13, 30, 30,
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
-    const status = home.label(statusCard, "RoomStatus", "", 42, -16, 420, 34, 17, "homeTextMuted");
+    const status = home.label(statusCard, "RoomStatus", "", 42, -15, 420, 26, 17, "homeTextMuted");
     const ready = home.actionButton(lobbyPanel, "Ready", "我准备好了", "", "✓", 0, -233, 440, 80,
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");
