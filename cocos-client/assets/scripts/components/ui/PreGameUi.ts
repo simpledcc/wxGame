@@ -403,11 +403,11 @@ export class PreGameUi {
   }
 
   statusBadge(parent: Node, name: string, text: string, x: number, y: number, width: number,
-    kind: PreGameActionKind): Node {
+    kind: PreGameActionKind, fontSize = 14): Node {
     const surface = kind === "surface";
     const node = this.pill(parent, name, x, y, width, 34, this.actionToken(kind),
       surface ? "homeCardBorder" : "homeTextOnColor");
-    this.label(node, `${name}Label`, text, 0, 0, width - 16, 28, 14,
+    this.label(node, `${name}Label`, text, 0, 0, width - 16, 28, fontSize,
       surface ? "homeTextMuted" : "homeTextOnColor");
     return node;
   }

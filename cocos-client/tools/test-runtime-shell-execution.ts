@@ -465,6 +465,24 @@ async function main(): Promise<void> {
   );
   assertOk(findDeep(canvas, "HomePlayerCard")?.getComponent(Graphics), "player name must use a dark utility pill");
   assertOk(findDeep(canvas, "HomeCoinPill")?.getComponent(Graphics), "coin count must use a dark utility pill");
+  const assertHomeCoinLayout = (root: Node, context: string): void => {
+    const button = findDeep(root, "HomeCoinButton")!;
+    const icon = findDeep(button, "HomeCoinButtonIconSlot")!;
+    const value = findDeep(button, "HomeCoins")!;
+    const add = findDeep(button, "HomeCoinAdd")!;
+    const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
+    const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+    assertOk(add.getComponent(Graphics), `${context} coin add affordance must use a visible circular badge`);
+    assertEqual(add.getComponent(Button), null, `${context} coin add badge must not split the coin click target`);
+    assertEqual(add.getComponent(UITransform)?.width, 34);
+    assertEqual(add.getComponent(UITransform)?.height, 34);
+    assertEqual(findDeep(add, "HomeCoinAddLabel")?.getComponent(Label)?.fontSize, 26);
+    assertOk(right(icon) + 4 <= left(value), `${context} coin icon/value gap must remain visible`);
+    assertOk(right(value) + 4 <= left(add), `${context} coin value/add gap must remain visible`);
+    assertOk(right(add) + 2 <= button.getComponent(UITransform)!.width / 2,
+      `${context} coin add badge must remain inside the coin action`);
+  };
+  assertHomeCoinLayout(canvas, "long Home");
   const homeLogoTransform = findDeep(canvas, "HomeLogoSlot")?.getComponent(UITransform);
   assertEqual(homeLogoTransform?.width, 520);
   assertEqual(homeLogoTransform?.height, 156);
@@ -640,6 +658,7 @@ async function main(): Promise<void> {
   assertVisibleUiContract(minimumHomeRoot, "minimum Home route");
   assertPreGameTargetDevices(minimumHomeRoot);
   assertPreGameIconLayout(minimumHomeRoot, "minimum Home route");
+  assertHomeCoinLayout(minimumHomeRoot, "minimum Home");
   setMockWindowSize(393, 852);
   app.store.setRoute("bank");
   await flushMany();
@@ -1111,6 +1130,7 @@ async function main(): Promise<void> {
   await flushMany();
   assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.string, "123456789");
   assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
+  assertHomeCoinLayout(canvas, "long-coin Home");
   app.wordBankStore.restoreProgress(app.wordBankCatalog, progressBeforeLongCoins);
 
   findDeep(canvas, "HistoryButton")?.emit(Button.EventType.CLICK);
