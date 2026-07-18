@@ -1710,6 +1710,8 @@ async function main(): Promise<void> {
         const visual = node?.getComponent(RuntimeButtonVisual);
         visual?.refresh();
         assertEqual(visual?.isShowingDisabledState(), true, `${name} must display its disabled color`);
+        assertEqual(node?.getChildByName(`${name}Highlight`)?.active, false,
+          `${name} must suppress its bright highlight while disabled`);
       });
       app.roomStore.setPendingAction(null);
       assertEqual(findDeep(canvas, "BackButton")?.getComponent(Button)?.interactable, true);

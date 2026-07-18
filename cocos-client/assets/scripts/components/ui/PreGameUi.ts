@@ -557,7 +557,7 @@ export class PreGameUi {
     skin.type = Sprite.Type.SLICED;
     skin.sizeMode = Sprite.SizeMode.CUSTOM;
     skinNode.active = false;
-    const highlightNode = this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
+    this.addHighlight(node, `${name}Highlight`, width - 22, height, radius);
 
     const compact=width<120;
     const iconSize = compact?24:Math.max(36, Math.min(height * 0.56, width * 0.18, 56));
@@ -656,7 +656,6 @@ export class PreGameUi {
         skin.sizeMode = Sprite.SizeMode.CUSTOM;
         skinNode.active = true;
         background.enabled = false;
-        highlightNode.active = false;
         visual.setSkin(skin, skinDensity);
       }).catch(() => undefined);
     }
@@ -680,8 +679,7 @@ export class PreGameUi {
       fillToken,
       backgroundStyle === "join" ? "homeTextOnColor" : "homeCardBorder"
     );
-    background.enabled = backgroundStyle === "card";
-    if (backgroundStyle === "join") background.enabled = true;
+    background.enabled=backgroundStyle!=="transparent";
     this.addHighlight(node, `${name}Highlight`, size - 16, size, radius);
     const iconSize = iconSizeOverride > 0
       ? Math.max(32, Math.min(iconSizeOverride, size - 8))

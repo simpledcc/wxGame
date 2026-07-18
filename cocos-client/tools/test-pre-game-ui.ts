@@ -233,6 +233,7 @@ function main(): void {
   assertEqual(transform(actionSkinNode).height, 112);
   const actionHighlight = action.node.getChildByName("FoundationActionHighlight");
   assertOk(actionHighlight, "action button must keep a fallback highlight node");
+  assertEqual(actionHighlight.active, true);
   action.visual.setSkin(actionSkinNode.getComponent(Sprite), 2);
   assertEqual(transform(actionSkinNode).width, 1120);
   assertEqual(transform(actionSkinNode).height, 224);
@@ -248,13 +249,16 @@ function main(): void {
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
+  assertEqual(actionHighlight.active, false, "pressed action must suppress its static highlight");
   assertEqual(action.background.strokeCount, 1, "pressed action must redraw its fallback border");
   assertEqual(action.iconSlot.position.y, -2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
+  assertEqual(actionHighlight.active, false, "formal skin must keep the fallback highlight suppressed");
   assertEqual(action.iconSlot.position.y, 0);
   action.button.interactable = false;
   action.visual.refresh();
+  assertEqual(actionHighlight.active, false, "disabled action must suppress its bright highlight");
   assertEqual(action.visual.isShowingDisabledState(), true);
   assertEqual(action.background.strokeCount, 1, "disabled action must redraw its fallback border");
   assertOk(action.titleLabel.color.a < 255, "disabled button copy must visibly soften with its background");
@@ -301,6 +305,17 @@ function main(): void {
   assertVisualMatchesHitArea(icon.node, icon.visual);
   assertEqual(transform(icon.iconSlot).width, 36);
   assertEqual(icon.visual.getVisualGeometry().radius, 32);
+  const iconHighlight = icon.node.getChildByName("SettingsIconHighlight")!;
+  assertEqual(iconHighlight.active, true);
+  icon.node.emit(Node.EventType.TOUCH_START);
+  assertEqual(iconHighlight.active, false, "pressed round control must suppress its static highlight");
+  icon.node.emit(Node.EventType.TOUCH_END);
+  assertEqual(iconHighlight.active, true);
+  icon.button.interactable = false;
+  icon.visual.refresh();
+  assertEqual(iconHighlight.active, false, "disabled round control must suppress its bright highlight");
+  icon.button.interactable = true;
+  icon.visual.refresh();
   icon.node.emit(Button.EventType.CLICK);
   assertEqual(iconCount, 1);
   const transparentIcon = preGame.iconButton(
