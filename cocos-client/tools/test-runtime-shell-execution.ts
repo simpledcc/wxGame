@@ -1491,7 +1491,7 @@ async function main(): Promise<void> {
       assertOk(horizontalGap(findDeep(canvas, "BankPage")!, findDeep(canvas, "NextBanks")!) >= 8);
       assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
-      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
+      assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 88);
       const bankStatusTab = findDeep(canvas, "BankStatusCardTab")!;
       const bankStatusCard = findDeep(canvas, "BankStatusCard")!;
       const bankHeader = findDeep(canvas, "BankHeader")!;
@@ -1523,7 +1523,7 @@ async function main(): Promise<void> {
           const title = findDeep(slot, `BankSlot${slotIndex}Title`)!;
           const subtitle = findDeep(slot, `BankSlot${slotIndex}Subtitle`)!;
           const halfHeight = slot.getComponent(UITransform)!.height / 2;
-          assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 4,
+          assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 6,
             `${context} Bank title needs a top inset`);
           assertOk(verticalGap(title, subtitle) >= 8, `${context} Bank title/subtitle gap must remain visible`);
           assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
@@ -1577,8 +1577,8 @@ async function main(): Promise<void> {
       const bankChain = ["BankHeader", "BankStatusCard", "BankSlot0", "BankSlot1", "BankSlot2", "BankSlot3", "PreviousBanks", "UnlockBank"]
         .map((name) => findDeep(minimumBankRoot, name)!);
       for (let gap = 0; gap < bankChain.length - 1; gap += 1) {
-        assertOk(verticalGap(bankChain[gap], bankChain[gap + 1]) >= 4,
-          `minimum Bank gap ${gap} must remain visible`);
+        assertOk(verticalGap(bankChain[gap], bankChain[gap + 1]) >= 8,
+          `minimum Bank gap ${gap} must retain the eight-pixel rhythm`);
       }
       const minimumUnlock = bankChain[7];
       assertOk(minimumUnlock.position.y - minimumUnlock.getComponent(UITransform)!.height / 2

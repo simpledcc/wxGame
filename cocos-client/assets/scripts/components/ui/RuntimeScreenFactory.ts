@@ -211,7 +211,7 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "BankHeader", "选择词库", "选择教材单元，练习和房间会同步使用",
       () => controller.back(), "wordBank");
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
-      safeTop - 160, 540, 80, "history", "coin");
+      safeTop - 164, 540, 80, "history", "coin");
     home.visualSlot(statusCard, "coin", -232, -13, 32, 32);
     const status = home.label(statusCard, "BankStatus", "", 24, -13, 430, 36, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
@@ -222,27 +222,27 @@ export class RuntimeScreenFactory {
     const slotStates: Label[] = [];
     let previous!: RuntimeButtonRef;
     let next!: RuntimeButtonRef;
-    const firstSlotY = safeTop - 252;
+    const firstSlotY = safeTop - 256;
     const slotGap = 104;
     for (let index = 0; index < pageSize; index += 1) {
       const slot = home.actionButton(safe.node, `BankSlot${index}`, "", "词库信息", "词", 0,
-        firstSlotY - index * slotGap, 540, 96, () => {
+        firstSlotY - index * slotGap, 540, 88, () => {
           const bankId = slotIds[index];
           if (!bankId) return;
           controller.selectBank(bankId);
           renderPage();
         }, "surface", "wordBank");
       home.selectionStyle(slot.visual, "practice");
-      slot.titleLabel.node.setPosition(-32, 21, 0);
-      slot.titleLabel.node.getComponent(UITransform)?.setContentSize(300, 42);
-      slot.subtitleLabel?.node.setPosition(-32, -24, 0);
-      slot.subtitleLabel?.node.getComponent(UITransform)?.setContentSize(300, 32);
+      slot.titleLabel.node.setPosition(-32, 19, 0);
+      slot.titleLabel.node.getComponent(UITransform)?.setContentSize(300, 38);
+      slot.subtitleLabel?.node.setPosition(-32, -22, 0);
+      slot.subtitleLabel?.node.getComponent(UITransform)?.setContentSize(300, 28);
       const badge = home.pill(slot.node, `BankSlot${index}Badge`, 198, 0, 112, 54,
         "homeCard", "homeCardBorder");
       slotStates.push(home.label(badge, `BankSlot${index}State`, "", 0, 0, 92, 36, 15, "homeText"));
       slots.push(slot);
     }
-    const pageLabel = home.label(safe.node, "BankPage", "", 0, safeBottom + 164, 112, 44, 18, "homeTextMuted");
+    const pageLabel = home.label(safe.node, "BankPage", "", 0, safeBottom + 162, 112, 44, 18, "homeTextMuted");
     const renderPage = (): void => {
       const selectedId = app.store.getState().bankPickerSelectedBankId;
       const pageCount = Math.max(1, Math.ceil(entries.length / pageSize));
@@ -276,11 +276,11 @@ export class RuntimeScreenFactory {
       previous.visual.refresh();
       next.visual.refresh();
     };
-    previous = home.iconButton(safe.node, "PreviousBanks", "‹", -105, safeBottom + 164, 80, () => {
+    previous = home.iconButton(safe.node, "PreviousBanks", "‹", -105, safeBottom + 162, 80, () => {
       page -= 1;
       renderPage();
     });
-    next = home.iconButton(safe.node, "NextBanks", "›", 105, safeBottom + 164, 80, () => {
+    next = home.iconButton(safe.node, "NextBanks", "›", 105, safeBottom + 162, 80, () => {
       page += 1;
       renderPage();
     });
