@@ -1079,7 +1079,8 @@ async function main(): Promise<void> {
     [copy, invite].forEach((action) => {
       const icon = findDeep(action, `${action.name}IconSlot`)!;
       const title = findDeep(action, `${action.name}Title`)!;
-      assertOk(right(icon) + 8 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
+      assertEqual(left(title) - right(icon), 8,
+        `${context} ${action.name} icon and title need an eight-pixel boundary`);
       assertEqual(action.position.y - action.getComponent(UITransform)!.height / 2
         + codeCard.getComponent(UITransform)!.height / 2, 8,
       `${context} ${action.name} must clear the card bottom frame`);
@@ -1087,16 +1088,19 @@ async function main(): Promise<void> {
     assertEqual(findDeep(copy, "CopyCodeTitle")?.getComponent(Label)?.string, "复制");
     assertEqual(findDeep(invite, "InviteFriendTitle")?.getComponent(Label)?.string, "邀请");
     assertOk(findDeep(invite, "HomeJoinRoomSlot"), `${context} Invite must retain its formal semantic icon`);
-    assertOk(right(code) + 8 <= left(copy), `${context} code/copy columns must remain separate`);
-    assertOk(right(copy) + 8 <= left(invite), `${context} copy/invite actions must remain separate`);
-    assertOk(right(invite) + 8 <= codeCard.getComponent(UITransform)!.width / 2,
-      `${context} invite action must retain its right inset`);
+    assertEqual(left(copy) - right(code), 8, `${context} code and copy need an eight-pixel boundary`);
+    assertEqual(left(invite) - right(copy), 8, `${context} copy and invite need an eight-pixel boundary`);
+    assertEqual(codeCard.getComponent(UITransform)!.width / 2 - right(invite), 8,
+      `${context} invite action needs an eight-pixel right inset`);
     assertOk(verticalGap(bankTab, bankCopy) >= 8, `${context} Bank tab/body gap must remain visible`);
     assertEqual(bankCopy.position.y - bankCopy.getComponent(UITransform)!.height / 2
       + bankCard.getComponent(UITransform)!.height / 2, 8,
     `${context} Bank copy must clear the card bottom frame`);
-    assertOk(right(bankCopy) + 8 <= bankCard.getComponent(UITransform)!.width / 2,
-      `${context} Bank copy must retain its right inset`);
+    assertEqual(left(bankCopy) + bankCard.getComponent(UITransform)!.width / 2,
+      bankCard.getComponent(UITransform)!.width / 2 - right(bankCopy),
+    `${context} Bank copy needs balanced horizontal card insets`);
+    assertEqual(bankCard.getComponent(UITransform)!.width / 2 - right(bankCopy), 24,
+      `${context} Bank copy needs a 24px right inset`);
     assertOk(verticalGap(statusTab, statusCopy) >= 8, `${context} status tab/copy gap must remain visible`);
     assertEqual(statusCopy.position.y - statusCopy.getComponent(UITransform)!.height / 2
       + statusCard.getComponent(UITransform)!.height / 2, 8,
