@@ -1234,6 +1234,7 @@ async function main(): Promise<void> {
     const bank = findDeep(root, "StudyBankBar")!;
     const card = findDeep(root, "StudyCard")!;
     const reveal = findDeep(root, "RevealWord")!;
+    const mark = findDeep(root, "MarkWrong")!;
     const toggle = findDeep(root, "MeaningToggle")!;
     const next = findDeep(root, "NextWord")!;
     const visualHalfHeight = (node: Node): number =>
@@ -1241,12 +1242,14 @@ async function main(): Promise<void> {
         ?? node.getComponent(UITransform)!.height) / 2;
     const visualGap = (upper: Node, lower: Node): number =>
       upper.position.y - visualHalfHeight(upper) - lower.position.y - visualHalfHeight(lower);
-    [bank, reveal, toggle, next].forEach((action) => {
+    [bank, reveal, mark, toggle, next].forEach((action) => {
       assertEqual(action.getComponent(UITransform)?.height, 80,
         `${context} ${action.name} must retain its target-device touch height`);
       assertEqual(action.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 72,
         `${context} ${action.name} must use its inset visual height`);
     });
+    assertEqual(mark.position.y, reveal.position.y,
+      `${context} reveal and wrong-word actions must share one visual axis`);
     [[header, bank], [bank, card], [card, reveal], [reveal, toggle], [toggle, next]]
       .forEach(([upper, lower], index) => assertOk(visualGap(upper, lower) >= 8,
         `${context} visual gap ${index} must retain the eight-pixel rhythm`));

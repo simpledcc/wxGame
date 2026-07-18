@@ -329,7 +329,7 @@ export class RuntimeScreenFactory {
     const revealY = cardY - 224 - stretch * 0.28;
     home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 72,
       () => controller.revealCurrentMeaning(), "join", "practice");
-    const markWrong = home.actionButton(safe.node, "MarkWrong", "标记错词", "", "★", 134, revealY, 252, 80,
+    const markWrong = home.actionButton(safe.node, "MarkWrong", "标记错词", "", "★", 134, revealY, 252, 72,
       () => controller.markCurrentUnfamiliar(), "history", "wordBank");
     home.selectionStyle(markWrong.visual, "history");
     const meaningToggle = home.actionButton(safe.node, "MeaningToggle", "", "", "书", 0,
