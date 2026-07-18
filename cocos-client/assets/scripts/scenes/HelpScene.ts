@@ -24,7 +24,7 @@ export class HelpScene extends Component {
     ].join("\n\n");
   }
 
-  backHome(): void {
-    app.router.navigate("home");
+  backCatalog(): void {
+    app.router.navigate("coopSelect");
   }
 }

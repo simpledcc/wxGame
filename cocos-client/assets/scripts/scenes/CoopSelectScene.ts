@@ -14,6 +14,10 @@ export class CoopSelectScene extends Component {
     app.router.navigate("room");
   }
 
+  openHelp(): void {
+    app.router.navigate("help");
+  }
+
   backHome(): void {
     app.router.navigate("home");
   }

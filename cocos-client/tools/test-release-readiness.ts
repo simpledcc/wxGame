@@ -110,8 +110,10 @@ function testSceneCoverage(): void {
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${sourcePath}.meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
-  ["openStudy", "openModeCatalog", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openHelp", "openPrivacyContract", "toggleMuted"]
+  ["openStudy", "openModeCatalog", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openPrivacyContract", "toggleMuted"]
     .forEach((handler) => assert.match(home, new RegExp(`\\b${handler}\\b`)));
+  assert.doesNotMatch(home, /\bopenHelp\b/);
+  assert.match(read("assets/scripts/scenes/CoopSelectScene.ts"), /\bopenHelp\b/);
   assert.doesNotMatch(home, /EditBox|playerName|nickNameInput/);
   assert.match(home, /playerStore\.getLocalPlayer\(\)\.displayName/);
   assert.match(home, /wordBankStore\.getWordCoins\(\)/);

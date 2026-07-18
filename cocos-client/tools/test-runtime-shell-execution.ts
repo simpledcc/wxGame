@@ -973,6 +973,23 @@ async function main(): Promise<void> {
       app.persistWordBankProgress = originalPersistWordBankProgress;
     }
     if (routes[index] === "coopSelect") {
+      const helpButton = findDeep(canvas, "ModeHelpButton");
+      const helpTransform = helpButton?.getComponent(UITransform);
+      const catalogTitle = findDeep(canvas, "CoopSelectHeaderTitle")?.getComponent(UITransform);
+      const catalogSubtitle = findDeep(canvas, "CoopSelectHeaderSubtitle")?.getComponent(UITransform);
+      assertOk(helpButton);
+      assertOk(helpButton.getComponent(Button) && helpTransform && catalogTitle && catalogSubtitle);
+      assertOk(catalogTitle.width / 2 + 62 <= helpButton.position.x - helpTransform.width / 2,
+        "catalog title must leave room for the rules action");
+      assertOk(catalogSubtitle.width / 2 + 14 <= helpButton.position.x - helpTransform.width / 2,
+        "catalog subtitle must leave room for the rules action");
+      helpButton.emit(Button.EventType.CLICK);
+      await flushMany();
+      assertEqual(app.store.getState().route, "help");
+      assertEqual(findDeep(canvas, "HelpHeaderTitle")?.getComponent(Label)?.string, "玩法说明");
+      findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
+      await flushMany();
+      assertEqual(app.store.getState().route, "coopSelect", "rules must return to the mode catalog");
       assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.width, 548);
       assertEqual(findDeep(canvas, "ModeOption0")?.getComponent(UITransform)?.height, 86);
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 548);
@@ -1240,7 +1257,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "HelpBody")?.getComponent(Label)?.fontSize, 20);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
-      assertEqual(app.store.getState().route, "home");
+      assertEqual(app.store.getState().route, "coopSelect");
     }
     if (routes[index] === "home") {
       assertEqual(

@@ -349,8 +349,12 @@ export class RuntimeScreenFactory {
     const safe = home.safeArea(root, "CoopSelectSafeArea");
     const safeTop = safe.height / 2;
     let controller!: CoopSelectScene;
-    home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法",
+    const header = home.pageHeader(safe, "CoopSelectHeader", "玩法目录", "选择想体验的双人玩法",
       () => controller.backHome(), "catalog");
+    header.titleLabel.node.getComponent(UITransform)?.setContentSize(250, 44);
+    header.subtitleLabel.node.getComponent(UITransform)?.setContentSize(348, 30);
+    home.iconButton(header.node, "ModeHelpButton", "?", 229, 14, 80,
+      () => controller.openHelp(), undefined, "transparent", 36);
     const modes = [
       ["准备体验模式", "双人房间流程体验", "joinRoom", "practice"],
       ["双人 PK 竞技", "快速抢答，一决高下", "practice", "surface"],
@@ -660,8 +664,8 @@ export class RuntimeScreenFactory {
     const { root, home, safe } = this.page(parent, ui, "Help");
     const safeTop = safe.height / 2;
     let controller!: HelpScene;
-    home.pageHeader(safe, "HelpHeader", "玩法目录", "玩法说明：了解练习、对战和合作规则",
-      () => controller.backHome(), "catalog");
+    home.pageHeader(safe, "HelpHeader", "玩法说明", "了解练习、对战和合作规则",
+      () => controller.backCatalog(), "catalog");
     const cardHeight = Math.min(820, safe.height - 140);
     const cardY = safeTop - 112 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);

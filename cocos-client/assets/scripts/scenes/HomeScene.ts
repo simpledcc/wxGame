@@ -89,10 +89,6 @@ export class HomeScene extends Component {
     this.navigateOnce(() => app.router.navigate("feedback"));
   }
 
-  openHelp(): void {
-    this.navigateOnce(() => app.router.navigate("help"));
-  }
-
   toggleMuted(): boolean {
     const current = app.settingsStore.isMuted();
     const next = !current;
