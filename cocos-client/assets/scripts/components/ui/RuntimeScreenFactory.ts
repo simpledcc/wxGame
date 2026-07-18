@@ -62,7 +62,7 @@ export class RuntimeScreenFactory {
       top, "HomeAvatarButton", "我", -252, 0, 80, () => openPlayer(), "avatar", "transparent", 68
     );
     const playerCard = home.pill(top, "HomePlayerCard", -114, 0, 178, 64);
-    const player = home.label(playerCard, "HomePlayerName", "", 0, 12, 152, 30, 21, "homeTextOnColor");
+    const player = home.label(playerCard, "HomePlayerName", "", 0, 13, 152, 26, 21, "homeTextOnColor");
     home.label(playerCard, "HomePlayerIdentityLabel", "系统安全身份", 0, -17, 152, 18, 13, "homeTextOnColor");
     home.pill(top, "HomeCoinPill", 90, 0, 206, 64);
     const coinButton = home.actionButton(

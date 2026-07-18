@@ -574,11 +574,11 @@ async function main(): Promise<void> {
     assertOk(right(card) + 8 <= left(coin), `${context} player/coin gap must remain visible`);
     assertEqual(cardHeight, coin.getComponent(UITransform)!.height, `${context} utility pills must align`);
     assertEqual(card.position.y, coin.position.y, `${context} utility pills must share one axis`);
-    assertOk(cardHeight / 2 - name.position.y - name.getComponent(UITransform)!.height / 2 >= 5,
-      `${context} player name needs a top inset`);
-    assertOk(verticalGap(name, identity) >= 5, `${context} player name/identity gap must remain visible`);
-    assertOk(identity.position.y - identity.getComponent(UITransform)!.height / 2 >= -cardHeight / 2 + 5,
-      `${context} player identity needs a bottom inset`);
+    assertEqual(cardHeight / 2 - name.position.y - name.getComponent(UITransform)!.height / 2, 6,
+      `${context} player name needs a balanced top inset`);
+    assertOk(verticalGap(name, identity) >= 8, `${context} player name/identity gap must remain visible`);
+    assertEqual(identity.position.y - identity.getComponent(UITransform)!.height / 2 + cardHeight / 2, 6,
+      `${context} player identity needs a balanced bottom inset`);
     assertEqual(identity.getComponent(Label)?.string, "系统安全身份");
     assertEqual(name.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
     assertEqual(card.getComponent(Button), null, `${context} player pill must not split the avatar click target`);
