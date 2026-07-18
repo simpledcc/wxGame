@@ -499,6 +499,9 @@ async function main(): Promise<void> {
   const verticalGap = (upper: Node, lower: Node): number =>
     upper.position.y - upper.getComponent(UITransform)!.height / 2
       - lower.position.y - lower.getComponent(UITransform)!.height / 2;
+  const horizontalGap = (left: Node, right: Node): number =>
+    right.position.x - right.getComponent(UITransform)!.width / 2
+      - left.position.x - left.getComponent(UITransform)!.width / 2;
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const createRoomButton = findDeep(canvas, "CreateRoomButton")!;
@@ -1462,6 +1465,8 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
+      assertOk(horizontalGap(findDeep(canvas, "PreviousBanks")!, findDeep(canvas, "BankPage")!) >= 8);
+      assertOk(horizontalGap(findDeep(canvas, "BankPage")!, findDeep(canvas, "NextBanks")!) >= 8);
       assertEqual(findDeep(canvas, "BankListHeader"), null, "Bank cards carry their own labels");
       assertEqual(findDeep(canvas, "BankFilter0"), null, "non-functional Bank filter placeholders must stay removed");
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
@@ -1945,8 +1950,12 @@ async function main(): Promise<void> {
       const historyDetailTitle = findDeep(historyDetailCard, "DetailTitle")!;
       const historyDetailBody = findDeep(historyDetailCard, "DetailBody")!;
       const historyDetailPrevious = findDeep(historyDetailCard, "DetailPrevious")!;
+      const historyDetailPage = findDeep(historyDetailCard, "DetailPage")!;
+      const historyDetailNext = findDeep(historyDetailCard, "DetailNext")!;
       assertOk(verticalGap(historyDetailTitle, historyDetailBody) >= 8);
       assertOk(verticalGap(historyDetailBody, historyDetailPrevious) >= 8);
+      assertOk(horizontalGap(historyDetailPrevious, historyDetailPage) >= 8);
+      assertOk(horizontalGap(historyDetailPage, historyDetailNext) >= 8);
       assertOk(historyDetailCard.getComponent(UITransform)!.height / 2
         - historyDetailTitle.position.y - historyDetailTitle.getComponent(UITransform)!.height / 2 >= 8);
       assertOk(historyDetailPrevious.position.y - historyDetailPrevious.getComponent(UITransform)!.height / 2
@@ -1974,6 +1983,8 @@ async function main(): Promise<void> {
       const minimumHistoryTitle = findDeep(minimumHistoryRoot, "HistoryTitle")!;
       const minimumHistoryRows = Array.from({ length: 4 }, (_, row) => findDeep(minimumHistoryRoot, `HistoryRow${row}`)!);
       const minimumHistoryPrevious = findDeep(minimumHistoryRoot, "HistoryPrevious")!;
+      const minimumHistoryPage = findDeep(minimumHistoryRoot, "HistoryPage")!;
+      const minimumHistoryNext = findDeep(minimumHistoryRoot, "HistoryNext")!;
       assertHistorySummary(minimumRecentCard, "History", "HistoryRecentSummary");
       assertHistorySummary(minimumBestCard, "Coin", "HistoryBestSummary");
       assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
@@ -1985,6 +1996,8 @@ async function main(): Promise<void> {
           `minimum History row gap ${gap} must remain visible`);
       }
       assertOk(verticalGap(minimumHistoryRows[3], minimumHistoryPrevious) >= 4);
+      assertOk(horizontalGap(minimumHistoryPrevious, minimumHistoryPage) >= 8);
+      assertOk(horizontalGap(minimumHistoryPage, minimumHistoryNext) >= 8);
       assertOk(minimumHistoryPrevious.position.y - minimumHistoryPrevious.getComponent(UITransform)!.height / 2
         >= -minimumHistorySafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumHistoryRoot, "minimum History route");

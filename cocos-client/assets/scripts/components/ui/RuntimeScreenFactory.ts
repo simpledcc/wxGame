@@ -242,7 +242,7 @@ export class RuntimeScreenFactory {
       slotStates.push(home.label(badge, `BankSlot${index}State`, "", 0, 0, 92, 36, 15, "homeText"));
       slots.push(slot);
     }
-    const pageLabel = home.label(safe.node, "BankPage", "", 0, safeBottom + 164, 120, 44, 18, "homeTextMuted");
+    const pageLabel = home.label(safe.node, "BankPage", "", 0, safeBottom + 164, 112, 44, 18, "homeTextMuted");
     const renderPage = (): void => {
       const selectedId = app.store.getState().bankPickerSelectedBankId;
       const pageCount = Math.max(1, Math.ceil(entries.length / pageSize));
@@ -605,7 +605,7 @@ export class RuntimeScreenFactory {
       items.push(r);
     }
     const pageY = safeBottom + 48 + stretch * 44 / 112;
-    const page = home.label(listRoot, "HistoryPage", "", 0, pageY, 120, 44, 17, "homeTextMuted");
+    const page = home.label(listRoot, "HistoryPage", "", 0, pageY, 112, 44, 17, "homeTextMuted");
     const previous = home.iconButton(listRoot, "HistoryPrevious", "‹", -105, pageY, 80, () => controller.previousPage());
     const next = home.iconButton(listRoot, "HistoryNext", "›", 105, pageY, 80, () => controller.nextPage());
 
@@ -614,7 +614,7 @@ export class RuntimeScreenFactory {
       () => controller.closeDetail(), undefined, "join", 44);
     const detailTitle = home.label(detailCard, "DetailTitle", "", 40, 286, 400, 54, 27, "homeText");
     const detailBody = home.label(detailCard, "DetailBody", "", 0, 5, 500, 490, 17, "homeText", 0);
-    const detailPage = home.label(detailCard, "DetailPage", "", 0, -288, 120, 44, 17, "homeTextMuted");
+    const detailPage = home.label(detailCard, "DetailPage", "", 0, -288, 112, 44, 17, "homeTextMuted");
     const detailPrevious = home.iconButton(detailCard, "DetailPrevious", "‹", -105, -288, 80, () => controller.previousDetailPage());
     const detailNext = home.iconButton(detailCard, "DetailNext", "›", 105, -288, 80, () => controller.nextDetailPage());
 
