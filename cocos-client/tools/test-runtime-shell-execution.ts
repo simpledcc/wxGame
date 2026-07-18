@@ -2141,8 +2141,10 @@ async function main(): Promise<void> {
           const bodyNode = findDeep(card, `HelpRule${ruleIndex}Body`)!;
           assertEqual(titleNode.getComponent(Label)?.string, title);
           assertEqual(bodyNode.getComponent(Label)?.string, detail);
-          assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 3
+          assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
             <= titleNode.position.x - titleNode.getComponent(UITransform)!.width / 2);
+          assertEqual(titleNode.position.x, bodyNode.position.x,
+            `${context} rule ${ruleIndex + 1} title/body columns must stay aligned`);
           assertOk(verticalGap(titleNode, bodyNode) >= 8,
             `${context} rule ${ruleIndex + 1} title/body gap must remain visible`);
           if (ruleIndex > 0) {

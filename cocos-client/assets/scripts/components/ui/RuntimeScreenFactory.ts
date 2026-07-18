@@ -688,8 +688,8 @@ export class RuntimeScreenFactory {
     HELP_RULES.forEach(([title, copy, kind], index) => {
       const y = cardHeight / 2 - 154 - index * pitch;
       home.statusBadge(helpCard, `HelpRule${index}Number`, `${index + 1}`, -218, y, 44, kind, 16);
-      home.label(helpCard, `HelpRule${index}Title`, title, 22, y + 20, 430, 24, 18, "homeText", 0);
-      home.label(helpCard, `HelpRule${index}Body`, copy, 22, y - 18, 430, 36, 14, "homeTextMuted", 0);
+      home.label(helpCard, `HelpRule${index}Title`, title, 27, y + 20, 430, 24, 18, "homeText", 0);
+      home.label(helpCard, `HelpRule${index}Body`, copy, 27, y - 18, 430, 36, 14, "homeTextMuted", 0);
     });
     controller = root.addComponent(HelpScene);
     return root;
