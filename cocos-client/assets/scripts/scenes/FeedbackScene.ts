@@ -72,6 +72,7 @@ export class FeedbackScene extends Component {
       });
       if (!this.isCurrentSubmission(sequence)) return;
       if (this.contentInput) this.contentInput.string = "";
+      this.contentInput?.node.emit("text-changed");
       if (this.contactInput) this.contactInput.string = "";
       this.render("反馈已提交，谢谢你的帮助");
     } catch (error) {

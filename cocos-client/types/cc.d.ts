@@ -19,6 +19,7 @@ declare module "cc" {
     setPosition(x: number, y: number, z?: number): void;
     setScale(x: number, y: number, z?: number): void;
     on(type: string, callback: (...args: any[]) => void, target?: unknown): void;
+    emit(type: string, ...args: any[]): void;
     destroy(): boolean;
   }
 
@@ -138,7 +139,7 @@ declare module "cc" {
     setDesignResolutionSize(width: number, height: number, resolutionPolicy: number): void;
   };
 
-  export class EditBox {
+  export class EditBox extends Component {
     static readonly InputMode: {
       ANY: number;
       SINGLE_LINE: number;

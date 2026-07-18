@@ -103,7 +103,7 @@ Updated: 2026-07-18
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | Three source passes cover shared chrome, control states, learning/room/filter feedback, Bank unlock availability and persistent wrong-word selection | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | Four source passes cover shared chrome, control states, learning/room/filter feedback, Bank/Study persistence and live room-code/feedback counters | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -702,6 +702,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Removed the unassigned `RoomScene.playersLabel` summary path so player-card badges remain the single visible source of preparation state.
 - Added runtime assertions for Bank unlock availability/title and Study wrong-word selected/title transitions; no data, storage, room or gameplay contract changed.
 - Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,994 / 1,520,000` core source bytes. Future source work must reclaim space before adding UI code; do not raise the gate merely to continue styling.
+
+### H8.7 fourth source checkpoint
+
+- Replaced the duplicated host/player card assembly with `PreGameUi.playerStatusCard` while preserving every runtime node name and existing ready/waiting binding.
+- EditBoxes at least 100px tall now show a live length counter; this adds `RoomCodeInputCount` (`0/6`) and `FeedbackContentCount` (`0/300`) without crowding the compact optional-contact field.
+- Successful Feedback submission emits the existing text-change event after clearing content so the visible counter resets immediately.
+- Corrected the local Cocos type surface so `Node.emit`, `Node.getChildByName` and `EditBox extends Component` match the runtime APIs already used by Creator and the test mock.
+- Runtime assertions cover room-code updates, feedback updates and post-submit reset. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,857 / 1,520,000` core source bytes.
 
 ## Assets
 

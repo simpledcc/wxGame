@@ -410,6 +410,19 @@ export class PreGameUi {
     return node;
   }
 
+  playerStatusCard(parent: Node, name: string, title: string, x: number,
+    kind: PreGameActionKind): { label: Label; ready: Node; waiting: Node } {
+    const card = this.sectionCard(parent, `${name}Card`, title, x, 2, 264, 234, kind, "avatar");
+    this.visualSlot(card, "avatar", 0, 34, 82, 82);
+    const ready = this.statusBadge(card, `${name}Ready`, "已准备", 82, 48, 94, "practice");
+    ready.active = false;
+    return {
+      label: this.label(card, name, "", 0, -60, 226, 76, 20, "homeText"),
+      ready,
+      waiting: this.statusBadge(card, `${name}Waiting`, "等待中", 82, 48, 94, "surface")
+    };
+  }
+
   progressBar(parent: Node, name: string, x: number, y: number, width: number, height: number,
     kind: PreGameActionKind): PreGameProgressRef {
     const node = this.node(parent, name, x, y, width, height);
@@ -510,6 +523,13 @@ export class PreGameUi {
     if (multiline) editBox.inputMode = EditBox.InputMode.ANY;
     node.on("editing-did-began", () => { focusRing.active = true; });
     node.on("editing-did-ended", () => { focusRing.active = false; });
+    if (height >= 100) {
+      const count = this.label(node, `${name}Count`, "", width / 2 - 56, -height / 2 + 17,
+        96, 24, 13, "homeTextMuted");
+      const refresh = (): void => { count.string = `${editBox.string.length}/${maxLength}`; };
+      node.on("text-changed", refresh);
+      refresh();
+    }
     return { node, backgroundNode, background, editBox, textLabel, placeholderLabel };
   }
 

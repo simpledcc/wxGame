@@ -453,24 +453,8 @@ export class RuntimeScreenFactory {
     const lobbyBank = home.sectionCard(lobbyPanel, "LobbyBankCard", "当前词库", 0, 168,
       520, 82, "practice", "wordBank");
     const mode = home.label(lobbyBank, "RoomMode", "", 18, -14, 430, 44, 20, "homeText");
-    const playerOneCard = home.sectionCard(lobbyPanel, "RoomPlayerOneCard", "房主", -140, 2,
-      264, 234, "practice", "avatar");
-    home.visualSlot(playerOneCard, "avatar", 0, 34, 82, 82);
-    const playerOneReady = home.statusBadge(playerOneCard, "RoomPlayerOneReady", "已准备",
-      82, 48, 94, "practice");
-    playerOneReady.active = false;
-    const playerOneWaiting = home.statusBadge(playerOneCard, "RoomPlayerOneWaiting", "等待中",
-      82, 48, 94, "surface");
-    const playerOne = home.label(playerOneCard, "RoomPlayerOne", "", 0, -60, 226, 76, 20, "homeText");
-    const playerTwoCard = home.sectionCard(lobbyPanel, "RoomPlayerTwoCard", "玩家", 140, 2,
-      264, 234, "join", "avatar");
-    home.visualSlot(playerTwoCard, "avatar", 0, 34, 82, 82);
-    const playerTwoReady = home.statusBadge(playerTwoCard, "RoomPlayerTwoReady", "已准备",
-      82, 48, 94, "practice");
-    playerTwoReady.active = false;
-    const playerTwoWaiting = home.statusBadge(playerTwoCard, "RoomPlayerTwoWaiting", "等待中",
-      82, 48, 94, "surface");
-    const playerTwo = home.label(playerTwoCard, "RoomPlayerTwo", "", 0, -60, 226, 76, 20, "homeText");
+    const playerOne = home.playerStatusCard(lobbyPanel, "RoomPlayerOne", "房主", -140, "practice");
+    const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -146,
       520, 78, "history");
     const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -10, 30, 30,
@@ -497,8 +481,8 @@ export class RuntimeScreenFactory {
     controller.lobbyPanel = lobbyPanel;
     controller.roomCodeLabel = roomCode;
     controller.modeLabel = mode;
-    controller.playerOneLabel = playerOne;
-    controller.playerTwoLabel = playerTwo;
+    controller.playerOneLabel = playerOne.label;
+    controller.playerTwoLabel = playerTwo.label;
     controller.statusLabel = status;
     controller.createButton = create?.button ?? null;
     controller.joinButton = join?.button ?? null;
@@ -513,8 +497,8 @@ export class RuntimeScreenFactory {
     controller.autoReadyVisual = autoReady?.visual ?? null;
     controller.readyVisual = ready.visual;
     controller.startVisual = start.visual;
-    controller.playerReadyIndicators = [playerOneReady, playerTwoReady];
-    controller.playerWaitingIndicators = [playerOneWaiting, playerTwoWaiting];
+    controller.playerReadyIndicators = [playerOne.ready, playerTwo.ready];
+    controller.playerWaitingIndicators = [playerOne.waiting, playerTwo.waiting];
     controller.roomReadyIndicator = roomReadyIndicator;
     return root;
   }

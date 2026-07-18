@@ -18,14 +18,14 @@ export class RuntimeButtonVisual extends Component {
   private pressed = false;
   private contentNodes: Node[] = [];
   private contentLabels: Label[] = [];
-  private contentLabelColors: Color[] = [];
+  private labelColors: Color[] = [];
   private contentSprites: Sprite[] = [];
-  private contentSpriteColors: Color[] = [];
-  private contentOffsetY = 0;
-  private contentTintMode: "normal" | "selected" | "disabled" = "normal";
+  private spriteColors: Color[] = [];
+  private contentY = 0;
+  private tintMode: "normal" | "selected" | "disabled" = "normal";
   private selected = false;
   private selectedFillColor: Color | null = null;
-  private selectedContentColor: Color | null = null;
+  private selectedTextColor: Color | null = null;
   private selectionRing: Node | null = null;
 
   configure(
@@ -63,17 +63,17 @@ export class RuntimeButtonVisual extends Component {
   setContent(nodes: readonly Node[], labels: readonly Label[] = [], sprites: readonly Sprite[] = []): void {
     this.contentNodes = [...nodes];
     this.contentLabels = [...labels];
-    this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
+    this.labelColors = this.contentLabels.map((label) => this.copyColor(label.color));
     this.contentSprites = [...sprites];
-    this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
-    this.contentOffsetY = 0;
-    this.contentTintMode = "normal";
+    this.spriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+    this.contentY = 0;
+    this.tintMode = "normal";
     this.refresh(true);
   }
 
   setSelectionStyle(fillColor: Color, strokeColor: Color, contentColor: Color): void {
     this.selectedFillColor = this.copyColor(fillColor);
-    this.selectedContentColor = this.copyColor(contentColor);
+    this.selectedTextColor = this.copyColor(contentColor);
     if (!this.selectionRing) {
       const inset = 4;
       const ring = new Node(`${this.node.name}SelectionRing`);
@@ -168,18 +168,18 @@ export class RuntimeButtonVisual extends Component {
 
   private refreshContent(interactable: boolean): void {
     const nextOffsetY = this.pressed && interactable ? -2 : 0;
-    if (nextOffsetY !== this.contentOffsetY) {
+    if (nextOffsetY !== this.contentY) {
       this.contentNodes.forEach((node) => {
-        node.setPosition(node.position.x, node.position.y - this.contentOffsetY + nextOffsetY, node.position.z);
+        node.setPosition(node.position.x, node.position.y - this.contentY + nextOffsetY, node.position.z);
       });
-      this.contentOffsetY = nextOffsetY;
+      this.contentY = nextOffsetY;
     }
     const nextTintMode = !interactable
       ? "disabled"
-      : (this.selected && this.selectedContentColor ? "selected" : "normal");
-    if (this.contentTintMode === "normal" && nextTintMode !== "normal") {
-      this.contentLabelColors = this.contentLabels.map((label) => this.copyColor(label.color));
-      this.contentSpriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
+      : (this.selected && this.selectedTextColor ? "selected" : "normal");
+    if (this.tintMode === "normal" && nextTintMode !== "normal") {
+      this.labelColors = this.contentLabels.map((label) => this.copyColor(label.color));
+      this.spriteColors = this.contentSprites.map((sprite) => this.copyColor(sprite.color));
     }
     if (nextTintMode === "disabled") {
       const muted = (base: Color, keep: number, alpha: number): Color => new Color(
@@ -188,33 +188,33 @@ export class RuntimeButtonVisual extends Component {
         Math.round(base.b * keep + this.disabledColor.b * (1 - keep)), Math.min(base.a, alpha)
       );
       this.contentLabels.forEach((label, index) => {
-        const base = this.contentLabelColors[index] || label.color;
+        const base = this.labelColors[index] || label.color;
         label.color = muted(base, 0.68, 190);
       });
       this.contentSprites.forEach((sprite, index) => {
-        const base = this.contentSpriteColors[index] || sprite.color;
+        const base = this.spriteColors[index] || sprite.color;
         sprite.color = muted(base, 0.72, 184);
       });
-    } else if (nextTintMode === "selected" && this.selectedContentColor) {
+    } else if (nextTintMode === "selected" && this.selectedTextColor) {
       const tint = (base: Color): Color => new Color(
-        this.selectedContentColor!.r, this.selectedContentColor!.g, this.selectedContentColor!.b,
-        Math.min(base.a, this.selectedContentColor!.a)
+        this.selectedTextColor!.r, this.selectedTextColor!.g, this.selectedTextColor!.b,
+        Math.min(base.a, this.selectedTextColor!.a)
       );
       this.contentLabels.forEach((label, index) => {
-        label.color = tint(this.contentLabelColors[index] || label.color);
+        label.color = tint(this.labelColors[index] || label.color);
       });
       this.contentSprites.forEach((sprite, index) => {
-        sprite.color = tint(this.contentSpriteColors[index] || sprite.color);
+        sprite.color = tint(this.spriteColors[index] || sprite.color);
       });
-    } else if (this.contentTintMode !== "normal") {
+    } else if (this.tintMode !== "normal") {
       this.contentLabels.forEach((label, index) => {
-        label.color = this.copyColor(this.contentLabelColors[index] || label.color);
+        label.color = this.copyColor(this.labelColors[index] || label.color);
       });
       this.contentSprites.forEach((sprite, index) => {
-        sprite.color = this.copyColor(this.contentSpriteColors[index] || sprite.color);
+        sprite.color = this.copyColor(this.spriteColors[index] || sprite.color);
       });
     }
-    this.contentTintMode = nextTintMode;
+    this.tintMode = nextTintMode;
   }
 
   private copyColor(color: Color): Color {

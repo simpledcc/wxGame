@@ -608,6 +608,8 @@ async function main(): Promise<void> {
   const entryRoomCodeInput = findDeep(canvas, "RoomCodeInput")?.getComponent(EditBox);
   assertOk(entryRoomCodeInput);
   entryRoomCodeInput.string = "ABC";
+  entryRoomCodeInput.node.emit("text-changed");
+  assertEqual(findDeep(canvas, "RoomCodeInputCount")?.getComponent(Label)?.string, "3/6");
   const callsBeforeEntryInvalidJoin = appRuntime.cloudCalls.length;
   findDeep(canvas, "JoinRoom")?.emit(Button.EventType.CLICK);
   await flushMany();
@@ -1142,6 +1144,8 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "FeedbackContentCaption"));
       assertOk(findDeep(canvas, "FeedbackContactCaption"));
       feedbackInput.string = "短";
+      feedbackInput.node.emit("text-changed");
+      assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.string, "1/300");
       const cloudCallCount = appRuntime.cloudCalls.length;
       findDeep(canvas, "SubmitFeedback")?.emit(Button.EventType.CLICK);
       assertEqual(appRuntime.cloudCalls.length, cloudCallCount, "invalid feedback must not call cloud functions");
@@ -1153,6 +1157,7 @@ async function main(): Promise<void> {
       feedbackContact.string = "contact@example.com";
       await feedbackController.submit();
       assertEqual(feedbackInput.string, "", "successful feedback must clear its content");
+      assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.string, "0/300");
       assertEqual(feedbackContact.string, "", "successful feedback must clear its optional contact");
       assertEqual(findDeep(canvas, "FeedbackStatus")?.getComponent(Label)?.string, "反馈已提交，谢谢你的帮助");
       assertEqual(feedbackButton.interactable, true, "feedback submit must unlock after success");
