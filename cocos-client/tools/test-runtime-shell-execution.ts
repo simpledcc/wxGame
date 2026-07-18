@@ -86,6 +86,10 @@ function assertVisibleUiContract(root: Node, context: string): void {
     if (label && label.overflow !== Label.Overflow.SHRINK) {
       violations.push(`${nodePath} uses non-shrinking Label overflow ${label.overflow}`);
     }
+    const buttonGraphics = node.getComponent(RuntimeButtonVisual) ? node.getComponent(Graphics) : null;
+    if (buttonGraphics?.enabled && buttonGraphics.strokeCount < 1) {
+      violations.push(`${nodePath} has no visible fallback border`);
+    }
     const title = node.children.find((child) => child.name === `${node.name}Title`);
     const subtitle = node.children.find((child) => child.name === `${node.name}Subtitle`);
     if (title?.active && subtitle?.active) {

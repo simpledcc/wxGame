@@ -209,6 +209,7 @@ function main(): void {
   assertEqual(action.subtitleLabel?.string, "邀请好友，一起开始对战");
   assertEqual(action.titleLabel.enableOutline, true);
   assertEqual(action.titleLabel.outlineWidth, 3);
+  assertEqual(action.background.strokeCount, 1, "fallback action border must survive visual setup");
   assertEqual(transform(action.iconSlot).width, 56);
   assertActionIconClearOfText(action);
   const actionSkinNode = action.node.getChildByName("FoundationActionSkin");
@@ -233,6 +234,7 @@ function main(): void {
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   action.node.emit(Node.EventType.TOUCH_START);
+  assertEqual(action.background.strokeCount, 1, "pressed action must redraw its fallback border");
   assertEqual(action.iconSlot.position.y, -2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
@@ -240,6 +242,7 @@ function main(): void {
   action.button.interactable = false;
   action.visual.refresh();
   assertEqual(action.visual.isShowingDisabledState(), true);
+  assertEqual(action.background.strokeCount, 1, "disabled action must redraw its fallback border");
   assertOk(action.titleLabel.color.a < 255, "disabled button copy must visibly soften with its background");
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1, "disabled pre-game buttons must not execute their action");
@@ -318,6 +321,7 @@ function main(): void {
     "bank"
   );
   assertVisualMatchesHitArea(directButton.node, directButton.visual);
+  assertEqual(directButton.background.strokeCount, 1, "plain buttons must retain their border after setup");
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderBackdrop")?.getComponent(Graphics));
   assertEqual(pageHeader.backButton.background.enabled, true);
   assertOk(pageHeader.node.getChildByName("FoundationPageHeaderIcon"));

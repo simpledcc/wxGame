@@ -100,30 +100,32 @@ export class RuntimeButtonVisual extends Component {
   }
 
   refresh(force = false): void {
-    if (!this.button || !this.background) return;
+    const bg=this.background;
+    if (!this.button || !bg) return;
     this.ensureSkinSize();
     const interactable = this.button.interactable;
     if (!force && interactable === this.lastEnabled) return;
     this.lastEnabled = interactable;
     if (!interactable) this.pressed = false;
-    this.background.clear();
-    this.background.fillColor = new Color(24, 42, 56, interactable ? 42 : 24);
+    bg.clear();
+    bg.fillColor = new Color(24, 42, 56, interactable ? 42 : 24);
     const shadowOffset = this.pressed ? -1 : -4;
-    this.background.roundRect(
+    bg.roundRect(
       -this.w / 2,
       -this.h / 2 + shadowOffset,
       this.w,
       this.h,
       this.r
     );
-    this.background.fill();
-    this.background.fillColor = interactable
+    bg.fill();
+    bg.fillColor = interactable
       ? (this.pressed
           ? this.pressedFill
           : (this.selected && this.selectedFill ? this.selectedFill : this.fill))
       : this.disabledFill;
-    this.background.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, this.r);
-    this.background.fill();
+    bg.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, this.r);
+    bg.fill();
+    bg.stroke();
     if (this.skin) {
       const channel = interactable ? (this.pressed ? 220 : 255) : 158;
       this.skin.color = new Color(channel, channel, channel, interactable ? 255 : 210);

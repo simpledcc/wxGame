@@ -159,6 +159,7 @@ export class Graphics extends Component {
   strokeColor = new Color();
   lineWidth = 1;
   lastRoundRect: { x: number; y: number; width: number; height: number; radius: number } | null = null;
+  strokeCount = 0;
   roundRect(x: number, y: number, width: number, height: number, radius: number): void {
     this.lastRoundRect = { x, y, width, height, radius };
   }
@@ -168,9 +169,10 @@ export class Graphics extends Component {
   lineTo(_x: number, _y: number): void {}
   close(): void {}
   fill(): void {}
-  stroke(): void {}
+  stroke(): void { this.strokeCount += 1; }
   clear(): void {
     this.lastRoundRect = null;
+    this.strokeCount = 0;
   }
 }
 
