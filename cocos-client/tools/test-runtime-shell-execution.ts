@@ -1042,7 +1042,7 @@ async function main(): Promise<void> {
       const title = findDeep(action, `${action.name}Title`)!;
       assertOk(right(icon) + 8 <= left(title), `${context} ${action.name} icon/title gap must remain visible`);
       assertEqual(action.position.y - action.getComponent(UITransform)!.height / 2
-        + codeCard.getComponent(UITransform)!.height / 2, 6,
+        + codeCard.getComponent(UITransform)!.height / 2, 8,
       `${context} ${action.name} must clear the card bottom frame`);
     });
     assertEqual(findDeep(copy, "CopyCodeTitle")?.getComponent(Label)?.string, "复制");
