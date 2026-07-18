@@ -2017,6 +2017,8 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "FeedbackStatusBand")?.getComponent(Graphics),
         "feedback guidance must stay inside a stable status band");
       const formCard = findDeep(canvas, "FeedbackFormCard")!;
+      const statusBand = findDeep(formCard, "FeedbackStatusBand")!;
+      const statusCopy = findDeep(formCard, "FeedbackStatus")!;
       const feedbackHeader = findDeep(canvas, "FeedbackHeader")!;
       const feedbackSubmit = findDeep(canvas, "SubmitFeedback")!;
       const feedbackPrivacy = findDeep(canvas, "OpenPrivacy")!;
@@ -2040,6 +2042,14 @@ async function main(): Promise<void> {
         assertOk(feedbackGap(feedbackNodes[gap], feedbackNodes[gap + 1]) >= 8,
           `feedback form gap ${gap} must retain the eight-pixel rhythm`);
       }
+      assertEqual(statusBand.position.y, statusCopy.position.y,
+        "feedback status copy must stay centered in its band");
+      assertEqual((statusBand.getComponent(UITransform)!.height
+        - statusCopy.getComponent(UITransform)!.height) / 2, 4,
+      "feedback status copy needs balanced vertical insets");
+      assertEqual(statusBand.position.y - statusBand.getComponent(UITransform)!.height / 2
+        + formCard.getComponent(UITransform)!.height / 2, 8,
+      "feedback status band must clear the card bottom frame");
       assertEqual(feedbackButton.interactable, false, "empty feedback must keep submit disabled");
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
