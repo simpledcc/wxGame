@@ -888,15 +888,15 @@ async function main(): Promise<void> {
       const label = findDeep(card, name)!;
       assertEqual(findDeep(tab, "HomeAvatarSlot"), null, `${context} title tab must not duplicate the avatar`);
       assertEqual(avatar.getComponent(UITransform)?.height, 72);
-      assertOk(verticalGap(tab, avatar) >= 4, `${context} title tab/avatar gap must remain visible`);
+      assertOk(verticalGap(tab, avatar) >= 8, `${context} title tab/avatar gap must remain visible`);
       [ready, waiting].forEach((badge) => {
-        assertOk(verticalGap(tab, badge) >= 4, `${context} title tab/badge gap must remain visible`);
-        assertOk(verticalGap(badge, label) >= 4, `${context} badge/name gap must remain visible`);
-        assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 4
+        assertOk(verticalGap(tab, badge) >= 8, `${context} title tab/badge gap must remain visible`);
+        assertOk(verticalGap(badge, label) >= 8, `${context} badge/name gap must remain visible`);
+        assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 8
           <= badge.position.x - badge.getComponent(UITransform)!.width / 2,
         `${context} avatar must not enter the status column`);
       });
-      assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 4
+      assertOk(avatar.position.x + avatar.getComponent(UITransform)!.width / 2 + 8
         <= label.position.x - label.getComponent(UITransform)!.width / 2,
       `${context} avatar must not enter the player-name column`);
     });
@@ -916,7 +916,7 @@ async function main(): Promise<void> {
     const indicators = [findDeep(statusCard, "RoomStatusReady")!, findDeep(statusCard, "RoomStatusAttention")!];
     const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
     const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
-    assertOk(verticalGap(codeTab, code) >= 4, `${context} code tab/body gap must remain visible`);
+    assertOk(verticalGap(codeTab, code) >= 8, `${context} code tab/body gap must remain visible`);
     assertEqual(copy.getComponent(UITransform)?.width, 112);
     assertEqual(invite.getComponent(UITransform)?.width, 112);
     [copy, invite].forEach((action) => {
@@ -931,12 +931,12 @@ async function main(): Promise<void> {
     assertOk(right(copy) + 8 <= left(invite), `${context} copy/invite actions must remain separate`);
     assertOk(right(invite) + 8 <= codeCard.getComponent(UITransform)!.width / 2,
       `${context} invite action must retain its right inset`);
-    assertOk(verticalGap(bankTab, bankCopy) >= 4, `${context} Bank tab/body gap must remain visible`);
+    assertOk(verticalGap(bankTab, bankCopy) >= 8, `${context} Bank tab/body gap must remain visible`);
     assertOk(right(bankCopy) + 8 <= bankCard.getComponent(UITransform)!.width / 2,
       `${context} Bank copy must retain its right inset`);
-    assertOk(verticalGap(statusTab, statusCopy) >= 4, `${context} status tab/copy gap must remain visible`);
+    assertOk(verticalGap(statusTab, statusCopy) >= 8, `${context} status tab/copy gap must remain visible`);
     indicators.forEach((indicator) => {
-      assertOk(verticalGap(statusTab, indicator) >= 4, `${context} status tab/indicator gap must remain visible`);
+      assertOk(verticalGap(statusTab, indicator) >= 8, `${context} status tab/indicator gap must remain visible`);
       assertOk(right(indicator) + 8 <= left(statusCopy), `${context} indicator/copy columns must remain separate`);
     });
     assertOk(right(statusCopy) + 8 <= statusCard.getComponent(UITransform)!.width / 2,

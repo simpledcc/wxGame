@@ -460,10 +460,10 @@ export class RuntimeScreenFactory {
     const playerTwo = home.playerStatusCard(lobbyPanel, "RoomPlayerTwo", "玩家", 140, "join");
     const statusCard = home.sectionCard(lobbyPanel, "RoomStatusCard", "当前状态", 0, -150,
       520, 70, "history");
-    const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -10, 30, 30,
+    const roomReadyIndicator = home.pill(statusCard, "RoomStatusReady", -222, -13, 30, 30,
       "homePractice", "homeTextOnColor");
     roomReadyIndicator.active = false;
-    const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -10, 30, 30,
+    const roomAttentionIndicator = home.pill(statusCard, "RoomStatusAttention", -222, -13, 30, 30,
       "homeHistory", "homeTextOnColor");
     roomAttentionIndicator.active = false;
     const status = home.label(statusCard, "RoomStatus", "", 42, -16, 420, 34, 17, "homeTextMuted");
