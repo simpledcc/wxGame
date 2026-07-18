@@ -1882,6 +1882,25 @@ async function main(): Promise<void> {
       setMockWindowSize(393, 852);
     }
     if (routes[index] === "help") {
+      const assertHelpRuleSpacing = (root: Node, context: string): void => {
+        const card = findDeep(root, "HelpCard")!;
+        HELP_RULES.forEach(([title, detail], ruleIndex) => {
+          const badge = findDeep(card, `HelpRule${ruleIndex}Number`)!;
+          const titleNode = findDeep(card, `HelpRule${ruleIndex}Title`)!;
+          const bodyNode = findDeep(card, `HelpRule${ruleIndex}Body`)!;
+          assertEqual(titleNode.getComponent(Label)?.string, title);
+          assertEqual(bodyNode.getComponent(Label)?.string, detail);
+          assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 3
+            <= titleNode.position.x - titleNode.getComponent(UITransform)!.width / 2);
+          assertOk(verticalGap(titleNode, bodyNode) >= 8,
+            `${context} rule ${ruleIndex + 1} title/body gap must remain visible`);
+          if (ruleIndex > 0) {
+            assertOk(verticalGap(findDeep(card, `HelpRule${ruleIndex - 1}Body`)!, titleNode) >= 8,
+              `${context} rule ${ruleIndex + 1} needs an inter-row gap`);
+          }
+        });
+      };
+      assertHelpRuleSpacing(routeRoot, "long Help");
       setMockWindowSize(640, 960);
       app.store.setRoute("home");
       await flushMany();
@@ -1895,19 +1914,7 @@ async function main(): Promise<void> {
       assertEqual(HELP_RULES.length, 6);
       assertEqual(HELP_RULES[0][0], "背单词");
       assertEqual(HELP_RULES[5][0], "战绩记录");
-      HELP_RULES.forEach(([title, detail], ruleIndex) => {
-        const badge = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Number`)!;
-        const titleNode = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Title`)!;
-        const bodyNode = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Body`)!;
-        assertEqual(titleNode.getComponent(Label)?.string, title);
-        assertEqual(bodyNode.getComponent(Label)?.string, detail);
-        assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 3
-          <= titleNode.position.x - titleNode.getComponent(UITransform)!.width / 2);
-        assertOk(verticalGap(titleNode, bodyNode) >= 3);
-        if (ruleIndex > 0) {
-          assertOk(verticalGap(findDeep(minimumHelpCard, `HelpRule${ruleIndex - 1}Body`)!, titleNode) >= 8);
-        }
-      });
+      assertHelpRuleSpacing(minimumHelpRoot, "minimum Help");
       assertOk(minimumHelpCard.position.y - minimumHelpCard.getComponent(UITransform)!.height / 2
         >= -minimumHelpSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumHelpRoot, "minimum Help route");
