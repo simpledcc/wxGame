@@ -211,7 +211,7 @@ export class RuntimeScreenFactory {
     home.pageHeader(safe, "BankHeader", "选择词库", "选择教材单元，练习和房间会同步使用",
       () => controller.back(), "wordBank");
     const statusCard = home.sectionCard(safe.node, "BankStatusCard", "词库状态", 0,
-      safeTop - 158, 540, 80, "history", "coin");
+      safeTop - 160, 540, 80, "history", "coin");
     home.visualSlot(statusCard, "coin", -232, -18, 32, 32);
     const status = home.label(statusCard, "BankStatus", "", 24, -14, 430, 46, 18, "homeText", 0);
     const entries = Object.entries(app.wordBankCatalog.WORD_BANKS);
@@ -222,7 +222,7 @@ export class RuntimeScreenFactory {
     const slotStates: Label[] = [];
     let previous!: RuntimeButtonRef;
     let next!: RuntimeButtonRef;
-    const firstSlotY = safeTop - 250;
+    const firstSlotY = safeTop - 252;
     const slotGap = 104;
     for (let index = 0; index < pageSize; index += 1) {
       const slot = home.actionButton(safe.node, `BankSlot${index}`, "", "", "词", 0,

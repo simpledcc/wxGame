@@ -1318,12 +1318,15 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "BankSlot0")?.getComponent(UITransform)?.height, 96);
       const bankStatusTab = findDeep(canvas, "BankStatusCardTab")!;
       const bankStatusCard = findDeep(canvas, "BankStatusCard")!;
+      const bankHeader = findDeep(canvas, "BankHeader")!;
       const bankStatusCoin = bankStatusCard.children.find((child) => child.name === "HomeCoinSlot")!;
       const bankStatusCopy = findDeep(canvas, "BankStatus")!;
       assertEqual(bankStatusTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 18);
       assertEqual(bankStatusCoin.getComponent(UITransform)?.height, 32);
+      assertOk(verticalGap(bankHeader, bankStatusCard) >= 4);
+      assertOk(verticalGap(bankStatusCard, findDeep(canvas, "BankSlot0")!) >= 4);
       assertOk(verticalGap(bankStatusTab, bankStatusCoin) >= 4);
       assertOk(verticalGap(bankStatusTab, bankStatusCopy) >= 4);
       assertOk(bankStatusCoin.position.x + bankStatusCoin.getComponent(UITransform)!.width / 2 + 4
@@ -1370,13 +1373,13 @@ async function main(): Promise<void> {
       await flushMany();
       const minimumBankRoot = findDeep(canvas, "BankRuntimeScreen")!;
       const minimumBankSafe = findDeep(minimumBankRoot, "BankSafeArea")!;
-      const bankChain = ["BankStatusCard", "BankSlot0", "BankSlot1", "BankSlot2", "BankSlot3", "PreviousBanks", "UnlockBank"]
+      const bankChain = ["BankHeader", "BankStatusCard", "BankSlot0", "BankSlot1", "BankSlot2", "BankSlot3", "PreviousBanks", "UnlockBank"]
         .map((name) => findDeep(minimumBankRoot, name)!);
       for (let gap = 0; gap < bankChain.length - 1; gap += 1) {
         assertOk(verticalGap(bankChain[gap], bankChain[gap + 1]) >= 4,
           `minimum Bank gap ${gap} must remain visible`);
       }
-      const minimumUnlock = bankChain[6];
+      const minimumUnlock = bankChain[7];
       assertOk(minimumUnlock.position.y - minimumUnlock.getComponent(UITransform)!.height / 2
         >= -minimumBankSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumBankRoot, "minimum Bank route");
