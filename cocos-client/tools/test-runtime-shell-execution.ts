@@ -884,6 +884,16 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "RoomCreatePanel"), null, "join entry must not build the unused create form");
   assertEqual(findDeep(canvas, "CreateRoom"), null, "join entry must not retain hidden create controls");
   assertEqual(findDeep(canvas, "RoomJoinPanel")?.active, true);
+  const roomHeaderCardGap = (root: Node, panelName: string, cardName: string): number => {
+    const header = findDeep(root, "RoomHeader")!;
+    const panel = findDeep(root, panelName)!;
+    const card = findDeep(panel, cardName)!;
+    return header.position.y - header.getComponent(UITransform)!.height / 2
+      - panel.position.y - card.position.y - card.getComponent(UITransform)!.height / 2;
+  };
+  const longJoinRoot = findDeep(canvas, "RoomRuntimeScreen")!;
+  assertOk(roomHeaderCardGap(longJoinRoot, "RoomJoinPanel", "JoinCodeCard") >= 8,
+    "long join form must clear the room header");
   const longJoinCard = findDeep(canvas, "JoinCodeCard")!;
   const longJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
     .map((name) => findDeep(longJoinCard, name)!);
@@ -898,14 +908,13 @@ async function main(): Promise<void> {
   await flushMany();
   const minimumJoinRoot = findDeep(canvas, "RoomRuntimeScreen")!;
   const minimumJoinSafe = findDeep(minimumJoinRoot, "RoomSafeArea")!;
-  const minimumJoinHeader = findDeep(minimumJoinRoot, "RoomHeader")!;
   const minimumJoinPanel = findDeep(minimumJoinRoot, "RoomJoinPanel")!;
   const minimumJoinCard = findDeep(minimumJoinRoot, "JoinCodeCard")!;
   const minimumJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
     .map((name) => findDeep(minimumJoinCard, name)!);
   const minimumJoinCardY = minimumJoinPanel.position.y + minimumJoinCard.position.y;
-  assertOk(minimumJoinHeader.position.y - minimumJoinHeader.getComponent(UITransform)!.height / 2
-    - minimumJoinCardY - minimumJoinCard.getComponent(UITransform)!.height / 2 >= 8);
+  assertOk(roomHeaderCardGap(minimumJoinRoot, "RoomJoinPanel", "JoinCodeCard") >= 8,
+    "minimum join form must clear the room header");
   for (let gap = 0; gap < minimumJoinChain.length - 1; gap += 1) {
     assertOk(verticalGap(minimumJoinChain[gap], minimumJoinChain[gap + 1]) >= 8,
       `minimum join-room gap ${gap} must retain the eight-pixel rhythm`);
@@ -1090,7 +1099,10 @@ async function main(): Promise<void> {
     assertOk(right(statusCopy) + 8 <= statusCard.getComponent(UITransform)!.width / 2,
       `${context} status copy must retain its right inset`);
   };
+  const longCreateRoot = findDeep(canvas, "RoomRuntimeScreen")!;
   assertCreateCardSpacing(findDeep(canvas, "RoomCreatePanel")!, "long create configuration");
+  assertOk(roomHeaderCardGap(longCreateRoot, "RoomCreatePanel", "SelectedModeCard") >= 8,
+    "long create configuration must clear the room header");
   const createBankLabel = findDeep(canvas, "CreateBankLabel")!;
   const createBankAction = findDeep(canvas, "ChangeRoomBank")!;
   assertOk(
@@ -1123,6 +1135,8 @@ async function main(): Promise<void> {
   const minimumRoomSafe = findDeep(minimumRoomRoot, "RoomSafeArea")!;
   const minimumCreatePanel = findDeep(minimumRoomRoot, "RoomCreatePanel")!;
   assertCreateCardSpacing(minimumCreatePanel, "minimum create configuration");
+  assertOk(roomHeaderCardGap(minimumRoomRoot, "RoomCreatePanel", "SelectedModeCard") >= 8,
+    "minimum create configuration must clear the room header");
   const createChain = ["SelectedModeCard", "CreateBankCard", "CreateGuidanceCard", "CreateRoom", "AutoReady"]
     .map((name) => findDeep(minimumCreatePanel, name)!);
   const minimumGuidanceTab = findDeep(minimumCreatePanel, "CreateGuidanceCardTab")!;
@@ -1169,6 +1183,8 @@ async function main(): Promise<void> {
   const minimumLobby = findDeep(minimumRoomRoot, "RoomLobbyPanel")!;
   assertLobbyPlayerCardSpacing(minimumLobby, "minimum room lobby");
   assertLobbyUtilityCardSpacing(minimumLobby, "minimum room lobby");
+  assertOk(roomHeaderCardGap(minimumRoomRoot, "RoomLobbyPanel", "RoomCodeCard") >= 8,
+    "minimum room lobby must clear the room header");
   const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
     .map((name) => findDeep(minimumLobby, name)!);
   assertEqual(lobbyChain[2].getComponent(UITransform)?.height, 218,
@@ -1761,8 +1777,11 @@ async function main(): Promise<void> {
       assertEqual(app.store.getState().route, "room");
     }
     if (routes[index] === "room") {
+      const longLobbyRoot = findDeep(canvas, "RoomRuntimeScreen")!;
       assertLobbyPlayerCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
       assertLobbyUtilityCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
+      assertOk(roomHeaderCardGap(longLobbyRoot, "RoomLobbyPanel", "RoomCodeCard") >= 8,
+        "long room lobby must clear the room header");
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");
       assertEqual(
         findDeep(canvas, "RoomPlayerOne")?.getComponent(Label)?.string,

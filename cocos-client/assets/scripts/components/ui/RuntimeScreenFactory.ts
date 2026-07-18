@@ -390,8 +390,8 @@ export class RuntimeScreenFactory {
 
   private buildRoom(parent: Node, ui: RuntimeUi): Node {
     const { root, home, safe } = this.page(parent, ui, "Room");
-    const roomContentY = (safe.height - 886) / 2 - 18;
-    const lobbyContentY = (safe.height - 822) / 2 - 14;
+    const roomContentY = (safe.height - 886) / 2 - 21;
+    const lobbyContentY = (safe.height - 822) / 2 - 17;
     let controller!: RoomScene;
     const entryIntent = app.store.getState().roomEntryIntent;
     const roomState = app.roomStore.getState();
