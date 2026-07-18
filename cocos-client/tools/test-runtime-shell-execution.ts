@@ -1902,11 +1902,17 @@ async function main(): Promise<void> {
         const icon = findDeep(detail, `${detail.name}IconSlot`)!;
         const label = findDeep(detail, `${detail.name}Title`)!;
         const halfWidth = detail.getComponent(UITransform)!.width / 2;
+        const geometry = detail.getComponent(RuntimeButtonVisual)!.getVisualGeometry();
         assertOk(rightEdge(icon) + 8 <= leftEdge(label), "History detail icon and title must not overlap");
         assertOk(leftEdge(icon) >= -halfWidth + 8, "History detail icon must remain inside its action");
         assertOk(rightEdge(label) <= halfWidth - 8, "History detail title must remain inside its action");
         assertOk(findDeep(detail, "HomeHistorySlot"), "History detail must mount the formal history icon");
         assertEqual(label.getComponent(Label)?.string, "详情");
+        assertEqual(geometry.height, 64, "History detail visual must stay inset from its record card");
+        assertEqual(detail.getComponent(UITransform)!.height, 80,
+          "History detail must retain its target-device touch height");
+        assertOk((detail.parent!.getComponent(UITransform)!.height - geometry.height) / 2 >= 8,
+          "History detail visual must clear the record card frame");
       };
       assertOk(rightEdge(historyTitle) + 8 <= leftEdge(historyScore), "History title and score columns must not overlap");
       assertOk(rightEdge(historyScore) + 8 <= leftEdge(historyDetail), "History score and detail columns must not overlap");

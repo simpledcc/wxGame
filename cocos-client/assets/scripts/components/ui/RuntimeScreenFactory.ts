@@ -589,18 +589,19 @@ export class RuntimeScreenFactory {
       const row = home.accentCard(listRoot, `HistoryRow${index}`, 0,
         safeTop - 405 + stretch * 15 / 112 - index * rowGap, 548, rowHeight, "history", 18);
       home.visualSlot(row, "history", -230, 0, 58, 58);
-      const rowTitle = home.label(row, "Title", "", -82, 22, 286, 32, 18, "homeText", 0);
-      const meta = home.label(row, "Meta", "", -82, -20, 286, 34, 13, "homeTextMuted", 0);
-      const rowScore = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
-      const detail = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 80,
-        () => item.open(), "surface", "history");
-      let item!: HistoryRecordItem;
-      item = row.addComponent(HistoryRecordItem);
-      item.titleLabel = rowTitle;
-      item.metaLabel = meta;
-      item.scoreLabel = rowScore;
-      item.detailButton = detail.button;
-      items.push(item);
+      const t = home.label(row, "Title", "", -82, 22, 286, 32, 18, "homeText", 0);
+      const m = home.label(row, "Meta", "", -82, -20, 286, 34, 13, "homeTextMuted", 0);
+      const s = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
+      const d = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 64,
+        () => r.open(), "surface", "history");
+      d.node.getComponent(UITransform)!.height=80;
+      let r!: HistoryRecordItem;
+      r = row.addComponent(HistoryRecordItem);
+      r.titleLabel = t;
+      r.metaLabel = m;
+      r.scoreLabel = s;
+      r.detailButton = d.button;
+      items.push(r);
     }
     const pageY = safeBottom + 48 + stretch * 44 / 112;
     const page = home.label(listRoot, "HistoryPage", "", 0, pageY, 120, 44, 17, "homeTextMuted");
