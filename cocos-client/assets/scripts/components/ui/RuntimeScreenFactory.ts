@@ -554,7 +554,7 @@ export class RuntimeScreenFactory {
     const modeIndicators: Node[] = [];
     const modeVisuals: RuntimeButtonVisual[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
-      const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 158,
+      const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 160,
         104, 80, action, kind, 16);
       home.selectionStyle(tab.visual, "join");
       modeVisuals.push(tab.visual);

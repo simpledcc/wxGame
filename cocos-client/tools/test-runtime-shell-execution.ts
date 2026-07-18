@@ -102,9 +102,9 @@ function assertVisibleUiContract(root: Node, context: string): void {
       const edgeGap = (upper: Node, lower: Node): number =>
         upper.position.y - upper.getComponent(UITransform)!.height / 2
           - lower.position.y - lower.getComponent(UITransform)!.height / 2;
-      if (edgeGap(title, divider) < 2) violations.push(`${nodePath} title intersects its divider`);
+      if (edgeGap(title, divider) < 4) violations.push(`${nodePath} title intersects its divider`);
       if (edgeGap(divider, subtitle) < 2) violations.push(`${nodePath} divider intersects its subtitle`);
-      if (edgeGap(headerIcon, subtitle) < 2) violations.push(`${nodePath} icon intersects its subtitle`);
+      if (edgeGap(headerIcon, subtitle) < 4) violations.push(`${nodePath} icon intersects its subtitle`);
     }
     node.children.forEach((child) => visit(child, x, y, scaleX, scaleY, nodePath));
   };
@@ -1692,7 +1692,7 @@ async function main(): Promise<void> {
       assertHistorySummary(minimumRecentCard, "History", "HistoryRecentSummary");
       assertHistorySummary(minimumBestCard, "Coin", "HistoryBestSummary");
       assertHistoryDetail(findDeep(minimumHistoryRows[0], "HistoryRow0Detail")!);
-      assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 2);
+      assertOk(verticalGap(minimumHistoryHeader, findDeep(minimumHistoryRoot, "HistoryAll")!) >= 4);
       assertOk(verticalGap(minimumRecentCard, minimumHistoryTitle) >= 4);
       assertOk(verticalGap(minimumHistoryTitle, minimumHistoryRows[0]) >= 4);
       for (let gap = 0; gap < minimumHistoryRows.length - 1; gap += 1) {
