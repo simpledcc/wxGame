@@ -6,11 +6,10 @@ import {
   resolveBankSelection
 } from "../domain/WordBankRules";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("BankScene")
 export class BankScene extends Component {
-  @property(Label)
   statusLabel: Label | null = null;
 
   onLoad(): void {

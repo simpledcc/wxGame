@@ -1,17 +1,12 @@
 import { _decorator, Component, Label } from "cc";
 import { app } from "../core/App";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("ResultScene")
 export class ResultScene extends Component {
-  @property(Label)
   titleLabel: Label | null = null;
-
-  @property(Label)
   scoreLabel: Label | null = null;
-
-  @property(Label)
   playersLabel: Label | null = null;
 
   private unsubscribe: (() => void) | null = null;

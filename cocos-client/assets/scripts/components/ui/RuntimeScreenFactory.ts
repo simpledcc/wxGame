@@ -89,8 +89,9 @@ export class RuntimeScreenFactory {
     bank.titleLabel.node.setPosition(-22, 0, 0);
     bank.titleLabel.node.getComponent(UITransform)?.setContentSize(350, 58);
     home.label(bank.node, "CurrentBankCaption", "当前词库", -118, 25, 130, 28, 15, "homeTextMuted");
-    home.button(bank.node, "CurrentBankChangeButton", "更换", 204, 0, 92, 80,
-      () => controller.openBankPicker(), "history", 17);
+    const bankChange = home.pill(bank.node, "CurrentBankChangeBadge", 204, 0, 92, 54,
+      "homeHistory", "homeTextOnColor");
+    home.label(bankChange, "CurrentBankChangeLabel", "更换", 0, 0, 72, 36, 17, "homeTextOnColor");
     home.actionButton(
       safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, logoY - 302, 520, 146,
       () => controller.openModeCatalog(), "create", "createRoom"

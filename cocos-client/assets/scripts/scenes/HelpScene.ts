@@ -1,11 +1,10 @@
 import { _decorator, Component, Label } from "cc";
 import { app } from "../core/App";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("HelpScene")
 export class HelpScene extends Component {
-  @property(Label)
   bodyLabel: Label | null = null;
 
   onLoad(): void {

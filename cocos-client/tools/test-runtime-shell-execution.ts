@@ -391,9 +391,13 @@ async function main(): Promise<void> {
     "Home Bank title must reserve its width for the real bank name");
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
+  const bankChangeBadge = findDeep(canvas, "CurrentBankChangeBadge");
   const subtitleTransform = homeSubtitle?.getComponent(UITransform);
   const bankTransform = currentBankBar?.getComponent(UITransform);
-  assertOk(homeSubtitle && currentBankBar && subtitleTransform && bankTransform);
+  assertOk(homeSubtitle && currentBankBar && bankChangeBadge && subtitleTransform && bankTransform);
+  assertOk(currentBankBar.getComponent(Button), "the whole Bank strip must remain clickable");
+  assertEqual(bankChangeBadge.getComponent(Button), null, "the change badge must not nest another Button");
+  assertOk(bankChangeBadge.getComponent(Graphics));
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
   assertOk(subtitleBankGap >= 2, "Home subtitle and bank bar must not overlap");

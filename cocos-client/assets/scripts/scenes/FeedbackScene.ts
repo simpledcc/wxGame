@@ -2,23 +2,14 @@ import { _decorator, Button, Component, EditBox, Label } from "cc";
 import { app } from "../core/App";
 import { getFeedbackValidationError, normalizeFeedbackDraft } from "../domain/FeedbackRules";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("FeedbackScene")
 export class FeedbackScene extends Component {
-  @property(EditBox)
   contentInput: EditBox | null = null;
-
-  @property(EditBox)
   contactInput: EditBox | null = null;
-
-  @property(Label)
   statusLabel: Label | null = null;
-
-  @property(Label)
   privacyLabel: Label | null = null;
-
-  @property(Button)
   submitButton: Button | null = null;
 
   private submitting = false;

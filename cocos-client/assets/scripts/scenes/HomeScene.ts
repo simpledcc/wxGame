@@ -2,20 +2,13 @@ import { _decorator, Component, Label } from "cc";
 import { app } from "../core/App";
 import { getWordBank, getWordBankLabel } from "../domain/WordBankRules";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("HomeScene")
 export class HomeScene extends Component {
-  @property(Label)
   playerLabel: Label | null = null;
-
-  @property(Label)
   coinLabel: Label | null = null;
-
-  @property(Label)
   bankLabel: Label | null = null;
-
-  @property(Label)
   historySummaryLabel: Label | null = null;
 
   private active = true;

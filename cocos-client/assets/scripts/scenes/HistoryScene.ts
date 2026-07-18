@@ -5,7 +5,7 @@ import { app } from "../core/App";
 import type { GameModeKey } from "../domain/GameTypes";
 import type { MatchRecord, SpellRoundRecord } from "../domain/RoomTypes";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 const MODE_LABELS: Record<GameModeKey, string> = {
   pk: "双人PK",
@@ -25,60 +25,24 @@ type HistoryMode = GameModeKey | "all";
 
 @ccclass("HistoryScene")
 export class HistoryScene extends Component {
-  @property(Label)
   titleLabel: Label | null = null;
-
-  @property(Label)
   bestLabel: Label | null = null;
-
-  @property(Label)
   recentSummaryLabel: Label | null = null;
-
-  @property(Label)
   bestSummaryLabel: Label | null = null;
-
-  @property(Label)
   emptyLabel: Label | null = null;
-
-  @property(Node)
   emptyStateNode: Node | null = null;
-
-  @property(Label)
   pageLabel: Label | null = null;
-
-  @property(Button)
   previousButton: Button | null = null;
-
-  @property(Button)
   nextButton: Button | null = null;
-
-  @property([Node])
   modeIndicators: Node[] = [];
-
   modeVisuals: RuntimeButtonVisual[] = [];
-
-  @property([HistoryRecordItem])
   recordItems: HistoryRecordItem[] = [];
-
-  @property(Node)
   listNode: Node | null = null;
-
-  @property(Node)
   detailNode: Node | null = null;
-
-  @property(Label)
   detailTitleLabel: Label | null = null;
-
-  @property(Label)
   detailBodyLabel: Label | null = null;
-
-  @property(Label)
   detailPageLabel: Label | null = null;
-
-  @property(Button)
   detailPreviousButton: Button | null = null;
-
-  @property(Button)
   detailNextButton: Button | null = null;
 
   private selectedMode: HistoryMode = "all";

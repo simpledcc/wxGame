@@ -3,20 +3,13 @@ import type { PreGameProgressRef } from "../components/ui/PreGameUi";
 import { RuntimeButtonVisual } from "../components/ui/RuntimeButtonVisual";
 import { app } from "../core/App";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("StudyScene")
 export class StudyScene extends Component {
-  @property(Label)
   wordLabel: Label | null = null;
-
-  @property(Label)
   meaningLabel: Label | null = null;
-
-  @property(Label)
   statusLabel: Label | null = null;
-
-  @property(Label)
   meaningToggleLabel: Label | null = null;
 
   progressView: PreGameProgressRef | null = null;
