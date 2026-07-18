@@ -983,6 +983,11 @@ async function main(): Promise<void> {
     assertOk(verticalGap(meaning, previous) >= 6, `${context} meaning/action gap must remain visible`);
     assertEqual(previous.position.y, random.position.y);
     [previous, random].forEach((action) => {
+      const icon = findDeep(action, `${action.name}IconSlot`)!;
+      const title = findDeep(action, `${action.name}Title`)!;
+      assertOk(icon.position.x + icon.getComponent(UITransform)!.width / 2 + 8
+        <= title.position.x - title.getComponent(UITransform)!.width / 2,
+      `${context} ${action.name} icon/title gap must remain visible`);
       assertOk(action.position.y - action.getComponent(UITransform)!.height / 2
         - (-card.getComponent(UITransform)!.height / 2) >= 8,
       `${context} bottom actions must retain their card inset`);
@@ -992,7 +997,10 @@ async function main(): Promise<void> {
   assertOk(findDeep(studyRoot, "StudySafeArea"));
   assertOk(findDeep(studyRoot, "StudyHeader"));
   assertPreGameTargetDevices(studyRoot);
-  assertOk(findDeep(canvas, "RandomWord"));
+  ["PreviousWord", "RandomWord"].forEach((name) =>
+    assertOk(findDeep(canvas, `${name}IconSlot`), `${name} must expose a semantic icon slot`));
+  assertEqual(findDeep(canvas, "PreviousWordTitle")?.getComponent(Label)?.string, "上一个");
+  assertEqual(findDeep(canvas, "RandomWordTitle")?.getComponent(Label)?.string, "随机");
   assertOk(findDeep(canvas, "MarkWrong"));
   ["RevealWord", "MarkWrong", "MeaningToggle"].forEach((name) =>
     assertOk(findDeep(canvas, `${name}IconSlot`), `${name} must expose a semantic icon slot`));
@@ -1013,6 +1021,16 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "ChangeStudyBank"), null, "Study bank strip must not retain a split click target");
   assertEqual(findDeep(canvas, "StudyBottomChangeBank"), null, "Study must not retain an overlapping duplicate Bank route");
   assertEqual(findDeep(canvas, "StudyBankBarTitle")?.getComponent(UITransform)?.width, 350);
+  const initialStudyStatus = findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string;
+  findDeep(canvas, "PreviousWord")?.emit(Button.EventType.CLICK);
+  assertOk(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string !== initialStudyStatus,
+    "PreviousWord must change the current Study card");
+  findDeep(canvas, "NextWord")?.emit(Button.EventType.CLICK);
+  assertEqual(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string, initialStudyStatus,
+    "NextWord must restore the card reached before PreviousWord");
+  findDeep(canvas, "RandomWord")?.emit(Button.EventType.CLICK);
+  assertOk(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string !== initialStudyStatus,
+    "RandomWord must choose a different Study card");
   assertOk(verticalGap(studyBankBar!, studyCard) >= 2);
   assertOk(verticalGap(studyCard, studyReveal) >= 2);
   assertOk(verticalGap(studyReveal, studyMeaningToggle) >= 2);

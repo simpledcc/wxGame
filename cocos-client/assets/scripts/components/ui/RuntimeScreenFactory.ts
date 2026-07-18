@@ -322,10 +322,10 @@ export class RuntimeScreenFactory {
     const progress = home.progressBar(card, "StudyProgress", 182, 84, 124, 12, "practice");
     const word = home.label(card, "StudyWord", "", 0, 32, 480, 80, 58, "homeText");
     const meaning = home.label(card, "StudyMeaning", "", 0, -50, 480, 72, 29, "homeTextMuted");
-    home.button(card, "PreviousWord", "← 上一个", -142, -132, 220, 80,
-      () => controller.previousWord(), "join", 17);
-    home.button(card, "RandomWord", "↻ 随机", 142, -132, 220, 80,
-      () => controller.randomWord(), "surface", 17);
+    home.actionButton(card, "PreviousWord", "上一个", "", "词", -142, -132, 220, 80,
+      () => controller.previousWord(), "join", "wordBank");
+    home.actionButton(card, "RandomWord", "随机", "", "练", 142, -132, 220, 80,
+      () => controller.randomWord(), "surface", "practice");
     const revealY = cardY - 226 - stretch * 0.28;
     home.actionButton(safe.node, "RevealWord", "查看当前释义", "", "书", -134, revealY, 252, 80,
       () => controller.revealCurrentMeaning(), "join", "practice");
