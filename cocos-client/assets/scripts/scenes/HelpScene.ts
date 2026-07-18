@@ -1,26 +1,21 @@
-import { _decorator, Component, Label } from "cc";
+import { _decorator, Component } from "cc";
 import { app } from "../core/App";
 
 const { ccclass } = _decorator;
 
+export const HELP_RULES = [
+  ["背单词", "浏览词库，隐藏中文、收录生词。", "practice"],
+  ["双人 PK", "按中文选英文：对 +100，错 -100。", "create"],
+  ["默契捕词赛", "两人作答，合计团队成绩。", "join"],
+  ["同舟拼词记", "双方各填两空，统一判定；每词 20 秒。", "bank"],
+  ["房间准备", "两人准备，房主开始。", "catalog"],
+  ["战绩记录", "三种对战保留近 50 局与最佳分。", "history"]
+] as const;
+
 @ccclass("HelpScene")
 export class HelpScene extends Component {
-  bodyLabel: Label | null = null;
-
   onLoad(): void {
     app.store.setRoute("help");
-  }
-
-  start(): void {
-    if (!this.bodyLabel) return;
-    this.bodyLabel.string = [
-      "01  背单词\n浏览当前词库，可隐藏中文或把生词加入错题库。",
-      "02  双人 PK\n根据中文提示点击正确英文，正确 +100，错误 -100。",
-      "03  默契捕词赛\n两名玩家共同作答，双方得分合计为团队成绩。",
-      "04  同舟拼词记\n双方各填写两个空位，提交后统一判定；每词 20 秒。",
-      "05  房间准备\n两名玩家加入并准备后，由房主开始。",
-      "06  战绩记录\n三种对战玩法分别保留最近 50 局和历史最佳。"
-    ].join("\n\n");
   }
 
   backCatalog(): void {

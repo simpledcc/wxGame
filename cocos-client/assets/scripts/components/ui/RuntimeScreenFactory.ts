@@ -7,7 +7,7 @@ import { getWordBank, getWordBankLabel, isUnlockableWordBankId } from "../../dom
 import { BankScene } from "../../scenes/BankScene";
 import { CoopSelectScene } from "../../scenes/CoopSelectScene";
 import { FeedbackScene } from "../../scenes/FeedbackScene";
-import { HelpScene } from "../../scenes/HelpScene";
+import { HELP_RULES, HelpScene } from "../../scenes/HelpScene";
 import { HistoryScene } from "../../scenes/HistoryScene";
 import { HomeScene } from "../../scenes/HomeScene";
 import { ResultScene } from "../../scenes/ResultScene";
@@ -679,11 +679,16 @@ export class RuntimeScreenFactory {
     const cardY = safeTop - 120 - cardHeight / 2;
     const helpCard = home.accentCard(safe.node, "HelpCard", 0, cardY, 560, cardHeight, "catalog", 22);
     home.visualSlot(helpCard, "catalog", -218, cardHeight / 2 - 76, 72, 72);
-    home.label(helpCard, "HelpRulesSummary", "玩法规则 · 学习、对战、合作与战绩说明", 52,
+    home.label(helpCard, "HelpRulesSummary", "学习、对战、合作与战绩规则", 52,
       cardHeight / 2 - 76, 360, 40, 17, "homeTextMuted", 0);
-    const body = home.label(helpCard, "HelpBody", "", 0, -46, 500, cardHeight - 180, 20, "homeText", 0);
+    const pitch = (cardHeight - 178) / HELP_RULES.length;
+    HELP_RULES.forEach(([title, copy, kind], index) => {
+      const y = cardHeight / 2 - 154 - index * pitch;
+      home.statusBadge(helpCard, `HelpRule${index}Number`, `${index + 1}`, -218, y, 44, kind, 16);
+      home.label(helpCard, `HelpRule${index}Title`, title, 22, y + 17, 430, 28, 18, "homeText", 0);
+      home.label(helpCard, `HelpRule${index}Body`, copy, 22, y - 18, 430, 36, 14, "homeTextMuted", 0);
+    });
     controller = root.addComponent(HelpScene);
-    controller.bodyLabel = body;
     return root;
   }
 

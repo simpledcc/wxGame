@@ -37,6 +37,7 @@ import { HomeScene } from "../assets/scripts/scenes/HomeScene";
 import { BankScene } from "../assets/scripts/scenes/BankScene";
 import { BootScene } from "../assets/scripts/scenes/BootScene";
 import { FeedbackScene } from "../assets/scripts/scenes/FeedbackScene";
+import { HELP_RULES } from "../assets/scripts/scenes/HelpScene";
 import { RoomScene } from "../assets/scripts/scenes/RoomScene";
 import { GameStore } from "../assets/scripts/store/GameStore";
 import type { RouteName } from "../assets/scripts/store/GameStore";
@@ -1836,6 +1837,22 @@ async function main(): Promise<void> {
       const minimumHelpHeader = findDeep(minimumHelpRoot, "HelpHeader")!;
       const minimumHelpCard = findDeep(minimumHelpRoot, "HelpCard")!;
       assertOk(verticalGap(minimumHelpHeader, minimumHelpCard) >= 4);
+      assertEqual(HELP_RULES.length, 6);
+      assertEqual(HELP_RULES[0][0], "背单词");
+      assertEqual(HELP_RULES[5][0], "战绩记录");
+      HELP_RULES.forEach(([title, detail], ruleIndex) => {
+        const badge = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Number`)!;
+        const titleNode = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Title`)!;
+        const bodyNode = findDeep(minimumHelpCard, `HelpRule${ruleIndex}Body`)!;
+        assertEqual(titleNode.getComponent(Label)?.string, title);
+        assertEqual(bodyNode.getComponent(Label)?.string, detail);
+        assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 3
+          <= titleNode.position.x - titleNode.getComponent(UITransform)!.width / 2);
+        assertOk(verticalGap(titleNode, bodyNode) >= 3);
+        if (ruleIndex > 0) {
+          assertOk(verticalGap(findDeep(minimumHelpCard, `HelpRule${ruleIndex - 1}Body`)!, titleNode) >= 8);
+        }
+      });
       assertOk(minimumHelpCard.position.y - minimumHelpCard.getComponent(UITransform)!.height / 2
         >= -minimumHelpSafe.getComponent(UITransform)!.height / 2);
       assertVisibleUiContract(minimumHelpRoot, "minimum Help route");
@@ -1845,11 +1862,9 @@ async function main(): Promise<void> {
       await flushMany();
       app.store.setRoute("help");
       await flushMany();
-      const helpBody = findDeep(canvas, "HelpBody")?.getComponent(Label)?.string || "";
-      assertOk(helpBody.includes("01  背单词\n") && helpBody.includes("06  战绩记录\n"),
-        "help copy must expose a numbered title/body hierarchy");
       assertOk(findDeep(canvas, "HelpRulesSummary"));
-      assertEqual(findDeep(canvas, "HelpBody")?.getComponent(Label)?.fontSize, 20);
+      assertEqual(findDeep(canvas, "HelpRule0Title")?.getComponent(Label)?.fontSize, 18);
+      assertEqual(findDeep(canvas, "HelpRule5Body")?.getComponent(Label)?.fontSize, 14);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "coopSelect");
