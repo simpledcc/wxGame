@@ -1579,6 +1579,18 @@ async function main(): Promise<void> {
       assertEqual(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 1,
         -modeRow.getComponent(UITransform)!.width / 2 + 6,
       "mode accent rail must remain clear of the card inner border");
+      const modeRailColors = Array.from({ length: 8 }, (_, rowIndex) =>
+        findDeep(canvas, `ModeOption${rowIndex}Accent`)!.getComponent(Graphics)!.fillColor
+      ).map((color) => `${color.r},${color.g},${color.b},${color.a}`);
+      assertOk(new Set(modeRailColors).size >= 5,
+        `mode accent rails must retain category color hierarchy: ${modeRailColors.join(" | ")}`);
+      for (let disabledIndex = 1; disabledIndex < 8; disabledIndex += 1) {
+        const disabledAction = findDeep(canvas, `ModeOption${disabledIndex}Action`)!;
+        assertEqual(disabledAction.getComponent(Button)?.interactable, false,
+          "colored mode rows must not enable unfinished actions");
+        assertEqual(disabledAction.getComponent(RuntimeButtonVisual)?.isShowingDisabledState(), true,
+          "unfinished mode actions must keep disabled visuals");
+      }
       const assertModeRowText = (root: Node, context: string): void => {
         for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
           const row = findDeep(root, `ModeOption${rowIndex}`)!;
