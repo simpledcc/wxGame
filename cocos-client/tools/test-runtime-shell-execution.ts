@@ -1878,8 +1878,11 @@ async function main(): Promise<void> {
       const historyFilter = findDeep(canvas, "HistoryAll")!;
       const historyFilterLabel = findDeep(historyFilter, "HistoryAllLabel")!;
       const historyFilterIndicator = findDeep(historyFilter, "HistoryAllSelected")!;
-      assertOk(verticalGap(historyFilterLabel, historyFilterIndicator) >= 4,
+      assertOk(verticalGap(historyFilterLabel, historyFilterIndicator) >= 8,
         "History filter copy must remain above its selected marker");
+      assertOk(historyFilter.getComponent(UITransform)!.height / 2
+        - historyFilterLabel.position.y - historyFilterLabel.getComponent(UITransform)!.height / 2 >= 8,
+      "History filter copy needs a top inset");
       assertOk(historyFilterIndicator.position.y - historyFilterIndicator.getComponent(UITransform)!.height / 2
         >= -historyFilter.getComponent(UITransform)!.height / 2 + 6,
       "History selected marker needs a bottom inset");

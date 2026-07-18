@@ -555,17 +555,18 @@ export class RuntimeScreenFactory {
     const modeIndicators: Node[] = [];
     const modeVisuals: RuntimeButtonVisual[] = [];
     tabs.forEach(([name, label, action, kind], index) => {
-      const tab = home.button(listRoot, name, label, -224 + index * 112, safeTop - 160,
+      const b = home.button(listRoot, name, label, -224 + index * 112, safeTop - 160,
         104, 80, action, kind, 16);
-      home.selectionStyle(tab.visual, "join");
-      modeVisuals.push(tab.visual);
-      const indicator = home.pill(tab.node, `${name}Selected`, 0, -31, 58, 6,
+      home.selectionStyle(b.visual, "join");
+      b.label.node.setPosition(0,4,0);
+      modeVisuals.push(b.visual);
+      const mark = home.pill(b.node, `${name}Selected`, 0, -31, 58, 6,
         "homeJoin", "homeJoin");
-      indicator.active = index === 0;
-      modeIndicators.push(indicator);
+      mark.active = index === 0;
+      modeIndicators.push(mark);
       if (name === "HistoryOther") {
-        tab.button.interactable = false;
-        tab.visual.refresh();
+        b.button.interactable = false;
+        b.visual.refresh();
       }
     });
     const recentCard = home.sectionCard(listRoot, "HistoryRecentCard", "最近记录", -144,
