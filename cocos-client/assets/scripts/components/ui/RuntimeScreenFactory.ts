@@ -233,11 +233,11 @@ export class RuntimeScreenFactory {
           renderPage();
         }, "surface", "wordBank");
       home.selectionStyle(slot.visual, "practice");
-      slot.titleLabel.node.setPosition(-32, 18, 0);
-      slot.titleLabel.node.getComponent(UITransform)?.setContentSize(300, 36);
-      slot.subtitleLabel?.node.setPosition(-32, -22, 0);
-      slot.subtitleLabel?.node.getComponent(UITransform)?.setContentSize(300, 28);
-      const badge = home.pill(slot.node, `BankSlot${index}Badge`, 198, 0, 112, 54,
+      slot.titleLabel.node.setPosition(-31.36, 18, 0);
+      slot.titleLabel.node.getComponent(UITransform)?.setContentSize(314.72, 36);
+      slot.subtitleLabel?.node.setPosition(-31.36, -22, 0);
+      slot.subtitleLabel?.node.getComponent(UITransform)?.setContentSize(314.72, 28);
+      const badge = home.pill(slot.node, `BankSlot${index}Badge`, 190, 0, 112, 54,
         "homeCard", "homeCardBorder");
       slotStates.push(home.label(badge, `BankSlot${index}State`, "", 0, 0, 92, 36, 15, "homeText"));
       slots.push(slot);

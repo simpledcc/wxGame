@@ -1620,8 +1620,10 @@ async function main(): Promise<void> {
       const assertBankSlotText = (root: Node, context: string): void => {
         for (let slotIndex = 0; slotIndex < 4; slotIndex += 1) {
           const slot = findDeep(root, `BankSlot${slotIndex}`)!;
+          const icon = findDeep(slot, `BankSlot${slotIndex}IconSlot`)!;
           const title = findDeep(slot, `BankSlot${slotIndex}Title`)!;
           const subtitle = findDeep(slot, `BankSlot${slotIndex}Subtitle`)!;
+          const badge = findDeep(slot, `BankSlot${slotIndex}Badge`)!;
           const halfHeight = slot.getComponent(UITransform)!.height / 2;
           assertEqual(title.getComponent(UITransform)!.height, 36,
             `${context} Bank title must retain its balanced text box`);
@@ -1633,6 +1635,17 @@ async function main(): Promise<void> {
             `${context} Bank subtitle needs an eight-pixel bottom inset`);
           assertOk(subtitle.getComponent(Label)?.string.includes("个单词"),
             `${context} Bank subtitle must expose the real word count`);
+          [title, subtitle].forEach((copy) => {
+            assertEqual(Math.round(copy.position.x - copy.getComponent(UITransform)!.width / 2
+              - icon.position.x - icon.getComponent(UITransform)!.width / 2), 8,
+            `${context} Bank slot ${slotIndex + 1} icon and copy need an eight-pixel boundary`);
+            assertEqual(Math.round(badge.position.x - badge.getComponent(UITransform)!.width / 2
+              - copy.position.x - copy.getComponent(UITransform)!.width / 2), 8,
+            `${context} Bank slot ${slotIndex + 1} copy and badge need an eight-pixel boundary`);
+          });
+          assertEqual(Math.round(icon.position.x - icon.getComponent(UITransform)!.width / 2 + 270),
+            Math.round(270 - badge.position.x - badge.getComponent(UITransform)!.width / 2),
+          `${context} Bank slot ${slotIndex + 1} needs balanced horizontal insets`);
         }
       };
       assertBankSlotText(routeRoot, "long");
