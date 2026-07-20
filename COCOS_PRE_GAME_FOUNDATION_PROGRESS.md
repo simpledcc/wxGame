@@ -1545,6 +1545,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Rebalanced the Settings header from an `x=-150,w=52` icon and `x=49,w=330` title to `x=-182,w=52` and `x=30,w=356`. The row now has equal 24px outer insets and an exact eight-pixel icon/title boundary. Runtime coverage also freezes the centered descending 420/360/260px status/toggle/close hierarchy, persisted sound state and all modal actions.
 - Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,957 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No player/audio data behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-twenty-sixth source checkpoint
+
+- Unified every non-compact (width at least 120px) shared action button around fixed 24px left/right content insets and an exact eight-pixel icon/title boundary. This replaces the former width-dependent 18-24px icon inset and 12px gap; compact Copy, Invite, paging and other sub-120px actions keep their existing 12/8/8px layout.
+- Added long/minimum Home coverage that freezes both Privacy and Feedback at `24px icon inset / 8px icon-title gap / 24px title inset`, while retaining 80px target height, eight-pixel SafeArea bottom clearance, Privacy pending/reset feedback and Feedback routing. The global visual contract now applies a `1e-6` comparison tolerance only to mathematical floating-point noise.
+- Focused shared/runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source reduced to `1,519,904 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No visible copy, action behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks

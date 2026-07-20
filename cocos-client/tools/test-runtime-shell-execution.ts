@@ -138,7 +138,7 @@ function assertVisibleUiContract(root: Node, context: string): void {
         const titleLeft = actionTitle.position.x - titleTransform.width / 2;
         const titleRight = actionTitle.position.x + titleTransform.width / 2;
         if (iconLeft < -transform.width / 2 + 8) violations.push(`${nodePath} action icon misses its inset`);
-        if (titleLeft - iconRight < 8) violations.push(`${nodePath} action icon crowds its title`);
+        if (titleLeft - iconRight < 8 - 1e-6) violations.push(`${nodePath} action icon crowds its title`);
         if (titleRight > transform.width / 2 - 8) violations.push(`${nodePath} action title misses its inset`);
       }
     }
@@ -626,8 +626,19 @@ async function main(): Promise<void> {
     const safe = findDeep(root, "HomeSafeArea")!;
     ["HomePrivacy", "FeedbackButton"].forEach((name) => {
       const action = findDeep(root, name)!;
+      const icon = findDeep(action, `${name}IconSlot`)!;
+      const title = findDeep(action, `${name}Title`)!;
+      const halfWidth = action.getComponent(UITransform)!.width / 2;
+      const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+      const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
       const height = action.getComponent(UITransform)!.height;
       assertEqual(height, 80, `${context} ${name} must retain its target-device touch height`);
+      assertEqual(Math.round((left(title) - right(icon)) * 10) / 10, 8,
+        `${context} ${name} icon/title gap must follow the eight-pixel rhythm`);
+      assertEqual(Math.round((left(icon) + halfWidth) * 10) / 10, 24,
+        `${context} ${name} icon needs its left content inset`);
+      assertEqual(Math.round((halfWidth - right(title)) * 10) / 10, 24,
+        `${context} ${name} title needs its right content inset`);
       assertEqual(action.position.y - height / 2 + safe.getComponent(UITransform)!.height / 2, 8,
         `${context} ${name} must clear the safe-area bottom`);
     });
