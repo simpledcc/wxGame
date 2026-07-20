@@ -553,11 +553,19 @@ async function main(): Promise<void> {
         const subtitle = findDeep(action, `${name}Subtitle`)!;
         const titleHeight = title.getComponent(UITransform)!.height;
         const subtitleHeight = subtitle.getComponent(UITransform)!.height;
+        const actionHeight = action.getComponent(UITransform)!.height;
+        const iconHeight = icon.getComponent(UITransform)!.height;
         const groupCenter = (title.position.y + titleHeight / 2
           + subtitle.position.y - subtitleHeight / 2) / 2;
         assertOk(Math.abs(icon.position.y - groupCenter) <= 1,
           `${context} ${name} icon must align with its combined copy group`);
-        assertEqual(icon.position.y, action.getComponent(UITransform)!.height >= 100 ? -2 : 0);
+        const topInset = actionHeight / 2 - Math.max(icon.position.y + iconHeight / 2,
+          title.position.y + titleHeight / 2);
+        const bottomInset = Math.min(icon.position.y - iconHeight / 2,
+          subtitle.position.y - subtitleHeight / 2) + actionHeight / 2;
+        assertOk(Math.abs(topInset - bottomInset) <= 2,
+          `${context} ${name} content group needs balanced vertical insets`);
+        assertEqual(icon.position.y, 0);
       });
   };
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");

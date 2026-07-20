@@ -69,6 +69,7 @@ function assertActionTextRhythm(action: ReturnType<PreGameUi["actionButton"]>): 
   const subtitle = action.subtitleLabel?.node;
   assertOk(subtitle, `${action.node.name} must have a subtitle`);
   const buttonBounds = transform(action.node);
+  const iconBounds = transform(action.iconSlot);
   const titleBounds = transform(action.titleLabel.node);
   const subtitleBounds = transform(subtitle);
   const gap = action.titleLabel.node.position.y - titleBounds.height / 2
@@ -76,10 +77,16 @@ function assertActionTextRhythm(action: ReturnType<PreGameUi["actionButton"]>): 
   const bottomInset = subtitle.position.y - subtitleBounds.height / 2 + buttonBounds.height / 2;
   const groupCenter = (action.titleLabel.node.position.y + titleBounds.height / 2
     + subtitle.position.y - subtitleBounds.height / 2) / 2;
+  const topInset = buttonBounds.height / 2 - Math.max(action.iconSlot.position.y + iconBounds.height / 2,
+    action.titleLabel.node.position.y + titleBounds.height / 2);
+  const lowerEdge = Math.min(action.iconSlot.position.y - iconBounds.height / 2,
+    subtitle.position.y - subtitleBounds.height / 2);
   assertOk(gap >= 8, `${action.node.name} title and subtitle need an eight-pixel gap`);
   assertOk(bottomInset >= 8, `${action.node.name} subtitle needs an eight-pixel bottom inset`);
   assertOk(Math.abs(action.iconSlot.position.y - groupCenter) <= 1,
     `${action.node.name} icon must align with its combined copy group`);
+  assertOk(Math.abs(topInset - (lowerEdge + buttonBounds.height / 2)) <= 2,
+    `${action.node.name} content group needs balanced vertical insets`);
 }
 
 function assertSectionTabSpacing(card: Node, name: string, visualKey: string): void {
@@ -263,7 +270,7 @@ function main(): void {
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
   const actionIconY = action.iconSlot.position.y;
-  assertEqual(actionIconY, -2);
+  assertEqual(actionIconY, 0);
   action.node.emit(Node.EventType.TOUCH_START);
   assertEqual(actionHighlight.active, false, "pressed action must suppress its static highlight");
   assertEqual(action.background.strokeCount, 1, "pressed action must redraw its fallback border");
