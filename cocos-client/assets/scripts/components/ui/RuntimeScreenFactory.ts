@@ -83,7 +83,7 @@ export class RuntimeScreenFactory {
     home.visualSlot(safe.node, "logo", 0, logoY, fit(416,520), fit(130, 156));
     const subtitleRibbon = home.pill(safe.node, "HomeSubtitleRibbon", 0, logoY - fit(78, 96), 372, fit(40, 48),
       "homeCreate", "homeTextOnColor");
-    home.label(subtitleRibbon, "HomeSubtitle", "和好友一起比拼单词实力", 0, 0, 338, 34, 20, "homeTextOnColor");
+    home.label(subtitleRibbon, "HomeSubtitle", "和好友一起比拼单词实力", 0, 0, 338, 24, 20, "homeTextOnColor");
     const bank = home.actionButton(
       safe.node, "CurrentBankBar", "", "", "词", 0, logoY - fit(146, 174), 520, fit(80, 92),
       () => controller.openBankPicker(), "surface", "wordBank"

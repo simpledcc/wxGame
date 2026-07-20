@@ -531,6 +531,19 @@ async function main(): Promise<void> {
         `${context} action stack gap ${gap} must follow the eight-pixel rhythm`);
     }
   };
+  const assertHomeSubtitleLayout = (root: Node, context: string, verticalInset: number): void => {
+    const ribbon = findDeep(root, "HomeSubtitleRibbon")!;
+    const copy = findDeep(ribbon, "HomeSubtitle")!;
+    const ribbonTransform = ribbon.getComponent(UITransform)!;
+    const copyTransform = copy.getComponent(UITransform)!;
+    const label = copy.getComponent(Label)!;
+    assertEqual((ribbonTransform.width - copyTransform.width) / 2, 17,
+      `${context} subtitle copy needs balanced horizontal insets`);
+    assertEqual((ribbonTransform.height - copyTransform.height) / 2, verticalInset,
+      `${context} subtitle copy needs balanced vertical insets`);
+    assertEqual(label.fontSize, 20);
+    assertEqual(label.lineHeight, 24);
+  };
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const createRoomButton = findDeep(canvas, "CreateRoomButton")!;
@@ -547,6 +560,7 @@ async function main(): Promise<void> {
     "Home Bank caption and real Bank name must form separate rows");
   assertHomeBankStrip(canvas, "long Home");
   assertHomeActionStack(canvas, "long Home");
+  assertHomeSubtitleLayout(canvas, "long Home", 12);
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
   assertOk(subtitleBankGap >= 8, "Home subtitle and bank bar need the eight-pixel rhythm");
@@ -883,6 +897,7 @@ async function main(): Promise<void> {
   assertOk(verticalGap(minimumBankCaption, minimumBankTitle) >= 8);
   assertHomeBankStrip(minimumHomeRoot, "minimum Home");
   assertHomeActionStack(minimumHomeRoot, "minimum Home");
+  assertHomeSubtitleLayout(minimumHomeRoot, "minimum Home", 8);
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
   assertEqual(minimumRibbonTop - minimumLogoBottom, 7,

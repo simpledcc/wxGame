@@ -1575,6 +1575,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Moved only the compact Logo center upward by 11px and increased every compact Logo-relative downstream offset by the same 11px. The top utility/Logo gap remains six pixels, Logo/ribbon attachment remains seven pixels, and the ribbon, Bank strip, complete eight-pixel action stack, character/footer calculation and all actions retain their previous absolute coordinates. Long Home is unchanged.
 - Focused formal-Sprite/minimum-layout coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,947 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No copy, action, route, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirty-first source checkpoint
+
+- Tightened Home's subtitle copy rectangle from `338x34` to `338x24`, matching the unchanged 20px font's actual 24px line height. Compact Home therefore replaces three-pixel top/bottom copy clearance with exact eight-pixel insets inside the unchanged 372x40 ribbon; long Home gains 12px top/bottom insets inside its unchanged 372x48 ribbon.
+- Both layouts retain equal 17px horizontal insets, centered text, the same copy/color, seven-pixel compact Logo attachment, exact eight-pixel ribbon/Bank gap and every downstream action coordinate. Shared runtime coverage freezes font size, line height and all four boundaries on long and minimum Home.
+- Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,947 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No copy, action, route, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1613,7 +1619,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Tighten the Home subtitle ribbon's internal text rectangle so the compact 40px pill provides an explicit eight-pixel top/bottom text safety area while preserving its 20px font, 372px width, Logo attachment, Bank gap and copy. Two-device gameplay acceptance remains deferred.
+Review the vertical composition inside Home's Create, Join, Study/Bank and Catalog/History actions: align each formal icon with the combined title/subtitle group across 80-146px responsive heights while preserving the existing text gap, horizontal 24/8/24px structure, skins, copy and actions. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1622,7 +1628,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-one source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
