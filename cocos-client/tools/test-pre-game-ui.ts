@@ -74,8 +74,12 @@ function assertActionTextRhythm(action: ReturnType<PreGameUi["actionButton"]>): 
   const gap = action.titleLabel.node.position.y - titleBounds.height / 2
     - subtitle.position.y - subtitleBounds.height / 2;
   const bottomInset = subtitle.position.y - subtitleBounds.height / 2 + buttonBounds.height / 2;
+  const groupCenter = (action.titleLabel.node.position.y + titleBounds.height / 2
+    + subtitle.position.y - subtitleBounds.height / 2) / 2;
   assertOk(gap >= 8, `${action.node.name} title and subtitle need an eight-pixel gap`);
   assertOk(bottomInset >= 8, `${action.node.name} subtitle needs an eight-pixel bottom inset`);
+  assertOk(Math.abs(action.iconSlot.position.y - groupCenter) <= 1,
+    `${action.node.name} icon must align with its combined copy group`);
 }
 
 function assertSectionTabSpacing(card: Node, name: string, visualKey: string): void {
@@ -258,14 +262,16 @@ function main(): void {
   assertEqual(actionSkinNode.scale.y, 0.5, "runtime visual must preserve 2x skin density");
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1);
+  const actionIconY = action.iconSlot.position.y;
+  assertEqual(actionIconY, -2);
   action.node.emit(Node.EventType.TOUCH_START);
   assertEqual(actionHighlight.active, false, "pressed action must suppress its static highlight");
   assertEqual(action.background.strokeCount, 1, "pressed action must redraw its fallback border");
-  assertEqual(action.iconSlot.position.y, -2);
+  assertEqual(action.iconSlot.position.y, actionIconY - 2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
   assertEqual(actionHighlight.active, false, "formal skin must keep the fallback highlight suppressed");
-  assertEqual(action.iconSlot.position.y, 0);
+  assertEqual(action.iconSlot.position.y, actionIconY);
   action.button.interactable = false;
   action.visual.refresh();
   assertEqual(actionHighlight.active, false, "disabled action must suppress its bright highlight");

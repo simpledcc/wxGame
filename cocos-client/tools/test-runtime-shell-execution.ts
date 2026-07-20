@@ -544,6 +544,22 @@ async function main(): Promise<void> {
     assertEqual(label.fontSize, 20);
     assertEqual(label.lineHeight, 24);
   };
+  const assertHomeActionVerticalComposition = (root: Node, context: string): void => {
+    ["CreateRoomButton", "JoinRoomButton", "StudyButton", "BankButton", "HelpButton", "HistoryButton"]
+      .forEach((name) => {
+        const action = findDeep(root, name)!;
+        const icon = findDeep(action, `${name}IconSlot`)!;
+        const title = findDeep(action, `${name}Title`)!;
+        const subtitle = findDeep(action, `${name}Subtitle`)!;
+        const titleHeight = title.getComponent(UITransform)!.height;
+        const subtitleHeight = subtitle.getComponent(UITransform)!.height;
+        const groupCenter = (title.position.y + titleHeight / 2
+          + subtitle.position.y - subtitleHeight / 2) / 2;
+        assertOk(Math.abs(icon.position.y - groupCenter) <= 1,
+          `${context} ${name} icon must align with its combined copy group`);
+        assertEqual(icon.position.y, action.getComponent(UITransform)!.height >= 100 ? -2 : 0);
+      });
+  };
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const createRoomButton = findDeep(canvas, "CreateRoomButton")!;
@@ -561,6 +577,7 @@ async function main(): Promise<void> {
   assertHomeBankStrip(canvas, "long Home");
   assertHomeActionStack(canvas, "long Home");
   assertHomeSubtitleLayout(canvas, "long Home", 12);
+  assertHomeActionVerticalComposition(canvas, "long Home");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
   assertOk(subtitleBankGap >= 8, "Home subtitle and bank bar need the eight-pixel rhythm");
@@ -898,6 +915,7 @@ async function main(): Promise<void> {
   assertHomeBankStrip(minimumHomeRoot, "minimum Home");
   assertHomeActionStack(minimumHomeRoot, "minimum Home");
   assertHomeSubtitleLayout(minimumHomeRoot, "minimum Home", 8);
+  assertHomeActionVerticalComposition(minimumHomeRoot, "minimum Home");
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
   assertEqual(minimumRibbonTop - minimumLogoBottom, 7,

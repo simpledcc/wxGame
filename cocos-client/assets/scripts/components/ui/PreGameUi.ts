@@ -568,7 +568,7 @@ export class PreGameUi {
       node,
       `${name}IconSlot`,
       -width / 2 + iconInset + iconSize / 2,
-      0,
+      subtitle&&height>=100?-2:0,
       iconSize,
       iconSize
     );
