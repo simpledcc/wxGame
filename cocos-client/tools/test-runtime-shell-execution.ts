@@ -725,6 +725,12 @@ async function main(): Promise<void> {
   const playerContent = findDeep(playerModal, "HomePlayerModalContent")!;
   const playerChain = ["HomePlayerModalTitle", "HomeAvatarSlot", "HomePlayerDetailName", "HomePlayerIdentity", "HomePlayerClose"]
     .map((name) => findDeep(playerContent, name)!);
+  assertEqual(playerChain[0].getComponent(UITransform)?.width, playerChain[2].getComponent(UITransform)?.width,
+    "player title and real display name need one horizontal safe area");
+  assertEqual(playerChain[0].position.x, playerChain[2].position.x,
+    "player title and real display name need one centered axis");
+  assertEqual(playerChain[2].getComponent(Label)?.overflow, Label.Overflow.SHRINK,
+    "player display name must shrink inside its shared safe area");
   assertEqual(findDeep(playerModal, "HomePlayerModalPanel")?.getComponent(UITransform)?.height, 400);
   assertEqual(playerContent.getComponent(UITransform)?.height, 364);
   for (let gap = 0; gap < playerChain.length - 1; gap += 1) {
@@ -759,11 +765,18 @@ async function main(): Promise<void> {
   assertOk(verticalGap(settingsTitle, settingsStatus) >= 8);
   assertOk(verticalGap(settingsStatus, settingsToggle) >= 8);
   assertOk(verticalGap(settingsToggle, settingsClose) >= 8);
-  assertOk(horizontalGap(settingsIcon, settingsTitle) >= 8,
-    "settings icon/title gap must remain visible");
-  assertOk(settingsTitle.position.x + settingsTitle.getComponent(UITransform)!.width / 2
-    <= settingsContent.getComponent(UITransform)!.width / 2 - 8,
-  "settings title must retain its right inset");
+  assertEqual(horizontalGap(settingsIcon, settingsTitle), 8,
+    "settings icon/title gap must follow the eight-pixel rhythm");
+  assertEqual(settingsIcon.position.x - settingsIcon.getComponent(UITransform)!.width / 2
+    + settingsContent.getComponent(UITransform)!.width / 2,
+  settingsContent.getComponent(UITransform)!.width / 2
+    - settingsTitle.position.x - settingsTitle.getComponent(UITransform)!.width / 2,
+  "settings title row needs balanced horizontal insets");
+  assertEqual(settingsStatus.position.x, settingsToggle.position.x);
+  assertEqual(settingsToggle.position.x, settingsClose.position.x);
+  assertOk(settingsStatus.getComponent(UITransform)!.width > settingsToggle.getComponent(UITransform)!.width
+    && settingsToggle.getComponent(UITransform)!.width > settingsClose.getComponent(UITransform)!.width,
+  "settings status and actions need a descending centered hierarchy");
   assertOk(settingsContent.getComponent(UITransform)!.height / 2
     - settingsIcon.position.y - settingsIcon.getComponent(UITransform)!.height / 2 >= 8);
   assertOk(settingsClose.position.y - settingsClose.getComponent(UITransform)!.height / 2

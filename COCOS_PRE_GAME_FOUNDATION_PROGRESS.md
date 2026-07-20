@@ -1539,6 +1539,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Avatar and Settings remain 80px targets, both utility pills remain vertically aligned at 64px, and the coin action keeps its existing icon/value/add layout. Real player identity, real coin data, avatar/settings/Bank actions and long-number SHRINK behavior remain unchanged. Runtime coverage freezes the complete row on long and minimum Home layouts and after a nine-digit coin update.
 - Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,957 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No route/data behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-twenty-fifth source checkpoint
+
+- Widened the player modal's real-name field from 400px to the title's centered 420px safe area, giving both text layers equal 22px content insets and preserving `SHRINK` for future long display names.
+- Rebalanced the Settings header from an `x=-150,w=52` icon and `x=49,w=330` title to `x=-182,w=52` and `x=30,w=356`. The row now has equal 24px outer insets and an exact eight-pixel icon/title boundary. Runtime coverage also freezes the centered descending 420/360/260px status/toggle/close hierarchy, persisted sound state and all modal actions.
+- Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,957 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No player/audio data behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks

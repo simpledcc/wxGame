@@ -157,7 +157,7 @@ export class RuntimeScreenFactory {
     const playerModal = home.modal(root, "HomePlayerModal", 500, 400);
     home.label(playerModal.content, "HomePlayerModalTitle", "玩家信息", 0, 145, 420, 48, 30);
     home.visualSlot(playerModal.content, "avatar", 0, 62, 96, 96);
-    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -18, 400, 42, 24);
+    const playerDetail = home.label(playerModal.content, "HomePlayerDetailName", "", 0, -18, 420, 42, 24);
     home.statusBadge(playerModal.content, "HomePlayerIdentity", "系统安全身份", 0, -64, 160, "surface");
     home.actionButton(
       playerModal.content, "HomePlayerClose", "关闭", "", "×", 0, -130, 260, 80,
@@ -169,8 +169,8 @@ export class RuntimeScreenFactory {
     };
 
     const settingsModal = home.modal(root, "HomeSettingsModal", 500, 350);
-    home.visualSlot(settingsModal.content, "settings", -150, 112, 52, 52);
-    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 49, 112, 330, 48, 30);
+    home.visualSlot(settingsModal.content, "settings", -182, 112, 52, 52);
+    home.label(settingsModal.content, "HomeSettingsTitle", "设置", 30, 112, 356, 48, 30);
     const soundStatus = home.label(
       settingsModal.content, "HomeSoundStatus", "", 0, 57, 420, 36, 20, "homeTextMuted"
     );
