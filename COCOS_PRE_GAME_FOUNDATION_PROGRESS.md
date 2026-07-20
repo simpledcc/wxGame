@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-one source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass strengthens Feedback's full-width Submit title against a narrower Privacy action while preserving the exact minimum-screen chain and all request states; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-two source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass strengthens each History record's compact Detail visual while preserving complete touch coverage, filters, empty state and detail behavior; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1641,6 +1641,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Narrowed only the supporting Privacy action from 560px to 520px. Submit remains `560x94` and now leads Privacy's `520x80/27px` in width, height, title and icon without changing either action's position, subtitle, skin or press/disabled behavior.
 - Removed the catalog's repeated `featured` local and inlined Feedback's one-use vertical coordinate without changing output, reducing core source from `1,519,979` to `1,519,958 / 1,520,000`. Long/minimum coverage freezes the new width/title/icon hierarchy and every existing eight-pixel boundary; interaction tests still cover too-short rejection, pending lock, active success/failure, successful clearing and Privacy routing. Full `npm run verify` and `npm run build:wechat:dry-run` pass; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, feedback validation/request contract, privacy contract, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-forty-second source checkpoint
+
+- Enlarged each History record's compact Detail visual from `92x64` to `92x70`; its actual target remains 80px high, and the semantic history icon/title remain `24/24px`. At the true minimum viewport, 86px record rows now retain exact eight-pixel visual top/bottom insets; long 102px rows retain 16px.
+- Kept Detail as a skin-free surface action. A colored formal skin attempt was rejected by the icon-layout regression because a 70px skin did not cover the complete 80px hit target; preserving the surface treatment avoids a visually smaller skin over a larger invisible click area while still gaining six pixels of command presence.
+- Long/minimum coverage freezes the new visual height, touch height, title/icon sizing, internal columns and row-frame clearance. Existing tests continue to switch real filters, render selected markers and empty/record states, open/close details and page detail content. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,958 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, stored history, filtering, paging, detail behavior, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1679,7 +1685,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review History filters, record rows and compact Detail actions together, strengthening selected/empty/record hierarchy without changing stored records, filtering, paging or detail behavior. Two-device gameplay acceptance remains deferred.
+Review Help's six numbered rule groups together, strengthening number/title/body/card reading hierarchy without changing rule copy, catalog return or route behavior. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1688,7 +1694,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-one source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-two source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

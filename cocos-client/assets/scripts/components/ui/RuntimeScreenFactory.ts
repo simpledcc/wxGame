@@ -592,7 +592,7 @@ export class RuntimeScreenFactory {
       const t = home.label(row, "Title", "", -64, 17, 258, 28, 18, "homeText", 0);
       const m = home.label(row, "Meta", "", -64, -18, 258, 26, 13, "homeTextMuted", 0);
       const s = home.label(row, "Score", "", 118, 0, 90, 42, 20, "homeText");
-      const d = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 64,
+      const d = home.actionButton(row, `HistoryRow${index}Detail`, "详情", "", "绩", 220, 0, 92, 70,
         () => r.open(), "surface", "history");
       let r!: HistoryRecordItem;
       r = row.addComponent(HistoryRecordItem);
