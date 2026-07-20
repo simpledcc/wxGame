@@ -580,11 +580,18 @@ async function main(): Promise<void> {
     const name = findDeep(card, "HomePlayerName")!;
     const identity = findDeep(card, "HomePlayerIdentityLabel")!;
     const coin = findDeep(root, "HomeCoinPill")!;
+    const settings = findDeep(root, "SettingsButton")!;
+    const top = findDeep(root, "HomeTopBar")!;
     const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
     const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
     const cardHeight = card.getComponent(UITransform)!.height;
-    assertOk(right(avatar) + 8 <= left(card), `${context} avatar/player gap must remain visible`);
-    assertOk(right(card) + 8 <= left(coin), `${context} player/coin gap must remain visible`);
+    assertEqual(left(card) - right(avatar), 8, `${context} avatar/player gap must follow the eight-pixel rhythm`);
+    assertEqual(left(coin) - right(card), 8, `${context} player/coin gap must follow the eight-pixel rhythm`);
+    assertEqual(left(settings) - right(coin), 8, `${context} coin/settings gap must follow the eight-pixel rhythm`);
+    assertEqual(left(avatar) + top.getComponent(UITransform)!.width / 2, 4,
+      `${context} top actions need a balanced left inset`);
+    assertEqual(top.getComponent(UITransform)!.width / 2 - right(settings), 4,
+      `${context} top actions need a balanced right inset`);
     assertEqual(cardHeight, coin.getComponent(UITransform)!.height, `${context} utility pills must align`);
     assertEqual(card.position.y, coin.position.y, `${context} utility pills must share one axis`);
     assertEqual(cardHeight / 2 - name.position.y - name.getComponent(UITransform)!.height / 2, 6,

@@ -1533,6 +1533,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - The unchanged 44.8/51.52px formal icons, both copy rows and badge now hold exact eight-pixel internal boundaries in both layouts, while icon-left and badge-right outer insets become equal 24px. Real Bank text, SHRINK behavior, vertical rhythm, visual/touch geometry, single whole-strip Button and Bank return flow remain unchanged; long/minimum runtime coverage freezes both layouts.
 - Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,955 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No route behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-twenty-fourth source checkpoint
+
+- Rebalanced the Home top row into one continuous utility chain. The player pill changes from `x=-114,w=178` to `x=-107,w=194`; the unchanged 206px coin pill/action moves from `x=90` to `x=101`. Avatar/player, player/coin and coin/settings boundaries are now exact eight pixels, with four-pixel outer insets on both sides of the 592px top bar.
+- Avatar and Settings remain 80px targets, both utility pills remain vertically aligned at 64px, and the coin action keeps its existing icon/value/add layout. Real player identity, real coin data, avatar/settings/Bank actions and long-number SHRINK behavior remain unchanged. Runtime coverage freezes the complete row on long and minimum Home layouts and after a nine-digit coin update.
+- Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,957 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No route/data behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
