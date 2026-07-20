@@ -2080,12 +2080,16 @@ async function main(): Promise<void> {
           assertEqual(action.position.x - actionTransform.width / 2
             - badge.position.x - badge.getComponent(UITransform)!.width / 2, 8,
           `${context} mode ${rowIndex + 1} badge and action need an eight-pixel boundary`);
-          assertEqual(halfHeight - actionGeometry.height / 2, 9,
+          assertEqual(halfHeight - actionGeometry.height / 2, rowIndex ? 9 : 5,
             `${context} mode ${rowIndex + 1} action must clear the card frame vertically`);
           assertOk(halfWidth - action.position.x - actionTransform.width / 2 >= 8,
             `${context} mode ${rowIndex + 1} action must clear the card frame horizontally`);
           assertEqual(actionTransform.height, 80,
             `${context} mode ${rowIndex + 1} action must retain its target-device touch height`);
+          assertEqual(actionGeometry.height, rowIndex ? 62 : 70,
+            `${context} only the available mode action may use the emphasized visual height`);
+          assertEqual(actionLabel.getComponent(Label)!.fontSize, rowIndex ? 17 : 18,
+            `${context} only the available mode action may use the emphasized label size`);
           assertOk((actionGeometry.height - actionLabel.getComponent(UITransform)!.height) / 2 >= 8,
             `${context} mode ${rowIndex + 1} action copy needs vertical breathing room`);
         }

@@ -378,8 +378,8 @@ export class RuntimeScreenFactory {
       home.label(row, `ModeOption${index}Subtitle`, subtitle, -69, -18, 244, 28, 15, "homeTextMuted", 0);
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -14, 70, "surface");
       const a=home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
-        202, 0, 126, 62, () => controller.openModeSetup(), featured ? "practice" : kind, 17);
-      if(index>0){
+        202, 0, 126, index?62:70, () => controller.openModeSetup(), featured ? "practice" : kind, index?17:18);
+      if(index){
         a.button.interactable=false;
         a.visual.refresh();
       }
