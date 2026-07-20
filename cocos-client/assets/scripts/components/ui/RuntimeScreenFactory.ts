@@ -472,7 +472,7 @@ export class RuntimeScreenFactory {
       () => void controller.toggleReady(), "practice", "practice");
     home.selectionStyle(ready.visual, "practice");
     const start = home.actionButton(lobbyPanel, "StartRoom", "开始游戏", "仅房主可在双方准备后开始", "▶", 0,
-      -342, 500, 90, () => void controller.startSelectedMode(), "create", "createRoom");
+      -334, 520, 104, () => void controller.startSelectedMode(), "create", "createRoom");
     home.selectionStyle(start.visual, "create");
 
     controller = root.addComponent(RoomScene);

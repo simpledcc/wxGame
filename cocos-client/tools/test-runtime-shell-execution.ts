@@ -1319,6 +1319,27 @@ async function main(): Promise<void> {
     assertOk(right(statusCopy) + 8 <= statusCard.getComponent(UITransform)!.width / 2,
       `${context} status copy must retain its right inset`);
   };
+  const assertLobbyActionHierarchy = (lobby: Node, safe: Node, context: string): void => {
+    const ready = findDeep(lobby, "Ready")!;
+    const start = findDeep(lobby, "StartRoom")!;
+    const readyTransform = ready.getComponent(UITransform)!;
+    const startTransform = start.getComponent(UITransform)!;
+    assertEqual(readyTransform.width, 440, `${context} Ready must stay secondary in width`);
+    assertEqual(startTransform.width, 520, `${context} Start must lead the action column in width`);
+    assertEqual(readyTransform.height, 80, `${context} Ready must stay secondary in height`);
+    assertEqual(startTransform.height, 104, `${context} Start must lead the action column in height`);
+    assertOk(findDeep(start, "StartRoomTitle")!.getComponent(Label)!.fontSize
+      > findDeep(ready, "ReadyTitle")!.getComponent(Label)!.fontSize,
+    `${context} Start title must exceed the Ready title`);
+    assertOk(findDeep(start, "StartRoomIconSlot")!.getComponent(UITransform)!.width
+      > findDeep(ready, "ReadyIconSlot")!.getComponent(UITransform)!.width,
+    `${context} Start icon must exceed the Ready icon`);
+    assertEqual(verticalGap(ready, start), 9,
+      `${context} Ready and Start need a nine-pixel boundary`);
+    assertOk(lobby.position.y + start.position.y - startTransform.height / 2
+      >= -safe.getComponent(UITransform)!.height / 2 + 8,
+    `${context} Start must retain its eight-pixel minimum-screen clearance`);
+  };
   const longCreateRoot = findDeep(canvas, "RoomRuntimeScreen")!;
   assertCreateCardSpacing(findDeep(canvas, "RoomCreatePanel")!, "long create configuration");
   assertOk(roomHeaderCardGap(longCreateRoot, "RoomCreatePanel", "SelectedModeCard") >= 8,
@@ -1404,6 +1425,7 @@ async function main(): Promise<void> {
   const minimumLobby = findDeep(minimumRoomRoot, "RoomLobbyPanel")!;
   assertLobbyPlayerCardSpacing(minimumLobby, "minimum room lobby");
   assertLobbyUtilityCardSpacing(minimumLobby, "minimum room lobby");
+  assertLobbyActionHierarchy(minimumLobby, minimumRoomSafe, "minimum room lobby");
   assertOk(roomHeaderCardGap(minimumRoomRoot, "RoomLobbyPanel", "RoomCodeCard") >= 8,
     "minimum room lobby must clear the room header");
   const lobbyChain = ["RoomCodeCard", "LobbyBankCard", "RoomPlayerOneCard", "RoomStatusCard", "Ready", "StartRoom"]
@@ -2103,8 +2125,10 @@ async function main(): Promise<void> {
     }
     if (routes[index] === "room") {
       const longLobbyRoot = findDeep(canvas, "RoomRuntimeScreen")!;
-      assertLobbyPlayerCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
-      assertLobbyUtilityCardSpacing(findDeep(canvas, "RoomLobbyPanel")!, "long room lobby");
+      const longLobby = findDeep(canvas, "RoomLobbyPanel")!;
+      assertLobbyPlayerCardSpacing(longLobby, "long room lobby");
+      assertLobbyUtilityCardSpacing(longLobby, "long room lobby");
+      assertLobbyActionHierarchy(longLobby, findDeep(longLobbyRoot, "RoomSafeArea")!, "long room lobby");
       assertOk(roomHeaderCardGap(longLobbyRoot, "RoomLobbyPanel", "RoomCodeCard") >= 8,
         "long room lobby must clear the room header");
       assertEqual(findDeep(canvas, "RoomCodeInput"), null, "active invitation rooms do not need the join input tree");

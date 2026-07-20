@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and thirty-eight source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass makes Bank's final Confirm command visibly larger than conditional Unlock while preserving aligned bottoms, balanced outer insets and minimum-screen clearance; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and thirty-nine source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass makes the lobby's final Start command visibly larger than Ready while preserving Store-driven disabled/ready/pending states and minimum-screen clearance; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1623,6 +1623,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Shifted the two controls horizontally to `x=-152/136` and raised only Confirm by eight pixels. Both bottom edges remain aligned at exactly eight pixels above the minimum SafeArea; the complete row preserves its former `-280..280` outer extent, equal left/right insets and 16px internal gap. Confirm retains at least 18px below pagination while Unlock retains 34px.
 - Shared long/minimum coverage freezes widths, heights, title/icon descent, outer insets, internal gap, aligned bottoms, pagination clearance and SafeArea clearance. Existing tests still exercise selection, paging, unlock availability, failed-persistence rollback and return routing. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, Bank data, coin persistence, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirty-ninth source checkpoint
+
+- Enlarged the preparation lobby's final Start command from `500x90` to `520x104`. Its title rises from 27px to 31px and its formal room icon from 50.4px to the shared 56px cap; the unchanged `440x80/27px` Ready action now reads clearly as the preceding player-state control.
+- Moved Start upward eight pixels. Ready/Start separation becomes 9px instead of 24px, producing a tighter final command group while Start retains exactly eight pixels above the minimum SafeArea bottom. The complete room-code, Bank, player and status-card chain remains unchanged and still clears every action by at least eight pixels.
+- Shared long/minimum coverage freezes width, height, title/icon descent, Ready/Start separation and bottom clearance. Existing runtime state tests still cover waiting, local ready, two real humans ready, Start enabled/selected, background syncing, sync error, pending lock, Copy and Invite without issuing a real Start request. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,963 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, room state/service/protocol, polling, sharing, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1661,7 +1667,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review the preparation lobby's final Start command against Ready, Copy and Invite controls, strengthening disabled-versus-ready visual hierarchy without changing room state, start eligibility, polling, sharing or protocol behavior. Do not execute two-device start-game acceptance; it remains deferred.
+Review the mode catalog's first available Experience action against the seven disabled Preparing actions, strengthening available-versus-unavailable hierarchy without enabling unfinished modes or changing catalog routing. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1670,7 +1676,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-eight source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-nine source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
