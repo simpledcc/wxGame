@@ -22,7 +22,7 @@ export class FeedbackScene extends Component {
 
   start(): void {
     if (this.privacyLabel) {
-      this.privacyLabel.string = `提交时会处理反馈内容和可选联系方式，详见${app.privacy.contractName}`;
+      this.privacyLabel.string = `反馈内容和联系方式处理说明见${app.privacy.contractName}`;
     }
     this.contentInput?.node.on("text-changed", () => this.render(), this);
     this.render();

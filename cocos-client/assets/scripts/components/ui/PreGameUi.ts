@@ -403,7 +403,7 @@ export class PreGameUi {
   }
 
   statusBadge(parent: Node, name: string, text: string, x: number, y: number, width: number,
-    kind: PreGameActionKind, fontSize = 14): Node {
+    kind: PreGameActionKind, fontSize = 15): Node {
     const surface = kind === "surface";
     const node = this.pill(parent, name, x, y, width, 34, this.actionToken(kind),
       surface ? "homeCardBorder" : "homeTextOnColor");
@@ -528,7 +528,7 @@ export class PreGameUi {
     node.on("editing-did-ended", () => { focusRing.active = false; });
     if (height >= 100) {
       const count = this.label(node, `${name}Count`, "", width / 2 - 56, -height / 2 + 17,
-        96, 24, 13, "homeTextMuted");
+        96, 24, 15, "homeTextMuted");
       const refresh = (): void => { count.string = `${editBox.string.length}/${maxLength}`; };
       node.on("text-changed", refresh);
       refresh();

@@ -667,6 +667,8 @@ async function main(): Promise<void> {
     assertEqual(identity.position.y - identity.getComponent(UITransform)!.height / 2 + cardHeight / 2, 6,
       `${context} player identity needs a balanced bottom inset`);
     assertEqual(identity.getComponent(Label)?.string, "系统安全身份");
+    assertEqual(identity.getComponent(Label)?.fontSize, 15,
+      `${context} player identity must keep the auxiliary-copy legibility floor`);
     assertEqual(name.getComponent(Label)?.overflow, Label.Overflow.SHRINK);
     assertEqual(card.getComponent(Button), null, `${context} player pill must not split the avatar click target`);
   };
@@ -1128,6 +1130,7 @@ async function main(): Promise<void> {
   entryRoomCodeInput.string = "ABC";
   entryRoomCodeInput.node.emit("text-changed");
   assertEqual(findDeep(canvas, "RoomCodeInputCount")?.getComponent(Label)?.string, "3/6");
+  assertEqual(findDeep(canvas, "RoomCodeInputCount")?.getComponent(Label)?.fontSize, 15);
   assertEqual(findDeep(canvas, "JoinCodeHint")?.getComponent(Label)?.string, "还需输入 3 位");
   assertEqual(entryJoinButton.interactable, false, "partial room code must keep Join disabled");
   const callsBeforeEntryInvalidJoin = appRuntime.cloudCalls.length;
@@ -2016,6 +2019,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
       assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
         "mode player count must use the shared status badge");
+      assertEqual(findDeep(canvas, "ModeOption0PlayersLabel")?.getComponent(Label)?.fontSize, 15);
       const modeRow = findDeep(canvas, "ModeOption0")!;
       const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
       const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
@@ -2563,6 +2567,10 @@ async function main(): Promise<void> {
       const feedbackIcon = findDeep(formCard, "HomeFeedbackSlot")!;
       const feedbackPrompt = findDeep(formCard, "FeedbackPrompt")!;
       const feedbackNotice = findDeep(formCard, "FeedbackPrivacy")!;
+      assertEqual(feedbackNotice.getComponent(Label)?.fontSize, 15);
+      assertOk((feedbackNotice.getComponent(Label)?.string.length || 0) <= 33,
+        "feedback privacy notice must stay short enough for its single-line card slot");
+      assertOk(feedbackNotice.getComponent(Label)?.string.endsWith(app.privacy.contractName));
       assertFeedbackPageSpacing(findDeep(canvas, "FeedbackRuntimeScreen")!, "minimum Feedback page");
       assertEqual(feedbackIcon.position.y - feedbackIcon.getComponent(UITransform)!.height / 2,
         feedbackPrompt.position.y - feedbackPrompt.getComponent(UITransform)!.height / 2,
@@ -2600,6 +2608,7 @@ async function main(): Promise<void> {
       feedbackInput.string = "短";
       feedbackInput.node.emit("text-changed");
       assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.string, "1/300");
+      assertEqual(findDeep(canvas, "FeedbackContentCount")?.getComponent(Label)?.fontSize, 15);
       assertEqual(feedbackButton.interactable, false, "short feedback must keep submit disabled");
       const cloudCallCount = appRuntime.cloudCalls.length;
       findDeep(canvas, "SubmitFeedback")?.emit(Button.EventType.CLICK);

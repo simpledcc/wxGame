@@ -363,6 +363,7 @@ function main(): void {
   assertEqual(transform(badge).height, 34);
   assertEqual(transform(badgeLabel).width, 78);
   assertEqual(transform(badgeLabel).height, 26);
+  assertEqual(badgeLabel.getComponent(Label)?.fontSize, 15);
   const largeBadge = preGame.statusBadge(topBar, "FoundationLargeBadge", "+", 0, 0, 34, "join", 26);
   assertEqual(transform(largeBadge.getChildByName("FoundationLargeBadgeLabel")!).height, 28);
 
@@ -434,6 +435,8 @@ function main(): void {
   assertEqual(directEdit.node.getComponent(Graphics), null, "PreGame EditBox host must not carry Graphics");
   assertOk(directEdit.backgroundNode.getComponent(Graphics));
   assertEqual(directEdit.backgroundNode.parent, directEdit.node);
+  const multilineEdit = preGame.edit(pageSafe.node, "FoundationMultilineEdit", "", 0, -200, 500, 196, 300, true);
+  assertEqual(multilineEdit.node.getChildByName("FoundationMultilineEditCount")?.getComponent(Label)?.fontSize, 15);
 
   const modal = preGame.modal(root, "FoundationModal", 520, 360);
   assertEqual(modal.root.active, false);

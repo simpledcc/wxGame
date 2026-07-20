@@ -63,7 +63,7 @@ export class RuntimeScreenFactory {
     );
     const playerCard = home.pill(top, "HomePlayerCard", -107, 0, 194, 64);
     const player = home.label(playerCard, "HomePlayerName", "", 0, 13, 152, 26, 21, "homeTextOnColor");
-    home.label(playerCard, "HomePlayerIdentityLabel", "系统安全身份", 0, -17, 152, 18, 13, "homeTextOnColor");
+    home.label(playerCard, "HomePlayerIdentityLabel", "系统安全身份", 0, -17, 152, 18, 15, "homeTextOnColor");
     home.pill(top, "HomeCoinPill", 101, 0, 206, 64);
     const coinButton = home.actionButton(
       top, "HomeCoinButton", "", "", "币", 101, 0, 206, 80,
@@ -648,7 +648,7 @@ export class RuntimeScreenFactory {
     const formCard = home.accentCard(safe.node, "FeedbackFormCard", 0, formY, 560, 500, "join", 24);
     home.visualSlot(formCard, "feedback", -228, 206, 48, 48);
     home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 448, 40, 18, "homeTextMuted", 0);
-    const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 14, "homeTextMuted");
+    const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 15, "homeTextMuted");
     home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
     const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 2, 500, 196, 300, true);
     home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -122, 460, 28, 16, "homeTextMuted", 0);
