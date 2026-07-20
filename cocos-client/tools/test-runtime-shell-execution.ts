@@ -1721,9 +1721,9 @@ async function main(): Promise<void> {
       assertEqual(modeAccent.getComponent(UITransform)?.height, 42);
       assertEqual(findDeep(modeRow, "ModeOption0InnerBorder")?.getComponent(UITransform)?.height, 66,
         "mode card visual must stay inset from its 80px layout node");
-      assertOk(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 8
-        <= modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2,
-      "mode accent rail must not enter its icon column");
+      assertEqual(modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2
+        - modeAccent.position.x - modeAccent.getComponent(UITransform)!.width / 2, 8,
+      "mode accent rail and icon need an eight-pixel boundary");
       assertEqual(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 1,
         -modeRow.getComponent(UITransform)!.width / 2 + 6,
       "mode accent rail must remain clear of the card inner border");
@@ -1757,6 +1757,7 @@ async function main(): Promise<void> {
           const halfWidth = row.getComponent(UITransform)!.width / 2;
           const actionTransform = action.getComponent(UITransform)!;
           const actionGeometry = action.getComponent(RuntimeButtonVisual)!.getVisualGeometry();
+          const accent = findDeep(row, `ModeOption${rowIndex}Accent`)!;
           assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 7,
             `${context} mode ${rowIndex + 1} title needs a top inset`);
           assertOk(verticalGap(title, subtitle) >= 8,
@@ -1771,6 +1772,9 @@ async function main(): Promise<void> {
               - copy.position.x - copy.getComponent(UITransform)!.width / 2, 8,
             `${context} mode ${rowIndex + 1} copy and badge need an eight-pixel boundary`);
           });
+          assertEqual(icon.position.x - icon.getComponent(UITransform)!.width / 2
+            - accent.position.x - accent.getComponent(UITransform)!.width / 2, 8,
+          `${context} mode ${rowIndex + 1} accent rail and icon need an eight-pixel boundary`);
           assertEqual(action.position.x - actionTransform.width / 2
             - badge.position.x - badge.getComponent(UITransform)!.width / 2, 8,
           `${context} mode ${rowIndex + 1} badge and action need an eight-pixel boundary`);
