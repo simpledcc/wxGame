@@ -1569,6 +1569,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - The companion's reserved vertical inset grows from 8px to 16px above and below, and its visibility threshold rises from 136px to 152px so the 120px minimum decoration is never shown without full breathing room. `393x852` and `360x800` show a bounded responsive character; `640x960` still hides it and retains every functional footer action.
 - Focused three-viewport runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,938 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No copy, action, route, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirtieth source checkpoint
+
+- Replaced compact Home's `520x108` Logo slot with an exact `416x130` `16:5` slot matching the formal `1280x400` resource. The loaded Logo now renders at the slot's full 416px width instead of being height-limited to 345.6px, giving it 22px of visual precedence on each side of the unchanged 372px subtitle ribbon; the programmatic fallback and formal Sprite also share one boundary.
+- Moved only the compact Logo center upward by 11px and increased every compact Logo-relative downstream offset by the same 11px. The top utility/Logo gap remains six pixels, Logo/ribbon attachment remains seven pixels, and the ribbon, Bank strip, complete eight-pixel action stack, character/footer calculation and all actions retain their previous absolute coordinates. Long Home is unchanged.
+- Focused formal-Sprite/minimum-layout coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,947 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No copy, action, route, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1607,7 +1613,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review the compact Home Logo/subtitle hierarchy against the formal `1280x400` Logo ratio: keep the visible Logo wider than its 372px subtitle ribbon without disturbing the top bar, exact eight-pixel action stack, minimum-height footer or any real action. Two-device gameplay acceptance remains deferred.
+Tighten the Home subtitle ribbon's internal text rectangle so the compact 40px pill provides an explicit eight-pixel top/bottom text safety area while preserving its 20px font, 372px width, Logo attachment, Bank gap and copy. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1616,7 +1622,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and twenty-nine source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

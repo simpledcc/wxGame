@@ -878,19 +878,31 @@ async function main(): Promise<void> {
     "HomeTopBar", "HomeLogoSlot", "HomeSubtitleRibbon", "CurrentBankBar", "CreateRoomButton",
     "JoinRoomButton", "StudyButton", "HelpButton", "HomePrivacy"
   ].map((name) => findDeep(minimumHomeRoot, name)!);
-  assertOk(verticalGap(minimumHomeChain[0], minimumHomeChain[1]) >= 4);
+  assertEqual(verticalGap(minimumHomeChain[0], minimumHomeChain[1]), 6,
+    "minimum Home utility bar and Logo need a visible boundary");
   assertOk(verticalGap(minimumBankCaption, minimumBankTitle) >= 8);
   assertHomeBankStrip(minimumHomeRoot, "minimum Home");
   assertHomeActionStack(minimumHomeRoot, "minimum Home");
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
-  assertOk(minimumRibbonTop - minimumLogoBottom >= 0 && minimumRibbonTop - minimumLogoBottom <= 8,
+  assertEqual(minimumRibbonTop - minimumLogoBottom, 7,
     "minimum Home ribbon must stay attached to the Logo without covering its core");
   for (let gap = 2; gap < minimumHomeChain.length - 1; gap += 1) {
     assertOk(verticalGap(minimumHomeChain[gap], minimumHomeChain[gap + 1]) >= 8,
       `minimum Home gap ${gap} must retain the eight-pixel rhythm`);
   }
-  assertEqual(minimumHomeChain[1].getComponent(UITransform)?.height, 108);
+  const minimumLogoTransform = minimumHomeChain[1].getComponent(UITransform)!;
+  const minimumRibbonTransform = minimumHomeChain[2].getComponent(UITransform)!;
+  assertEqual(minimumLogoTransform.width, 416);
+  assertEqual(minimumLogoTransform.height, 130);
+  assertEqual(minimumLogoTransform.width * 5, minimumLogoTransform.height * 16,
+    "minimum Home Logo slot must match the formal 1280x400 ratio");
+  assertOk(minimumLogoTransform.width > minimumRibbonTransform.width,
+    "minimum Home Logo must remain wider than its subtitle ribbon");
+  const minimumLogoSprite = findDeep(minimumHomeRoot, "HomeLogoSprite")!;
+  assertEqual(minimumLogoSprite.active, true, "minimum Home must render the formal Logo");
+  assertEqual(minimumLogoSprite.getComponent(UITransform)?.width, 416);
+  assertEqual(minimumLogoSprite.getComponent(UITransform)?.height, 130);
   assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 92);
   assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 92);
   assertEqual(minimumHomeChain[6].getComponent(UITransform)?.height, 80);
