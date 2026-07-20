@@ -664,9 +664,27 @@ async function main(): Promise<void> {
         `${context} ${name} title needs its right content inset`);
       assertEqual(action.position.y - height / 2 + safe.getComponent(UITransform)!.height / 2, 8,
         `${context} ${name} must clear the safe-area bottom`);
-    });
+      });
+  };
+  const assertHomeCharacterLayout = (root: Node, context: string): void => {
+    const character = findDeep(root, "HomeCharacterSlot")!;
+    const transform = character.getComponent(UITransform)!;
+    const safe = findDeep(root, "HomeSafeArea")!;
+    assertEqual(character.active, true, `${context} needs its companion decoration`);
+    assertEqual(Math.round(transform.width * 3), transform.height * 2,
+      `${context} companion must match the formal 2:3 art ratio`);
+    assertOk(transform.height >= 120 && transform.height <= 236,
+      `${context} companion height must stay inside its responsive limits`);
+    assertEqual(verticalGap(findDeep(root, "HelpButton")!, character), 16,
+      `${context} companion must clear the auxiliary action grid`);
+    assertEqual(verticalGap(character, findDeep(root, "HomePrivacy")!), 16,
+      `${context} companion must clear the footer actions`);
+    assertEqual(Math.round(safe.getComponent(UITransform)!.width / 2
+      - character.position.x - transform.width / 2), 24,
+      `${context} companion must follow the footer content inset`);
   };
   assertHomeFooterLayout(canvas, "long Home");
+  assertHomeCharacterLayout(canvas, "long Home");
   const homeLogoTransform = findDeep(canvas, "HomeLogoSlot")?.getComponent(UITransform);
   assertEqual(homeLogoTransform?.width, 520);
   assertEqual(homeLogoTransform?.height, 156);
@@ -888,6 +906,12 @@ async function main(): Promise<void> {
   assertHomePlayerLayout(minimumHomeRoot, "minimum Home");
   assertHomeCoinLayout(minimumHomeRoot, "minimum Home");
   assertHomeFooterLayout(minimumHomeRoot, "minimum Home");
+  setMockWindowSize(360, 800);
+  app.store.setRoute("bank");
+  await flushMany();
+  app.store.setRoute("home");
+  await flushMany();
+  assertHomeCharacterLayout(findDeep(canvas, "HomeRuntimeScreen")!, "tall Home");
   setMockWindowSize(393, 852);
   app.store.setRoute("bank");
   await flushMany();

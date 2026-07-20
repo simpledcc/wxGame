@@ -119,16 +119,16 @@ export class RuntimeScreenFactory {
       () => controller.openHistory(), "history", "history"
     );
     const secondaryBottom = logoY - fit(511, 711) - fit(40, 59);
-    const footerTop = footerY + 42;
+    const footerTop = footerY + 40;
     const characterSpace = secondaryBottom - footerTop;
-    const characterVisible = characterSpace >= 136;
-    const characterHeight = Math.max(120, Math.min(236, characterSpace - 16));
+    const characterVisible = characterSpace >= 152;
+    const characterHeight = Math.max(120, Math.min(236, characterSpace - 32));
     const character = home.visualSlot(
       safe.node,
       "character",
-      205,
+      safe.width / 2 - 24 - characterHeight / 3,
       (secondaryBottom + footerTop) / 2,
-      180 * characterHeight / 236,
+      2 * characterHeight / 3,
       characterHeight
     );
     character.node.active = characterVisible;
