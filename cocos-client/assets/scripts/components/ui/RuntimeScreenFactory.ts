@@ -333,10 +333,10 @@ export class RuntimeScreenFactory {
       () => controller.markCurrentUnfamiliar(), "history", "wordBank");
     home.selectionStyle(markWrong.visual, "history");
     const meaningToggle = home.actionButton(safe.node, "MeaningToggle", "", "", "书", 0,
-      cardY - 308 - stretch * 0.39, 500, 72, () => controller.toggleChinese(), "surface", "practice");
+      cardY - 304 - stretch * 0.39, 500, 72, () => controller.toggleChinese(), "surface", "practice");
     home.selectionStyle(meaningToggle.visual, "join");
     home.actionButton(safe.node, "NextWord", "下一个", "继续背诵本单元", "→", 0,
-      cardY - 392 - stretch * 0.6, 500, 72, () => controller.nextWord(), "create", "practice");
+      cardY - 388 - stretch * 0.6, 500, 80, () => controller.nextWord(), "create", "practice");
     controller = root.addComponent(StudyScene);
     controller.wordLabel = word;
     controller.meaningLabel = meaning;

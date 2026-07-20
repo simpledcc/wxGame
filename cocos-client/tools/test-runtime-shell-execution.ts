@@ -1483,12 +1483,24 @@ async function main(): Promise<void> {
         ?? node.getComponent(UITransform)!.height) / 2;
     const visualGap = (upper: Node, lower: Node): number =>
       upper.position.y - visualHalfHeight(upper) - lower.position.y - visualHalfHeight(lower);
-    [bank, reveal, mark, toggle, next].forEach((action) => {
+    [bank, reveal, mark, toggle].forEach((action) => {
       assertEqual(action.getComponent(UITransform)?.height, 80,
         `${context} ${action.name} must retain its target-device touch height`);
       assertEqual(action.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 72,
         `${context} ${action.name} must use its inset visual height`);
     });
+    assertEqual(next.getComponent(UITransform)?.height, 80,
+      `${context} final action must retain its target-device touch height`);
+    assertEqual(next.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 80,
+      `${context} final action must visibly exceed the auxiliary controls`);
+    assertEqual(next.getComponent(UITransform)?.width, toggle.getComponent(UITransform)?.width,
+      `${context} final action and meaning control must share the main column`);
+    assertOk(findDeep(next, "NextWordTitle")!.getComponent(Label)!.fontSize
+      > findDeep(toggle, "MeaningToggleTitle")!.getComponent(Label)!.fontSize,
+    `${context} final action title must exceed the meaning-control title`);
+    assertOk(findDeep(next, "NextWordIconSlot")!.getComponent(UITransform)!.width
+      > findDeep(toggle, "MeaningToggleIconSlot")!.getComponent(UITransform)!.width,
+    `${context} final action icon must exceed the meaning-control icon`);
     [bankTitle, bankSubtitle].forEach((copy) => {
       assertEqual(Math.round(copy.position.x - copy.getComponent(UITransform)!.width / 2
         - bankIcon.position.x - bankIcon.getComponent(UITransform)!.width / 2), 8,
