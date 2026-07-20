@@ -108,7 +108,7 @@ export class RuntimeButtonVisual extends Component {
     this.lastEnabled = interactable;
     if (!interactable) this.pressed = false;
     bg.clear();
-    bg.fillColor = new Color(24, 42, 56, interactable ? 42 : 24);
+    bg.fillColor = new Color(24, 42, 56, interactable ? (this.pressed ? 34 : 56) : 24);
     const shadowOffset = this.pressed ? -1 : -4;
     bg.roundRect(
       -this.w / 2,

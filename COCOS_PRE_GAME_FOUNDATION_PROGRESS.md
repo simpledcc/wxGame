@@ -1683,6 +1683,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Raised Section Card tab-shadow alpha from 46 to 60 while retaining the same four-pixel offset, tab size, border, title, icon and card-body coordinates. This gives compact and large title tabs clearer separation from their white cards without adding nodes or texture assets.
 - Removed the unused placeholder argument from `PreGameUi.edit()` and the Join/Feedback call sites. The implementation had always discarded that value and deliberately configures native placeholders as blank, so input text, counters, focus rings, validation and adapter safety remain unchanged. Foundation and full-route coverage pass, as do full `npm run verify` and `npm run build:wechat:dry-run`; core source falls to `1,519,965 / 1,520,000`, and formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, copy, Store/route behavior, room/gameplay/cloud protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-forty-ninth source checkpoint
+
+- Strengthened the depth cue for skin-free and fallback pre-game controls. The resting shadow alpha rises from 42 to 56; while pressed it softens to 34 and collapses from a four-pixel lower offset to one pixel. Disabled controls retain alpha 24, so unavailable actions remain visually quieter than both active states.
+- Formal bitmap skins, button dimensions, hit geometry, selected rings and the existing two-pixel content travel are unchanged. The Cocos Graphics test mock now records each fill's RGBA and rounded-rectangle geometry; foundation tests prove exact resting, pressed and disabled shadow states instead of inferring them from the final face fill.
+- `npm run verify`, `npm run build:wechat:dry-run`, `npm run home-art:status` and `git diff --check` pass; formal art remains `imported` with 18 images and 23 metadata files. Core source is `1,519,987 / 1,520,000`, leaving only 13 bytes, so further runtime source work must first recover budget and use current Creator/WeChat screenshots as evidence. No bitmap, importer metadata, page layout, copy, Store/route behavior, room/gameplay/cloud protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1730,7 +1736,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-eight source-verified visual-polish passes/audits and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-nine source-verified visual-polish passes/audits and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

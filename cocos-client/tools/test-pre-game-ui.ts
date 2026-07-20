@@ -251,6 +251,8 @@ function main(): void {
   assertEqual(action.titleLabel.enableOutline, true);
   assertEqual(action.titleLabel.outlineWidth, 3);
   assertEqual(action.background.strokeCount, 1, "fallback action border must survive visual setup");
+  assertEqual(action.background.fills[0]?.color.a, 56, "resting action must keep a clear depth shadow");
+  assertEqual(action.background.fills[0]?.rect.y, -60, "resting action shadow must sit four pixels low");
   assertEqual(transform(action.iconSlot).width, 56);
   assertActionIconClearOfText(action);
   assertActionTextRhythm(action);
@@ -281,6 +283,8 @@ function main(): void {
   action.node.emit(Node.EventType.TOUCH_START);
   assertEqual(actionHighlight.active, false, "pressed action must suppress its static highlight");
   assertEqual(action.background.strokeCount, 1, "pressed action must redraw its fallback border");
+  assertEqual(action.background.fills[0]?.color.a, 34, "pressed action shadow must soften");
+  assertEqual(action.background.fills[0]?.rect.y, -57, "pressed action shadow must collapse toward its face");
   assertEqual(action.iconSlot.position.y, actionIconY - 2);
   assertVisualMatchesHitArea(action.node, action.visual);
   action.node.emit(Node.EventType.TOUCH_END);
@@ -291,6 +295,7 @@ function main(): void {
   assertEqual(actionHighlight.active, false, "disabled action must suppress its bright highlight");
   assertEqual(action.visual.isShowingDisabledState(), true);
   assertEqual(action.background.strokeCount, 1, "disabled action must redraw its fallback border");
+  assertEqual(action.background.fills[0]?.color.a, 24, "disabled action shadow must stay quiet");
   assertOk(action.titleLabel.color.a < 255, "disabled button copy must visibly soften with its background");
   action.node.emit(Button.EventType.CLICK);
   assertEqual(actionCount, 1, "disabled pre-game buttons must not execute their action");

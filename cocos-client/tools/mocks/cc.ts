@@ -159,6 +159,7 @@ export class Graphics extends Component {
   strokeColor = new Color();
   lineWidth = 1;
   lastRoundRect: { x: number; y: number; width: number; height: number; radius: number } | null = null;
+  fills: Array<{ color: Color; rect: NonNullable<Graphics["lastRoundRect"]> }> = [];
   strokeCount = 0;
   roundRect(x: number, y: number, width: number, height: number, radius: number): void {
     this.lastRoundRect = { x, y, width, height, radius };
@@ -168,10 +169,16 @@ export class Graphics extends Component {
   moveTo(_x: number, _y: number): void {}
   lineTo(_x: number, _y: number): void {}
   close(): void {}
-  fill(): void {}
+  fill(): void {
+    if (this.lastRoundRect) {
+      const { r, g, b, a } = this.fillColor;
+      this.fills.push({ color: new Color(r, g, b, a), rect: { ...this.lastRoundRect } });
+    }
+  }
   stroke(): void { this.strokeCount += 1; }
   clear(): void {
     this.lastRoundRect = null;
+    this.fills = [];
     this.strokeCount = 0;
   }
 }
