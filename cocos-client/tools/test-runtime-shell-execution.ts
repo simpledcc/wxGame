@@ -624,13 +624,25 @@ async function main(): Promise<void> {
   assertHomeCoinLayout(canvas, "long Home");
   const assertHomeFooterLayout = (root: Node, context: string): void => {
     const safe = findDeep(root, "HomeSafeArea")!;
+    const halfSafe = safe.getComponent(UITransform)!.width / 2;
+    const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
+    const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
+    [["StudyButton", "BankButton"], ["HelpButton", "HistoryButton"], ["HomePrivacy", "FeedbackButton"]]
+      .forEach(([leftName, rightName]) => {
+        const leftAction = findDeep(root, leftName)!;
+        const rightAction = findDeep(root, rightName)!;
+        assertEqual(left(rightAction) - right(leftAction), 8, `${context} ${leftName}/${rightName} needs an eight-pixel gutter`);
+        assertEqual(left(leftAction) + halfSafe, halfSafe - right(rightAction),
+          `${context} ${leftName}/${rightName} needs balanced outer insets`);
+        assertEqual(leftAction.position.y, rightAction.position.y, `${context} ${leftName}/${rightName} must share one axis`);
+        assertEqual(leftAction.getComponent(UITransform)?.width, 256);
+        assertEqual(rightAction.getComponent(UITransform)?.width, 256);
+      });
     ["HomePrivacy", "FeedbackButton"].forEach((name) => {
       const action = findDeep(root, name)!;
       const icon = findDeep(action, `${name}IconSlot`)!;
       const title = findDeep(action, `${name}Title`)!;
       const halfWidth = action.getComponent(UITransform)!.width / 2;
-      const left = (node: Node): number => node.position.x - node.getComponent(UITransform)!.width / 2;
-      const right = (node: Node): number => node.position.x + node.getComponent(UITransform)!.width / 2;
       const height = action.getComponent(UITransform)!.height;
       assertEqual(height, 80, `${context} ${name} must retain its target-device touch height`);
       assertEqual(Math.round((left(title) - right(icon)) * 10) / 10, 8,
@@ -660,7 +672,7 @@ async function main(): Promise<void> {
   assertEqual(findDeep(canvas, "JoinRoomButton")?.getComponent(UITransform)?.height, 136);
   ["StudyButton", "BankButton", "HelpButton", "HistoryButton"].forEach((name) => {
     const transform = findDeep(canvas, name)?.getComponent(UITransform);
-    assertEqual(transform?.width, 252, `${name} must use the shorter two-column layout`);
+    assertEqual(transform?.width, 256, `${name} must use the balanced two-column layout`);
     assertEqual(transform?.height, 118, `${name} must use the taller two-column layout`);
     assertEqual(findDeep(canvas, `${name}Title`)?.getComponent(Label)?.fontSize, 31);
     assertEqual(findDeep(canvas, `${name}Subtitle`)?.active, true, `${name} subtitle must remain visible`);

@@ -1551,6 +1551,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Added long/minimum Home coverage that freezes both Privacy and Feedback at `24px icon inset / 8px icon-title gap / 24px title inset`, while retaining 80px target height, eight-pixel SafeArea bottom clearance, Privacy pending/reset feedback and Feedback routing. The global visual contract now applies a `1e-6` comparison tolerance only to mathematical floating-point noise.
 - Focused shared/runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source reduced to `1,519,904 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No visible copy, action behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-twenty-seventh source checkpoint
+
+- Expanded Home's Study/Bank, Catalog/History and Privacy/Feedback columns from 252px to 256px and moved their centers from `x=-134/134` to `x=-132/132`. Each pair's former 16px gutter becomes the shared eight-pixel rhythm while equal SafeArea outer insets remain 36px.
+- Long/minimum runtime coverage freezes all three rows at `36 + 256 + 8 + 256 + 36px`, requires each pair to share one vertical axis and retains the preceding `24/8/24px` internal icon/title contract for both footer actions. Responsive 80/118px heights, formal skins, copy, character visibility, Privacy pending/reset and every real route remain unchanged.
+- Focused runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,904 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No route/data behavior, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1589,12 +1595,16 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
+Normalize the long-screen Home action stack so Create, Join, Study/Bank and Catalog/History retain the same eight-pixel vertical rhythm already used by the minimum-height layout, without changing responsive heights, copy, formal skins, character space or route behavior. Two-device gameplay acceptance remains deferred.
+
+## Deferred external visual gate
+
 Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, traverse every H8.7 pre-game page and capture the required `360x800`, `393x852` and `430x932` state evidence. Check the catalog's icon-aligned category rails with still-disabled unfinished actions, same-axis Back/rules circles, symmetric rule-button backdrop inset and eight-pixel title/subtitle safety boundary, that circular highlights stay inside their top chord, transparent avatar/settings controls have no floating highlight, normal/pressed/disabled/formal-skin highlight transitions, 34px Back/paging/detail/help fallbacks inside circular controls, circular Back/paging/avatar/settings icon controls with unchanged hit areas, Home's aligned player/coin pills and 6/8/6px identity rhythm, Home Bank strip's eight-pixel caption/name/icon/change hierarchy and Player/Settings modals, shared headers' 8/9/8px vertical and 12px icon/title rhythm, every large/compact colored card tab's eight-pixel horizontal and four-pixel vertical content boundaries, plain/fallback buttons' normal/pressed/disabled/selected borders, subtitle actions' eight-pixel text gap and height-aware lower/sliced-skin clearance, 80px catalog/History plain-button 48px label balance and History marker separation, room-code/Copy/Invite alignment and eight-pixel bottom clearance, compact Copy/Invite/Detail/Change actions' eight-pixel horizontal boundaries, regular badges' 8/4px text insets and large coin-plus balance, Bank's real row subtitles, Study's complete eight-pixel card chain, catalog-row 7/8/9px rhythm, create mode/Bank cards' eight-pixel tab/body and main-column boundaries, lobby player/status cards' eight-pixel hierarchy and the complete Bank/Feedback vertical chains, Join's eight-pixel input chain, Help's six numbered rule rows and eight-pixel title/body rhythm, History filters/summary cards and detail pagination chain, card-top reflections separated from inner borders, 4px left accent rails separated from both borders and icon columns, preparation cards, text, native inputs and state feedback, then continue screenshot-driven visual adjustment. Two-device gameplay acceptance remains deferred until H8.7 is complete.
 
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and twenty-three source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and twenty-seven source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

@@ -103,19 +103,19 @@ export class RuntimeScreenFactory {
       () => controller.openJoinRoom(), "join", "joinRoom"
     );
     home.actionButton(
-      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -134, logoY - fit(423, 587), 252, fit(80, 118),
+      safe.node, "StudyButton", "赛前练习", "背单词，提升实力", "练", -132, logoY - fit(423, 587), 256, fit(80, 118),
       () => controller.openStudy(), "practice", "practice"
     );
     home.actionButton(
-      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 134, logoY - fit(423, 587), 252, fit(80, 118),
+      safe.node, "BankButton", "选择词库", "更换词库，准备比赛", "词", 132, logoY - fit(423, 587), 256, fit(80, 118),
       () => controller.openBankPicker(), "bank", "wordBank"
     );
     home.actionButton(
-      safe.node, "HelpButton", "玩法目录", "多种玩法，敬请期待", "玩", -134, logoY - fit(511, 714), 252, fit(80, 118),
+      safe.node, "HelpButton", "玩法目录", "多种玩法，敬请期待", "玩", -132, logoY - fit(511, 714), 256, fit(80, 118),
       () => controller.openModeCatalog(), "catalog", "catalog"
     );
     const history = home.actionButton(
-      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 134, logoY - fit(511, 714), 252, fit(80, 118),
+      safe.node, "HistoryButton", "战绩记录", "查看成绩，复盘提升", "绩", 132, logoY - fit(511, 714), 256, fit(80, 118),
       () => controller.openHistory(), "history", "history"
     );
     const secondaryBottom = logoY - fit(511, 714) - fit(40, 59);
@@ -135,7 +135,7 @@ export class RuntimeScreenFactory {
 
     let privacy!: PreGameActionButtonRef;
     privacy = home.actionButton(
-      safe.node, "HomePrivacy", "隐私保护指引", "", "隐", -134, footerY, 252, 80,
+      safe.node, "HomePrivacy", "隐私保护指引", "", "隐", -132, footerY, 256, 80,
       () => {
         if (!privacy.button.interactable) return;
         privacy.button.interactable = false;
@@ -150,7 +150,7 @@ export class RuntimeScreenFactory {
       }, "practice", "privacy"
     );
     home.actionButton(
-      safe.node, "FeedbackButton", "问题反馈", "", "言", 134, footerY, 252, 80,
+      safe.node, "FeedbackButton", "问题反馈", "", "言", 132, footerY, 256, 80,
       () => controller.openFeedback(), "bank", "feedback"
     );
 
