@@ -1051,10 +1051,36 @@ async function main(): Promise<void> {
     return header.position.y - header.getComponent(UITransform)!.height / 2
       - panel.position.y - card.position.y - card.getComponent(UITransform)!.height / 2;
   };
+  const assertJoinCommandHierarchy = (card: Node, context: string): void => {
+    const input = findDeep(card, "RoomCodeInput")!;
+    const hint = findDeep(card, "JoinInviteHint")!;
+    const action = findDeep(card, "JoinRoom")!;
+    const formTitle = findDeep(card, "JoinCodeTitle")!.getComponent(Label)!;
+    const actionTitle = findDeep(action, "JoinRoomTitle")!.getComponent(Label)!;
+    const icon = findDeep(action, "JoinRoomIconSlot")!;
+    const cardBounds = card.getComponent(UITransform)!;
+    const actionBounds = action.getComponent(UITransform)!;
+    const inputBounds = input.getComponent(UITransform)!;
+    assertEqual(actionBounds.width, 520);
+    assertEqual(actionBounds.height, 120);
+    assertOk(actionBounds.width > inputBounds.width && actionBounds.height > inputBounds.height,
+      `${context} final command must dominate the room-code field`);
+    assertEqual(actionTitle.fontSize, 38);
+    assertOk(actionTitle.fontSize > formTitle.fontSize, `${context} final command title must lead the form heading`);
+    assertEqual(icon.getComponent(UITransform)?.width, 56);
+    assertEqual((cardBounds.width - actionBounds.width) / 2, 20,
+      `${context} final command needs balanced horizontal card insets`);
+    const upperGap = verticalGap(hint, action);
+    const lowerInset = action.position.y - actionBounds.height / 2 + cardBounds.height / 2;
+    assertEqual(upperGap, 20, `${context} guidance/Join gap must remain deliberate`);
+    assertEqual(lowerInset, 19, `${context} Join command must clear the card bottom`);
+    assertOk(Math.abs(upperGap - lowerInset) <= 1, `${context} final command needs balanced vertical framing`);
+  };
   const longJoinRoot = findDeep(canvas, "RoomRuntimeScreen")!;
   assertOk(roomHeaderCardGap(longJoinRoot, "RoomJoinPanel", "JoinCodeCard") >= 8,
     "long join form must clear the room header");
   const longJoinCard = findDeep(canvas, "JoinCodeCard")!;
+  assertJoinCommandHierarchy(longJoinCard, "long join form");
   const longJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
     .map((name) => findDeep(longJoinCard, name)!);
   for (let gap = 0; gap < longJoinChain.length - 1; gap += 1) {
@@ -1070,6 +1096,7 @@ async function main(): Promise<void> {
   const minimumJoinSafe = findDeep(minimumJoinRoot, "RoomSafeArea")!;
   const minimumJoinPanel = findDeep(minimumJoinRoot, "RoomJoinPanel")!;
   const minimumJoinCard = findDeep(minimumJoinRoot, "JoinCodeCard")!;
+  assertJoinCommandHierarchy(minimumJoinCard, "minimum join form");
   const minimumJoinChain = ["HomeJoinRoomSlot", "JoinCodeTitle", "JoinCodeHint", "RoomCodeInput", "JoinInviteHint", "JoinRoom"]
     .map((name) => findDeep(minimumJoinCard, name)!);
   const minimumJoinCardY = minimumJoinPanel.position.y + minimumJoinCard.position.y;

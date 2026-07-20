@@ -1605,6 +1605,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Moved the unchanged `390x80/27px` Auto-ready control ten pixels downward. Guidance/Create and Create/Auto-ready retain exact eight-pixel gaps, while the minimum screen still keeps a frozen 14px safe-area bottom inset. Together with the unchanged `118x80/27px` Change Bank action, the page now has strict `480/390/118px` width descent, `38/27/27px` title hierarchy and `56/44.8/24px` icon descent. Copy, selected state, Bank return, auto-ready persistence and room creation behavior remain unchanged.
 - Long/minimum runtime coverage freezes the complete hierarchy and boundaries; full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`. Formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirty-sixth source checkpoint
+
+- Enlarged the Join-room form's final Join command from `500x110` to `520x120`. The shared title tier rises from 31px to 38px while the 56px formal friend icon remains stable; the command is now wider and taller than the unchanged `500x104` room-code input instead of nearly matching it.
+- Moved the Join command center down three pixels. It now keeps equal 20px left/right insets inside the 560px card, a 20px guidance/command gap and a 19px command/card-bottom inset; the previous 22/27px vertical framing is replaced by a one-pixel-balanced composition. Form heading, input, hints, character counter, empty/partial disabled state, complete-code enabled state and route behavior remain unchanged.
+- Long/minimum runtime coverage freezes button/input hierarchy and all four card boundaries while existing interaction coverage traverses the disabled and enabled states. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1643,7 +1649,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review the Join-room entry page's primary Join action against its room-code field and guidance copy, strengthening the enabled/disabled command hierarchy without changing validation, input behavior, copy, routes or card spacing. Two-device gameplay acceptance remains deferred.
+Review the pre-match Study page's final Next action against Reveal, Mark-wrong and meaning-display controls, strengthening the learning-flow hierarchy without changing study state, copy, Bank return or progress behavior. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1652,7 +1658,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-five source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-six source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
