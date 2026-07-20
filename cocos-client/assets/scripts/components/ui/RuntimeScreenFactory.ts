@@ -369,16 +369,15 @@ export class RuntimeScreenFactory {
       ["合作挑战 Boss","一起挑战强大对手","catalog","catalog"]
     ] as const;
     modes.forEach(([title,subtitle,icon,kind],index)=>{
-      const featured=index===0;
       const row=home.accentCard(safe.node, `ModeOption${index}`, 0, safeTop - 163 - index * 86,
-        548, 78, featured ? "practice" : kind, 18);
+        548, 78, index?kind:"practice", 18);
       row.getComponent(UITransform)!.height=80;
       home.visualSlot(row, icon, -230, 0, 62, 62);
       home.label(row, `ModeOption${index}Title`, title, -69, 18, 244, 28, 23, "homeText", 0);
       home.label(row, `ModeOption${index}Subtitle`, subtitle, -69, -18, 244, 28, 15, "homeTextMuted", 0);
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -14, 70, "surface");
-      const a=home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
-        202, 0, 126, index?62:70, () => controller.openModeSetup(), featured ? "practice" : kind, index?17:18);
+      const a=home.button(row, `ModeOption${index}Action`, index?"筹备中":"立即体验",
+        202, 0, 126, index?62:70, () => controller.openModeSetup(), index?kind:"practice", index?17:18);
       if(index){
         a.button.interactable=false;
         a.visual.refresh();
@@ -642,8 +641,7 @@ export class RuntimeScreenFactory {
 
   private buildFeedback(parent: Node, ui: RuntimeUi): Node {
     const { root, home, safe } = this.page(parent, ui, "Feedback");
-    const safeTop = safe.height / 2;
-    const formY = safeTop - 374;
+    const formY=safe.height/2-374;
     let controller!: FeedbackScene;
     home.pageHeader(safe, "FeedbackHeader", "问题反馈", "告诉我们遇到的问题或改进建议",
       () => controller.backHome(), "feedback");
@@ -659,8 +657,9 @@ export class RuntimeScreenFactory {
     const status = home.label(formCard, "FeedbackStatus", "", 0, -225, 468, 26, 18, "homeTextMuted");
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,
       formY - 305, 560, 94, () => void controller.submit(), "join", "feedback");
+    submit.titleLabel.fontSize=31;submit.titleLabel.lineHeight=38;
     home.actionButton(safe.node, "OpenPrivacy", "隐私保护指引", "查看反馈数据处理说明", "隐", 0,
-      formY - 400, 560, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
+      formY - 400, 520, 80, () => void controller.openPrivacyContract(), "surface", "privacy");
     controller = root.addComponent(FeedbackScene);
     controller.contentInput = content.editBox;
     controller.contactInput = contact.editBox;

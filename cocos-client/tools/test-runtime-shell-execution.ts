@@ -2496,6 +2496,8 @@ async function main(): Promise<void> {
         const promptCopy = findDeep(card, "FeedbackPrompt")!;
         const chain = ["FeedbackHeader", "FeedbackFormCard", "SubmitFeedback", "OpenPrivacy"]
           .map((name) => findDeep(root, name)!);
+        const submit = chain[2];
+        const privacy = chain[3];
         for (let gap = 0; gap < chain.length - 1; gap += 1) {
           assertOk(verticalGap(chain[gap], chain[gap + 1]) >= 8,
             `${context} gap ${gap} must retain the eight-pixel rhythm`);
@@ -2503,6 +2505,16 @@ async function main(): Promise<void> {
         assertOk(chain[3].position.y - chain[3].getComponent(UITransform)!.height / 2
           >= -safe.getComponent(UITransform)!.height / 2 + 8,
         `${context} privacy action must retain its safe-area clearance`);
+        assertEqual(submit.getComponent(UITransform)!.width, 560,
+          `${context} Submit must retain the full form width`);
+        assertEqual(privacy.getComponent(UITransform)!.width, 520,
+          `${context} Privacy must remain a narrower supporting action`);
+        assertOk(findDeep(submit, "SubmitFeedbackTitle")!.getComponent(Label)!.fontSize
+          > findDeep(privacy, "OpenPrivacyTitle")!.getComponent(Label)!.fontSize,
+        `${context} Submit title must exceed the Privacy title`);
+        assertOk(findDeep(submit, "SubmitFeedbackIconSlot")!.getComponent(UITransform)!.width
+          > findDeep(privacy, "OpenPrivacyIconSlot")!.getComponent(UITransform)!.width,
+        `${context} Submit icon must exceed the Privacy icon`);
         assertEqual(promptCopy.position.x - promptCopy.getComponent(UITransform)!.width / 2
           - promptIcon.position.x - promptIcon.getComponent(UITransform)!.width / 2, 8,
         `${context} prompt icon and copy need an eight-pixel boundary`);
