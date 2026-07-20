@@ -374,8 +374,8 @@ export class RuntimeScreenFactory {
         548, 78, featured ? "practice" : kind, 18);
       row.getComponent(UITransform)!.height=80;
       home.visualSlot(row, icon, -226, 0, 62, 62);
-      home.label(row, `ModeOption${index}Title`, title, -65, 18, 236, 28, 23, "homeText", 0);
-      home.label(row, `ModeOption${index}Subtitle`, subtitle, -65, -18, 236, 28, 15, "homeTextMuted", 0);
+      home.label(row, `ModeOption${index}Title`, title, -67, 18, 240, 28, 23, "homeText", 0);
+      home.label(row, `ModeOption${index}Subtitle`, subtitle, -67, -18, 240, 28, 15, "homeTextMuted", 0);
       home.statusBadge(row, `ModeOption${index}Players`, "双人", 96, -14, 70, "surface");
       const a=home.button(row, `ModeOption${index}Action`, featured ? "立即体验" : "筹备中",
         202, 0, 126, 62, () => controller.openModeSetup(), featured ? "practice" : kind, 17);

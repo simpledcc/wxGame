@@ -1747,6 +1747,7 @@ async function main(): Promise<void> {
       const assertModeRowText = (root: Node, context: string): void => {
         for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
           const row = findDeep(root, `ModeOption${rowIndex}`)!;
+          const icon = row.children.find((child) => child.name.startsWith("Home") && child.name.endsWith("Slot"))!;
           const title = findDeep(row, `ModeOption${rowIndex}Title`)!;
           const subtitle = findDeep(row, `ModeOption${rowIndex}Subtitle`)!;
           const badge = findDeep(row, `ModeOption${rowIndex}Players`)!;
@@ -1762,12 +1763,17 @@ async function main(): Promise<void> {
             `${context} mode ${rowIndex + 1} title/subtitle gap must remain visible`);
           assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
             `${context} mode ${rowIndex + 1} subtitle needs a bottom inset`);
-          assertOk(subtitle.position.x + subtitle.getComponent(UITransform)!.width / 2 + 8
-            <= badge.position.x - badge.getComponent(UITransform)!.width / 2,
-          `${context} mode ${rowIndex + 1} copy must reserve its badge column`);
-          assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
-            <= action.position.x - actionTransform.width / 2,
-          `${context} mode ${rowIndex + 1} badge/action columns must remain separate`);
+          [title, subtitle].forEach((copy) => {
+            assertEqual(copy.position.x - copy.getComponent(UITransform)!.width / 2
+              - icon.position.x - icon.getComponent(UITransform)!.width / 2, 8,
+            `${context} mode ${rowIndex + 1} icon and copy need an eight-pixel boundary`);
+            assertEqual(badge.position.x - badge.getComponent(UITransform)!.width / 2
+              - copy.position.x - copy.getComponent(UITransform)!.width / 2, 8,
+            `${context} mode ${rowIndex + 1} copy and badge need an eight-pixel boundary`);
+          });
+          assertEqual(action.position.x - actionTransform.width / 2
+            - badge.position.x - badge.getComponent(UITransform)!.width / 2, 8,
+          `${context} mode ${rowIndex + 1} badge and action need an eight-pixel boundary`);
           assertEqual(halfHeight - actionGeometry.height / 2, 9,
             `${context} mode ${rowIndex + 1} action must clear the card frame vertically`);
           assertOk(halfWidth - action.position.x - actionTransform.width / 2 >= 8,
