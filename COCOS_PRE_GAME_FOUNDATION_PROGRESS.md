@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-three source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass strengthens Help's six real rule groups from 16/18/14px to 18/20/15px number/title/body hierarchy without moving the responsive card; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-four source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest audit closes an eight-page final-command matrix and finds no remaining source-proven primary/secondary equality; detailed evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1653,6 +1653,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - The true minimum viewport still keeps exact eight-pixel title/body gaps and at least 16px between one body and the next title; long screens continue using their existing larger pitch. Number badges remain centered against each complete title/body block, and the summary row retains balanced icon/copy insets.
 - Long/minimum coverage freezes all six source strings, new font tiers, horizontal alignment, group centering and inter-group boundaries. Existing route tests still open Help from the catalog and return through the shared Back action. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,958 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, rule copy, route behavior, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-forty-fourth source audit checkpoint
+
+- Audited the final-command hierarchy across all active preparation paths. Runtime assertions now prove: Create `480x128/38px` over Auto-ready `390x80/27px`; Join `520x120/38px` over its `500x104` input; Study Next `500x80/27px` over `500x72/24px` Meaning Toggle; Bank Confirm `288x96/31px` over Unlock `256x80/27px`; Lobby Start `520x104/31px` over Ready `440x80/27px`; Catalog Experience `126x70/18px` over seven disabled `126x62/17px` actions; Feedback Submit `560x94/31px` over Privacy `520x80/27px`; and History Detail as a bounded `92x70/24px` row command.
+- The audit found no remaining source-proven primary/secondary equality. Home's primary chain and same-level paired auxiliary actions already have separate responsive contracts; Help is informational and has no competing final command. No arbitrary geometry change was made after this finding.
+- The unchanged source has passed full `npm run verify` and `npm run build:wechat:dry-run` at `1,519,958 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, behavior, gameplay Bundle, cloud function, legacy client, protocol or AppID changed. H8.7 remains `IN_PROGRESS` because current Creator/WeChat screenshots do not yet exist; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1691,7 +1697,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Audit final-command hierarchy across Create, Join, Study, Bank, Lobby, Catalog, Feedback and History, identify any remaining primary/secondary equality with geometry evidence, and adjust only confirmed inconsistencies without changing behavior. Two-device gameplay acceptance remains deferred.
+On the Creator 3.8.8 computer, build the unchanged latest branch and inspect Home plus every H8.7 preparation page/state at `360x800`, `393x852` and `430x932`; capture screenshots and adjust only issues visible in that evidence. Do not execute two-device start-game acceptance; it remains deferred.
 
 ## Deferred external visual gate
 
@@ -1700,7 +1706,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-three source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-four source-verified visual-polish passes/audits and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
