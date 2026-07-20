@@ -568,6 +568,22 @@ async function main(): Promise<void> {
         assertEqual(icon.position.y, 0);
       });
   };
+  const assertHomeActionHierarchy = (root: Node, context: string): void => {
+    const actions = ["CreateRoomButton", "JoinRoomButton", "StudyButton"]
+      .map((name) => findDeep(root, name)!);
+    const heights = actions.map((action) => action.getComponent(UITransform)!.height);
+    const titles = actions.map((action) => findDeep(action, `${action.name}Title`)!.getComponent(Label)!.fontSize);
+    const icons = actions.map((action) => findDeep(action, `${action.name}IconSlot`)!.getComponent(UITransform)!.width);
+    assertOk(heights[0] > heights[1] && heights[1] > heights[2],
+      `${context} primary action heights must descend from Create through learning`);
+    assertOk(titles[0] >= titles[1] && titles[1] >= titles[2],
+      `${context} title sizes must preserve the primary hierarchy`);
+    assertOk(icons[0] >= icons[1] && icons[1] > icons[2],
+      `${context} icon sizes must preserve the primary hierarchy`);
+    assertEqual(actions[0].getComponent(UITransform)!.width, actions[1].getComponent(UITransform)!.width);
+    assertOk(actions[1].getComponent(UITransform)!.width > actions[2].getComponent(UITransform)!.width,
+      `${context} primary actions must remain wider than secondary actions`);
+  };
   const homeSubtitle = findDeep(canvas, "HomeSubtitleRibbon");
   const currentBankBar = findDeep(canvas, "CurrentBankBar");
   const createRoomButton = findDeep(canvas, "CreateRoomButton")!;
@@ -586,6 +602,7 @@ async function main(): Promise<void> {
   assertHomeActionStack(canvas, "long Home");
   assertHomeSubtitleLayout(canvas, "long Home", 12);
   assertHomeActionVerticalComposition(canvas, "long Home");
+  assertHomeActionHierarchy(canvas, "long Home");
   const subtitleBankGap = homeSubtitle.position.y - subtitleTransform.height / 2
     - (currentBankBar.position.y + bankTransform.height / 2);
   assertOk(subtitleBankGap >= 8, "Home subtitle and bank bar need the eight-pixel rhythm");
@@ -924,6 +941,7 @@ async function main(): Promise<void> {
   assertHomeActionStack(minimumHomeRoot, "minimum Home");
   assertHomeSubtitleLayout(minimumHomeRoot, "minimum Home", 8);
   assertHomeActionVerticalComposition(minimumHomeRoot, "minimum Home");
+  assertHomeActionHierarchy(minimumHomeRoot, "minimum Home");
   const minimumLogoBottom = minimumHomeChain[1].position.y - minimumHomeChain[1].getComponent(UITransform)!.height / 2;
   const minimumRibbonTop = minimumHomeChain[2].position.y + minimumHomeChain[2].getComponent(UITransform)!.height / 2;
   assertEqual(minimumRibbonTop - minimumLogoBottom, 7,
@@ -944,8 +962,10 @@ async function main(): Promise<void> {
   assertEqual(minimumLogoSprite.active, true, "minimum Home must render the formal Logo");
   assertEqual(minimumLogoSprite.getComponent(UITransform)?.width, 416);
   assertEqual(minimumLogoSprite.getComponent(UITransform)?.height, 130);
-  assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 92);
-  assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 92);
+  assertEqual(minimumHomeChain[4].getComponent(UITransform)?.height, 96);
+  assertEqual(minimumHomeChain[5].getComponent(UITransform)?.height, 88);
+  assertEqual(findDeep(minimumHomeRoot, "CreateRoomButtonTitle")?.getComponent(Label)?.fontSize, 31);
+  assertEqual(findDeep(minimumHomeRoot, "JoinRoomButtonTitle")?.getComponent(Label)?.fontSize, 27);
   assertEqual(minimumHomeChain[6].getComponent(UITransform)?.height, 80);
   assertEqual(findDeep(minimumHomeRoot, "BankButton")?.position.y, minimumHomeChain[6].position.y);
   assertEqual(findDeep(minimumHomeRoot, "HistoryButton")?.position.y, minimumHomeChain[7].position.y);

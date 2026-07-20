@@ -591,7 +591,7 @@ export class PreGameUi {
 
     const textLeft = -width / 2 + iconInset + iconSize + 8;
     const textWidth = Math.max(40, width - (textLeft + width / 2) - (compact?8:24));
-    const titleY=subtitle?(height>=120?26:height>=100?22:height>=96?20:height>=90?18:16):0;
+    const titleY=subtitle?(height>=120?26:height>=100?22:height>=96?20:height>=88?18:16):0;
     const titleFontSize = height >= 120 ? 38 : height >= 96 ? 31 : height >= 80 ? 27 : 24;
     const titleLabel = this.label(
       node,

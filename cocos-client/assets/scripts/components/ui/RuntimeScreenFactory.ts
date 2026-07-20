@@ -95,11 +95,11 @@ export class RuntimeScreenFactory {
       "homeHistory", "homeTextOnColor");
     home.label(bankChange, "CurrentBankChangeLabel", "更换", 0, 0, 72, 36, 17, "homeTextOnColor");
     home.actionButton(
-      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, logoY - fit(240, 301), 520, fit(92, 146),
+      safe.node, "CreateRoomButton", "创建房间", "邀请好友，一起开始对战", "房", 0, logoY - fit(242, 301), 520, fit(96, 146),
       () => controller.openModeCatalog(), "create", "createRoom"
     );
     home.actionButton(
-      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, logoY - fit(340, 450), 520, fit(92, 136),
+      safe.node, "JoinRoomButton", "加入房间", "输入房间码，快速加入好友对局", "友", 0, logoY - fit(342, 450), 520, fit(88, 136),
       () => controller.openJoinRoom(), "join", "joinRoom"
     );
     home.actionButton(

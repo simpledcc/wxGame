@@ -1593,6 +1593,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - The 118/136/146px Home actions' former 3.6/3.2/5.2px top/bottom inset differences reduce to 0.4/0.8/1.2px. Compact 80/92px actions remain byte-for-byte unchanged, every icon stays within one pixel of its combined copy-group center, and pressed feedback still moves all content down two pixels before exact release restoration. Shared and Home runtime coverage now freezes both center alignment and complete-group outer balance.
 - Focused component/runtime coverage, full `npm run verify` and `npm run build:wechat:dry-run` pass with core source at `1,519,962 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No copy, route, bitmap, importer metadata, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirty-fourth source checkpoint
+
+- Replaced compact Home's equal 92/92px Create/Join actions with a 96/88px pair. Both centers move two pixels downward, so the Bank/Create, Create/Join and Join/learning gaps remain exactly eight pixels and the action stack's top and bottom boundaries remain unchanged.
+- Compact Home now presents a continuous 96/88/80px Create/Join/learning hierarchy: Create receives the shared 31px title and 53.76px icon, Join uses 27px and 49.28px, and Study/Bank remain 27px and 44.8px. Long Home retains its existing 146/136/118px hierarchy, formal orange/blue/green skins, copy, widths and routes. Lowered the shared 18px title-baseline threshold from 90px to 88px so the new Join action keeps a 9.2px title/subtitle gap, 8.8px bottom inset and centered complete content block.
+- Focused shared/runtime coverage now freezes responsive action height, title, icon and width descent; full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`. Formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, route, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1631,7 +1637,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review the visual hierarchy between Home's primary Create/Join actions and secondary Study/Bank actions, checking their responsive title sizes, subtitle sizes, formal icon scale and color emphasis without changing copy, bounds, routes or the newly frozen alignment. Two-device gameplay acceptance remains deferred.
+Review the Create-room setup page's primary Create action against its Change Bank and Auto-ready controls, strengthening the command hierarchy without changing settings, room requests, copy, routes or the frozen card spacing. Two-device gameplay acceptance remains deferred.
 
 ## Deferred external visual gate
 
@@ -1640,7 +1646,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-three source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-four source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
