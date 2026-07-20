@@ -2670,10 +2670,17 @@ async function main(): Promise<void> {
         `${context} summary row needs balanced horizontal card insets`);
         HELP_RULES.forEach(([title, detail], ruleIndex) => {
           const badge = findDeep(card, `HelpRule${ruleIndex}Number`)!;
+          const badgeLabel = findDeep(badge, `HelpRule${ruleIndex}NumberLabel`)!;
           const titleNode = findDeep(card, `HelpRule${ruleIndex}Title`)!;
           const bodyNode = findDeep(card, `HelpRule${ruleIndex}Body`)!;
           assertEqual(titleNode.getComponent(Label)?.string, title);
           assertEqual(bodyNode.getComponent(Label)?.string, detail);
+          assertEqual(badgeLabel.getComponent(Label)?.fontSize, 18,
+            `${context} rule ${ruleIndex + 1} number must lead the group`);
+          assertEqual(titleNode.getComponent(Label)?.fontSize, 20,
+            `${context} rule ${ruleIndex + 1} title must lead its body`);
+          assertEqual(bodyNode.getComponent(Label)?.fontSize, 15,
+            `${context} rule ${ruleIndex + 1} body must remain readable`);
           assertOk(badge.position.x + badge.getComponent(UITransform)!.width / 2 + 8
             <= titleNode.position.x - titleNode.getComponent(UITransform)!.width / 2);
           assertEqual(titleNode.position.x, bodyNode.position.x,
@@ -2710,8 +2717,8 @@ async function main(): Promise<void> {
       app.store.setRoute("help");
       await flushMany();
       assertOk(findDeep(canvas, "HelpRulesSummary"));
-      assertEqual(findDeep(canvas, "HelpRule0Title")?.getComponent(Label)?.fontSize, 18);
-      assertEqual(findDeep(canvas, "HelpRule5Body")?.getComponent(Label)?.fontSize, 14);
+      assertEqual(findDeep(canvas, "HelpRule0Title")?.getComponent(Label)?.fontSize, 20);
+      assertEqual(findDeep(canvas, "HelpRule5Body")?.getComponent(Label)?.fontSize, 15);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "coopSelect");
