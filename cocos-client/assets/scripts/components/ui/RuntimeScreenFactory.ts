@@ -424,8 +424,8 @@ export class RuntimeScreenFactory {
       home.label(guidance, "CreateGuidance", "创建后邀请好友加入；两名玩家准备后由房主开始", 30, -13,
         432, 58, 19, "homeText", 0);
       create = home.actionButton(createPanel, "CreateRoom", "创建房间", "生成房间码并等待好友", "房", 0,
-        -187, 460, 118, () => void controller.createConfiguredRoom(), "create", "createRoom");
-      autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -294,
+        -192, 480, 128, () => void controller.createConfiguredRoom(), "create", "createRoom");
+      autoReady = home.actionButton(createPanel, "AutoReady", "创建后自动准备", "", "✓", 0, -304,
         390, 80, () => controller.toggleAutoReady(), "surface", "practice");
       home.selectionStyle(autoReady.visual, "practice");
     }

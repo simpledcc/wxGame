@@ -1152,6 +1152,8 @@ async function main(): Promise<void> {
     const guidanceCard = findDeep(panel, "CreateGuidanceCard")!;
     const guidanceIcon = guidanceCard.children.find((child) => child.name === "HomePracticeSlot")!;
     const guidanceCopy = findDeep(guidanceCard, "CreateGuidance")!;
+    const createAction = findDeep(panel, "CreateRoom")!;
+    const autoReadyAction = findDeep(panel, "AutoReady")!;
     assertOk(verticalGap(modeTab, modeIcon) >= 8, `${context} mode tab/icon gap must remain visible`);
     assertOk(verticalGap(modeTab, modeTitle) >= 8, `${context} mode tab/title gap must remain visible`);
     assertOk(verticalGap(modeTitle, modeSummary) >= 8, `${context} mode title/summary gap must remain visible`);
@@ -1186,6 +1188,17 @@ async function main(): Promise<void> {
     guidanceCard.getComponent(UITransform)!.width / 2
       - guidanceCopy.position.x - guidanceCopy.getComponent(UITransform)!.width / 2,
     `${context} guidance row needs balanced horizontal card insets`);
+    const hierarchy = [createAction, autoReadyAction, bankAction];
+    const widths = hierarchy.map((action) => action.getComponent(UITransform)!.width);
+    const heights = hierarchy.map((action) => action.getComponent(UITransform)!.height);
+    const titles = hierarchy.map((action) => findDeep(action, `${action.name}Title`)!.getComponent(Label)!.fontSize);
+    const icons = hierarchy.map((action) => findDeep(action, `${action.name}IconSlot`)!.getComponent(UITransform)!.width);
+    assertOk(widths[0] > widths[1] && widths[1] > widths[2], `${context} command widths must descend`);
+    assertOk(heights[0] > heights[1] && heights[1] === heights[2], `${context} primary command must be taller`);
+    assertOk(titles[0] > titles[1] && titles[1] === titles[2], `${context} primary title must be larger`);
+    assertOk(icons[0] > icons[1] && icons[1] > icons[2], `${context} command icons must descend`);
+    assertEqual(verticalGap(guidanceCard, createAction), 8, `${context} guidance/Create gap must remain exact`);
+    assertEqual(verticalGap(createAction, autoReadyAction), 8, `${context} Create/auto-ready gap must remain exact`);
   };
   const assertLobbyPlayerCardSpacing = (lobby: Node, context: string): void => {
     ["RoomPlayerOne", "RoomPlayerTwo"].forEach((name) => {
@@ -1328,9 +1341,10 @@ async function main(): Promise<void> {
       `minimum create-room gap ${gap} must remain visible`);
   }
   const minimumAutoReady = createChain[4];
-  assertOk(minimumCreatePanel.position.y + minimumAutoReady.position.y
+  assertEqual(minimumCreatePanel.position.y + minimumAutoReady.position.y
     - minimumAutoReady.getComponent(UITransform)!.height / 2
-    >= -minimumRoomSafe.getComponent(UITransform)!.height / 2);
+    + minimumRoomSafe.getComponent(UITransform)!.height / 2, 14,
+    "minimum create configuration needs a fourteen-pixel bottom inset");
   const originalCreateRoom = app.roomSession.create.bind(app.roomSession);
   const originalToggleReady = app.roomSession.toggleReady.bind(app.roomSession);
   let autoReadyCount = 0;
