@@ -308,10 +308,10 @@ export class RuntimeScreenFactory {
       "当前词库", "词", 0, safeTop - 160, 560, 72, () => controller.changeBank(), "surface", "wordBank");
     [bankBar.titleLabel, bankBar.subtitleLabel].forEach((label) => {
       if (!label) return;
-      label.node.setPosition(-20, label.node.position.y, 0);
-      label.node.getComponent(UITransform)?.setContentSize(350, label.node.getComponent(UITransform)?.height || 44);
+      label.node.setPosition(-31.84, label.node.position.y, 0);
+      label.node.getComponent(UITransform)?.setContentSize(351.68, label.node.getComponent(UITransform)?.height || 44);
     });
-    const bankChange = home.pill(bankBar.node, "StudyBankChangeBadge", 220, 0, 104, 54,
+    const bankChange = home.pill(bankBar.node, "StudyBankChangeBadge", 204, 0, 104, 54,
       "homePractice", "homeTextOnColor");
     home.label(bankChange, "StudyBankChangeLabel", "更换", 0, 0, 78, 36, 17, "homeTextOnColor");
     const cardY = safeTop - 384 - stretch * 0.05;

@@ -1268,6 +1268,10 @@ async function main(): Promise<void> {
     const safe = findDeep(root, "StudySafeArea")!;
     const header = findDeep(root, "StudyHeader")!;
     const bank = findDeep(root, "StudyBankBar")!;
+    const bankIcon = findDeep(bank, "StudyBankBarIconSlot")!;
+    const bankTitle = findDeep(bank, "StudyBankBarTitle")!;
+    const bankSubtitle = findDeep(bank, "StudyBankBarSubtitle")!;
+    const bankBadge = findDeep(bank, "StudyBankChangeBadge")!;
     const card = findDeep(root, "StudyCard")!;
     const reveal = findDeep(root, "RevealWord")!;
     const mark = findDeep(root, "MarkWrong")!;
@@ -1284,6 +1288,19 @@ async function main(): Promise<void> {
       assertEqual(action.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 72,
         `${context} ${action.name} must use its inset visual height`);
     });
+    [bankTitle, bankSubtitle].forEach((copy) => {
+      assertEqual(Math.round(copy.position.x - copy.getComponent(UITransform)!.width / 2
+        - bankIcon.position.x - bankIcon.getComponent(UITransform)!.width / 2), 8,
+      `${context} Study Bank icon and copy need an eight-pixel boundary`);
+      assertEqual(bankBadge.position.x - bankBadge.getComponent(UITransform)!.width / 2
+        - copy.position.x - copy.getComponent(UITransform)!.width / 2, 8,
+      `${context} Study Bank copy and change badge need an eight-pixel boundary`);
+    });
+    assertEqual(bankIcon.position.x - bankIcon.getComponent(UITransform)!.width / 2
+      + bank.getComponent(UITransform)!.width / 2,
+    bank.getComponent(UITransform)!.width / 2
+      - bankBadge.position.x - bankBadge.getComponent(UITransform)!.width / 2,
+    `${context} Study Bank row needs balanced outer insets`);
     assertEqual(mark.position.y, reveal.position.y,
       `${context} reveal and wrong-word actions must share one visual axis`);
     [[header, bank], [bank, card], [card, reveal], [reveal, toggle], [toggle, next]]
@@ -1316,7 +1333,7 @@ async function main(): Promise<void> {
   assertEqual(studyBankBadge?.getComponent(Button), null, "Study bank change badge must not nest a second Button");
   assertEqual(findDeep(canvas, "ChangeStudyBank"), null, "Study bank strip must not retain a split click target");
   assertEqual(findDeep(canvas, "StudyBottomChangeBank"), null, "Study must not retain an overlapping duplicate Bank route");
-  assertEqual(findDeep(canvas, "StudyBankBarTitle")?.getComponent(UITransform)?.width, 350);
+  assertEqual(findDeep(canvas, "StudyBankBarTitle")?.getComponent(UITransform)?.width, 351.68);
   const initialStudyStatus = findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string;
   findDeep(canvas, "PreviousWord")?.emit(Button.EventType.CLICK);
   assertOk(findDeep(canvas, "StudyStatus")?.getComponent(Label)?.string !== initialStudyStatus,
