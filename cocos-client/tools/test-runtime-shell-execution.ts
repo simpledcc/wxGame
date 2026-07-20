@@ -1385,7 +1385,7 @@ async function main(): Promise<void> {
     .map((name) => findDeep(minimumCreatePanel, name)!);
   const minimumGuidanceTab = findDeep(minimumCreatePanel, "CreateGuidanceCardTab")!;
   assertEqual(minimumGuidanceTab.getComponent(UITransform)?.height, 24);
-  assertEqual(findDeep(minimumGuidanceTab, "CreateGuidanceCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+  assertEqual(findDeep(minimumGuidanceTab, "CreateGuidanceCardTabTitle")?.getComponent(Label)?.fontSize, 15);
   assertOk(verticalGap(minimumGuidanceTab, findDeep(minimumCreatePanel, "CreateGuidance")!) >= 4);
   for (let gap = 0; gap < createChain.length - 1; gap += 1) {
     assertOk(verticalGap(createChain[gap], createChain[gap + 1]) >= 8,
@@ -1443,7 +1443,7 @@ async function main(): Promise<void> {
   [["LobbyBankCardTab", "RoomMode"], ["RoomStatusCardTab", "RoomStatus"]].forEach(([tabName, contentName]) => {
     const tab = findDeep(minimumLobby, tabName)!;
     assertEqual(tab.getComponent(UITransform)?.height, 24);
-    assertEqual(findDeep(tab, `${tabName}Title`)?.getComponent(Label)?.fontSize, 14);
+    assertEqual(findDeep(tab, `${tabName}Title`)?.getComponent(Label)?.fontSize, 15);
     assertOk(verticalGap(tab, findDeep(minimumLobby, contentName)!) >= 4);
   });
   const minimumStart = lobbyChain[5];
@@ -1873,7 +1873,7 @@ async function main(): Promise<void> {
       const bankStatusCoin = bankStatusCard.children.find((child) => child.name === "HomeCoinSlot")!;
       const bankStatusCopy = findDeep(canvas, "BankStatus")!;
       assertEqual(bankStatusTab.getComponent(UITransform)?.height, 24);
-      assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+      assertEqual(findDeep(bankStatusTab, "BankStatusCardTabTitle")?.getComponent(Label)?.fontSize, 15);
       assertEqual(findDeep(bankStatusTab, "HomeCoinSlot")?.getComponent(UITransform)?.height, 16);
       assertEqual(bankStatusCoin.getComponent(UITransform)?.height, 32);
       assertOk(verticalGap(bankHeader, bankStatusCard) >= 4);
@@ -2317,7 +2317,7 @@ async function main(): Promise<void> {
       assertOk(findDeep(canvas, "HistoryRecentCardTab")?.getComponent(Graphics));
       const recentTab = findDeep(canvas, "HistoryRecentCardTab")!;
       assertEqual(recentTab.getComponent(UITransform)?.height, 24);
-      assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
+      assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 15);
       assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
       const rowMeta = findDeep(findDeep(canvas, "HistoryRow0")!, "Meta")!.getComponent(Label)!;
       assertEqual(rowMeta.fontSize, 15, "history row metadata must keep the auxiliary-copy legibility floor");

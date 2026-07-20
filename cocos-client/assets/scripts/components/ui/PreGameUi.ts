@@ -375,7 +375,7 @@ export class PreGameUi {
     if (visualKey) this.visualSlot(tab, visualKey, -tabWidth/2+(h<58?18:32), 0,
       h<58?16:38, h<58?16:38, textToken);
     const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey?(h<58?14:22):0, 0,
-      tabWidth-(visualKey?(h<58?48:76):24), h<58?16:42, h<58?14:22, textToken);
+      tabWidth-(visualKey?(h<58?48:76):24), h<58?16:42, h<58?15:22, textToken);
     if (kind!=="surface") {
       tabTitle.enableOutline = true;
       tabTitle.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.42);
@@ -761,7 +761,7 @@ export class PreGameUi {
     const label = node.addComponent(Label);
     label.string = text;
     label.fontSize = Math.max(12, Math.round(fontSize));
-    label.lineHeight = Math.max(label.fontSize + 4, Math.round(label.fontSize * 1.2));
+    label.lineHeight = Math.min(height, Math.max(label.fontSize + 4, Math.round(label.fontSize * 1.2)));
     label.color = this.color(colorToken);
     label.horizontalAlign = horizontalAlign;
     label.verticalAlign = 1;

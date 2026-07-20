@@ -221,7 +221,12 @@ function main(): void {
   assertEqual(
     compactSection.getChildByName("FoundationCompactSectionTab")
       ?.getChildByName("FoundationCompactSectionTabTitle")?.getComponent(Label)?.fontSize,
-    14
+    15
+  );
+  assertEqual(
+    compactSection.getChildByName("FoundationCompactSectionTab")
+      ?.getChildByName("FoundationCompactSectionTabTitle")?.getComponent(Label)?.lineHeight,
+    16
   );
 
   let actionCount = 0;

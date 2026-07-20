@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-six source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass establishes a 15px floor for safe fixed-geometry identity, status and input-count copy, and shortens Feedback privacy copy to prevent runtime shrinking; detailed evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-seven source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass raises compact Section Card titles to 15px and prevents generated line height from exceeding its text box, eliminating vertical `SHRINK` pressure without moving page geometry; detailed evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1671,6 +1671,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Raised Feedback's privacy notice from 14px to 15px and shortened its dynamic copy from 39 to at most 33 Chinese characters. The unchanged `500x32` single-line slot now keeps the intended tier while still naming feedback/contact handling and ending with the real privacy contract name. Prompt, captions, inputs, status band and exact eight-pixel form chain do not move.
 - Foundation and full route runtime coverage freeze the new badge, identity, counter and privacy typography plus the shortened compliance-copy boundary. Full `npm run verify` and `npm run build:wechat:dry-run` pass; core source falls to `1,519,981 / 1,520,000`, and formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, Store/route behavior, room/gameplay/cloud protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-forty-seventh source checkpoint
+
+- Raised every compact Section Card title from 14px to 15px. The shared rule applies to Bank status, Create guidance, Room code, Lobby current Bank/current status and History recent/best summaries; large 58px title tabs remain at 22px, and compact tabs/icons/title boxes remain `24/16/16px` with the same four-pixel top/bottom and eight-pixel horizontal boundaries.
+- Fixed the underlying vertical-fit contract in `PreGameUi.label()`: generated line height is now capped by the supplied text-box height. A compact 15px title in its 16px box therefore receives a 16px line height rather than requesting 19px and relying on `SHRINK` to compensate. Labels whose boxes already accommodate their natural line height remain unchanged.
+- Foundation and long/minimum route coverage freeze the new 15px/16px compact title contract, all existing tab geometry and body clearance. Full `npm run verify` and `npm run build:wechat:dry-run` pass at `1,519,999 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, copy, Store/route behavior, room/gameplay/cloud protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Future source work must first recover payload bytes; current Creator/WeChat visual evidence remains pending and this is not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1718,7 +1724,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-six source-verified visual-polish passes/audits and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-seven source-verified visual-polish passes/audits and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
