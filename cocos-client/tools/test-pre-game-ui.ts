@@ -197,9 +197,9 @@ function main(): void {
   assertEqual(accent?.position.x, -277);
   assertEqual(accent?.position.y, 0);
   assertEqual(transform(accent!).width, 4);
-  assertEqual(transform(accent!).height, 104);
+  assertEqual(transform(accent!).height, 112);
   assertDeepEqual(accent?.getComponent(Graphics)?.lastRoundRect, {
-    x: -2, y: -52, width: 4, height: 104, radius: 2
+    x: -2, y: -56, width: 4, height: 112, radius: 2
   });
   const accentInner = accentCard.getChildByName("FoundationAccentCardInnerBorder")!;
   assertEqual(accent!.position.x + transform(accent!).width / 2 + 1,
@@ -211,6 +211,8 @@ function main(): void {
   const compactSection = preGame.sectionCard(
     safe.node, "FoundationCompactSection", "当前状态", 0, 130, 560, 70, "history", "history"
   );
+  assertEqual(largeSection.getChildByName("FoundationLargeSectionTabShadow")
+    ?.getComponent(Graphics)?.fillColor.a, 60);
   assertSectionTabSpacing(largeSection, "FoundationLargeSection", "WordBank");
   assertSectionTabSpacing(compactSection, "FoundationCompactSection", "History");
   assertEqual(
@@ -426,7 +428,7 @@ function main(): void {
     - headerIcon.position.x - transform(headerIcon).width / 2 >= 8);
   assertEqual(pageHeader.titleLabel.enableOutline, true);
   assertDeepEqual(pageHeader.titleLabel.color, preGame.color("homeTextOnColor"));
-  const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", "输入房间码", 0, -100, 420, 80, 6);
+  const directEdit = preGame.edit(pageSafe.node, "FoundationEdit", 0, -100, 420, 80, 6);
   assertOk(directEdit.node.getComponent(EditBox));
   const focusRing = directEdit.node.getChildByName("FoundationEditFocusRing");
   assertEqual(focusRing?.active, false);
@@ -440,7 +442,7 @@ function main(): void {
   assertEqual(directEdit.node.getComponent(Graphics), null, "PreGame EditBox host must not carry Graphics");
   assertOk(directEdit.backgroundNode.getComponent(Graphics));
   assertEqual(directEdit.backgroundNode.parent, directEdit.node);
-  const multilineEdit = preGame.edit(pageSafe.node, "FoundationMultilineEdit", "", 0, -200, 500, 196, 300, true);
+  const multilineEdit = preGame.edit(pageSafe.node, "FoundationMultilineEdit", 0, -200, 500, 196, 300, true);
   assertEqual(multilineEdit.node.getChildByName("FoundationMultilineEditCount")?.getComponent(Label)?.fontSize, 15);
 
   const modal = preGame.modal(root, "FoundationModal", 520, 360);

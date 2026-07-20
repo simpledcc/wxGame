@@ -2024,7 +2024,7 @@ async function main(): Promise<void> {
       const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
       const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
       assertEqual(modeAccent.getComponent(UITransform)?.width, 4);
-      assertEqual(modeAccent.getComponent(UITransform)?.height, 42);
+      assertEqual(modeAccent.getComponent(UITransform)?.height, 50);
       assertEqual(findDeep(modeRow, "ModeOption0InnerBorder")?.getComponent(UITransform)?.height, 66,
         "mode card visual must stay inset from its 80px layout node");
       assertEqual(modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2

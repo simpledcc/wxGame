@@ -439,7 +439,7 @@ export class RuntimeScreenFactory {
       home.visualSlot(joinCard, "joinRoom", 0, 212, 90, 90);
       home.label(joinCard, "JoinCodeTitle", "输入六位房间码", 0, 100, 480, 50, 30, "homeText");
       joinHint = home.label(joinCard, "JoinCodeHint", "请输入 6 位英文字母或数字", 0, 50, 480, 34, 18, "homeTextMuted");
-      input = home.edit(joinCard, "RoomCodeInput", "", 0, -27, 500, 104, ROOM_CODE_LENGTH);
+      input = home.edit(joinCard, "RoomCodeInput", 0, -27, 500, 104, ROOM_CODE_LENGTH);
       home.label(joinCard, "JoinInviteHint", "也可以通过好友邀请直接进入准备房间", 0, -114, 480, 54, 18, "homeTextMuted");
       join = home.actionButton(joinCard, "JoinRoom", "加入房间", "查找好友创建的房间", "友", 0, -221,
         520, 120, () => void controller.joinEnteredRoom(), "join", "joinRoom");
@@ -650,9 +650,9 @@ export class RuntimeScreenFactory {
     home.label(formCard, "FeedbackPrompt", "反馈内容仅用于定位问题和改进体验", 28, 202, 448, 40, 18, "homeTextMuted", 0);
     const privacy = home.label(formCard, "FeedbackPrivacy", "", 0, 158, 500, 32, 15, "homeTextMuted");
     home.label(formCard, "FeedbackContentCaption", "反馈内容（4-300 字）", 0, 118, 460, 28, 16, "homeTextMuted", 0);
-    const content = home.edit(safe.node, "FeedbackContent", "", 0, formY - 2, 500, 196, 300, true);
+    const content = home.edit(safe.node, "FeedbackContent", 0, formY - 2, 500, 196, 300, true);
     home.label(formCard, "FeedbackContactCaption", "联系方式（选填）", 0, -122, 460, 28, 16, "homeTextMuted", 0);
-    const contact = home.edit(safe.node, "FeedbackContact", "", 0, formY - 172, 500, 56, 80);
+    const contact = home.edit(safe.node, "FeedbackContact", 0, formY - 172, 500, 56, 80);
     home.pill(formCard, "FeedbackStatusBand", 0, -225, 500, 34, "homeCard", "homeCardBorder");
     const status = home.label(formCard, "FeedbackStatus", "", 0, -225, 468, 26, 18, "homeTextMuted");
     const submit = home.actionButton(safe.node, "SubmitFeedback", "提交反馈", "提交前会检查内容长度与格式", "言", 0,

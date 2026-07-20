@@ -343,10 +343,10 @@ export class PreGameUi {
   accentCard(parent: Node, name: string, x: number, y: number, width: number, height: number,
     kind: PreGameActionKind, radius = 20): Node {
     const node = this.card(parent, name, x, y, width, height, radius);
-    const accent=this.node(node,`${name}Accent`,-width/2+3,0,4,height-36);
+    const accent=this.node(node,`${name}Accent`,-width/2+3,0,4,height-28);
     const graphics = accent.addComponent(Graphics);
     graphics.fillColor = this.color(this.actionToken(kind));
-    graphics.roundRect(-2,-(height-36)/2,4,height-36,2);
+    graphics.roundRect(-2,-(height-28)/2,4,height-28,2);
     graphics.fill();
     return node;
   }
@@ -359,7 +359,7 @@ export class PreGameUi {
     const tabShadow = this.node(card, `${name}TabShadow`, -width/2+tabWidth/2+14,
       height/2-h/2-5, tabWidth, h);
     const tabShadowGraphics = tabShadow.addComponent(Graphics);
-    tabShadowGraphics.fillColor = new Color(24, 42, 56, 46);
+    tabShadowGraphics.fillColor = new Color(24, 42, 56, 60);
     tabShadowGraphics.roundRect(-tabWidth/2,-h/2,tabWidth,h,Math.min(18,h/2));
     tabShadowGraphics.fill();
     const tab = this.node(card, `${name}Tab`, -width/2+tabWidth/2+14,
@@ -491,7 +491,7 @@ export class PreGameUi {
     return { node, button, label, background, visual };
   }
 
-  edit(parent: Node, name: string, _placeholder: string, x: number, y: number, width: number, height: number,
+  edit(parent: Node, name: string, x: number, y: number, width: number, height: number,
     maxLength: number, multiline = false): RuntimeEditRef {
     const node = this.node(parent, name, x, y, width, height);
     const backgroundNode = this.node(node, `${name}Background`, 0, 0, width, height);
