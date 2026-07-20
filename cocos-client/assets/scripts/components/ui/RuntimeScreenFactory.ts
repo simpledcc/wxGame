@@ -284,12 +284,12 @@ export class RuntimeScreenFactory {
       page += 1;
       renderPage();
     });
-    const unlock = home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -144, safeBottom + 48, 272, 80, () => {
+    const unlock = home.actionButton(safe.node, "UnlockBank", "解锁所选", "使用真实单词金币", "币", -152, safeBottom + 48, 256, 80, () => {
       controller.unlockSelectedBank();
       renderPage();
     }, "history", "coin");
-    home.actionButton(safe.node, "ConfirmBank", "确定选择", "用于练习和下一场比赛", "词", 144,
-      safeBottom + 48, 272, 80, () => controller.confirmSelection(), "bank", "wordBank");
+    home.actionButton(safe.node, "ConfirmBank", "确定选择", "用于练习和下一场比赛", "词", 136,
+      safeBottom + 56, 288, 96, () => controller.confirmSelection(), "bank", "wordBank");
     controller = root.addComponent(BankScene);
     controller.statusLabel = status;
     renderPage();

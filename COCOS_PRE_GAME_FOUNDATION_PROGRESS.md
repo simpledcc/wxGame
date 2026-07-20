@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and thirty-seven source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass makes Study's final Next command visibly larger than Reveal, Mark-wrong and meaning-display controls while preserving the complete eight-pixel minimum-screen chain; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and thirty-eight source-verified passes now cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass makes Bank's final Confirm command visibly larger than conditional Unlock while preserving aligned bottoms, balanced outer insets and minimum-screen clearance; detailed per-pass evidence remains below. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1617,6 +1617,12 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Moved Meaning Toggle and Next upward four pixels. At the true `640x960` minimum viewport this replaces the previous 12/12px auxiliary/final gaps with exact eight-pixel Reveal/Toggle and Toggle/Next rhythm while retaining ten pixels below the final command; the long-screen gaps continue expanding responsively. Reveal, wrong-word persistence, Chinese visibility, progress, word navigation and Bank return remain unchanged.
 - Long/minimum runtime coverage now freezes final-versus-auxiliary visual height, title size, icon size, shared main-column width, every eight-pixel boundary and safe-area clearance; existing clicks still traverse Previous, Random, Next, Reveal, Mark-wrong, Meaning Toggle and Bank return. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, study state, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-thirty-eighth source checkpoint
+
+- Replaced Bank's equal `272x80` Unlock/Confirm actions with a `256x80` conditional Unlock and `288x96` final Confirm. Their title tiers now descend from 31px Confirm to 27px Unlock, and their formal semantic icons from 53.76px to 44.8px, making Confirm the clear end of the selection flow.
+- Shifted the two controls horizontally to `x=-152/136` and raised only Confirm by eight pixels. Both bottom edges remain aligned at exactly eight pixels above the minimum SafeArea; the complete row preserves its former `-280..280` outer extent, equal left/right insets and 16px internal gap. Confirm retains at least 18px below pagination while Unlock retains 34px.
+- Shared long/minimum coverage freezes widths, heights, title/icon descent, outer insets, internal gap, aligned bottoms, pagination clearance and SafeArea clearance. Existing tests still exercise selection, paging, unlock availability, failed-persistence rollback and return routing. Full `npm run verify` and `npm run build:wechat:dry-run` pass with core source unchanged at `1,519,962 / 1,520,000`; formal art remains `imported` with 18 images and 23 metadata files. No bitmap, importer metadata, Bank data, coin persistence, room protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1655,7 +1661,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Review the Bank page's final Confirm selection command against its conditional Unlock action and pagination controls, strengthening the selection-flow hierarchy without changing Bank data, coin spending, unlock state, paging or return behavior. Two-device gameplay acceptance remains deferred.
+Review the preparation lobby's final Start command against Ready, Copy and Invite controls, strengthening disabled-versus-ready visual hierarchy without changing room state, start eligibility, polling, sharing or protocol behavior. Do not execute two-device start-game acceptance; it remains deferred.
 
 ## Deferred external visual gate
 
@@ -1664,7 +1670,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-seven source-verified visual-polish passes and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and thirty-eight source-verified visual-polish passes and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
 Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.

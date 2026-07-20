@@ -1799,6 +1799,41 @@ async function main(): Promise<void> {
           - copy.position.x - copy.getComponent(UITransform)!.width / 2,
         `${context} Bank status row needs balanced horizontal card insets`);
       };
+      const assertBankFinalActions = (root: Node, context: string): void => {
+        const safe = findDeep(root, "BankSafeArea")!;
+        const pager = findDeep(root, "PreviousBanks")!;
+        const unlock = findDeep(root, "UnlockBank")!;
+        const confirm = findDeep(root, "ConfirmBank")!;
+        const unlockTransform = unlock.getComponent(UITransform)!;
+        const confirmTransform = confirm.getComponent(UITransform)!;
+        assertEqual(unlockTransform.width, 256, `${context} conditional unlock width must stay secondary`);
+        assertEqual(confirmTransform.width, 288, `${context} final confirmation width must lead the row`);
+        assertEqual(unlockTransform.height, 80, `${context} conditional unlock height must stay secondary`);
+        assertEqual(confirmTransform.height, 96, `${context} final confirmation height must lead the row`);
+        assertOk(findDeep(confirm, "ConfirmBankTitle")!.getComponent(Label)!.fontSize
+          > findDeep(unlock, "UnlockBankTitle")!.getComponent(Label)!.fontSize,
+        `${context} final confirmation title must exceed the unlock title`);
+        assertOk(findDeep(confirm, "ConfirmBankIconSlot")!.getComponent(UITransform)!.width
+          > findDeep(unlock, "UnlockBankIconSlot")!.getComponent(UITransform)!.width,
+        `${context} final confirmation icon must exceed the unlock icon`);
+        assertEqual(horizontalGap(unlock, confirm), 16,
+          `${context} final Bank actions need a sixteen-pixel boundary`);
+        assertEqual(unlock.position.y - unlockTransform.height / 2,
+          confirm.position.y - confirmTransform.height / 2,
+        `${context} final Bank actions must share one bottom edge`);
+        assertEqual(unlock.position.x - unlockTransform.width / 2
+          + safe.getComponent(UITransform)!.width / 2,
+        safe.getComponent(UITransform)!.width / 2
+          - confirm.position.x - confirmTransform.width / 2,
+        `${context} final Bank actions need balanced outer insets`);
+        [unlock, confirm].forEach((action) => {
+          assertOk(verticalGap(pager, action) >= 8,
+            `${context} final Bank actions must clear pagination`);
+          assertOk(action.position.y - action.getComponent(UITransform)!.height / 2
+            >= -safe.getComponent(UITransform)!.height / 2 + 8,
+          `${context} final Bank actions must retain bottom clearance`);
+        });
+      };
       assertEqual(findDeep(canvas, "BankPage")?.getComponent(Label)?.string, "1/12");
       assertEqual(findDeep(canvas, "PreviousBanks")?.getComponent(Button)?.interactable, false);
       assertEqual(findDeep(canvas, "NextBanks")?.getComponent(Button)?.interactable, true);
@@ -1823,6 +1858,7 @@ async function main(): Promise<void> {
       assertEqual(bankStatusCoin.position.y, bankStatusCopy.position.y,
         "Bank status icon and copy must share one baseline");
       assertBankStatusRow(routeRoot, "long");
+      assertBankFinalActions(routeRoot, "long");
       [bankStatusCoin, bankStatusCopy].forEach((content) => {
         assertOk(verticalGap(bankStatusTab, content) >= 8,
           "Bank status content must clear its compact title tab");
@@ -1916,6 +1952,7 @@ async function main(): Promise<void> {
       assertPreGameTargetDevices(minimumBankRoot);
       assertBankStatusRow(minimumBankRoot, "minimum");
       assertBankSlotText(minimumBankRoot, "minimum");
+      assertBankFinalActions(minimumBankRoot, "minimum");
       setMockWindowSize(393, 852);
     }
     if (routes[index] === "coopSelect") {
