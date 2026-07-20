@@ -2304,7 +2304,10 @@ async function main(): Promise<void> {
       assertOk(app.historyStore.getRecords("pk").some((record) => record.id === "pk:runtime-result-room"));
     }
     if (routes[index] === "history") {
-      assertOk(findDeep(canvas, "HistoryRecentSummary")?.getComponent(Label)?.string.length);
+      const recentSummary = findDeep(canvas, "HistoryRecentSummary")?.getComponent(Label);
+      assertOk(recentSummary?.string.length);
+      assertEqual(recentSummary?.string.includes(":"), false,
+        "recent history summary must omit time detail so the date remains readable");
       assertEqual(findDeep(canvas, "HistoryBestSummary")?.getComponent(Label)?.string, "700 分");
       assertEqual(findDeep(canvas, "HistoryEmptyState")?.active, false, "history records must hide the empty-state card");
       assertOk(findDeep(canvas, "HistoryRecentCardTab")?.getComponent(Graphics));
@@ -2312,6 +2315,10 @@ async function main(): Promise<void> {
       assertEqual(recentTab.getComponent(UITransform)?.height, 24);
       assertEqual(findDeep(recentTab, "HistoryRecentCardTabTitle")?.getComponent(Label)?.fontSize, 14);
       assertOk(verticalGap(recentTab, findDeep(canvas, "HistoryRecentSummary")!) >= 4);
+      const rowMeta = findDeep(findDeep(canvas, "HistoryRow0")!, "Meta")!.getComponent(Label)!;
+      assertEqual(rowMeta.fontSize, 15, "history row metadata must keep the auxiliary-copy legibility floor");
+      assertOk(/^\d{1,2}月\d{1,2}日 · /.test(rowMeta.string),
+        "history row metadata must use a compact date before its bank label");
       const historyFilter = findDeep(canvas, "HistoryAll")!;
       const historyFilterLabel = findDeep(historyFilter, "HistoryAllLabel")!;
       const historyFilterIndicator = findDeep(historyFilter, "HistoryAllSelected")!;

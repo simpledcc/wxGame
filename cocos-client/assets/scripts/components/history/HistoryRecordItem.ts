@@ -22,7 +22,8 @@ export class HistoryRecordItem extends Component {
     this.node.active = true;
     if (this.titleLabel) this.titleLabel.string = `${record.modeLabel} · ${record.result}`;
     if (this.metaLabel) {
-      this.metaLabel.string = `${new Date(record.finishedAt).toLocaleString()} · ${record.bankLabel}`;
+      const d = new Date(record.finishedAt);
+      this.metaLabel.string = `${d.getMonth() + 1}月${d.getDate()}日 · ${record.bankLabel}`;
     }
     if (this.scoreLabel) this.scoreLabel.string = `${record.score} 分`;
     if (this.detailButton) this.detailButton.interactable = record.modeKey === "coopSpell";

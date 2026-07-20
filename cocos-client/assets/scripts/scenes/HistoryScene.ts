@@ -151,7 +151,7 @@ export class HistoryScene extends Component {
     if (this.recentSummaryLabel) {
       const recent = this.records[0];
       this.recentSummaryLabel.string = recent
-        ? `${recent.modeLabel}\n${new Date(recent.finishedAt).toLocaleString()}`
+        ? `${recent.modeLabel}\n${new Date(recent.finishedAt).toLocaleDateString()}`
         : "暂无比赛记录";
     }
     if (this.bestSummaryLabel) {
