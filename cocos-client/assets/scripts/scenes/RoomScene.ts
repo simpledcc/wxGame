@@ -321,7 +321,7 @@ export class RoomScene extends Component {
     const mode = app.store.getState().selectedMode;
     if (mode === "coopShared") return "默契捕词赛";
     if (mode === "coopSpell") return "同舟拼词记";
-    return "准备体验模式";
+    return "好友房间体验";
   }
 
   private getSelectedBankLabel(room: RoomSnapshot | null = null): string {

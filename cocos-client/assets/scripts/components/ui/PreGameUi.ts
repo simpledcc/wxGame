@@ -304,25 +304,36 @@ export class PreGameUi {
   }
 
   pageHeader(parent: PreGameSafeAreaRef, name: string, title: string, subtitle: string,
-    backHandler: () => void, icon: HomeVisualSlotKey = "catalog"): PreGamePageHeaderRef {
+    backHandler: () => void, icon: HomeVisualSlotKey = "catalog",
+    kind: PreGameActionKind = "join"): PreGamePageHeaderRef {
     const node = this.topBar(parent, name, 116);
-    this.pill(node, `${name}Backdrop`, 42, 0, 454, 96, "homeJoin", "homeTextOnColor");
+    const backdrop = this.node(node, `${name}Backdrop`, 42, 0, 454, 96);
+    const backdropGraphics = this.addRoundedBackground(
+      backdrop,
+      454,
+      96,
+      24,
+      this.actionToken(kind),
+      "homeTextOnColor"
+    );
+    backdropGraphics.lineWidth = 2;
+    this.addHighlight(backdrop, `${name}BackdropHighlight`, 424, 96, 24, 12);
     const backButton = this.iconButton(node, "BackButton", "←", -250, 0, 86, backHandler, undefined, "join", 48);
     backButton.titleLabel.color = this.color("homeTextOnColor");
-    const iconPlate = this.pill(node, `${name}Icon`, -126, 18, 58, 58, "homeCard", "homeTextOnColor");
-    this.visualSlot(iconPlate, icon, 0, 0, 48, 48);
-    const titleLabel = this.label(node, `${name}Title`, title, 66, 22, 302, 44, 31, "homeTextOnColor");
+    const iconPlate = this.pill(node, `${name}Icon`, -131, 15, 52, 52, "homeCard", "homeTextOnColor");
+    this.visualSlot(iconPlate, icon, 0, 0, 42, 42);
+    const titleLabel = this.label(node, `${name}Title`, title, 61, 21, 310, 42, 30, "homeTextOnColor");
     titleLabel.enableOutline = true;
-    titleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.5);
+    titleLabel.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.5);
     titleLabel.outlineWidth = 2;
-    const divider = this.node(node, `${name}Divider`, 62, -9, 286, 2);
+    const divider = this.node(node, `${name}Divider`, 61, -9, 300, 2);
     const dividerGraphics = divider.addComponent(Graphics);
     dividerGraphics.fillColor = new Color(255, 255, 255, 92);
-    dividerGraphics.roundRect(-143, -1, 286, 2, 1);
+    dividerGraphics.roundRect(-150, -1, 300, 2, 1);
     dividerGraphics.fill();
-    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -31, 382, 24, 15, "homeTextOnColor");
+    const subtitleLabel = this.label(node, `${name}Subtitle`, subtitle, 14, -31, 390, 24, 15, "homeTextOnColor");
     subtitleLabel.enableOutline = true;
-    subtitleLabel.outlineColor = this.darken(this.color("homeJoin"), 0.54);
+    subtitleLabel.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.54);
     subtitleLabel.outlineWidth = 1;
     return { node, backButton, titleLabel, subtitleLabel };
   }
@@ -354,8 +365,10 @@ export class PreGameUi {
   sectionCard(parent: Node, name: string, title: string, x: number, y: number, width: number,
     height: number, kind: PreGameActionKind, visualKey?: HomeVisualSlotKey): Node {
     const card = this.card(parent, name, x, y, width, height, 22);
-    const h=height<120?24:58;
-    const tabWidth=Math.min(width-36,Math.max(170,title.length*26+(visualKey?76:42)));
+    const h = height < 120 ? 24 : height < 170 ? 34 : 44;
+    const iconSize = h < 30 ? 16 : h < 40 ? 22 : 28;
+    const tabWidth = Math.min(width - 36, Math.max(150,
+      title.length * (h < 40 ? 22 : 24) + (visualKey ? iconSize + 46 : 34)));
     const tabShadow = this.node(card, `${name}TabShadow`, -width/2+tabWidth/2+14,
       height/2-h/2-5, tabWidth, h);
     const tabShadowGraphics = tabShadow.addComponent(Graphics);
@@ -372,10 +385,11 @@ export class PreGameUi {
     tabBackground.fill();
     tabBackground.stroke();
     const textToken:ThemeColorToken=kind==="surface"?"homeText":"homeTextOnColor";
-    if (visualKey) this.visualSlot(tab, visualKey, -tabWidth/2+(h<58?18:32), 0,
-      h<58?16:38, h<58?16:38, textToken);
-    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey?(h<58?14:22):0, 0,
-      tabWidth-(visualKey?(h<58?48:76):24), h<58?16:42, h<58?15:22, textToken);
+    if (visualKey) this.visualSlot(tab, visualKey, -tabWidth / 2 + 16 + iconSize / 2, 0,
+      iconSize, iconSize, textToken);
+    const tabTitle = this.label(tab, `${name}TabTitle`, title, visualKey ? iconSize / 2 + 8 : 0, 0,
+      tabWidth - (visualKey ? iconSize + 44 : 24), Math.max(16, h - 10), h < 30 ? 15 : h < 40 ? 17 : 19,
+      textToken);
     if (kind!=="surface") {
       tabTitle.enableOutline = true;
       tabTitle.outlineColor = this.darken(this.color(this.actionToken(kind)), 0.42);

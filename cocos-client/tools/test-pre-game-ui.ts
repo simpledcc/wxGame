@@ -218,7 +218,7 @@ function main(): void {
   assertEqual(
     largeSection.getChildByName("FoundationLargeSectionTab")
       ?.getChildByName("FoundationLargeSectionTabTitle")?.getComponent(Label)?.fontSize,
-    22
+    17
   );
   assertEqual(
     compactSection.getChildByName("FoundationCompactSectionTab")

@@ -29,6 +29,7 @@ export interface AppState {
   bankId: string;
   wordMode: WordMode;
   bankReturnRoute: RouteName;
+  helpReturnRoute: "home" | "coopSelect";
   bankPickerSelectedBankId: string;
 }
 
@@ -49,6 +50,7 @@ export class GameStore {
     bankId: "jilin-g1a-b1-welcome",
     wordMode: "regular",
     bankReturnRoute: "home",
+    helpReturnRoute: "home",
     bankPickerSelectedBankId: "jilin-g1a-b1-welcome"
   };
 

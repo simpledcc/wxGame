@@ -15,6 +15,7 @@ export class CoopSelectScene extends Component {
   }
 
   openHelp(): void {
+    app.store.patch({ helpReturnRoute: "coopSelect" });
     app.router.navigate("help");
   }
 

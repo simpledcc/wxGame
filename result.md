@@ -1,6 +1,6 @@
 # Cocos 新编译版本图片加载与清晰度排查结果
 
-排查日期：2026-07-16
+排查日期：2026-07-16；2026-07-21 补充开发者工具分包缓存复现
 排查基线：`5b73bdf` 之后的高清导入完成提交，分支 `feature/pre-game-ui-home-goal`
 Cocos Creator：`3.8.8`
 
@@ -91,6 +91,10 @@ Creator 构建日志包含 `WordBankData.generated.ts exceeds 500KB` 的 Babel �
 
 项目启用了 `md5Cache`，微信开发者工具也会保留编译和文件缓存。重新构建后若工具没有刷新到新 hash，可能暂时继续显示旧画面。此前清理 compile/file 缓存并重新打开正确构建目录后，正式图片恢复显示。
 
+2026-07-21 已复现一个更具体的时序：微信开发者工具保持项目打开时，Creator 外部构建先向临时 `assets/home_common` 输出文件，随后删除该目录并创建最终 `subpackages/home_common`。开发者工具的文件监听日志完整记录了这次搬迁，但当时运行缓存仍按中间状态查找，因而报 `loadSubpackage:fail module not found`，页面则静默显示程序化 fallback。
+
+构建完成后只需点击开发者工具顶部的“普通编译”一次。复测中控制台的 `home_common` 错误随即消失，首页背景、Logo、头像、金币、角色、图标和按钮皮肤全部恢复，并且选择玩法、创建房间和玩法介绍页继续正常显示。这说明产物结构和资源路径正确，不应为这个缓存现象修改 Bundle 名称、`game.json` 或 Creator 元数据。
+
 ## 4. 建议的确认步骤
 
 在 `cocos-client/` 执行：
@@ -105,12 +109,12 @@ npm run inspect:wechat-build
 
 然后：
 
-1. 关闭微信开发者工具中的旧项目。
-2. 清理编译缓存和文件缓存。
-3. 重新导入 `cocos-client/build/wechatgame/`。
-4. 确认项目名为 `word-battle-park-wechatgame`。
-5. 确认资源管理器存在 `subpackages/home_common`。
-6. 再检查首页和其他准备页。
+1. 等待 Creator 构建命令完全结束。
+2. 在微信开发者工具中点击一次“普通编译”。
+3. 确认项目名为 `word-battle-park-wechatgame`。
+4. 确认资源管理器存在 `subpackages/home_common`。
+5. 确认控制台没有 `loadSubpackage:fail module not found`，再检查首页和其他准备页。
+6. 只有普通编译仍失败时，才关闭旧项目、清理编译/文件缓存并重新导入 `cocos-client/build/wechatgame/`。
 
 ## 5. 后续改进建议
 

@@ -66,6 +66,13 @@ export class HomeScene extends Component {
     });
   }
 
+  openHelp(): void {
+    this.navigateOnce(() => {
+      app.store.patch({ helpReturnRoute: "home" });
+      app.router.navigate("help");
+    });
+  }
+
   openJoinRoom(): void {
     this.navigateOnce(() => {
       app.roomSession.leave();

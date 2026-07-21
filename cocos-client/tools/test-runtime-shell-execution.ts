@@ -22,7 +22,6 @@ import { HomePlaceholder } from "../assets/scripts/components/HomePlaceholder";
 import { GameplayFeedbackPool } from "../assets/bundles/mode_pk/scripts/GameplayFeedbackPool";
 import { ThemedWordTargetVisual } from "../assets/bundles/mode_pk/scripts/ThemedWordTargetVisual";
 import { RuntimeButtonVisual } from "../assets/scripts/components/ui/RuntimeButtonVisual";
-import { parseThemeColor } from "../assets/scripts/themes/ThemeCatalog";
 import {
   configurePortraitViewport,
   getPortraitViewportHeight
@@ -1007,7 +1006,7 @@ async function main(): Promise<void> {
   assertEqual(appRuntime.toastMessages[appRuntime.toastMessages.length - 1], "页面暂时无法打开，请重试");
   findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().route, "coopSelect", "failed Home navigation must allow a retry");
+  assertEqual(app.store.getState().route, "help", "failed Home navigation must allow a retry");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   app.router.navigate = originalNavigate;
@@ -1163,9 +1162,9 @@ async function main(): Promise<void> {
   );
   assertEqual(findDeep(canvas, "SelectedModeCard")?.getComponent(UITransform)?.height, 184);
   assertOk(findDeep(canvas, "SelectedModeCardTab")?.getComponent(Graphics));
-  assertEqual(findDeep(canvas, "SelectedModeCardTab")?.getComponent(UITransform)?.height, 58);
-  assertEqual(findDeep(canvas, "SelectedModeCardTabTitle")?.getComponent(Label)?.fontSize, 22);
-  assertEqual(findDeep(findDeep(canvas, "SelectedModeCardTab")!, "HomeJoinRoomSlot")?.getComponent(UITransform)?.height, 38);
+  assertEqual(findDeep(canvas, "SelectedModeCardTab")?.getComponent(UITransform)?.height, 44);
+  assertEqual(findDeep(canvas, "SelectedModeCardTabTitle")?.getComponent(Label)?.fontSize, 19);
+  assertEqual(findDeep(findDeep(canvas, "SelectedModeCardTab")!, "HomeJoinRoomSlot")?.getComponent(UITransform)?.height, 28);
   const assertCreateCardSpacing = (panel: Node, context: string): void => {
     const modeCard = findDeep(panel, "SelectedModeCard")!;
     const modeTab = findDeep(modeCard, "SelectedModeCardTab")!;
@@ -1653,7 +1652,7 @@ async function main(): Promise<void> {
   });
   findDeep(canvas, "HelpButton")?.emit(Button.EventType.CLICK);
   await flushMany();
-  assertEqual(app.store.getState().route, "coopSelect");
+  assertEqual(app.store.getState().route, "help");
   findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
   await flushMany();
   assertEqual(findDeep(canvas, "HomeCoins")?.getComponent(Label)?.string, "123456789");
@@ -2008,7 +2007,7 @@ async function main(): Promise<void> {
       helpButton.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "help");
-      assertEqual(findDeep(canvas, "HelpHeaderTitle")?.getComponent(Label)?.string, "玩法说明");
+      assertEqual(findDeep(canvas, "HelpHeaderTitle")?.getComponent(Label)?.string, "玩法介绍");
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "coopSelect", "rules must return to the mode catalog");
@@ -2017,32 +2016,16 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.width, 548);
       assertEqual(findDeep(canvas, "ModeOption1")?.getComponent(UITransform)?.height, 80);
       assertEqual(findDeep(canvas, "ModeOption7")?.getComponent(UITransform)?.width, 548);
-      assertOk(findDeep(canvas, "ModeOption0Players")?.getComponent(Graphics),
-        "mode player count must use the shared status badge");
-      assertEqual(findDeep(canvas, "ModeOption0PlayersLabel")?.getComponent(Label)?.fontSize, 15);
       const modeRow = findDeep(canvas, "ModeOption0")!;
-      const modeAccent = findDeep(modeRow, "ModeOption0Accent")!;
-      const modeIcon = findDeep(modeRow, "HomeJoinRoomSlot")!;
-      assertEqual(modeAccent.getComponent(UITransform)?.width, 4);
-      assertEqual(modeAccent.getComponent(UITransform)?.height, 50);
-      assertEqual(findDeep(modeRow, "ModeOption0InnerBorder")?.getComponent(UITransform)?.height, 66,
-        "mode card visual must stay inset from its 80px layout node");
-      assertEqual(modeIcon.position.x - modeIcon.getComponent(UITransform)!.width / 2
-        - modeAccent.position.x - modeAccent.getComponent(UITransform)!.width / 2, 8,
-      "mode accent rail and icon need an eight-pixel boundary");
-      assertEqual(modeAccent.position.x + modeAccent.getComponent(UITransform)!.width / 2 + 1,
-        -modeRow.getComponent(UITransform)!.width / 2 + 6,
-      "mode accent rail must remain clear of the card inner border");
-      const modeRailColors = Array.from({ length: 8 }, (_, rowIndex) =>
-        findDeep(canvas, `ModeOption${rowIndex}Accent`)!.getComponent(Graphics)!.fillColor
-      ).map((color) => `${color.r},${color.g},${color.b},${color.a}`);
-      assertOk(new Set(modeRailColors).size >= 5,
-        `mode accent rails must retain category color hierarchy: ${modeRailColors.join(" | ")}`);
-      const expectedRailTokens = ["homePractice", "homePractice", "homeCatalog", "homeHistory",
-        "homeCreate", "homeBank", "homeJoin", "homeCatalog"] as const;
-      expectedRailTokens.forEach((token, rowIndex) => assertEqual(modeRailColors[rowIndex],
-        parseThemeColor(app.themes.getCurrentTheme().colors[token]).join(","),
-      `mode ${rowIndex + 1} rail must match its formal icon semantics`));
+      const modeAction = findDeep(modeRow, "ModeOption0Action")!;
+      assertEqual(modeAction.getComponent(UITransform)?.width, 548,
+        "mode choices must use the same full-width button silhouette as Home actions");
+      assertEqual(modeAction.getComponent(RuntimeButtonVisual)?.getVisualGeometry().height, 80);
+      assertOk(findDeep(modeAction, "ModeOption0ActionSkin"),
+        "mode choices must expose the shared bitmap-skin slot");
+      assertOk(findDeep(modeAction, "ModeOption0Status")?.getComponent(Graphics),
+        "mode availability must use the shared status badge");
+      assertEqual(findDeep(modeAction, "ModeOption0StatusLabel")?.getComponent(Label)?.string, "可体验");
       for (let disabledIndex = 1; disabledIndex < 8; disabledIndex += 1) {
         const disabledAction = findDeep(canvas, `ModeOption${disabledIndex}Action`)!;
         assertEqual(disabledAction.getComponent(Button)?.interactable, false,
@@ -2053,17 +2036,15 @@ async function main(): Promise<void> {
       const assertModeRowText = (root: Node, context: string): void => {
         for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
           const row = findDeep(root, `ModeOption${rowIndex}`)!;
-          const icon = row.children.find((child) => child.name.startsWith("Home") && child.name.endsWith("Slot"))!;
-          const title = findDeep(row, `ModeOption${rowIndex}Title`)!;
-          const subtitle = findDeep(row, `ModeOption${rowIndex}Subtitle`)!;
-          const badge = findDeep(row, `ModeOption${rowIndex}Players`)!;
           const action = findDeep(row, `ModeOption${rowIndex}Action`)!;
-          const actionLabel = findDeep(action, `ModeOption${rowIndex}ActionLabel`)!;
+          const icon = findDeep(action, `ModeOption${rowIndex}ActionIconSlot`)!;
+          const title = findDeep(action, `ModeOption${rowIndex}ActionTitle`)!;
+          const subtitle = findDeep(action, `ModeOption${rowIndex}ActionSubtitle`)!;
+          const badge = findDeep(action, `ModeOption${rowIndex}Status`)!;
           const halfHeight = row.getComponent(UITransform)!.height / 2;
           const halfWidth = row.getComponent(UITransform)!.width / 2;
           const actionTransform = action.getComponent(UITransform)!;
           const actionGeometry = action.getComponent(RuntimeButtonVisual)!.getVisualGeometry();
-          const accent = findDeep(row, `ModeOption${rowIndex}Accent`)!;
           assertOk(halfHeight - title.position.y - title.getComponent(UITransform)!.height / 2 >= 7,
             `${context} mode ${rowIndex + 1} title needs a top inset`);
           assertOk(verticalGap(title, subtitle) >= 8,
@@ -2071,31 +2052,24 @@ async function main(): Promise<void> {
           assertOk(subtitle.position.y - subtitle.getComponent(UITransform)!.height / 2 >= -halfHeight + 8,
             `${context} mode ${rowIndex + 1} subtitle needs a bottom inset`);
           [title, subtitle].forEach((copy) => {
-            assertEqual(copy.position.x - copy.getComponent(UITransform)!.width / 2
-              - icon.position.x - icon.getComponent(UITransform)!.width / 2, 8,
-            `${context} mode ${rowIndex + 1} icon and copy need an eight-pixel boundary`);
-            assertEqual(badge.position.x - badge.getComponent(UITransform)!.width / 2
-              - copy.position.x - copy.getComponent(UITransform)!.width / 2, 8,
-            `${context} mode ${rowIndex + 1} copy and badge need an eight-pixel boundary`);
+            assertOk(copy.position.x - copy.getComponent(UITransform)!.width / 2
+              - icon.position.x - icon.getComponent(UITransform)!.width / 2 >= 8,
+            `${context} mode ${rowIndex + 1} icon and copy need a visible boundary`);
+            assertOk(badge.position.x - badge.getComponent(UITransform)!.width / 2
+              - copy.position.x - copy.getComponent(UITransform)!.width / 2 >= 8,
+            `${context} mode ${rowIndex + 1} copy and status need a visible boundary`);
           });
-          assertEqual(icon.position.x - icon.getComponent(UITransform)!.width / 2
-            - accent.position.x - accent.getComponent(UITransform)!.width / 2, 8,
-          `${context} mode ${rowIndex + 1} accent rail and icon need an eight-pixel boundary`);
-          assertEqual(action.position.x - actionTransform.width / 2
-            - badge.position.x - badge.getComponent(UITransform)!.width / 2, 8,
-          `${context} mode ${rowIndex + 1} badge and action need an eight-pixel boundary`);
-          assertEqual(halfHeight - actionGeometry.height / 2, rowIndex ? 9 : 5,
-            `${context} mode ${rowIndex + 1} action must clear the card frame vertically`);
-          assertOk(halfWidth - action.position.x - actionTransform.width / 2 >= 8,
-            `${context} mode ${rowIndex + 1} action must clear the card frame horizontally`);
+          assertOk(halfWidth - badge.position.x - badge.getComponent(UITransform)!.width / 2 >= 8,
+            `${context} mode ${rowIndex + 1} status must clear the button edge`);
+          assertEqual(action.position.x, 0);
+          assertEqual(action.position.y, 0);
+          assertEqual(actionTransform.width, 548);
           assertEqual(actionTransform.height, 80,
             `${context} mode ${rowIndex + 1} action must retain its target-device touch height`);
-          assertEqual(actionGeometry.height, rowIndex ? 62 : 70,
-            `${context} only the available mode action may use the emphasized visual height`);
-          assertEqual(actionLabel.getComponent(Label)!.fontSize, rowIndex ? 17 : 18,
-            `${context} only the available mode action may use the emphasized label size`);
-          assertOk((actionGeometry.height - actionLabel.getComponent(UITransform)!.height) / 2 >= 8,
-            `${context} mode ${rowIndex + 1} action copy needs vertical breathing room`);
+          assertEqual(actionGeometry.width, 548);
+          assertEqual(actionGeometry.height, 80);
+          assertEqual(findDeep(action, `ModeOption${rowIndex}StatusLabel`)?.getComponent(Label)?.string,
+            rowIndex ? "筹备中" : "可体验");
         }
       };
       assertModeRowText(findDeep(canvas, "CoopSelectRuntimeScreen")!, "long catalog");
@@ -2148,7 +2122,7 @@ async function main(): Promise<void> {
       assertEqual(findDeep(canvas, "RoomPlayerTwo")?.getComponent(Label)?.string, "等待加入");
       assertEqual(findDeep(canvas, "RoomStatus")?.getComponent(Label)?.string, "正在进入房间...");
       assertEqual(findDeep(canvas, "RoomStatusAttention")?.active, false);
-      assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "准备体验模式");
+      assertEqual(findDeep(canvas, "RoomHeaderTitle")?.getComponent(Label)?.string, "好友房间体验");
       assertEqual(findDeep(canvas, "CreateRoom"), null);
       assertEqual(findDeep(canvas, "JoinRoom"), null);
       assertEqual(findDeep(canvas, "RoomCreatePanel"), null);
@@ -2693,7 +2667,7 @@ async function main(): Promise<void> {
           assertEqual(bodyNode.getComponent(Label)?.string, detail);
           assertEqual(badgeLabel.getComponent(Label)?.fontSize, 18,
             `${context} rule ${ruleIndex + 1} number must lead the group`);
-          assertEqual(titleNode.getComponent(Label)?.fontSize, 20,
+          assertEqual(titleNode.getComponent(Label)?.fontSize, 19,
             `${context} rule ${ruleIndex + 1} title must lead its body`);
           assertEqual(bodyNode.getComponent(Label)?.fontSize, 15,
             `${context} rule ${ruleIndex + 1} body must remain readable`);
@@ -2721,9 +2695,9 @@ async function main(): Promise<void> {
       await flushMany();
       const minimumHelpRoot = findDeep(canvas, "HelpRuntimeScreen")!;
       assertHelpPageSpacing(minimumHelpRoot, "minimum Help page");
-      assertEqual(HELP_RULES.length, 6);
-      assertEqual(HELP_RULES[0][0], "背单词");
-      assertEqual(HELP_RULES[5][0], "战绩记录");
+      assertEqual(HELP_RULES.length, 8);
+      assertEqual(HELP_RULES[0][0], "赛前练习");
+      assertEqual(HELP_RULES[7][0], "合作挑战 Boss");
       assertHelpRuleSpacing(minimumHelpRoot, "minimum Help");
       assertVisibleUiContract(minimumHelpRoot, "minimum Help route");
       assertPreGameTargetDevices(minimumHelpRoot);
@@ -2733,8 +2707,8 @@ async function main(): Promise<void> {
       app.store.setRoute("help");
       await flushMany();
       assertOk(findDeep(canvas, "HelpRulesSummary"));
-      assertEqual(findDeep(canvas, "HelpRule0Title")?.getComponent(Label)?.fontSize, 20);
-      assertEqual(findDeep(canvas, "HelpRule5Body")?.getComponent(Label)?.fontSize, 15);
+      assertEqual(findDeep(canvas, "HelpRule0Title")?.getComponent(Label)?.fontSize, 19);
+      assertEqual(findDeep(canvas, "HelpRule7Body")?.getComponent(Label)?.fontSize, 15);
       findDeep(canvas, "BackButton")?.emit(Button.EventType.CLICK);
       await flushMany();
       assertEqual(app.store.getState().route, "coopSelect");

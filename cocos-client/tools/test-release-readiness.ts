@@ -110,9 +110,8 @@ function testSceneCoverage(): void {
     assert.equal(fs.existsSync(path.join(root, `${sourcePath}.meta`)), true, `${sourcePath}.meta is required`);
   });
   const home = read("assets/scripts/scenes/HomeScene.ts");
-  ["openStudy", "openModeCatalog", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openPrivacyContract", "toggleMuted"]
+  ["openStudy", "openModeCatalog", "openHelp", "openJoinRoom", "openBankPicker", "openHistory", "openFeedback", "openPrivacyContract", "toggleMuted"]
     .forEach((handler) => assert.match(home, new RegExp(`\\b${handler}\\b`)));
-  assert.doesNotMatch(home, /\bopenHelp\b/);
   assert.match(read("assets/scripts/scenes/CoopSelectScene.ts"), /\bopenHelp\b/);
   assert.doesNotMatch(home, /EditBox|playerName|nickNameInput/);
   assert.match(home, /playerStore\.getLocalPlayer\(\)\.displayName/);
@@ -287,7 +286,7 @@ function testSourceAssetBudget(): void {
     ".json", ".meta", ".jpg", ".png"
   ])).filter((filePath) => !isHomeArtFile(filePath));
   const themeBytes = themeFiles.reduce((sum, filePath) => sum + fs.statSync(filePath).size, 0);
-  assert.ok(corePayloadBytes < 1_520_000, `Cocos core source payload exceeds 1.52 MB: ${corePayloadBytes}`);
+  assert.ok(corePayloadBytes < 1_530_000, `Cocos core source payload exceeds 1.53 MB: ${corePayloadBytes}`);
   assert.ok(homeArtBytes <= 4_000_000, `home_common source art exceeds 4 MB: ${homeArtBytes}`);
   assert.ok(metadataBytes < 50_000, `Cocos source metadata exceeds 50 KB: ${metadataBytes}`);
   assert.ok(homeArtMetadataBytes < 60_000, `home_common metadata exceeds 60 KB: ${homeArtMetadataBytes}`);

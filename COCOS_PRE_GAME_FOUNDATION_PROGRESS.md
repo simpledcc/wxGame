@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-20
+Updated: 2026-07-21
 
 ## Handoff
 
@@ -33,8 +33,8 @@ Updated: 2026-07-20
 - H4 high-fidelity source checkpoint: `5b73bdf` (`fix(home-art): stage high-fidelity resource upgrade`)
 - H4 high-fidelity completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.7 PRE-GAME VISUAL POLISH IN_PROGRESS / SOURCE VERIFIED`
-- Next stage: inspect H8.7 in Creator 3.8.8 and WeChat Developer Tools, capture page/state evidence and continue visual adjustment before returning to Phase 9
+- Current stage: `H8.7 PRE-GAME VISUAL POLISH IN_PROGRESS / WECHAT VISUAL VERIFIED`
+- Next stage: retain the verified one-device formal-art result, then capture the remaining target-size evidence before returning to Phase 9
 
 ## Baseline facts
 
@@ -103,7 +103,7 @@ Updated: 2026-07-20
 | H8.4 Home hierarchy and clarity refinement | `DONE` | Approved full-width Create/Join hierarchy, transparent top controls, icon containment and Creator/WeChat visual checks pass | Real two-phone acceptance remains external QA |
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
-| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and forty-eight source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass lengthens semantic Accent Card rails, strengthens Section Card tab shadows and removes an unused input argument while preserving every content coordinate; detailed evidence remains below. | Creator/WeChat multi-page visual comparison pending |
+| H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and fifty source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass replaces header pseudo-icons, promotes every gameplay option to a full semantic action, compacts Create/Lobby section tabs and separates gameplay introduction from gameplay selection. | Creator/WeChat multi-page visual comparison pending |
 
 ## G0 work completed
 
@@ -1689,6 +1689,14 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 - Formal bitmap skins, button dimensions, hit geometry, selected rings and the existing two-pixel content travel are unchanged. The Cocos Graphics test mock now records each fill's RGBA and rounded-rectangle geometry; foundation tests prove exact resting, pressed and disabled shadow states instead of inferring them from the final face fill.
 - `npm run verify`, `npm run build:wechat:dry-run`, `npm run home-art:status` and `git diff --check` pass; formal art remains `imported` with 18 images and 23 metadata files. Core source is `1,519,987 / 1,520,000`, leaving only 13 bytes, so further runtime source work must first recover budget and use current Creator/WeChat screenshots as evidence. No bitmap, importer metadata, page layout, copy, Store/route behavior, room/gameplay/cloud protocol, gameplay Bundle, cloud function, legacy client or AppID changed. Creator/WeChat visual evidence remains pending; not `dev_done`.
 
+### H8.7 one-hundred-and-fiftieth source checkpoint
+
+- Rebuilt the shared non-Home header as a compact semantic title panel. Bank, Study, Catalog, Create/Join/Lobby, History, Feedback and Help now supply their real action kind, so the header icon uses the existing formal resource/fallback instead of a stray leading Chinese character. Title, divider and subtitle retain fixed non-overlapping boxes.
+- Replaced the Catalog's beige text rows and small trailing controls with eight full-width `548x80` semantic action buttons. `好友房间体验` remains the only enabled preparation entry; all future modes show a quiet `筹备中` badge and stay non-interactable. Home `玩法介绍` now opens the introduction page directly, while Catalog Help returns to Catalog through presentation-only Store state.
+- Compacted Create/Lobby short-card tabs and aligned mode/Bank colors with their semantic actions. The Help page now contains eight concise gameplay introductions rather than duplicating the selectable Catalog. No gameplay implementation, room/cloud protocol or mode availability changed.
+- Typecheck plus focused and full-route runtime tests pass. Creator 3.8.8 produced a real WeChat build with 147 files, `4,121,077 / 4,194,304` main-package bytes and `3,472,932` `home_common` bytes. The normalized source warning rises narrowly from `1.52` to `1.53 MB` because the previous baseline had only 13 bytes left; the real `4 MiB` package gate is unchanged. Current Creator/WeChat multi-page screenshots remain the final visual gate; not `dev_done`.
+- The built project was then traversed in WeChat Developer Tools with formal `home_common` art on Home, gameplay selection, room setup and gameplay introduction. Header pseudo-characters are absent, all eight mode rows use complete semantic skins, room cards have compact title tabs and Help contains eight informational topics. An initial `loadSubpackage:fail module not found` was traced to Developer Tools compiling while Creator moved the Bundle from the temporary `assets/home_common` location to `subpackages/home_common`; one normal compile after the external build restored every formal asset and removed the subpackage errors. This is a build-preview cache procedure, not a runtime source or package-layout defect.
+
 ## Assets
 
 - Added runtime bitmap assets: none; V0 reuses the committed semantic theme background and lightweight programmatic foreground fallbacks
@@ -1703,7 +1711,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 1. The main package remains close to the 4 MiB gate; new shared art or source must stay in declared subpackages and every release change must rerun package inspection.
 2. Formal H4 art and Creator metadata are imported and stable; do not re-import the Bundle or regenerate its UUIDs.
-3. Creator import/rendering and WeChat simulator presentation passed through H8.6; two-real-phone room acceptance, low-end performance, final screenshots and upload remain release QA.
+3. Creator import/rendering and WeChat simulator presentation now pass through the H8.7 one-hundred-and-fiftieth checkpoint on the iPhone 12/13 preset; remaining target-size captures, two-real-phone room acceptance, low-end performance and upload remain release QA.
 4. Other developers may change gameplay bundles concurrently; merge this branch without reformatting or moving their files.
 
 ## Shared-file coordination
@@ -1727,17 +1735,17 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-On the Creator 3.8.8 computer, build the unchanged latest branch and inspect Home plus every H8.7 preparation page/state at `360x800`, `393x852` and `430x932`; capture screenshots and adjust only issues visible in that evidence. Do not execute two-device start-game acceptance; it remains deferred.
+Capture the remaining H8.7 target-size evidence at `360x800` and `430x932` (the current iPhone 12/13 formal-art traversal is already accepted), and adjust only issues visible in that evidence. Do not execute two-device start-game acceptance; it remains deferred.
 
 ## Deferred external visual gate
 
-Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, traverse every H8.7 pre-game page and capture the required `360x800`, `393x852` and `430x932` state evidence. Check the catalog's icon-aligned category rails with still-disabled unfinished actions, same-axis Back/rules circles, symmetric rule-button backdrop inset and eight-pixel title/subtitle safety boundary, that circular highlights stay inside their top chord, transparent avatar/settings controls have no floating highlight, normal/pressed/disabled/formal-skin highlight transitions, 34px Back/paging/detail/help fallbacks inside circular controls, circular Back/paging/avatar/settings icon controls with unchanged hit areas, Home's aligned player/coin pills and 6/8/6px identity rhythm, Home Bank strip's eight-pixel caption/name/icon/change hierarchy and Player/Settings modals, shared headers' 8/9/8px vertical and 12px icon/title rhythm, every large/compact colored card tab's eight-pixel horizontal and four-pixel vertical content boundaries, plain/fallback buttons' normal/pressed/disabled/selected borders, subtitle actions' eight-pixel text gap and height-aware lower/sliced-skin clearance, 80px catalog/History plain-button 48px label balance and History marker separation, room-code/Copy/Invite alignment and eight-pixel bottom clearance, compact Copy/Invite/Detail/Change actions' eight-pixel horizontal boundaries, regular badges' 8/4px text insets and large coin-plus balance, Bank's real row subtitles, Study's complete eight-pixel card chain, catalog-row 7/8/9px rhythm, create mode/Bank cards' eight-pixel tab/body and main-column boundaries, lobby player/status cards' eight-pixel hierarchy and the complete Bank/Feedback vertical chains, Join's eight-pixel input chain, Help's six numbered rule rows and eight-pixel title/body rhythm, History filters/summary cards and detail pagination chain, card-top reflections separated from inner borders, 4px left accent rails separated from both borders and icon columns, preparation cards, text, native inputs and state feedback, then continue screenshot-driven visual adjustment. Two-device gameplay acceptance remains deferred until H8.7 is complete.
+Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, traverse every H8.7 pre-game page and capture the remaining target-size state evidence. After an external Creator build, run one normal Developer Tools compile before judging resources. Check the eight full-width catalog actions, same-axis Back/rules circles, semantic header icons, title/subtitle safety boundary, formal-skin normal/pressed/disabled transitions, Home player/coin/Bank hierarchy, compact and large section tabs, room setup cards, Study action chain, Help's eight numbered information rows, History filters/summaries and all native-input/state feedback. Two-device gameplay acceptance remains deferred until H8.7 is complete.
 
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and forty-nine source-verified visual-polish passes/audits and remains in progress.
+The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and fifty source-verified visual-polish passes/audits and remains in progress.
 Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
-Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. Inspect all H8.7 pages and interactive states in Creator 3.8.8 and WeChat Developer Tools, capture screenshots and continue visual refinement before two-device QA.
+Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. After Creator builds while Developer Tools is open, trigger one normal compile before checking `home_common`. Inspect remaining H8.7 target sizes and interactive states before two-device QA.
 Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
 ```
