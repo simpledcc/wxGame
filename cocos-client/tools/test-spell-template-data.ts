@@ -7,9 +7,8 @@ import { WORD_BANK_DATA } from "../assets/scripts/data/WordBankData.generated";
 import { buildRoomGameOptions, ROOM_SPELL_QUESTION_LIMIT } from "../assets/scripts/domain/RoomRules";
 import { getSpellTemplatesForBank } from "../assets/scripts/domain/SpellTemplateCatalog";
 
-const repositoryRoot = path.resolve(__dirname, "..", "..");
-const spellSourcePath = path.join(repositoryRoot, "miniprogram", "spellWordBankData.js");
-const legacySpellBanks = require(spellSourcePath).SPELL_WORD_BANKS as Record<string, unknown[]>;
+const spellSourcePath = path.join(__dirname, "..", "source-data", "word-banks", "spellWordBankData.js");
+const sourceSpellBanks = require(spellSourcePath).SPELL_WORD_BANKS as Record<string, unknown[]>;
 
 function testSourceHashAndExactTemplates(): void {
   const source = fs.readFileSync(spellSourcePath, "utf8").replace(/\r\n?/g, "\n");
@@ -18,7 +17,7 @@ function testSourceHashAndExactTemplates(): void {
   assert.equal(Object.keys(SPELL_TEMPLATE_DATA).length, 44);
 
   let templateCount = 0;
-  Object.entries(legacySpellBanks).forEach(([bankId, legacyTemplates]) => {
+  Object.entries(sourceSpellBanks).forEach(([bankId, sourceTemplates]) => {
     const expanded = getSpellTemplatesForBank(
       SPELL_TEMPLATE_DATA,
       WORD_BANK_DATA,
@@ -26,7 +25,7 @@ function testSourceHashAndExactTemplates(): void {
       [],
       Number.MAX_SAFE_INTEGER
     );
-    assert.deepEqual(expanded, legacyTemplates, `${bankId} compact templates drifted from the legacy source`);
+    assert.deepEqual(expanded, sourceTemplates, `${bankId} compact templates drifted from the source data`);
     templateCount += expanded.length;
   });
   assert.equal(templateCount, 6351);
@@ -83,7 +82,7 @@ function main(): void {
   testSourceHashAndExactTemplates();
   testPayloadLimitAndModeIsolation();
   testStableFallback();
-  console.log("Spell template data OK: 44 banks and 6351 legacy templates decode exactly, with deterministic fallback and 240-item payload caps.");
+  console.log("Spell template data OK: 44 banks and 6351 source templates decode exactly, with deterministic fallback and 240-item payload caps.");
 }
 
 main();

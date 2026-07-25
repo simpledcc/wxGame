@@ -1,6 +1,6 @@
 import type { WordBankDataSource } from "../domain/WordBank";
 
-// Generated from ../../miniprogram/wordBankData.js. Do not edit by hand.
+// Generated from ../../../source-data/word-banks/wordBankData.js. Do not edit by hand.
 export const WORD_BANK_DATA: WordBankDataSource = {
   "DEFAULT_BANK_ID": "jilin-g1a-b1-welcome",
   "WRONG_BANK_ID": "wrong",

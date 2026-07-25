@@ -14,8 +14,8 @@
 - Cocos Creator 目标版本：`3.8.8`
 - 当前产品方向：竖屏，逻辑设计分辨率 `640x960`
 - 运行架构：持久化 `Home.scene` 加运行时 route 页面
-- 旧版可上传客户端：`miniprogram/`，迁移完成前必须保留
-- 云函数：`cloudfunctions/`，客户端迁移期间保持生产协议兼容
+- 唯一客户端：`cocos-client/`；旧 `miniprogram/` 已在单客户端架构收敛阶段删除，不得恢复
+- 云函数：`cloudfunctions/`，作为 Cocos 客户端复用的生产后端并保持协议兼容
 - 当前工作区说明：`COCOS_WORKSPACE.md`
 
 历史文档中的 `D:\wx_game` 和旧横屏说明不是当前工作路径。发现文档与当前代码冲突时，先检查当前目标、代码、测试和最新提交，再更新过时文档。
@@ -87,9 +87,9 @@ git fetch origin
 
 ## 3. 当前目标指针
 
-当前工作流：A 线，首页和游戏准备前界面；H4 高清资源升级及 H8.4-H8.6 已完成，用户暂缓 Phase 9，当前进入 H8.7 赛前界面视觉精修。
+当前工作流：Cocos 单客户端架构收敛。旧微信客户端已退出仓库，生产前端只保留 `cocos-client/`，云函数继续作为后端。
 
-当前目标：继续美化全部游戏进入前页面的按钮、卡片、文字和状态反馈。H8.7 已完成一百五十轮源码精修与审计；最新一轮完成非首页页头、玩法入口、创建配置标题签和玩法说明职责修正，并已在 Creator 3.8.8/微信开发者工具检查首页、玩法目录、创建房间和玩法介绍。项目架构、模块逻辑、优化路线以及美术/代码解耦操作说明已统一到 `COCOS_ARCHITECTURE_REVIEW.md`。下一项唯一行动是在微信开发者工具按 `360x800`、`393x852`、`430x932` 补齐全部 H8.7 赛前页面和状态截图，并只修正画面证实的问题；不执行双人真机开始验证。外部视觉证据完成前 H8.7 保持 `IN_PROGRESS`。
+当前目标：`S1 COCOS_SINGLE_CLIENT_ARCHITECTURE DONE`。旧 `miniprogram/` 运行客户端已删除；词库和拼词模板源数据迁入 `cocos-client/source-data/word-banks/`；根微信配置指向 `cocos-client/build/wechatgame/`；`RuntimeScreenFactory` 已收敛为轻量 route 门面，Home、学习、房间和支持页由独立 Builder 负责；`PreGameIconRenderer`、`HomeArtManager` 已从通用 UI/主题职责中拆出；`test:architecture` 持续验证单客户端、静态 import 无循环、分层边界和模块体积。下一项唯一行动是在 Creator 3.8.8 执行一次真实微信构建和页面冒烟检查，确认新增 TypeScript 模块导入与生成包无误；这属于外部构建复验，不重新引入旧客户端，也不要求新的美术协作设计。
 
 当前权威文件：
 
@@ -101,7 +101,7 @@ git fetch origin
 - 首页目标参考：`docs/design/home/README.md`
 - 图片加载与清晰度诊断：`result.md`
 
-当前快照：H4 高清运行资源、Creator 元数据和 `home_common` 分包保持不变；H8.7 仅维护赛前展示与状态反馈，一百五十轮详细证据见 `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` 和 `COCOS_PRE_GAME_PAGES_DESIGN.md`。当前 73 个核心 TypeScript 文件无静态 import 循环；架构审计把 `RuntimeScreenFactory`/`PreGameUi` 拆分、HomeArt 职责拆分和约 885 KB 词库数据分包列为视觉冻结后的优化，不在当前阶段重写。核心源码为 `1,521,345 / 1,530,000` 字节。`1.53 MB` 仅是源码回归提醒值，真实微信构建主包为 `4,121,077 / 4,194,304` 字节，`4 MiB` 硬门槛未变。Creator 在开发者工具已打开时进行外部构建，会让工具短暂监听到分包搬迁的中间状态；构建完成后必须再点一次“普通编译”，确认 `home_common` 正式图片显示且控制台无分包错误。
+当前快照：仓库为 Cocos 单客户端加云函数后端；根目录不再包含 `miniprogram/`。运行逻辑、玩法 Bundle、房间/计分/同步协议、AppID 和正式美术资源均未改变。核心 route 门面约 1.5 KB，页面 Builder 分组均小于 16 KB，`PreGameUi` 小于 35 KB，主题与 HomeArt 缓存职责已分离。词库运行数据仍同步生成到现有 TypeScript 层，后续是否迁入 `learning_data` Bundle 必须先用真实构建证明主包收益，不属于本目标。H8.7 原视觉状态保持，外部截图与 Phase 9 仍可后续单独执行。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -161,7 +161,7 @@ git fetch origin
 - `cocos-client/assets/bundles/mode_pk/**`
 - `cocos-client/assets/bundles/mode_spell/**`
 - `cloudfunctions/**`
-- `miniprogram/**`
+- 已删除的旧 `miniprogram/` 客户端不得恢复；词库源数据只维护在 `cocos-client/source-data/word-banks/`
 - 房间、计分、同步和云请求/响应协议
 - AppID、云环境、数据库权限和上传配置
 - 为展示效果伪造昵称、等级、金币、房间或历史数据

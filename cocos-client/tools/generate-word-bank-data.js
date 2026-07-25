@@ -2,10 +2,10 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
-const projectRoot = path.resolve(__dirname, "..", "..");
 const cocosRoot = path.resolve(__dirname, "..");
-const wordSourcePath = path.join(projectRoot, "miniprogram", "wordBankData.js");
-const spellSourcePath = path.join(projectRoot, "miniprogram", "spellWordBankData.js");
+const sourceRoot = path.join(cocosRoot, "source-data", "word-banks");
+const wordSourcePath = path.join(sourceRoot, "wordBankData.js");
+const spellSourcePath = path.join(sourceRoot, "spellWordBankData.js");
 const outputDir = path.join(cocosRoot, "assets", "scripts", "data");
 const wordOutputPath = path.join(outputDir, "WordBankData.generated.ts");
 const spellOutputPath = path.join(outputDir, "SpellTemplateData.generated.ts");
@@ -92,12 +92,12 @@ function main() {
   const wordText = [
     "import type { WordBankDataSource } from \"../domain/WordBank\";",
     "",
-    "// Generated from ../../miniprogram/wordBankData.js. Do not edit by hand.",
+    "// Generated from ../../../source-data/word-banks/wordBankData.js. Do not edit by hand.",
     `export const WORD_BANK_DATA: WordBankDataSource = ${JSON.stringify(wordData, null, 2)};`,
     ""
   ].join("\n");
   const spellText = [
-    "// Generated from ../../miniprogram/spellWordBankData.js. Do not edit by hand.",
+    "// Generated from ../../../source-data/word-banks/spellWordBankData.js. Do not edit by hand.",
     `export const SPELL_TEMPLATE_SOURCE_SHA256 = \"${sourceHash(spellSourcePath)}\";`,
     `export const SPELL_TEMPLATE_DATA: Readonly<Record<string, string>> = ${JSON.stringify(packedSpellData, null, 2)};`,
     ""

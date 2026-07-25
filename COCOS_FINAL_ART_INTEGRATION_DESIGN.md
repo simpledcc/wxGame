@@ -415,7 +415,7 @@ npm run inspect:wechat-build -- <实际构建目录>
 请先阅读 COCOS_FINAL_ART_INTEGRATION_DESIGN.md、COCOS_HOME_ASSET_MANIFEST.md、
 COCOS_PRE_GAME_FOUNDATION_PROGRESS.md 和 CODEX_HANDOFF.md。
 从 H4.0 正式资产冻结与交付开始；先确认正式图片是否齐全，并指定唯一 Creator 导入负责人。
-不得从参考合成图裁图，不得手写图片 importer .meta，不得修改 mode_pk、mode_spell、
-cloudfunctions 或 miniprogram。每完成一个阶段更新进度文件；H4 全部完成后提交并推送，
+不得从参考合成图裁图，不得手写图片 importer .meta，不得修改 mode_pk、mode_spell 或
+cloudfunctions，也不得恢复已删除的旧客户端。每完成一个阶段更新进度文件；H4 全部完成后提交并推送，
 提交主题最后包含 dev_done。
 ```

@@ -1,8 +1,6 @@
 # Cocos Multi-mode Client
 
-This directory is the Cocos Creator migration workspace for `词斗乐园`. The preparation shell is mode-neutral: it owns Home, mode selection, word-bank setup, room entry, two-human readiness, and routing, while each game owns its rules and presentation in a dedicated module.
-
-It intentionally does not replace the current production WeChat Mini Game under `../miniprogram/`. Cloud functions under `../cloudfunctions/` remain the source of truth during this migration.
+This directory is the only client workspace for `词斗乐园`. The preparation shell is mode-neutral: it owns Home, mode selection, word-bank setup, room entry, two-human readiness, and routing, while each game owns its rules and presentation in a dedicated module. Cloud functions under `../cloudfunctions/` remain the production backend.
 
 ## Current Phase
 
@@ -19,8 +17,8 @@ The engine-independent migration now provides platform services, Home/Bank/Study
 - Fixed `系统玩家：玩家` identity display without custom nickname input.
 - Cloud, storage, share, and logging service wrappers.
 - Legacy storage snapshot hydration for coins, unlocked banks, history, best scores, wrong words, and muted state.
-- Generated word bank data from the legacy WeChat client.
-- Lossless compact data for all 44 legacy spell banks and 6,351 prebuilt templates, with source-hash and field-level drift checks.
+- Generated word bank data from `source-data/word-banks/`.
+- Lossless compact data for all 44 spell banks and 6,351 prebuilt templates, with source-hash and field-level drift checks.
 - Word bank unlock and selection rules.
 - Study session rules for hidden Chinese, current-word reveal, and next/previous word.
 - Read-only room document access compatible with the production database rules.
@@ -207,4 +205,4 @@ The configured WeChat Mini Game build output is:
 build/wechatgame/
 ```
 
-The generated build directory is ignored by Git. The pipeline rejects output paths outside `cocos-client/build/`; do not copy it over `../miniprogram/` until the external acceptance gates pass and a later migration phase explicitly performs the version switch.
+The generated build directory is ignored by Git. The pipeline rejects output paths outside `cocos-client/build/`. Import or upload `build/wechatgame/`; there is no second client tree to copy over.

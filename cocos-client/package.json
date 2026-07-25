@@ -15,6 +15,7 @@
     "home-art:verify-import": "node ./tools/home-art-import.js --verify",
     "generate:word-banks": "node ./tools/generate-word-bank-data.js",
     "test:home-art-import": "node ./tools/test-home-art-import.js",
+    "test:architecture": "tsx ./tools/test-architecture.ts",
     "test:stage3": "tsx ./tools/test-word-bank-study.ts",
     "test:room": "tsx ./tools/test-room-service.ts",
     "test:phase4": "tsx ./tools/test-room-flow.ts",
@@ -34,7 +35,7 @@
     "test:spell-data": "tsx ./tools/test-spell-template-data.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:shell-runtime": "tsc -p tsconfig.runtime-test-typecheck.json --noEmit",
-    "verify": "npm run check:structure && npm run test:home-art-import && npm run test:platform && npm run test:lifecycle && npm run test:contracts && npm run test:build-pipeline && npm run test:performance && npm run test:spell-data && npm run test:stage3 && npm run test:room && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:phase7 && npm run test:phase8 && npm run test:shell && npm run test:pre-game-ui && npm run test:shell-runtime && npm run test:release && npm run typecheck && npm run typecheck:shell-runtime"
+    "verify": "npm run check:structure && npm run test:architecture && npm run test:home-art-import && npm run test:platform && npm run test:lifecycle && npm run test:contracts && npm run test:build-pipeline && npm run test:performance && npm run test:spell-data && npm run test:stage3 && npm run test:room && npm run test:phase4 && npm run test:phase5 && npm run test:phase6 && npm run test:phase7 && npm run test:phase8 && npm run test:shell && npm run test:pre-game-ui && npm run test:shell-runtime && npm run test:release && npm run typecheck && npm run typecheck:shell-runtime"
   },
   "devDependencies": {
     "tsx": "^3.12.7",

@@ -1,6 +1,6 @@
 {
-  "description": "Word Fishing Battle WeChat Mini Game",
-  "miniprogramRoot": "miniprogram/",
+  "description": "Word Battle Park Cocos WeChat Mini Game",
+  "miniprogramRoot": "cocos-client/build/wechatgame/",
   "cloudfunctionRoot": "cloudfunctions/",
   "appid": "wx063a1823d29bed9e",
   "projectname": "word-fishing-battle-game",
@@ -34,28 +34,7 @@
   "libVersion": "3.16.0",
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [
-      {
-        "type": "file",
-        "value": "app.js"
-      },
-      {
-        "type": "file",
-        "value": "app.json"
-      },
-      {
-        "type": "file",
-        "value": "app.wxss"
-      },
-      {
-        "type": "file",
-        "value": "sitemap.json"
-      },
-      {
-        "type": "folder",
-        "value": "pages"
-      }
-    ],
+    "ignore": [],
     "include": []
   },
   "editorSetting": {},

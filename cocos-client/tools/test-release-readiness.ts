@@ -192,7 +192,7 @@ function testPlatformBoundariesAndUploadRoot(): void {
     .map((filePath) => path.relative(root, filePath).replace(/\\/g, "/"));
   assert.deepEqual(directWxUsers, ["assets/scripts/adapters/WechatRuntimePort.ts"]);
   const projectConfig = JSON.parse(fs.readFileSync(path.join(repositoryRoot, "project.config.json"), "utf8"));
-  assert.equal(projectConfig.miniprogramRoot, "miniprogram/");
+  assert.equal(projectConfig.miniprogramRoot, "cocos-client/build/wechatgame/");
   assert.equal(projectConfig.cloudfunctionRoot, "cloudfunctions/");
   assert.equal(projectConfig.setting.uploadWithSourceMap, false);
 

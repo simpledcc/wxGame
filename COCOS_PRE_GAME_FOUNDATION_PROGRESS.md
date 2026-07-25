@@ -1,6 +1,6 @@
 # Cocos Pre-game Foundation Progress
 
-Updated: 2026-07-21
+Updated: 2026-07-25
 
 ## Handoff
 
@@ -33,8 +33,8 @@ Updated: 2026-07-21
 - H4 high-fidelity source checkpoint: `5b73bdf` (`fix(home-art): stage high-fidelity resource upgrade`)
 - H4 high-fidelity completion commit: the commit containing this record, with subject ending in `dev_done`; use `git log -1` after checkout for the exact SHA
 - Computer/task owner: current pre-game UI Codex task
-- Current stage: `H8.7 PRE-GAME VISUAL POLISH IN_PROGRESS / WECHAT VISUAL VERIFIED`
-- Next stage: retain the verified one-device formal-art result, then capture the remaining target-size evidence before returning to Phase 9
+- Current stage: `S1 COCOS SINGLE-CLIENT ARCHITECTURE DONE / CREATOR BUILD RECHECK NEXT`
+- Next stage: run one real Creator 3.8.8 WeChat build against the refactored TypeScript module graph; H8.7/Phase 9 remain separate deferred work
 
 ## Baseline facts
 
@@ -45,7 +45,7 @@ Updated: 2026-07-21
 - Runtime shell: persistent `Home.scene` plus route builders
 - Phone runtime: `BASELINE_ACCEPTED` (confirmed by user/current project baseline)
 - Creator/WeChat DevTools evidence: `PASSED` for H4 import/build plus iPhone 12/13, 360x800 and 430x932 formal-art traversal; application errors remained `0`
-- Legacy upload client: `miniprogram/`, untouched by G0
+- Client: `cocos-client/` is the only runnable client; retired `miniprogram/` was removed in S1
 - Cloud functions: `cloudfunctions/`, untouched by G0
 - Gameplay bundles: `mode_pk` and `mode_spell`, outside this task's ownership
 
@@ -58,6 +58,7 @@ Updated: 2026-07-21
 - Home/pre-game portions of `cocos-client/assets/scripts/components/ui/RuntimeScreenFactory.ts`
 - `cocos-client/assets/scripts/scenes/HomeScene.ts`
 - Reusable pre-game UI components under `cocos-client/assets/scripts/components/ui/`
+- Canonical client word sources under `cocos-client/source-data/word-banks/`
 - Home-related semantic theme tokens and resource slots, after checking shared use
 - Tests directly covering the runtime Home shell and pre-game controls
 
@@ -74,7 +75,7 @@ Updated: 2026-07-21
 - `cocos-client/assets/bundles/mode_pk/**`
 - `cocos-client/assets/bundles/mode_spell/**`
 - `cloudfunctions/**`
-- `miniprogram/**`
+- Retired `miniprogram/` client must not be restored
 - Room, scoring, synchronization and cloud request/response contracts
 - AppID, cloud environment, database permissions and upload configuration
 
@@ -104,6 +105,28 @@ Updated: 2026-07-21
 | H8.5 Supporting-page visual hierarchy | `DONE` | Shared headers/accent cards, page-specific hierarchy, complete history empty state and native-input ghost-text prevention pass runtime and WeChat visual checks | Real two-phone acceptance remains external QA |
 | H8.6 Final reference-aligned preparation UI | `DONE` | Shorter/taller Home actions, button-style shared headers, one-column mode catalog, framed room/bank/study/history sections, target-device touch gates and actual WeChat build pass | Real two-phone acceptance remains external QA |
 | H8.7 Pre-game visual polish | `IN_PROGRESS` | One hundred and fifty source-verified passes/audits cover all preparation routes, responsive minimum layouts, real-data states, formal-art fallback, button/card/text hierarchy and interaction feedback. The latest pass replaces header pseudo-icons, promotes every gameplay option to a full semantic action, compacts Create/Lobby section tabs and separates gameplay introduction from gameplay selection. | Creator/WeChat multi-page visual comparison pending |
+
+| S1 Cocos single-client architecture | `DONE` | Retired client deleted; word sources moved under Cocos; root build entry switched; route builders, icon renderer and HomeArt cache split; architecture, runtime, release and type checks pass | One real Creator build is the next external recheck, not a source blocker |
+
+## S1 Cocos single-client architecture
+
+- Status: `DONE`
+- Goal: remove the retired runnable client and make the repository architecture explicitly Cocos-only without changing gameplay, cloud, room, scoring or art contracts.
+- Completed:
+  - Deleted the old `miniprogram/` runtime tree.
+  - Moved canonical word and spell source data to `cocos-client/source-data/word-banks/` and updated generation/hash tests.
+  - Pointed root `project.config.json` to `cocos-client/build/wechatgame/`.
+  - Reduced `RuntimeScreenFactory.ts` from about 39 KB to a roughly 1.5 KB route facade.
+  - Split Home, learning, mode/room and support-page assembly into focused Builder modules.
+  - Split vector icon rendering into `PreGameIconRenderer.ts`.
+  - Split Home art loading/cache responsibility into `HomeArtManager.ts`.
+  - Added `test:architecture` for single-client presence, static import cycles, layer boundaries and module-size guards.
+- Modified scope: repository/client entry, Cocos source-data/tooling, pre-game UI assembly, theme/HomeArt ownership, architecture tests and current documentation.
+- Untouched scope: `mode_pk`, `mode_spell`, `cloudfunctions`, room/scoring/synchronization/cloud contracts, AppID, cloud environment and runtime bitmap/importer metadata.
+- Source evidence: full `npm run verify` and `npm run build:wechat:dry-run` pass; `npm run home-art:status` reports `imported` with 18 files and 23 metadata files; scope audit confirms no gameplay Bundle, cloud function, formal-art Bundle or AppID change.
+- External evidence: `npm run check:cocos-env` confirms this computer has no callable Creator. A real Creator build is not required to prove the source refactor, but remains the next cross-computer recheck because new TypeScript modules were added.
+- Completion commit: the commit containing this record, with subject ending in `dev_done`.
+- Next single action: open the clean pushed commit with Creator 3.8.8, run `npm run build:wechat`, and smoke-test Home, Bank, Study, Catalog, Create/Join, Lobby, Result, History, Feedback and Help.
 
 ## G0 work completed
 
@@ -1735,7 +1758,7 @@ For H4 design alone, bitmap import, QR code, phone screenshots and upload were `
 
 ## Next single action
 
-Capture the remaining H8.7 target-size evidence at `360x800` and `430x932` (the current iPhone 12/13 formal-art traversal is already accepted), and adjust only issues visible in that evidence. Do not execute two-device start-game acceptance; it remains deferred.
+On a Creator 3.8.8 computer, pull the clean S1 completion commit, run `npm run verify` and `npm run build:wechat`, then smoke-test every non-game route in WeChat Developer Tools. Do not restore the retired client or mix H8.7 visual changes into that verification.
 
 ## Deferred external visual gate
 
@@ -1744,8 +1767,7 @@ Open the current branch with Cocos Creator 3.8.8 and WeChat Developer Tools, tra
 ## Continue prompt
 
 ```text
-The H4 Creator import/build plus H8.4-H8.6 Home and supporting-page visual goals are complete on branch feature/pre-game-ui-home-goal; H8.7 has one hundred and fifty source-verified visual-polish passes/audits and remains in progress.
-Read AGENTS.md, this progress file, COCOS_FINAL_ART_INTEGRATION_DESIGN.md, COCOS_HOME_ASSET_MANIFEST.md and the latest checkpoint commit.
-Require npm run home-art:status to remain imported; do not re-import or regenerate UUIDs. After Creator builds while Developer Tools is open, trigger one normal compile before checking `home_common`. Inspect remaining H8.7 target sizes and interactive states before two-device QA.
-Do not hand-write or replace importer metadata and do not modify mode_pk, mode_spell, cloudfunctions, miniprogram, room/scoring/cloud contracts, AppID or cloud environment.
+The repository is now a single-client Cocos project on branch feature/pre-game-ui-home-goal. Read AGENTS.md, COCOS_ARCHITECTURE_REVIEW.md, this progress file and the latest S1 completion commit.
+Require npm run test:architecture, npm run verify and npm run build:wechat:dry-run to pass. On a Creator 3.8.8 computer, perform one real WeChat build and route smoke test before resuming H8.7 or Phase 9.
+Do not restore miniprogram, re-import art, regenerate image UUIDs or modify mode_pk, mode_spell, cloudfunctions, room/scoring/cloud contracts, AppID or cloud environment.
 ```

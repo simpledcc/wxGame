@@ -6,7 +6,7 @@ Date: 2026-07-16
 
 The repository has a deterministic Cocos Creator command-line build contract and an independent WeChat build inspector. Creator 3.8.8 and WeChat Developer Tools are available on the current build computer. The latest 2026-07-16 high-fidelity button-rendering export and package inspection passed at 147 files / 9,970,209 bytes, with a 4,121,077-byte main package and a 3,472,932-byte `home_common` subpackage.
 
-The stable legacy client remains `miniprogram/`. The pipeline only writes below `cocos-client/build/` and rejects output paths that overlap the legacy upload root.
+`cocos-client/` is the only client. The pipeline writes only below `cocos-client/build/` and rejects every output path outside that generated directory.
 
 ## Commands
 
@@ -56,7 +56,7 @@ The inspector fails the build when any of these conditions is found:
 - `mode_pk` or `mode_spell` is not emitted as a declared WeChat subpackage.
 - Any bundle emitted below `subpackages/` is not declared by `game.json`.
 - Release output contains `.map` source maps.
-- Output embeds `cloudfunctions`, the legacy `miniprogram`, or `node_modules`.
+- Output embeds `cloudfunctions`, a retired `miniprogram` tree, or `node_modules`.
 - Subpackage roots are invalid or duplicated.
 - Generated output contains symbolic links.
 
@@ -71,16 +71,15 @@ The JSON report records total bytes, main-package bytes/file count, aggregate an
 5. Review `build/wechatgame-report.json` and Creator's `build/wechat-build.log`; confirm all five required bundles are listed, `home_common` and both gameplay bundles are subpackages, and every package limit is green.
 6. Import `cocos-client/build/wechatgame/` into WeChat Developer Tools as a Mini Game.
 7. Complete the route, privacy, invitation, background recovery, two-device, performance, screenshot, and development-upload gates in `COCOS_RELEASE_QA.md`.
-8. Keep a known-good legacy upload and the accepted Cocos development build before changing any production upload-root configuration.
+8. Keep the accepted Cocos development build and its package report before changing production upload configuration.
 
 ## Import-Root Warning
 
-The repository contains two different WeChat Developer Tools entry points:
-
-- Repository root `project.config.json`: legacy client, with `miniprogramRoot` set to `miniprogram/`.
-- `cocos-client/build/wechatgame/project.config.json`: generated Cocos client, project name `word-battle-park-wechatgame`.
-
-To inspect or upload the Cocos build, import the directory `cocos-client/build/wechatgame/` itself. Importing the repository root compiles the legacy client and cannot prove that Cocos scenes or `home_common` art are working.
+The repository contains one client entry point. The root `project.config.json` sets
+`miniprogramRoot` to `cocos-client/build/wechatgame/`, while the generated directory also contains
+Creator's own project configuration. A clean checkout must run the Cocos build before the root
+project can be opened. For the least ambiguous inspection and upload flow, import
+`cocos-client/build/wechatgame/` directly.
 
 After a new Creator build, clear WeChat Developer Tools compile/file caches when the UI still shows an older layout or programmatic fallback. Confirm `subpackages/home_common` exists in the resource tree before treating missing art as a runtime defect. The detailed 2026-07-15 investigation is recorded in `result.md`.
 

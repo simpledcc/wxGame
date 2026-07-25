@@ -21,7 +21,7 @@ Cocos Creator：`3.8.8`
 1. 当前 Cocos 微信构建**没有漏打包图片**。`home_common` 已作为微信分包进入 `cocos-client/build/wechatgame/subpackages/home_common/`，包含 18 张正式图片对应的 SpriteFrame 和原始纹理。
 2. 使用正确构建目录打开微信开发者工具时，首页背景、Logo、头像、金币、角色、功能图标和按钮皮肤均能加载。2026-07-16 的实际开发者工具画面已确认高清替换图正在显示。
 3. “界面很简单”主要来自资源覆盖范围，而不是构建失败。除首页外的准备页面目前主要由 Cocos `Graphics`、`Label` 和卡片布局绘制，只复用少量公共图标，没有各页面独立的场景、角色、装饰和插画资源。
-4. “完全没有图片”首先应检查是否打开了错误项目。仓库根目录 `project.config.json` 指向旧版 `miniprogram/`；Cocos 新版必须导入 `cocos-client/build/wechatgame/`。
+4. “完全没有图片”首先应检查是否打开了尚未构建或缓存过期的项目。仓库根目录 `project.config.json` 现在指向 `cocos-client/build/wechatgame/`；必须先完成 Cocos 构建。
 5. 旧版图片清晰度确实受 V0 资源预算影响：运行图从母图大幅缩小并压缩，高分辨率手机再次放大后发软。当前运行图已升级，像素不足和索引色量化不再是首页的主要限制。
 6. 当前资源加载失败会静默保留程序化 fallback，因此分包、缓存或路径异常时，页面仍能操作，却会看起来像“没有加载图片”。本次正确构建中未复现资源加载失败，但该诊断可见性不足是后续需要改进的风险。
 
@@ -43,11 +43,11 @@ Creator 构建日志包含 `WordBankData.generated.ts exceeds 500KB` 的 Babel �
 
 ### P0：打开了旧版项目或错误目录
 
-- 仓库根目录的 `project.config.json` 配置为 `miniprogramRoot: "miniprogram/"`，对应保留的旧版微信客户端。
+- 仓库根目录的 `project.config.json` 配置为 `miniprogramRoot: "cocos-client/build/wechatgame/"`，对应唯一的 Cocos 构建客户端。
 - Cocos 生成项目的配置文件位于 `cocos-client/build/wechatgame/project.config.json`，项目名是 `word-battle-park-wechatgame`，并声明 `home_common`、`mode_pk` 和 `mode_spell` 分包。
 - 若从仓库根目录点击编译或上传，看到的不会是当前 Cocos 构建。
 
-正确做法：在微信开发者工具中单独导入 `cocos-client/build/wechatgame/`，不要导入仓库根目录或 `miniprogram/`。
+正确做法：先执行 Cocos 微信构建，再在微信开发者工具中导入 `cocos-client/build/wechatgame/`；根目录导入也只能在该生成目录已经存在时使用。
 
 ### P1：其他页面没有独立美术资源
 

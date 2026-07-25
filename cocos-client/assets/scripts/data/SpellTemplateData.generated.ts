@@ -1,4 +1,4 @@
-// Generated from ../../miniprogram/spellWordBankData.js. Do not edit by hand.
+// Generated from ../../../source-data/word-banks/spellWordBankData.js. Do not edit by hand.
 export const SPELL_TEMPLATE_SOURCE_SHA256 = "7e0714f14360ba39f85f4a33510a682cbed84ae02ab77b90540cebe6246e83fd";
 export const SPELL_TEMPLATE_DATA: Readonly<Record<string, string>> = {
   "jilin-g1a-b1-welcome": "AACIZQAQBEQAIIzKADAIZQBQBGUAYARDAHAERQCACGQAkASGAKAERACwiIUAwIhlANAIhgDgjKYA8AREAQAIhQEwCIUBYARDAXCIyAGACGUBwAyGAeAIhgIACIUCEASFAjAIhQJBkMcCUAhnAmCIpgKQBEQCsAinAsAIZgLQBGYC4RUqAvAEQwMAiIYDEAyFAyAIZQMwCGQDQZCmA1AZKgNgBEQDcARk",

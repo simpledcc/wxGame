@@ -2,18 +2,17 @@
 
 Updated: 2026-07-25
 
-本文档是当前项目的架构总览、美术与代码协作边界、优化路线和美术操作手册。内容以当前工作树代码、`2e7c516` 及其后续提交为准，不把早期迁移建议当成已经实现的事实。
+本文档是当前项目的架构总览、美术与代码协作边界、优化路线和操作手册。内容以当前工作树代码及 2026-07-25 单客户端架构收敛结果为准，不把早期迁移建议当成已经实现的事实。
 
 详细阶段进度仍以 `COCOS_MIGRATION_COMPLETION_MATRIX.md` 和 `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` 为准；资源逐文件状态仍以 `COCOS_HOME_ASSET_MANIFEST.md` 为准。
 
 ## 1. 结论
 
-当前方案应继续保留，不需要推倒重写：
+仓库已经完成单客户端收敛：
 
 ```text
-miniprogram/      稳定可上传旧客户端
+cocos-client/     唯一 Cocos Creator 3.8.8 客户端
 cloudfunctions/   继续复用的生产后端
-cocos-client/     新 Cocos Creator 3.8.8 客户端
 ```
 
 当前 Cocos 客户端已经形成可用的分层架构：
@@ -38,7 +37,6 @@ cocos-client/     新 Cocos Creator 3.8.8 客户端
 ```mermaid
 flowchart TB
     User["微信小游戏用户"]
-    Legacy["miniprogram/<br/>稳定旧客户端"]
     Cocos["cocos-client/<br/>Cocos Creator 客户端"]
     Runtime["RuntimePort<br/>微信/内存适配"]
     Cloud["cloudfunctions/<br/>11 个生产云函数"]
@@ -46,7 +44,6 @@ flowchart TB
     Build["Creator 3.8.8 构建<br/>build/wechatgame"]
     DevTools["微信开发者工具<br/>预览/上传"]
 
-    User --> Legacy
     User --> Cocos
     Cocos --> Runtime
     Runtime --> Cloud
@@ -58,8 +55,8 @@ flowchart TB
 
 边界说明：
 
-1. 根目录 `project.config.json` 继续指向 `miniprogram/`，不能用它证明 Cocos 版本可运行。
-2. Cocos 构建入口是 `cocos-client/build/wechatgame/`。
+1. 根目录 `project.config.json` 与生成项目都指向唯一的 Cocos 微信构建；干净检出必须先执行 Cocos 构建。
+2. 构建、预览和上传入口是 `cocos-client/build/wechatgame/`。
 3. Cocos 客户端只通过 `RuntimePort`、`CloudService` 和服务门面访问微信能力。
 4. 云函数、房间协议、计分协议和数据库结构在当前美术工作流中冻结。
 
@@ -73,7 +70,8 @@ flowchart TB
     GameStore["GameStore<br/>route/赛前选择"]
     HomeScene["Home.scene<br/>持久运行壳"]
     Shell["HomePlaceholder<br/>背景/Loading/页面生命周期"]
-    Factory["RuntimeScreenFactory<br/>赛前页面装配"]
+    Factory["RuntimeScreenFactory<br/>轻量 route 门面"]
+    Builders["Screen Builders<br/>Home/Learning/Room/Support"]
     Controllers["Scene Controllers<br/>Home/Bank/Study/Room/..."]
     Stores["Stores<br/>Room/WordBank/History/玩法状态"]
     Services["Services<br/>RoomSession/Cloud/Storage/..."]
@@ -101,7 +99,8 @@ flowchart TB
     Shell --> Factory
     GameBundles --> Registry
     Registry --> Factory
-    Factory --> Controllers
+    Factory --> Builders
+    Builders --> Controllers
     Controllers --> App
     Controllers --> Stores
     Controllers --> Services
@@ -109,7 +108,7 @@ flowchart TB
     Services --> Domain
     Services --> Port
     Stores --> Domain
-    Factory --> HomeArt
+    Builders --> HomeArt
 ```
 
 ### 3.1 实际路由机制
@@ -121,14 +120,14 @@ flowchart TB
 3. 后续 `home`、`bank`、`study`、`room`、`history` 等 route 只更新 `GameStore`。
 4. `HomePlaceholder` 监听 Store，预加载背景或玩法 Bundle。
 5. 加载期间保留旧页面，并用 `BlockInputEvents` Loading 层阻止误触。
-6. 最新加载完成后销毁旧 route 根节点，再由 `RuntimeScreenFactory` 挂载新页面。
+6. 最新加载完成后销毁旧 route 根节点，再由 `RuntimeScreenFactory` 分发到对应页面 Builder。
 7. 迟到的异步加载通过 sequence 丢弃，不能覆盖新 route。
 
-这种结构减少 Scene 文件冲突，适合当前多电脑和无 Creator 环境，但页面装配代码会集中到 `RuntimeScreenFactory`，这是后续维护优化点。
+这种结构减少 Scene 文件冲突，适合当前多电脑和无 Creator 环境。页面装配已按 Home、学习、房间和支持页分组，`RuntimeScreenFactory` 只保留 route 分发职责。
 
 ## 4. 模块职责
 
-当前 `cocos-client/assets/scripts` 有 73 个 TypeScript 文件，静态依赖审计未发现循环依赖。
+当前静态架构测试会扫描 `cocos-client/assets/scripts` 的全部 TypeScript 文件，并拒绝相对 import 循环。
 
 | 层 | 主要职责 | 关键文件 | 不应承担 |
 | --- | --- | --- | --- |
@@ -139,8 +138,8 @@ flowchart TB
 | `store/` | 可观察状态和快照 | `GameStore.ts`、`RoomStore.ts`、各玩法 Store | 直接调用云函数 |
 | `services/` | 云函数、房间会话、轮询、持久化、玩法编排 | `RoomSessionService.ts`、`CloudService.ts` 等 | 创建 Cocos 节点 |
 | `scenes/` | 页面 Controller、用户命令、状态到 Label/Button 的绑定 | `HomeScene.ts`、`RoomScene.ts` 等 | 复制协议和底层网络实现 |
-| `components/ui/` | 通用控件、赛前视觉基础、route 页面装配 | `PreGameUi.ts`、`RuntimeButtonVisual.ts`、`RuntimeScreenFactory.ts` | 修改业务协议 |
-| `themes/` | 语义颜色、主题背景、正式美术资源缓存 | `ThemeManager.ts`、`ThemeCatalog.ts` | 页面回调和业务数据 |
+| `components/ui/` | 通用控件、赛前视觉基础、route 门面和分组页面 Builder | `PreGameUi.ts`、`PreGameIconRenderer.ts`、`screens/*`、`RuntimeScreenFactory.ts` | 修改业务协议 |
+| `themes/` | 语义颜色、主题背景、正式美术资源缓存 | `ThemeManager.ts`、`HomeArtManager.ts`、`ThemeCatalog.ts` | 页面回调和业务数据 |
 | `assets/bundles/` | 运行时图片、主题和玩法代码资源 | `home_common`、`mode_pk`、`mode_spell` | 跨 Bundle 复制共享状态 |
 
 ### 4.1 Core 与 App
@@ -299,13 +298,14 @@ sequenceDiagram
 
 ### 6.1 已确认的优点
 
-1. 73 个核心 TypeScript 文件没有静态 import 循环。
+1. `test:architecture` 扫描全部核心 TypeScript 相对 import，当前没有循环。
 2. Domain、Store 和 Service 没有把 Cocos 节点逻辑混入业务规则。
 3. RuntimePort 让大部分逻辑可以在无 Creator 电脑测试。
 4. 玩法 Bundle 不被主 UI 静态 import，按 route 加载。
 5. 正式美术不拥有动态文字和业务回调，缺图仍可运行。
-6. 云函数协议、旧客户端和 Cocos 表现层可以独立迭代。
-7. 全量 `npm run verify` 覆盖平台、生命周期、协议、玩法、主题、页面装配、包体和类型检查。
+6. 云函数协议与唯一 Cocos 客户端通过 RuntimePort/Service 边界独立迭代。
+7. 全量 `npm run verify` 覆盖架构边界、平台、生命周期、协议、玩法、主题、页面装配、包体和类型检查。
+8. 根目录不再存在第二套运行客户端，词库构建源与运行代码归入同一个 Cocos 工作区。
 
 ### 6.2 优化项
 
@@ -313,11 +313,11 @@ sequenceDiagram
 | --- | --- | --- | --- | --- |
 | P0 | 主包余量很小 | 最新真实主包 `4,121,077 / 4,194,304` | 新图片继续放已声明分包；每次真实构建检查包体 | 立即持续执行 |
 | P0 | H8.7 仍缺完整多尺寸截图 | 当前仅部分页面通过 Creator/微信检查 | 先截图再改视觉，不继续盲调 | 当前下一项 |
-| P1 | `RuntimeScreenFactory.ts` 约 40 KB，装配九个页面 | 多人修改时冲突集中 | 保留 Facade，拆为 `HomePageBuilder`、`RoomPageBuilder` 等 route builder | H8.7 视觉冻结后 |
-| P1 | `PreGameUi.ts` 约 40 KB | 基础控件、绘图和图标集中 | 按“基础控件/图标绘制/资源绑定”拆分，但保持公开 API | H8.7 视觉冻结后 |
-| P1 | `ThemeManager.ts` 同时包含 Theme 和 HomeArt | 两种缓存职责位于同一文件 | 拆出 `HomeArtManager.ts`，保持资源键不变 | H8.7 完成后 |
+| DONE | `RuntimeScreenFactory.ts` 原约 40 KB | 已收敛为约 1.5 KB Facade | Home/Learning/Room/Support Builder 独立维护 | `test:architecture` 防回归 |
+| DONE | `PreGameUi.ts` 原图标职责集中 | 图标绘制拆入 `PreGameIconRenderer.ts`，公开 API 不变 | 后续只按实际复用继续拆基础控件 | 当前保持 |
+| DONE | `ThemeManager.ts` 原混合 Theme 和 HomeArt | `HomeArtManager.ts` 已独立，资源键不变 | 两类缓存分别维护 | `test:architecture` 防回归 |
 | P1 | `WordBankData.generated.ts` 约 885 KB，位于主源码层 | 是当前最大单文件 | 设计 `learning_data` Bundle 和异步 CatalogRepository，实际构建证明收益后再迁移 | 第一版集成前专项 |
-| P1 | 依赖边界依靠约定 | 当前无循环，但没有独立架构测试 | 增加 import-cycle、Domain 无 `cc`、Service 无 UI 依赖检查 | 拆文件时同步 |
+| DONE | 依赖边界原依靠约定 | `test:architecture` 检查相对 import 循环、Domain/Store/Service 的 `cc` 和表现层依赖 | 新模块必须通过架构测试 | 持续执行 |
 | P2 | Controller 直接依赖全局 `app` | 测试需要全局组合根 | 引入只读 `AppContext`/Controller deps，逐页注入 | 首版稳定后 |
 | P2 | `GameStore.patch()` 较宽 | 任意调用方可组合 Partial 状态 | 为 route、房间意图和词库返回增加 typed action | 路由再次扩展时 |
 | P2 | Runtime UI 全部程序化装配 | 代码易测，但视觉维护集中 | 只把稳定且重复的控件提取 Prefab，不把每页全部 Scene 化 | 完成 Creator 视觉验收后 |
@@ -331,7 +331,7 @@ sequenceDiagram
 - 不把动态文字烘焙进按钮、背景或角色图片。
 - 不重命名 `home_common`、`mode_pk`、`mode_spell`，否则会放大 Bundle 和 UUID 风险。
 - 不直接在业务 Controller 中写 `assetManager.loadBundle()` 或 UUID。
-- 不在 H8.7 截图完成前进行大规模 Builder/Prefab 重构。
+- 不把已分组的 Builder 再合并回单一页面装配文件。
 
 ## 7. 美术与代码分离设计
 
@@ -554,9 +554,8 @@ npm run inspect:wechat-build
 
 ## 10. 当前建议执行顺序
 
-1. 保持当前架构，不进行大规模重写。
-2. 完成 H8.7 全赛前页面的三个目标尺寸截图。
-3. 只根据截图修正可见问题并完成 H8.7。
-4. 冻结页面视觉后，拆分 `RuntimeScreenFactory` 和 `PreGameUi`。
-5. 单独设计词库数据分包，先用真实构建证明主包收益。
-6. 最后执行 Phase 9 的双设备、性能、最终截图和上传验证。
+1. 在 Creator 3.8.8 对单客户端与 Builder 拆分执行一次真实微信构建和页面冒烟检查。
+2. 保持 `RuntimeScreenFactory` 轻量门面、分组 Builder、独立图标渲染和独立 HomeArt 缓存边界。
+3. 后续如恢复 H8.7，补齐全赛前页面目标尺寸截图，只修正画面证实的问题。
+4. 单独评估词库数据分包，先用真实构建证明主包收益。
+5. 最后执行 Phase 9 的双设备、性能、最终截图和上传验证。

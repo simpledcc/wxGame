@@ -1,7 +1,6 @@
 .codex-preview/
 project.private.config.json
 node_modules/
-miniprogram_npm/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

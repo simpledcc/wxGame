@@ -24,10 +24,10 @@ Codex 的唯一启动入口是 `AGENTS.md`。新电脑或新任务只需先阅�
 ## 2. 当前工程事实
 
 - 主开发分支为 `develop/cocos-migration`。
-- Cocos 工程位于 `cocos-client/`，旧版 `miniprogram/` 和 `cloudfunctions/` 继续保留。
+- 唯一客户端位于 `cocos-client/`；旧版 `miniprogram/` 已删除，`cloudfunctions/` 作为生产后端继续保留。
 - Cocos Creator 目标版本为 3.8.8。
 - 当前逻辑设计分辨率为 `640x960`，微信构建方向为竖屏。
-- `Home.scene` 是持久运行壳，业务页面由 `RuntimeScreenFactory` 按 route 动态挂载。
+- `Home.scene` 是持久运行壳；轻量 `RuntimeScreenFactory` 按 route 分发到 Home、学习、房间和支持页 Builder。
 - 房间、PK、默契捕词、同舟拼词、词库、背词、战绩、反馈和隐私已有代码实现。
 - `mode_pk` 和 `mode_spell` 已具有独立 Asset Bundle/微信分包边界。
 - 用户已确认当前代码能够在手机上启动运行。本地没有 Creator 或微信开发者工具时，不重复把“手机能否启动”作为每个代码 Goal 的阻塞项。

@@ -24,13 +24,9 @@ function isInside(parent, target) {
 
 function assertSafeBuildRoot(projectRoot, buildRoot) {
   const generatedRoot = path.join(projectRoot, "build");
-  const legacyRoot = path.resolve(projectRoot, "..", "miniprogram");
 
   if (path.resolve(buildRoot) === path.resolve(generatedRoot) || !isInside(generatedRoot, buildRoot)) {
     throw new Error(`Build output must be a child of ${generatedRoot}`);
-  }
-  if (isInside(legacyRoot, buildRoot) || isInside(buildRoot, legacyRoot)) {
-    throw new Error("Build output must not overlap the legacy miniprogram directory.");
   }
 }
 

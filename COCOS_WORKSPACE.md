@@ -8,9 +8,9 @@ Active Cocos project:
 
 `cocos-client/`
 
-Legacy uploadable client in this checkout:
+Client layout:
 
-`miniprogram/`
+`cocos-client/` is the only client. The retired `miniprogram/` tree is no longer part of the repository.
 
 The explicitly listed backup and archive paths below are historical records. They are not the active checkout and have not been reverified for current Cocos development.
 
@@ -31,14 +31,14 @@ Archive SHA256:
 ## Rules
 
 - Continue Cocos migration from the current Git worktree's `cocos-client/` directory; do not hard-code another computer's absolute path.
-- Do not replace or delete the legacy `miniprogram/` implementation until a later migration phase explicitly performs the production switch.
-- Keep `cloudfunctions/` contracts compatible with the production backend while the Cocos client is migrated incrementally.
+- Do not restore the retired `miniprogram/` implementation or add a second runnable client.
+- Keep `cloudfunctions/` contracts compatible with the production backend while the Cocos client evolves.
 - Treat `cocos-client/build/`, `library/`, `temp/`, `local/`, and `profiles/` as generated directories.
 
 ## Current State
 
-- Legacy WeChat client passed JavaScript and JSON checks.
-- WeChat Developer Tools generated a successful legacy preview on 2026-07-09.
+- The repository now has one runnable client under `cocos-client/`; historical upload backups remain outside Git.
+- Word-bank build sources live under `cocos-client/source-data/word-banks/`, not in a retired client tree.
 - Cocos migration phases 0-8 have engine-independent implementations and regression tests.
 - `Home.scene` provides a runtime UI shell for every migrated route and controller.
 - Route-specific theme backgrounds, grass/insect and island/fish targets, and fixed-capacity gameplay feedback effects are wired through the runtime shell.

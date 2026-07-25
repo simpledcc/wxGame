@@ -7,12 +7,14 @@ import {
   THEME_MANIFESTS
 } from "../assets/scripts/themes/ThemeCatalog";
 import {
+  ThemeManager
+} from "../assets/scripts/themes/ThemeManager";
+import {
   HOME_ART_ASSET_PATHS,
   HOME_ART_BUNDLE_NAME,
   HOME_BUTTON_SKIN_PATHS,
-  HomeArtManager,
-  ThemeManager
-} from "../assets/scripts/themes/ThemeManager";
+  HomeArtManager
+} from "../assets/scripts/themes/HomeArtManager";
 import { getRouteBackgroundAssetKey } from "../assets/scripts/themes/ThemeRouteRules";
 import type { ThemeBundlePort, ThemeId } from "../assets/scripts/themes/ThemeTypes";
 

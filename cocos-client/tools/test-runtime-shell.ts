@@ -8,32 +8,42 @@ function read(relativePath: string): string {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
 }
 
+function readCoreScreenBuilders(): string {
+  return [
+    "assets/scripts/components/ui/screens/HomeScreenBuilder.ts",
+    "assets/scripts/components/ui/screens/LearningScreenBuilders.ts",
+    "assets/scripts/components/ui/screens/RoomScreenBuilders.ts",
+    "assets/scripts/components/ui/screens/SupportScreenBuilders.ts"
+  ].map(read).join("\n");
+}
+
 function testRouteCoverage(): void {
-  const source = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
+  const factory = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
+  const source = readCoreScreenBuilders();
   const modePk = read("assets/bundles/mode_pk/scripts/ModePkScreenBuilder.ts");
   const modeSpell = read("assets/bundles/mode_spell/scripts/ModeSpellScreenBuilder.ts");
   const coreRouteBuilders: Record<string, string> = {
-    bank: "buildBank",
-    study: "buildStudy",
-    coopSelect: "buildCoopSelect",
-    room: "buildRoom",
-    result: "buildResult",
-    history: "buildHistory",
-    feedback: "buildFeedback",
-    help: "buildHelp",
-    home: "buildHome"
+    bank: "buildBankScreen",
+    study: "buildStudyScreen",
+    coopSelect: "buildModeCatalogScreen",
+    room: "buildRoomScreen",
+    result: "buildResultScreen",
+    history: "buildHistoryScreen",
+    feedback: "buildFeedbackScreen",
+    help: "buildHelpScreen",
+    home: "buildHomeScreen"
   };
   Object.entries(coreRouteBuilders).forEach(([route, builder]) => {
-    assert.equal(source.includes(`case "${route}":`), true, `route case missing: ${route}`);
+    assert.match(factory, new RegExp(`\\b${route}:\\s*${builder}\\b`), `route builder missing: ${route}`);
     assert.match(source, new RegExp(`\\b${builder}\\(`));
   });
   ["pkGame", "coopShared", "coopSpell"].forEach((route) => {
-    assert.equal(source.includes(`case "${route}":`), true, `gameplay route case missing: ${route}`);
+    assert.equal(factory.includes(`"${route}"`), true, `gameplay route missing: ${route}`);
   });
   assert.match(modePk, /register\("pkGame"/);
   assert.match(modePk, /register\("coopShared"/);
   assert.match(modeSpell, /register\("coopSpell"/);
-  const allBuilders = `${source}\n${modePk}\n${modeSpell}`;
+  const allBuilders = `${factory}\n${source}\n${modePk}\n${modeSpell}`;
   [
     "HomeScene",
     "BankScene",
@@ -50,12 +60,12 @@ function testRouteCoverage(): void {
   ].forEach((controller) => {
     assert.match(allBuilders, new RegExp(`addComponent\\(${controller}\\)`));
   });
-  assert.doesNotMatch(source, /PkGameScene|CoopSharedScene|CoopSpellScene|SpellLetterKey|PkWordTarget/);
-  assert.match(source, /gameplayScreens\.build/);
+  assert.doesNotMatch(factory, /PkGameScene|CoopSharedScene|CoopSpellScene|SpellLetterKey|PkWordTarget/);
+  assert.match(factory, /gameplayScreens\.build/);
 }
 
 function testExpectedControls(): void {
-  const source = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
+  const source = readCoreScreenBuilders();
   const gameplay = [
     read("assets/bundles/mode_pk/scripts/ModePkScreenBuilder.ts"),
     read("assets/bundles/mode_spell/scripts/ModeSpellScreenBuilder.ts")
@@ -202,10 +212,16 @@ function testShellLifecycleAndSceneAttachment(): void {
 
 function testPreGameUiFoundation(): void {
   const source = read("assets/scripts/components/ui/PreGameUi.ts");
+  const iconSource = read("assets/scripts/components/ui/PreGameIconRenderer.ts");
   ["visualSlot", "setVisualAsset", "safeArea", "topBar", "pageHeader", "group", "card", "button", "edit", "actionButton", "iconButton", "modal", "drawProgrammaticIcon", "drawProgrammaticLogo"]
     .forEach((method) => assert.match(source, new RegExp(`\\b${method}\\(`)));
   ["coin", "createRoom", "joinRoom", "practice", "wordBank", "catalog", "history", "settings", "privacy", "feedback"]
-    .forEach((icon) => assert.match(source, new RegExp(`key === \\"${icon}\\"`)));
+    .forEach((icon) => assert.match(iconSource, new RegExp(`key === \\"${icon}\\"`)));
+  assert.match(source, /PreGameIconRenderer/);
+  assert.ok(Buffer.byteLength(source, "utf8") < 35_000, "PreGameUi must stay below 35 KB");
+  const factory = read("assets/scripts/components/ui/RuntimeScreenFactory.ts");
+  assert.ok(Buffer.byteLength(factory, "utf8") < 5_000, "RuntimeScreenFactory must remain a small route facade");
+  assert.doesNotMatch(factory, /addComponent\(/);
   assert.match(source, /DESIGN_WIDTH/);
   assert.match(source, /getPortraitViewportHeight/);
   assert.doesNotMatch(source, /DESIGN_HEIGHT/);

@@ -1,6 +1,6 @@
 # Cocos Migration Completion Matrix
 
-Date: 2026-07-18
+Date: 2026-07-25
 
 Purpose: track the design document requirement-by-requirement and distinguish implemented source code from evidence that requires Cocos Creator, WeChat Developer Tools, cloud access, or real devices.
 
@@ -29,7 +29,9 @@ Status meanings:
 
 | Requirement | Authoritative evidence | Status |
 | --- | --- | --- |
-| Preserve legacy uploadable client | Root `project.config.json` still points to `miniprogram/`; release test freezes that value | Passed |
+| Single Cocos client | Retired `miniprogram/` tree is absent; root `project.config.json` points to `cocos-client/build/wechatgame/`; `test:architecture` freezes both conditions | Passed |
+| Focused client modules | Route facade is below 5 KB, page Builders are grouped below 16 KB, `PreGameUi`/icon rendering and Theme/HomeArt caches are separated | Passed |
+| No static client import cycles | `test:architecture` resolves all relative imports under `assets/scripts/` and rejects cycles | Passed |
 | Preserve cloud contracts | `test-production-contracts.ts` reads production handler sources and checks typed client coverage | Passed |
 | No direct client database writes | Database rules plus adapter/service tests | Passed |
 | Privacy before cloud/personal storage | Runtime Boot test declines with zero cloud init, then accepts and enters Home after one init; platform/lifecycle tests cover storage and invitation gates | Passed in source/runtime mock; visual platform proof pending |

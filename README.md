@@ -20,9 +20,8 @@
 
 | 目录/文件 | 作用 |
 | --- | --- |
-| `cocos-client/` | 当前 Cocos Creator 3.8.8 迁移客户端 |
-| `cloudfunctions/` | 生产云函数，迁移期间保持协议兼容 |
-| `miniprogram/` | 旧版稳定微信小游戏客户端，正式切换前保留 |
+| `cocos-client/` | 唯一微信小游戏客户端，使用 Cocos Creator 3.8.8 |
+| `cloudfunctions/` | Cocos 客户端复用的生产云函数后端 |
 | `AGENTS.md` | 开发启动协议、当前目标和禁止修改边界 |
 | `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` | 首页与赛前流程进度 |
 | `COCOS_MIGRATION_COMPLETION_MATRIX.md` | 整体迁移完成度和外部验证缺口 |
@@ -57,7 +56,7 @@ npm run build:wechat:dry-run
 
 安装 Cocos Creator 3.8.8 的电脑可以打开 `cocos-client/`，以 `assets/scenes/Boot.scene` 为初始场景进行预览和微信小游戏构建。
 
-执行 `npm run build:wechat` 后，微信开发者工具必须导入 `cocos-client/build/wechatgame/`。仓库根目录的 `project.config.json` 仍指向旧版 `miniprogram/`；从根目录编译看到的不是 Cocos 新界面。若新构建仍显示旧画面，清理开发者工具的编译/文件缓存，并确认资源树中存在 `subpackages/home_common`。图片加载与清晰度排查见 [`result.md`](result.md)。
+执行 `npm run build:wechat` 后，微信开发者工具导入 `cocos-client/build/wechatgame/`。根目录 `project.config.json` 也指向该生成目录，因此从仓库根目录导入前必须先完成一次 Cocos 构建。若新构建仍显示旧缓存画面，清理开发者工具的编译/文件缓存，并确认资源树中存在 `subpackages/home_common`。图片加载与清晰度排查见 [`result.md`](result.md)。
 
 ## 联机环境
 
@@ -77,11 +76,11 @@ checkText
 submitFeedback
 ```
 
-其中机器人入口已从当前 Cocos 赛前流程移除；保留云函数只是为了旧客户端、旧房间和生产协议兼容。
+其中机器人入口已从当前 Cocos 赛前流程移除；相关后端兼容函数仅用于已有房间数据和生产协议兼容，不代表客户端仍提供机器人入口。
 
 ## 当前验收状态
 
-- Cocos 迁移阶段 0-8 已有实现和自动化证据。
+- Cocos 迁移阶段 0-8 已有实现和自动化证据，旧客户端已经从仓库删除。
 - 首页与赛前流程 H5-H8.3 已完成代码验证。
 - Creator 和微信开发者工具已有阶段性构建证据。
 - 两台真实手机的创建、加入、准备、开始及弱网恢复仍属于外部验收。
