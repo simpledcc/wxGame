@@ -54,6 +54,7 @@ git fetch origin
 
 首次接手项目、切换大阶段或发现文档冲突时，再读取：
 
+- `COCOS_ARCHITECTURE_REVIEW.md`：当前实现架构、模块逻辑、优化路线和美术操作说明。
 - `COCOS_FIRST_PLAYABLE_MASTER_PLAN.md`：第一版总计划、工作流和模块所有权。
 - `COCOS_MIGRATION_COMPLETION_MATRIX.md`：阶段 0-9 的代码证据和外部验证缺口。
 - `COCOS_MIGRATION_DESIGN.md`：长期迁移架构。
@@ -88,18 +89,19 @@ git fetch origin
 
 当前工作流：A 线，首页和游戏准备前界面；H4 高清资源升级及 H8.4-H8.6 已完成，用户暂缓 Phase 9，当前进入 H8.7 赛前界面视觉精修。
 
-当前目标：继续美化全部游戏进入前页面的按钮、卡片、文字和状态反馈。H8.7 已在无 Creator 电脑完成一百四十九轮源码精修与审计；第一百四十九轮强化无正式皮肤按钮的纵深反馈：静止阴影透明度由 42 提升至 56，按下时降至 34 并由四像素承托收拢为一像素，禁用态仍为 24；正式图片皮肤、按钮尺寸、命中范围、文字/图标位移及点击逻辑均不变。完整 `npm run verify` 和 `npm run build:wechat:dry-run` 在同一源码上均已通过。下一项唯一行动是在 Creator 3.8.8 和微信开发者工具按 `360x800`、`393x852`、`430x932` 逐页检查最新 H8.7 首页及赛前页面，截图并只修正画面证实的问题；不执行双人真机开始验证。外部视觉证据完成前 H8.7 保持 `IN_PROGRESS`。
+当前目标：继续美化全部游戏进入前页面的按钮、卡片、文字和状态反馈。H8.7 已完成一百五十轮源码精修与审计；最新一轮完成非首页页头、玩法入口、创建配置标题签和玩法说明职责修正，并已在 Creator 3.8.8/微信开发者工具检查首页、玩法目录、创建房间和玩法介绍。项目架构、模块逻辑、优化路线以及美术/代码解耦操作说明已统一到 `COCOS_ARCHITECTURE_REVIEW.md`。下一项唯一行动是在微信开发者工具按 `360x800`、`393x852`、`430x932` 补齐全部 H8.7 赛前页面和状态截图，并只修正画面证实的问题；不执行双人真机开始验证。外部视觉证据完成前 H8.7 保持 `IN_PROGRESS`。
 
 当前权威文件：
 
 - 进度：`COCOS_PRE_GAME_FOUNDATION_PROGRESS.md`
+- 架构与美术协作：`COCOS_ARCHITECTURE_REVIEW.md`
 - 设计与验收：`COCOS_PRE_GAME_PAGES_DESIGN.md`
 - 后续美术设计：`COCOS_FINAL_ART_INTEGRATION_DESIGN.md`
 - 后续资源交付：`COCOS_HOME_ASSET_MANIFEST.md`
 - 首页目标参考：`docs/design/home/README.md`
 - 图片加载与清晰度诊断：`result.md`
 
-当前快照：H4 高清运行资源、Creator 元数据和 `home_common` 分包保持不变；H8.7 仅维护赛前展示与状态反馈，一百五十轮详细证据见 `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` 和 `COCOS_PRE_GAME_PAGES_DESIGN.md`。最新一轮修复非首页页头、玩法入口、创建配置标题签和玩法说明的职责混淆，并已在微信开发者工具中用正式图片逐页核对首页、选择玩法、创建房间和玩法介绍；核心源码为 `1,521,345 / 1,530,000` 字节。`1.53 MB` 仅是源码回归提醒值，真实微信构建主包为 `4,121,077 / 4,194,304` 字节，`4 MiB` 硬门槛未变。Creator 在开发者工具已打开时进行外部构建，会让工具短暂监听到分包搬迁的中间状态；构建完成后必须再点一次“普通编译”，确认 `home_common` 正式图片显示且控制台无分包错误。
+当前快照：H4 高清运行资源、Creator 元数据和 `home_common` 分包保持不变；H8.7 仅维护赛前展示与状态反馈，一百五十轮详细证据见 `COCOS_PRE_GAME_FOUNDATION_PROGRESS.md` 和 `COCOS_PRE_GAME_PAGES_DESIGN.md`。当前 73 个核心 TypeScript 文件无静态 import 循环；架构审计把 `RuntimeScreenFactory`/`PreGameUi` 拆分、HomeArt 职责拆分和约 885 KB 词库数据分包列为视觉冻结后的优化，不在当前阶段重写。核心源码为 `1,521,345 / 1,530,000` 字节。`1.53 MB` 仅是源码回归提醒值，真实微信构建主包为 `4,121,077 / 4,194,304` 字节，`4 MiB` 硬门槛未变。Creator 在开发者工具已打开时进行外部构建，会让工具短暂监听到分包搬迁的中间状态；构建完成后必须再点一次“普通编译”，确认 `home_common` 正式图片显示且控制台无分包错误。
 
 当一个目标完全结束并切换到新目标时，必须在同一个交接提交中更新本节指针。H4 子阶段内部推进只更新进度文件，不需要每次改写本节。
 
@@ -108,6 +110,7 @@ git fetch origin
 | 文件 | 作用 | 何时更新 |
 | --- | --- | --- |
 | `AGENTS.md` | 唯一入口、启动协议、当前目标指针和永久边界 | 切换目标、工作流或永久规则时 |
+| `COCOS_ARCHITECTURE_REVIEW.md` | 当前架构图、模块逻辑、优化路线和美术操作说明 | 架构边界、模块职责、资源流程或优化优先级变化时 |
 | `CODEX_HANDOFF.md` | 跨电脑、跨任务的重要事实和最近交接 | 每个重要提交、阻塞或外部环境状态变化时 |
 | `COCOS_FIRST_PLAYABLE_MASTER_PLAN.md` | 第一版总阶段、分工和集成路线 | 总范围、里程碑或模块所有权变化时 |
 | `COCOS_MIGRATION_COMPLETION_MATRIX.md` | 全局阶段完成度及代码/外部证据 | 阶段状态或 Creator/微信/真机证据变化时 |
